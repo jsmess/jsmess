@@ -43,6 +43,10 @@ public:
 	svision_t m_svision;
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
+	DECLARE_READ8_MEMBER(svision_r);
+	DECLARE_WRITE8_MEMBER(svision_w);
+	DECLARE_READ8_MEMBER(tvlink_r);
+	DECLARE_WRITE8_MEMBER(tvlink_w);
 };
 
 

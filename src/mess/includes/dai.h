@@ -26,6 +26,11 @@ public:
 	device_t *m_tms5501;
 	UINT8 m_keyboard_scan_mask;
 	unsigned short m_4_colours_palette[4];
+	DECLARE_WRITE8_MEMBER(dai_stack_interrupt_circuit_w);
+	DECLARE_READ8_MEMBER(dai_io_discrete_devices_r);
+	DECLARE_WRITE8_MEMBER(dai_io_discrete_devices_w);
+	DECLARE_READ8_MEMBER(dai_amd9511_r);
+	DECLARE_WRITE8_MEMBER(dai_amd9511_w);
 };
 
 
@@ -37,11 +42,6 @@ extern const tms5501_interface dai_tms5501_interface;
 
 MACHINE_START( dai );
 MACHINE_RESET( dai );
-READ8_HANDLER( dai_io_discrete_devices_r );
-WRITE8_HANDLER( dai_io_discrete_devices_w );
-WRITE8_HANDLER( dai_stack_interrupt_circuit_w );
-READ8_HANDLER( dai_amd9511_r );
-WRITE8_HANDLER( dai_amd9511_w );
 
 
 /*----------- defined in video/dai.c -----------*/

@@ -116,16 +116,14 @@ const struct pic8259_interface mbc55x_pic8259_config =
 	DEVCB_NULL
 };
 
-READ8_HANDLER( pic8259_r )
+READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	return pic8259_r(state->m_pic, offset>>1);
+	return pic8259_r(m_pic, offset>>1);
 }
 
-WRITE8_HANDLER( pic8259_w )
+WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	pic8259_w(state->m_pic, offset>>1, data);
+	pic8259_w(m_pic, offset>>1, data);
 }
 
 static IRQ_CALLBACK(mbc55x_irq_callback)
@@ -157,16 +155,14 @@ const struct pit8253_config mbc55x_pit8253_config =
 	}
 };
 
-READ8_HANDLER( pit8253_r )
+READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	return pit8253_r(state->m_pit, offset>>1);
+	return pit8253_r(m_pit, offset>>1);
 }
 
-WRITE8_HANDLER( pit8253_w )
+WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	pit8253_w(state->m_pit, offset>>1, data);
+	pit8253_w(m_pit, offset>>1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
@@ -189,16 +185,14 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 	m_vram_page=data;
 }
 
-READ8_HANDLER( mbc55x_disk_r )
+READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	return wd17xx_r(state->m_fdc, offset>>1);
+	return wd17xx_r(m_fdc, offset>>1);
 }
 
-WRITE8_HANDLER( mbc55x_disk_w )
+WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
-	wd17xx_w(state->m_fdc, offset>>1, data);
+	wd17xx_w(m_fdc, offset>>1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_intrq_w )
@@ -311,20 +305,19 @@ const i8251_interface mbc55x_i8251a_interface =
 	DEVCB_NULL
 };
 
-READ8_HANDLER( mbc55x_kb_usart_r )
+READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
 	UINT8 result = 0;
 	offset>>=1;
 
 	switch (offset)
 	{
-		case 0	: //logerror("%s read kb_uart\n",space->machine().describe_context());
-				result = state->m_kb_uart->data_r(*space,0); break;
+		case 0	: //logerror("%s read kb_uart\n",machine().describe_context());
+				result = m_kb_uart->data_r(space,0); break;
 
-		case 1	:	result = state->m_kb_uart->status_r(*space,0);
+		case 1	:	result = m_kb_uart->status_r(space,0);
 
-				if (state->m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
+				if (m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
 					result |= I8251_STATUS_PARITY_ERROR;
 				break;
 	}
@@ -332,15 +325,14 @@ READ8_HANDLER( mbc55x_kb_usart_r )
 	return result;
 }
 
-WRITE8_HANDLER( mbc55x_kb_usart_w )
+WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 {
-	mbc55x_state *state = space->machine().driver_data<mbc55x_state>();
 	offset>>=1;
 
 	switch (offset)
 	{
-		case 0	: state->m_kb_uart->data_w(*space, 0, data); break;
-		case 1	: state->m_kb_uart->control_w(*space, 0, data); break;
+		case 0	: m_kb_uart->data_w(space, 0, data); break;
+		case 1	: m_kb_uart->control_w(space, 0, data); break;
 	}
 }
 

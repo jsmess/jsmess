@@ -66,13 +66,13 @@ enum {
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
-#define JOYPAD		state->m_gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
-#define SIODATA		state->m_gb_io[0x01]	/* Serial IO data buffer                       */
-#define SIOCONT		state->m_gb_io[0x02]	/* Serial IO control register                  */
-#define DIVREG		state->m_gb_io[0x04]	/* Divider register (???)                      */
-#define TIMECNT		state->m_gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
-#define TIMEMOD		state->m_gb_io[0x06]	/* New value of TimeCount after it overflows   */
-#define TIMEFRQ		state->m_gb_io[0x07]	/* Timer frequency and start/stop switch       */
+#define JOYPAD		m_gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
+#define SIODATA		m_gb_io[0x01]	/* Serial IO data buffer                       */
+#define SIOCONT		m_gb_io[0x02]	/* Serial IO control register                  */
+#define DIVREG		m_gb_io[0x04]	/* Divider register (???)                      */
+#define TIMECNT		m_gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
+#define TIMEMOD		m_gb_io[0x06]	/* New value of TimeCount after it overflows   */
+#define TIMEFRQ		m_gb_io[0x07]	/* Timer frequency and start/stop switch       */
 
 
 
@@ -82,29 +82,29 @@ enum {
 
 static TIMER_CALLBACK(gb_serial_timer_proc);
 static void gb_machine_stop(running_machine &machine);
-static WRITE8_HANDLER( gb_rom_bank_select_mbc1 );
-static WRITE8_HANDLER( gb_ram_bank_select_mbc1 );
-static WRITE8_HANDLER( gb_mem_mode_select_mbc1 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc2 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc3 );
-static WRITE8_HANDLER( gb_ram_bank_select_mbc3 );
-static WRITE8_HANDLER( gb_mem_mode_select_mbc3 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc5 );
-static WRITE8_HANDLER( gb_ram_bank_select_mbc5 );
-static WRITE8_HANDLER( gb_ram_bank_select_mbc6 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc7 );
-static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 );
-static WRITE8_HANDLER( gb_ram_tama5 );
-static WRITE8_HANDLER( gb_rom_bank_select_wisdom );
-static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w );
-static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w );
-static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w );
-static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w );
-static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor );
-static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor );
-static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 static void gb_timer_increment( running_machine &machine );
 
 #ifdef MAME_DEBUG
@@ -116,11 +116,11 @@ static void gb_init_regs(running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	/* Initialize the registers */
-	SIODATA = 0x00;
-	SIOCONT = 0x7E;
+	state->SIODATA = 0x00;
+	state->SIOCONT = 0x7E;
 
-	gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
-	gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
+	state->gb_io_w( *machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
+	state->gb_io_w( *machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
 static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
@@ -178,59 +178,59 @@ static void gb_init(running_machine &machine)
 		case MBC_NONE:
 			break;
 		case MBC_MMM01:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_rom_bank_mmm01_0000_w) );
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_mmm01_2000_w));
-			space->install_legacy_write_handler( 0x4000, 0x5fff, FUNC(gb_rom_bank_mmm01_4000_w));
-			space->install_legacy_write_handler( 0x6000, 0x7fff, FUNC(gb_rom_bank_mmm01_6000_w));
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),state) );
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),state));
+			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),state));
+			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),state));
 			break;
 		case MBC_MBC1:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_enable) );	/* We don't emulate RAM enable yet */
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_select_mbc1) );
-			space->install_legacy_write_handler( 0x4000, 0x5fff, FUNC(gb_ram_bank_select_mbc1) );
-			space->install_legacy_write_handler( 0x6000, 0x7fff, FUNC(gb_mem_mode_select_mbc1) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),state) );
+			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),state) );
+			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),state) );
 			break;
 		case MBC_MBC2:
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_select_mbc2) );
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),state) );
 			break;
 		case MBC_MBC3:
 		case MBC_HUC1:	/* Possibly wrong */
 		case MBC_HUC3:	/* Possibly wrong */
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_enable) );	/* We don't emulate RAM enable yet */
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_select_mbc3) );
-			space->install_legacy_write_handler( 0x4000, 0x5fff, FUNC(gb_ram_bank_select_mbc3) );
-			space->install_legacy_write_handler( 0x6000, 0x7fff, FUNC(gb_mem_mode_select_mbc3) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),state) );
+			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),state) );
+			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),state) );
 			break;
 		case MBC_MBC5:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_enable) );
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_select_mbc5) );
-			space->install_legacy_write_handler( 0x4000, 0x5fff, FUNC(gb_ram_bank_select_mbc5) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),state) );
+			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),state) );
 			break;
 		case MBC_MBC6:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_bank_select_mbc6) );
-			space->install_legacy_write_handler( 0x2000, 0x2fff, FUNC(gb_rom_bank_select_mbc6_1) );
-			space->install_legacy_write_handler( 0x3000, 0x3fff, FUNC(gb_rom_bank_select_mbc6_2) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),state) );
+			space->install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),state) );
+			space->install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),state) );
 			break;
 		case MBC_MBC7:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_enable) );
-			space->install_legacy_write_handler( 0x2000, 0x2fff, FUNC(gb_rom_bank_select_mbc7) );
-			space->install_legacy_write_handler( 0x3000, 0x7fff, FUNC(gb_rom_bank_unknown_mbc7) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
+			space->install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),state) );
+			space->install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),state) );
 			break;
 		case MBC_TAMA5:
-			space->install_legacy_write_handler( 0xA000, 0xBFFF, FUNC(gb_ram_tama5) );
+			space->install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),state) );
 			break;
 		case MBC_WISDOM:
-			space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(gb_rom_bank_select_wisdom) );
+			space->install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),state) );
 			break;
 		case MBC_MBC1_KOR:
-			space->install_legacy_write_handler( 0x0000, 0x1fff, FUNC(gb_ram_enable) ); /* We don't emulate RAM enable yet */
-			space->install_legacy_write_handler( 0x2000, 0x3fff, FUNC(gb_rom_bank_select_mbc1_kor) );
-			space->install_legacy_write_handler( 0x4000, 0x5fff, FUNC(gb_ram_bank_select_mbc1_kor) );
-			space->install_legacy_write_handler( 0x6000, 0x7fff, FUNC(gb_mem_mode_select_mbc1_kor) );
+			space->install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) ); /* We don't emulate RAM enable yet */
+			space->install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),state) );
+			space->install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),state) );
+			space->install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),state) );
 			break;
 
 		case MBC_MEGADUCK:
-			space->install_legacy_write_handler( 0x0001, 0x0001, FUNC(megaduck_rom_bank_select_type1) );
-			space->install_legacy_write_handler( 0xB000, 0xB000, FUNC(megaduck_rom_bank_select_type2) );
+			space->install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),state) );
+			space->install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),state) );
 			break;
 	}
 
@@ -398,22 +398,20 @@ static void gb_set_mbc1_banks( running_machine &machine )
 	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x1F; /* Only uses lower 5 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
 		data = 1;
 
-	state->m_ROMBank = ( state->m_ROMBank & 0x01E0 ) | data;
+	m_ROMBank = ( m_ROMBank & 0x01E0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_banks(space->machine());
+	gb_set_mbc1_banks(machine());
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc2)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x0F; /* Only uses lower 4 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -421,99 +419,94 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
 
 	/* The least significant bit of the upper address byte must be 1 */
 	if( offset & 0x0100 )
-		state->m_ROMBank = ( state->m_ROMBank & 0x100 ) | data;
+		m_ROMBank = ( m_ROMBank & 0x100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc3)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 	data &= 0x7F; /* Only uses lower 7 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
 		data = 1;
 
-	state->m_ROMBank = ( state->m_ROMBank & 0x0100 ) | data;
+	m_ROMBank = ( m_ROMBank & 0x0100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc5)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	/* MBC5 has a 9 bit bank select
       Writing into 2000-2FFF sets the lower 8 bits
       Writing into 3000-3FFF sets the 9th bit
     */
-	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 	if( offset & 0x1000 )
 	{
-		state->m_ROMBank = (state->m_ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
+		m_ROMBank = (m_ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
 	}
 	else
 	{
-		state->m_ROMBank = (state->m_ROMBank & 0x100 ) | data;
+		m_ROMBank = (m_ROMBank & 0x100 ) | data;
 	}
 	/* Switch banks */
-	gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc6 )
+WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc6)
 {
-	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_1)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x2000 + offset, data );
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), 0x2000 + offset, data );
 	if ( offset & 0x0800 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_4000( space->machine(), state->m_ROMMap[state->m_ROMBank>>1] + ( ( state->m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_4000( machine(), m_ROMMap[m_ROMBank>>1] + ( ( m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
 	{
-		state->m_ROMBank = data;
+		m_ROMBank = data;
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_2)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x3000 + offset, data );
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), 0x3000 + offset, data );
 	if ( offset & 0x0800 )
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_6000( space->machine(), state->m_ROMMap[state->m_ROMBank00>>1] + ( ( state->m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_6000( machine(), m_ROMMap[m_ROMBank00>>1] + ( ( m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
 	{
-		state->m_ROMBank00 = data;
+		m_ROMBank00 = data;
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc7 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc7)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x2000 + offset, data );
+	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), 0x2000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
-		state->m_ROMBank = data;
-		gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+		m_ROMBank = data;
+		gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
+WRITE8_MEMBER(gb_state::gb_rom_bank_unknown_mbc7)
 {
-        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0x3000 + offset, data );
+        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), 0x3000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
@@ -529,145 +522,138 @@ static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 )
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_wisdom )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_wisdom)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( &space->device() ), offset );
+	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( &space.device() ), offset );
 	/* The address determines the bank to select */
-	state->m_ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( space->machine(), "bank5", state->m_ROMMap[ state->m_ROMBank ] );
-	memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[ state->m_ROMBank ] + 0x0100 );
-	gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_ROMBank + 1 ] );
+	m_ROMBank = ( offset << 1 ) & 0x1FF;
+	memory_set_bankptr( machine(), "bank5", m_ROMMap[ m_ROMBank ] );
+	memory_set_bankptr( machine(), "bank10", m_ROMMap[ m_ROMBank ] + 0x0100 );
+	gb_rom16_4000( machine(), m_ROMMap[ m_ROMBank + 1 ] );
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
+WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
-	state->m_ROMBank = ( state->m_ROMBank & 0x1F ) | ( data << 5 );
+	m_ROMBank = ( m_ROMBank & 0x1F ) | ( data << 5 );
 
 	/* Switch banks */
-	gb_set_mbc1_banks(space->machine());
+	gb_set_mbc1_banks(machine());
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
+WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 	if( data & 0x8 )
 	{	/* RTC banks */
-		if ( state->m_CartType & TIMER )
+		if ( m_CartType & TIMER )
 		{
-			state->m_MBC3RTCBank = data & 0x07;
+			m_MBC3RTCBank = data & 0x07;
 			if ( data < 5 )
 			{
-				memset( state->m_MBC3RTCData, state->m_MBC3RTCMap[state->m_MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( space->machine(), "bank2", state->m_MBC3RTCData );
+				memset( m_MBC3RTCData, m_MBC3RTCMap[m_MBC3RTCBank], 0x2000 );
+				memory_set_bankptr( machine(), "bank2", m_MBC3RTCData );
 			}
 		}
 	}
 	else
 	{	/* RAM banks */
-		state->m_RAMBank = data & 0x3;
-		state->m_MBC3RTCBank = 0xFF;
+		m_RAMBank = data & 0x3;
+		m_MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( space->machine(), "bank2", state->m_RAMMap[state->m_RAMBank] );
+		memory_set_bankptr( machine(), "bank2", m_RAMMap[m_RAMBank] );
 	}
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
+WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc5)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 	data &= 0x0F;
-	if( state->m_CartType & RUMBLE )
+	if( m_CartType & RUMBLE )
 	{
 		data &= 0x7;
 	}
-	state->m_RAMBank = data;
+	m_RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (space->machine(), "bank2", state->m_RAMMap[state->m_RAMBank] );
+	memory_set_bankptr (machine(), "bank2", m_RAMMap[m_RAMBank] );
 }
 
-WRITE8_HANDLER ( gb_ram_enable )
+WRITE8_MEMBER(gb_state::gb_ram_enable)
 {
 	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
      * writing to the cart's RAM banks */
-	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
+	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
 }
 
-static WRITE8_HANDLER( gb_mem_mode_select_mbc1 )
+WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	state->m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_banks(space->machine());
+	m_MBC1Mode = data & 0x1;
+	gb_set_mbc1_banks(machine());
 }
 
-static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
+WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc3)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), offset, data );
-	if( state->m_CartType & TIMER )
+        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), offset, data );
+	if( m_CartType & TIMER )
 	{
 		/* FIXME: RTC Latch goes here */
-		state->m_MBC3RTCMap[0] = 50;    /* Seconds */
-		state->m_MBC3RTCMap[1] = 40;    /* Minutes */
-		state->m_MBC3RTCMap[2] = 15;    /* Hours */
-		state->m_MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
-		state->m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occurred (bit7) */
+		m_MBC3RTCMap[0] = 50;    /* Seconds */
+		m_MBC3RTCMap[1] = 40;    /* Minutes */
+		m_MBC3RTCMap[2] = 15;    /* Hours */
+		m_MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
+		m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occurred (bit7) */
 	}
 }
 
-static WRITE8_HANDLER( gb_ram_tama5 )
+WRITE8_MEMBER(gb_state::gb_ram_tama5)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( &space->device() ), 0xA000 + offset, data );
+	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( &space.device() ), 0xA000 + offset, data );
 	switch( offset & 0x0001 )
 	{
 	case 0x0000:    /* Write to data register */
-		switch( state->m_gbLastTama5Command )
+		switch( m_gbLastTama5Command )
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
-			state->m_ROMBank = ( state->m_ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+			m_ROMBank = ( m_ROMBank & 0xF0 ) | ( data & 0x0F );
+			gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 			break;
 		case 0x01:      /* Bit 4(-7?) for rom bank selection */
-			state->m_ROMBank = ( state->m_ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( space->machine(), state->m_ROMMap[state->m_ROMBank] );
+			m_ROMBank = ( m_ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 			break;
 		case 0x04:      /* Data to write lo */
-			state->m_gbTama5Byte = ( state->m_gbTama5Byte & 0xF0 ) | ( data & 0x0F );
+			m_gbTama5Byte = ( m_gbTama5Byte & 0xF0 ) | ( data & 0x0F );
 			break;
 		case 0x05:      /* Data to write hi */
-			state->m_gbTama5Byte = ( state->m_gbTama5Byte & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			m_gbTama5Byte = ( m_gbTama5Byte & 0x0F ) | ( ( data & 0x0F ) << 4 );
 			break;
 		case 0x06:      /* Address selection hi */
-			state->m_gbTama5Address = ( state->m_gbTama5Address & 0x0F ) | ( ( data & 0x0F ) << 4 );
+			m_gbTama5Address = ( m_gbTama5Address & 0x0F ) | ( ( data & 0x0F ) << 4 );
 			break;
 		case 0x07:      /* Address selection lo */
 				/* This address always seems to written last, so we'll just
                    execute the command here */
-			state->m_gbTama5Address = ( state->m_gbTama5Address & 0xF0 ) | ( data & 0x0F );
-			switch ( state->m_gbTama5Address & 0xE0 )
+			m_gbTama5Address = ( m_gbTama5Address & 0xF0 ) | ( data & 0x0F );
+			switch ( m_gbTama5Address & 0xE0 )
 			{
 			case 0x00:      /* Write memory */
-				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", state->m_gbTama5Address & 0x1F, state->m_gbTama5Byte );
-				state->m_gbTama5Memory[ state->m_gbTama5Address & 0x1F ] = state->m_gbTama5Byte;
+				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", m_gbTama5Address & 0x1F, m_gbTama5Byte );
+				m_gbTama5Memory[ m_gbTama5Address & 0x1F ] = m_gbTama5Byte;
 				break;
 			case 0x20:      /* Read memory */
-				logerror( "Read tama5 memory 0x%02X\n", state->m_gbTama5Address & 0x1F );
-				state->m_gbTama5Byte = state->m_gbTama5Memory[ state->m_gbTama5Address & 0x1F ];
+				logerror( "Read tama5 memory 0x%02X\n", m_gbTama5Address & 0x1F );
+				m_gbTama5Byte = m_gbTama5Memory[ m_gbTama5Address & 0x1F ];
 				break;
 			case 0x40:      /* Unknown, some kind of read */
-				if ( ( state->m_gbTama5Address & 0x1F ) == 0x12 )
+				if ( ( m_gbTama5Address & 0x1F ) == 0x12 )
 				{
-					state->m_gbTama5Byte = 0xFF;
+					m_gbTama5Byte = 0xFF;
 				}
 			case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 			default:
-				logerror( "0x%04X: Unknown addressing mode\n", cpu_get_pc( &space->device() ) );
+				logerror( "0x%04X: Unknown addressing mode\n", cpu_get_pc( &space.device() ) );
 				break;
 			}
 			break;
@@ -684,20 +670,20 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 		case 0x07:      /* Address register lo */
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
-			state->m_MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( space->machine(), "bank2", state->m_MBC3RTCData );
+			m_MBC3RTCData[0] = 0x01;
+			memory_set_bankptr( machine(), "bank2", m_MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
-			state->m_MBC3RTCData[0] = state->m_gbTama5Byte & 0x0F;
+			m_MBC3RTCData[0] = m_gbTama5Byte & 0x0F;
 			break;
 		case 0x0D:      /* Data read register hi */
-			state->m_MBC3RTCData[0] = ( state->m_gbTama5Byte & 0xF0 ) >> 4;
+			m_MBC3RTCData[0] = ( m_gbTama5Byte & 0xF0 ) >> 4;
 			break;
 		default:
-			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( &space->device() ), data );
+			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( &space.device() ), data );
 			break;
 		}
-		state->m_gbLastTama5Command = data;
+		m_gbLastTama5Command = data;
 		break;
 	}
 }
@@ -705,49 +691,46 @@ static WRITE8_HANDLER( gb_ram_tama5 )
 /* This mmm01 implementation is mostly guess work, no clue how correct it all is */
 
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w )
+WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_0000_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space.device() ), data, offset+0x000 );
 	if ( data & 0x40 )
 	{
-		state->m_mmm01_bank_offset = state->m_mmm01_reg1;
-		memory_set_bankptr( space->machine(), "bank5", state->m_ROMMap[ state->m_mmm01_bank_offset ] );
-		memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[ state->m_mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_mmm01_bank_offset + state->m_mmm01_bank ] );
+		m_mmm01_bank_offset = m_mmm01_reg1;
+		memory_set_bankptr( machine(), "bank5", m_ROMMap[ m_mmm01_bank_offset ] );
+		memory_set_bankptr( machine(), "bank10", m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
+		gb_rom16_4000( machine(), m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
 	}
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w )
+WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_2000_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x2000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space.device() ), data, offset+0x2000 );
 
-	state->m_mmm01_reg1 = data & state->m_ROMMask;
-	state->m_mmm01_bank = state->m_mmm01_reg1 & state->m_mmm01_bank_mask;
-	if ( state->m_mmm01_bank == 0 )
+	m_mmm01_reg1 = data & m_ROMMask;
+	m_mmm01_bank = m_mmm01_reg1 & m_mmm01_bank_mask;
+	if ( m_mmm01_bank == 0 )
 	{
-		state->m_mmm01_bank = 1;
+		m_mmm01_bank = 1;
 	}
-	gb_rom16_4000( space->machine(), state->m_ROMMap[ state->m_mmm01_bank_offset + state->m_mmm01_bank ] );
+	gb_rom16_4000( machine(), m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w )
+WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_4000_w)
 {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x4000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space.device() ), data, offset+0x4000 );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w )
+WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_6000_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space->device() ), data, offset+0x6000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( &space.device() ), data, offset+0x6000 );
 	/* Not sure if this is correct, Taito Variety Pack sets these values */
 	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data )
 	{
-	case 0x30:	state->m_mmm01_bank_mask = 0x07;	break;
-	case 0x38:	state->m_mmm01_bank_mask = 0x03;	break;
-	default:	state->m_mmm01_bank_mask = 0xFF; break;
+	case 0x30:	m_mmm01_bank_mask = 0x07;	break;
+	case 0x38:	m_mmm01_bank_mask = 0x03;	break;
+	default:	m_mmm01_bank_mask = 0xFF; break;
 	}
 }
 
@@ -764,41 +747,37 @@ static void gb_set_mbc1_kor_banks( running_machine &machine )
 	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
-static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
+WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1_kor)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x0F; /* Only uses lower 5 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
 		data = 1;
 
-	state->m_ROMBank = ( state->m_ROMBank & 0x01F0 ) | data;
+	m_ROMBank = ( m_ROMBank & 0x01F0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_kor_banks(space->machine());
+	gb_set_mbc1_kor_banks(machine());
 }
 
-static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
+WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1_kor)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	data &= 0x3; /* Only uses the lower 2 bits */
 
 	/* Select the upper bits of the ROMMask */
-	state->m_ROMBank = ( state->m_ROMBank & 0x0F ) | ( data << 4 );
+	m_ROMBank = ( m_ROMBank & 0x0F ) | ( data << 4 );
 
 	/* Switch banks */
-	gb_set_mbc1_kor_banks(space->machine());
+	gb_set_mbc1_kor_banks(machine());
 }
 
-static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor )
+WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1_kor)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	state->m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_kor_banks(space->machine());
+	m_MBC1Mode = data & 0x1;
+	gb_set_mbc1_kor_banks(machine());
 }
 
-WRITE8_HANDLER ( gb_io_w )
+WRITE8_MEMBER(gb_state::gb_io_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	static const UINT8 timer_shifts[4] = {10, 4, 6, 8};
 
 	switch (offset)
@@ -806,9 +785,9 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x00:						/* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (input_port_read(space->machine(), "INPUTS") >> 4) | 0xF0;
+			JOYPAD &= (input_port_read(machine(), "INPUTS") >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= input_port_read(space->machine(), "INPUTS") | 0xF0;
+			JOYPAD &= input_port_read(machine(), "INPUTS") | 0xF0;
 		return;
 	case 0x01:						/* SB - Serial transfer data */
 		break;
@@ -818,32 +797,32 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x00:
 		case 0x01:
 		case 0x80:				/* enabled & external clock */
-			state->m_SIOCount = 0;
+			m_SIOCount = 0;
 			break;
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
-			state->m_SIOCount = 8;
-			state->m_gb_serial_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
-			state->m_gb_serial_timer->enable( 1 );
+			m_SIOCount = 8;
+			m_gb_serial_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
+			m_gb_serial_timer->enable( 1 );
 			break;
 		}
 		break;
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
-		if ( state->m_divcount >= 16 )
-			gb_timer_increment(space->machine());
-		state->m_divcount = 0;
+		if ( m_divcount >= 16 )
+			gb_timer_increment(machine());
+		m_divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( state->m_reloading && ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) == 4 )
+		if ( m_reloading && ( m_divcount & ( m_shift_cycles - 1 ) ) == 4 )
 		{
 			data = TIMECNT;
 		}
 		break;
 	case 0x06:						/* TMA - Timer module */
 		/* Check if the counter is being reloaded in this cycle */
-		if ( state->m_reloading && ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) == 4 )
+		if ( m_reloading && ( m_divcount & ( m_shift_cycles - 1 ) ) == 4 )
 		{
 			TIMECNT = data;
 		}
@@ -854,30 +833,29 @@ WRITE8_HANDLER ( gb_io_w )
 		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) )
 		{
 			/* Check if TIMECNT should be incremented */
-			if ( ( state->m_divcount & ( state->m_shift_cycles - 1 ) ) >= ( state->m_shift_cycles >> 1 ) )
+			if ( ( m_divcount & ( m_shift_cycles - 1 ) ) >= ( m_shift_cycles >> 1 ) )
 			{
-				gb_timer_increment(space->machine());
+				gb_timer_increment(machine());
 			}
 		}
-		state->m_shift = timer_shifts[data & 0x03];
-		state->m_shift_cycles = 1 << state->m_shift;
+		m_shift = timer_shifts[data & 0x03];
+		m_shift_cycles = 1 << m_shift;
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		space->machine().device<lr35902_cpu_device>(":maincpu")->set_if( data );
+		machine().device<lr35902_cpu_device>(":maincpu")->set_if( data );
 		break;
 	}
 
-	state->m_gb_io[offset] = data;
+	m_gb_io[offset] = data;
 }
 
-WRITE8_HANDLER ( gb_io2_w )
+WRITE8_MEMBER(gb_state::gb_io2_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	if ( offset == 0x10 )
 	{
 		/* disable BIOS ROM */
-		gb_rom16_0000( space->machine(), state->m_ROMMap[state->m_ROMBank00] );
+		gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
 	}
 	else
 	{
@@ -917,10 +895,9 @@ static const char *const sgbcmds[26] =
 };
 #endif
 
-WRITE8_HANDLER ( sgb_io_w )
+WRITE8_MEMBER(gb_state::sgb_io_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	UINT8 *sgb_data = state->m_sgb_data;
+	UINT8 *sgb_data = m_sgb_data;
 
 	switch( offset )
 	{
@@ -928,41 +905,41 @@ WRITE8_HANDLER ( sgb_io_w )
 			switch (data & 0x30)
 			{
 			case 0x00:				   /* start condition */
-				if (state->m_sgb_start)
+				if (m_sgb_start)
 					logerror("SGB: Start condition before end of transfer ??\n");
-				state->m_sgb_bitcount = 0;
-				state->m_sgb_start = 1;
-				state->m_sgb_rest = 0;
-				JOYPAD = 0x0F & ((input_port_read(space->machine(), "INPUTS") >> 4) | input_port_read(space->machine(), "INPUTS") | 0xF0);
+				m_sgb_bitcount = 0;
+				m_sgb_start = 1;
+				m_sgb_rest = 0;
+				JOYPAD = 0x0F & ((input_port_read(machine(), "INPUTS") >> 4) | input_port_read(machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x10:				   /* data true */
-				if (state->m_sgb_rest)
+				if (m_sgb_rest)
 				{
 					/* We should test for this case , but the code below won't
                        work with the current setup */
 #if 0
-					if (state->m_sgb_bytecount == 16)
+					if (m_sgb_bytecount == 16)
 					{
 						logerror("SGB: end of block is not zero!");
-						state->m_sgb_start = 0;
+						m_sgb_start = 0;
 					}
 #endif
-					sgb_data[state->m_sgb_bytecount] >>= 1;
-					sgb_data[state->m_sgb_bytecount] |= 0x80;
-					state->m_sgb_bitcount++;
-					if (state->m_sgb_bitcount == 8)
+					sgb_data[m_sgb_bytecount] >>= 1;
+					sgb_data[m_sgb_bytecount] |= 0x80;
+					m_sgb_bitcount++;
+					if (m_sgb_bitcount == 8)
 					{
-						state->m_sgb_bitcount = 0;
-						state->m_sgb_bytecount++;
+						m_sgb_bitcount = 0;
+						m_sgb_bytecount++;
 					}
-					state->m_sgb_rest = 0;
+					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((input_port_read(space->machine(), "INPUTS") >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((input_port_read(machine(), "INPUTS") >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
-				if (state->m_sgb_rest)
+				if (m_sgb_rest)
 				{
-					if( state->m_sgb_bytecount == 16 && state->m_sgb_packets == -1 )
+					if( m_sgb_bytecount == 16 && m_sgb_packets == -1 )
 					{
 #ifdef MAME_DEBUG
 						logerror("SGB: %s (%02X) pkts: %d data: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
@@ -971,52 +948,52 @@ WRITE8_HANDLER ( sgb_io_w )
 								sgb_data[8], sgb_data[9], sgb_data[10], sgb_data[11],
 								sgb_data[12], sgb_data[13], sgb_data[14], sgb_data[15]);
 #endif
-						state->m_sgb_packets = sgb_data[0] & 0x07;
-						state->m_sgb_start = 0;
+						m_sgb_packets = sgb_data[0] & 0x07;
+						m_sgb_start = 0;
 					}
-					if (state->m_sgb_bytecount == (state->m_sgb_packets << 4) )
+					if (m_sgb_bytecount == (m_sgb_packets << 4) )
 					{
 						switch( sgb_data[0] >> 3 )
 						{
 							case 0x00:	/* PAL01 */
-								state->m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->m_sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->m_sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								m_sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								m_sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x01:	/* PAL23 */
-								state->m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->m_sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->m_sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								m_sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								m_sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x02:	/* PAL03 */
-								state->m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x03:	/* PAL12 */
-								state->m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								state->m_sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								state->m_sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								state->m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								state->m_sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								state->m_sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								state->m_sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
+								m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								m_sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								m_sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								m_sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								m_sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								m_sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x04:	/* ATTR_BLK */
 								{
@@ -1030,7 +1007,7 @@ WRITE8_HANDLER ( sgb_io_w )
 											{
 												for( J = sgb_data[o + 5]; J <= sgb_data[o + 7]; J++ )
 												{
-													state->m_sgb_pal_map[I][J] = sgb_data[o + 3] & 0x3;
+													m_sgb_pal_map[I][J] = sgb_data[o + 3] & 0x3;
 												}
 											}
 										}
@@ -1048,14 +1025,14 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->m_sgb_pal_map[J][sgb_data[K + 1] & 0x1f] = (sgb_data[K + 1] & 0x60) >> 5;
+												m_sgb_pal_map[J][sgb_data[K + 1] & 0x1f] = (sgb_data[K + 1] & 0x60) >> 5;
 											}
 										}
 										else
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->m_sgb_pal_map[sgb_data[K + 1] & 0x1f][J] = (sgb_data[K + 1] & 0x60) >> 5;
+												m_sgb_pal_map[sgb_data[K + 1] & 0x1f][J] = (sgb_data[K + 1] & 0x60) >> 5;
 											}
 										}
 									}
@@ -1070,18 +1047,18 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->m_sgb_pal_map[J][I] = (sgb_data[1] & 0xC) >> 2;
+												m_sgb_pal_map[J][I] = (sgb_data[1] & 0xC) >> 2;
 											}
 										}
 										for( J = 0; J < 20; J++ )
 										{
-											state->m_sgb_pal_map[J][sgb_data[2]] = (sgb_data[1] & 0x30) >> 4;
+											m_sgb_pal_map[J][sgb_data[2]] = (sgb_data[1] & 0x30) >> 4;
 										}
 										for( I = sgb_data[2] + 1; I < 18; I++ )
 										{
 											for( J = 0; J < 20; J++ )
 											{
-												state->m_sgb_pal_map[J][I] = sgb_data[1] & 0x3;
+												m_sgb_pal_map[J][I] = sgb_data[1] & 0x3;
 											}
 										}
 									}
@@ -1091,18 +1068,18 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->m_sgb_pal_map[I][J] = (sgb_data[1] & 0xC) >> 2;
+												m_sgb_pal_map[I][J] = (sgb_data[1] & 0xC) >> 2;
 											}
 										}
 										for( J = 0; J < 18; J++ )
 										{
-											state->m_sgb_pal_map[sgb_data[2]][J] = (sgb_data[1] & 0x30) >> 4;
+											m_sgb_pal_map[sgb_data[2]][J] = (sgb_data[1] & 0x30) >> 4;
 										}
 										for( I = sgb_data[2] + 1; I < 20; I++ )
 										{
 											for( J = 0; J < 18; J++ )
 											{
-												state->m_sgb_pal_map[I][J] = sgb_data[1] & 0x3;
+												m_sgb_pal_map[I][J] = sgb_data[1] & 0x3;
 											}
 										}
 									}
@@ -1123,7 +1100,7 @@ WRITE8_HANDLER ( sgb_io_w )
 									{
 										for( I = 6; I < sets; I++ )
 										{
-											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC0) >> 6;
+											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC0) >> 6;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1132,7 +1109,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0x30) >> 4;
+											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0x30) >> 4;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1141,7 +1118,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC) >> 2;
+											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC) >> 2;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1150,7 +1127,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													x = 0;
 											}
 
-											state->m_sgb_pal_map[x][y++] = sgb_data[I] & 0x3;
+											m_sgb_pal_map[x][y++] = sgb_data[I] & 0x3;
 											if( y > 17 )
 											{
 												y = 0;
@@ -1164,7 +1141,7 @@ WRITE8_HANDLER ( sgb_io_w )
 									{
 										for( I = 6; I < sets; I++ )
 										{
-											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC0) >> 6;
+											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC0) >> 6;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1173,7 +1150,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0x30) >> 4;
+											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0x30) >> 4;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1182,7 +1159,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC) >> 2;
+											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC) >> 2;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1191,7 +1168,7 @@ WRITE8_HANDLER ( sgb_io_w )
 													y = 0;
 											}
 
-											state->m_sgb_pal_map[x++][y] = sgb_data[I] & 0x3;
+											m_sgb_pal_map[x++][y] = sgb_data[I] & 0x3;
 											if( x > 19 )
 											{
 												x = 0;
@@ -1218,42 +1195,42 @@ WRITE8_HANDLER ( sgb_io_w )
 
 									/* Palette 0 */
 									index_ = (UINT16)(sgb_data[1] | (sgb_data[2] << 8)) * 4;
-									state->m_sgb_pal[0] = state->m_sgb_pal_data[index_];
-									state->m_sgb_pal[1] = state->m_sgb_pal_data[index_ + 1];
-									state->m_sgb_pal[2] = state->m_sgb_pal_data[index_ + 2];
-									state->m_sgb_pal[3] = state->m_sgb_pal_data[index_ + 3];
+									m_sgb_pal[0] = m_sgb_pal_data[index_];
+									m_sgb_pal[1] = m_sgb_pal_data[index_ + 1];
+									m_sgb_pal[2] = m_sgb_pal_data[index_ + 2];
+									m_sgb_pal[3] = m_sgb_pal_data[index_ + 3];
 									/* Palette 1 */
 									index_ = (UINT16)(sgb_data[3] | (sgb_data[4] << 8)) * 4;
-									state->m_sgb_pal[4] = state->m_sgb_pal_data[index_];
-									state->m_sgb_pal[5] = state->m_sgb_pal_data[index_ + 1];
-									state->m_sgb_pal[6] = state->m_sgb_pal_data[index_ + 2];
-									state->m_sgb_pal[7] = state->m_sgb_pal_data[index_ + 3];
+									m_sgb_pal[4] = m_sgb_pal_data[index_];
+									m_sgb_pal[5] = m_sgb_pal_data[index_ + 1];
+									m_sgb_pal[6] = m_sgb_pal_data[index_ + 2];
+									m_sgb_pal[7] = m_sgb_pal_data[index_ + 3];
 									/* Palette 2 */
 									index_ = (UINT16)(sgb_data[5] | (sgb_data[6] << 8)) * 4;
-									state->m_sgb_pal[8] = state->m_sgb_pal_data[index_];
-									state->m_sgb_pal[9] = state->m_sgb_pal_data[index_ + 1];
-									state->m_sgb_pal[10] = state->m_sgb_pal_data[index_ + 2];
-									state->m_sgb_pal[11] = state->m_sgb_pal_data[index_ + 3];
+									m_sgb_pal[8] = m_sgb_pal_data[index_];
+									m_sgb_pal[9] = m_sgb_pal_data[index_ + 1];
+									m_sgb_pal[10] = m_sgb_pal_data[index_ + 2];
+									m_sgb_pal[11] = m_sgb_pal_data[index_ + 3];
 									/* Palette 3 */
 									index_ = (UINT16)(sgb_data[7] | (sgb_data[8] << 8)) * 4;
-									state->m_sgb_pal[12] = state->m_sgb_pal_data[index_];
-									state->m_sgb_pal[13] = state->m_sgb_pal_data[index_ + 1];
-									state->m_sgb_pal[14] = state->m_sgb_pal_data[index_ + 2];
-									state->m_sgb_pal[15] = state->m_sgb_pal_data[index_ + 3];
+									m_sgb_pal[12] = m_sgb_pal_data[index_];
+									m_sgb_pal[13] = m_sgb_pal_data[index_ + 1];
+									m_sgb_pal[14] = m_sgb_pal_data[index_ + 2];
+									m_sgb_pal[15] = m_sgb_pal_data[index_ + 3];
 									/* Attribute File */
 									if( sgb_data[9] & 0x40 )
-										state->m_sgb_window_mask = 0;
-									state->m_sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
+										m_sgb_window_mask = 0;
+									m_sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
 									if( sgb_data[9] & 0x80 )
 									{
 										for( J = 0; J < 18; J++ )
 										{
 											for( I = 0; I < 5; I++ )
 											{
-												state->m_sgb_pal_map[I * 4][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC0) >> 6;
-												state->m_sgb_pal_map[(I * 4) + 1][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x30) >> 4;
-												state->m_sgb_pal_map[(I * 4) + 2][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC) >> 2;
-												state->m_sgb_pal_map[(I * 4) + 3][J] = state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x3;
+												m_sgb_pal_map[I * 4][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC0) >> 6;
+												m_sgb_pal_map[(I * 4) + 1][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x30) >> 4;
+												m_sgb_pal_map[(I * 4) + 2][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC) >> 2;
+												m_sgb_pal_map[(I * 4) + 3][J] = m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x3;
 											}
 										}
 									}
@@ -1261,13 +1238,13 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x0B:	/* PAL_TRN */
 								{
-									UINT8 *gb_vram = gb_get_vram_ptr(space->machine());
+									UINT8 *gb_vram = gb_get_vram_ptr(machine());
 									UINT16 I, col;
 
 									for( I = 0; I < 2048; I++ )
 									{
 										col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
-										state->m_sgb_pal_data[I] = col;
+										m_sgb_pal_data[I] = col;
 									}
 								}
 								break;
@@ -1288,46 +1265,46 @@ WRITE8_HANDLER ( sgb_io_w )
 								break;
 							case 0x11:	/* MLT_REQ - Multi controller request */
 								if (sgb_data[1] == 0x00)
-									state->m_sgb_controller_mode = 0;
+									m_sgb_controller_mode = 0;
 								else if (sgb_data[1] == 0x01)
-									state->m_sgb_controller_mode = 2;
+									m_sgb_controller_mode = 2;
 								break;
 							case 0x12:	/* JUMP */
 								/* Not Implemented */
 								break;
 							case 0x13:	/* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
-									memcpy( state->m_sgb_tile_data + 4096, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
+									memcpy( m_sgb_tile_data + 4096, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
 								else
-									memcpy( state->m_sgb_tile_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4096 );
+									memcpy( m_sgb_tile_data, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
 								break;
 							case 0x14:	/* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
-									UINT8 *gb_vram = gb_get_vram_ptr(space->machine());
-									if( state->m_sgb_hack )
+									UINT8 *gb_vram = gb_get_vram_ptr(machine());
+									if( m_sgb_hack )
 									{
-										memcpy( state->m_sgb_tile_map, gb_vram + 0x1000, 2048 );
+										memcpy( m_sgb_tile_map, gb_vram + 0x1000, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
 											col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
-											state->m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
+											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 									else /* Do things normally */
 									{
-										memcpy( state->m_sgb_tile_map, gb_vram + 0x0800, 2048 );
+										memcpy( m_sgb_tile_map, gb_vram + 0x0800, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
 											col = ( gb_vram[ 0x1000 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x1000 + (I*2) ];
-											state->m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
+											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 								}
 								break;
 							case 0x15:	/* ATTR_TRN */
-								memcpy( state->m_sgb_atf_data, gb_get_vram_ptr(space->machine()) + 0x0800, 4050 );
+								memcpy( m_sgb_atf_data, gb_get_vram_ptr(machine()) + 0x0800, 4050 );
 								break;
 							case 0x16:	/* ATTR_SET */
 								{
@@ -1335,22 +1312,22 @@ WRITE8_HANDLER ( sgb_io_w )
 
 									/* Attribute File */
 									if( sgb_data[1] & 0x40 )
-										state->m_sgb_window_mask = 0;
-									state->m_sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
+										m_sgb_window_mask = 0;
+									m_sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
 									for( J = 0; J < 18; J++ )
 									{
 										for( I = 0; I < 5; I++ )
 										{
-											state->m_sgb_pal_map[I * 4][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC0) >> 6;
-											state->m_sgb_pal_map[(I * 4) + 1][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x30) >> 4;
-											state->m_sgb_pal_map[(I * 4) + 2][J] = (state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0xC) >> 2;
-											state->m_sgb_pal_map[(I * 4) + 3][J] = state->m_sgb_atf_data[(J * 5) + state->m_sgb_atf + I] & 0x3;
+											m_sgb_pal_map[I * 4][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC0) >> 6;
+											m_sgb_pal_map[(I * 4) + 1][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x30) >> 4;
+											m_sgb_pal_map[(I * 4) + 2][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC) >> 2;
+											m_sgb_pal_map[(I * 4) + 3][J] = m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x3;
 										}
 									}
 								}
 								break;
 							case 0x17:	/* MASK_EN */
-								state->m_sgb_window_mask = sgb_data[1];
+								m_sgb_window_mask = sgb_data[1];
 								break;
 							case 0x18:	/* OBJ_TRN */
 								/* Not Implemnted */
@@ -1368,33 +1345,33 @@ WRITE8_HANDLER ( sgb_io_w )
 								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
 						}
 
-						state->m_sgb_start = 0;
-						state->m_sgb_bytecount = 0;
-						state->m_sgb_packets = -1;
+						m_sgb_start = 0;
+						m_sgb_bytecount = 0;
+						m_sgb_packets = -1;
 					}
-					if( state->m_sgb_start )
+					if( m_sgb_start )
 					{
-						sgb_data[state->m_sgb_bytecount] >>= 1;
-						state->m_sgb_bitcount++;
-						if (state->m_sgb_bitcount == 8)
+						sgb_data[m_sgb_bytecount] >>= 1;
+						m_sgb_bitcount++;
+						if (m_sgb_bitcount == 8)
 						{
-							state->m_sgb_bitcount = 0;
-							state->m_sgb_bytecount++;
+							m_sgb_bitcount = 0;
+							m_sgb_bytecount++;
 						}
 					}
-					state->m_sgb_rest = 0;
+					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (input_port_read(space->machine(), "INPUTS") | 0xF0);
+				JOYPAD = 0x2F & (input_port_read(machine(), "INPUTS") | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
-				if (state->m_sgb_start)
-					state->m_sgb_rest = 1;
-				if (state->m_sgb_controller_mode)
+				if (m_sgb_start)
+					m_sgb_rest = 1;
+				if (m_sgb_controller_mode)
 				{
-					state->m_sgb_controller_no++;
-					if (state->m_sgb_controller_no == state->m_sgb_controller_mode)
-						state->m_sgb_controller_no = 0;
-					JOYPAD = 0x3F - state->m_sgb_controller_no;
+					m_sgb_controller_no++;
+					if (m_sgb_controller_no == m_sgb_controller_mode)
+						m_sgb_controller_no = 0;
+					JOYPAD = 0x3F - m_sgb_controller_no;
 				}
 				else
 					JOYPAD = 0x3F;
@@ -1411,28 +1388,27 @@ WRITE8_HANDLER ( sgb_io_w )
 			return;
 	}
 
-	state->m_gb_io[offset] = data;
+	m_gb_io[offset] = data;
 }
 
 /* Interrupt Enable register */
-READ8_HANDLER( gb_ie_r )
+READ8_MEMBER(gb_state::gb_ie_r)
 {
-	return space->machine().device<lr35902_cpu_device>(":maincpu")->get_ie();
+	return machine().device<lr35902_cpu_device>(":maincpu")->get_ie();
 }
 
-WRITE8_HANDLER ( gb_ie_w )
+WRITE8_MEMBER(gb_state::gb_ie_w)
 {
-	space->machine().device<lr35902_cpu_device>(":maincpu")->set_ie( data & 0x1F );
+	machine().device<lr35902_cpu_device>(":maincpu")->set_ie( data & 0x1F );
 }
 
 /* IO read */
-READ8_HANDLER ( gb_io_r )
+READ8_MEMBER(gb_state::gb_io_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	switch(offset)
 	{
 		case 0x04:
-			return ( state->m_divcount >> 8 ) & 0xFF;
+			return ( m_divcount >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
@@ -1440,10 +1416,10 @@ READ8_HANDLER ( gb_io_r )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			return state->m_gb_io[offset];
+			return m_gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | space->machine().device<lr35902_cpu_device>(":maincpu")->get_if();
+			return 0xE0 | machine().device<lr35902_cpu_device>(":maincpu")->get_if();
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1927,13 +1903,13 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	/* Shift in a received bit */
-	SIODATA = (SIODATA << 1) | 0x01;
+	state->SIODATA = (state->SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
 	state->m_SIOCount--;
 	/* If all bits done, stop timer and trigger interrupt */
 	if ( ! state->m_SIOCount )
 	{
-		SIOCONT &= 0x7F;
+		state->SIOCONT &= 0x7F;
 		state->m_gb_serial_timer->enable( 0 );
 		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
 	}
@@ -1946,9 +1922,9 @@ INLINE void gb_timer_check_irq( running_machine &machine )
 	if ( state->m_triggering_irq )
 	{
 		state->m_triggering_irq = 0;
-		if ( TIMECNT == 0 )
+		if ( state->TIMECNT == 0 )
 		{
-			TIMECNT = TIMEMOD;
+			state->TIMECNT = state->TIMEMOD;
 			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
 			state->m_reloading = 1;
 		}
@@ -1960,8 +1936,8 @@ static void gb_timer_increment( running_machine &machine )
 	gb_state *state = machine.driver_data<gb_state>();
 	gb_timer_check_irq(machine);
 
-	TIMECNT += 1;
-	if ( TIMECNT == 0 )
+	state->TIMECNT += 1;
+	if ( state->TIMECNT == 0 )
 	{
 		state->m_triggering_irq = 1;
 	}
@@ -1975,7 +1951,7 @@ void gb_timer_callback(lr35902_cpu_device *device, int cycles)
 
 	gb_timer_check_irq(device->machine());
 
-	if ( TIMEFRQ & 0x04 )
+	if ( state->TIMEFRQ & 0x04 )
 	{
 		UINT16 old_count = old_gb_divcount >> state->m_shift;
 		UINT16 new_count = state->m_divcount >> state->m_shift;
@@ -1995,24 +1971,23 @@ void gb_timer_callback(lr35902_cpu_device *device, int cycles)
 	}
 }
 
-WRITE8_HANDLER ( gbc_io2_w )
+WRITE8_MEMBER(gb_state::gbc_io2_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			space->machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
+			machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
-			gb_rom16_0000( space->machine(), state->m_ROMMap[state->m_ROMBank00] );
+			gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;
 		case 0x30:	/* SVBK - RAM bank select */
-			state->m_GBC_RAMBank = data & 0x7;
-			if ( ! state->m_GBC_RAMBank )
-				state->m_GBC_RAMBank = 1;
-			memory_set_bankptr (space->machine(), "bank3", state->m_GBC_RAMMap[state->m_GBC_RAMBank]);
+			m_GBC_RAMBank = data & 0x7;
+			if ( ! m_GBC_RAMBank )
+				m_GBC_RAMBank = 1;
+			memory_set_bankptr (machine(), "bank3", m_GBC_RAMMap[m_GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2020,17 +1995,16 @@ WRITE8_HANDLER ( gbc_io2_w )
 	gbc_video_w( space, offset, data );
 }
 
-READ8_HANDLER( gbc_io2_r )
+READ8_MEMBER(gb_state::gbc_io2_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		space->machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
+		machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
-		return state->m_GBC_RAMBank;
+		return m_GBC_RAMBank;
 	default:
 		break;
 	}
@@ -2097,7 +2071,7 @@ MACHINE_RESET( megaduck )
 
  **************/
 
- READ8_HANDLER( megaduck_video_r )
+READ8_MEMBER(gb_state::megaduck_video_r)
 {
 	UINT8 data;
 
@@ -2111,7 +2085,7 @@ MACHINE_RESET( megaduck )
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
 }
 
-WRITE8_HANDLER ( megaduck_video_w )
+WRITE8_MEMBER(gb_state::megaduck_video_w)
 {
 	if ( !offset )
 	{
@@ -2128,27 +2102,27 @@ WRITE8_HANDLER ( megaduck_video_w )
 
 static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-WRITE8_HANDLER( megaduck_sound_w1 )
+WRITE8_MEMBER(gb_state::megaduck_sound_w1)
 {
-	gb_sound_w(space->machine().device("custom"), megaduck_sound_offsets[offset], data );
+	gb_sound_w(machine().device("custom"), megaduck_sound_offsets[offset], data );
 }
 
-READ8_HANDLER( megaduck_sound_r1 )
+READ8_MEMBER(gb_state::megaduck_sound_r1)
 {
-	return gb_sound_r( space->machine().device("custom"), megaduck_sound_offsets[offset] );
+	return gb_sound_r( machine().device("custom"), megaduck_sound_offsets[offset] );
 }
 
-WRITE8_HANDLER( megaduck_sound_w2 )
+WRITE8_MEMBER(gb_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
-		case 0x00:	gb_sound_w(space->machine().device("custom"), 0x10, data );	break;
-		case 0x01:	gb_sound_w(space->machine().device("custom"), 0x12, data );	break;
-		case 0x02:	gb_sound_w(space->machine().device("custom"), 0x11, data );	break;
-		case 0x03:	gb_sound_w(space->machine().device("custom"), 0x13, data );	break;
-		case 0x04:	gb_sound_w(space->machine().device("custom"), 0x14, data );	break;
-		case 0x05:	gb_sound_w(space->machine().device("custom"), 0x16, data );	break;
-		case 0x06:	gb_sound_w(space->machine().device("custom"), 0x15, data );	break;
+		case 0x00:	gb_sound_w(machine().device("custom"), 0x10, data );	break;
+		case 0x01:	gb_sound_w(machine().device("custom"), 0x12, data );	break;
+		case 0x02:	gb_sound_w(machine().device("custom"), 0x11, data );	break;
+		case 0x03:	gb_sound_w(machine().device("custom"), 0x13, data );	break;
+		case 0x04:	gb_sound_w(machine().device("custom"), 0x14, data );	break;
+		case 0x05:	gb_sound_w(machine().device("custom"), 0x16, data );	break;
+		case 0x06:	gb_sound_w(machine().device("custom"), 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2162,33 +2136,31 @@ WRITE8_HANDLER( megaduck_sound_w2 )
 	}
 }
 
-READ8_HANDLER( megaduck_sound_r2 )
+READ8_MEMBER(gb_state::megaduck_sound_r2)
 {
-	return gb_sound_r(space->machine().device("custom"), 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(machine().device("custom"), 0x10 + megaduck_sound_offsets[offset]);
 }
 
-WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
+WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type1)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	if( state->m_ROMMask )
+	if( m_ROMMask )
 	{
-		state->m_ROMBank = data & state->m_ROMMask;
+		m_ROMBank = data & m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (space->machine(), "bank1", state->m_ROMMap[state->m_ROMBank]);
+		memory_set_bankptr (machine(), "bank1", m_ROMMap[m_ROMBank]);
 	}
 }
 
-WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
+WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type2)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	if( state->m_ROMMask )
+	if( m_ROMMask )
 	{
-		state->m_ROMBank = (data << 1) & state->m_ROMMask;
+		m_ROMBank = (data << 1) & m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[state->m_ROMBank]);
-		memory_set_bankptr( space->machine(), "bank1", state->m_ROMMap[state->m_ROMBank + 1]);
+		memory_set_bankptr( machine(), "bank10", m_ROMMap[m_ROMBank]);
+		memory_set_bankptr( machine(), "bank1", m_ROMMap[m_ROMBank + 1]);
 	}
 }
 

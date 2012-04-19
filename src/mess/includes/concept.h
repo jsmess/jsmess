@@ -48,6 +48,11 @@ public:
 	UINT8 m_fdc_local_status;
 	UINT8 m_fdc_local_command;
 	expansion_slot_t m_expansion_slots[4];
+	DECLARE_READ16_MEMBER(concept_io_r);
+	DECLARE_WRITE16_MEMBER(concept_io_w);
+	DECLARE_WRITE8_MEMBER(concept_fdc_reg_w);
+	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
+	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
 };
 
 
@@ -60,8 +65,6 @@ MACHINE_START(concept);
 VIDEO_START(concept);
 SCREEN_UPDATE_IND16(concept);
 INTERRUPT_GEN( concept_interrupt );
-READ16_HANDLER(concept_io_r);
-WRITE16_HANDLER(concept_io_w);
 
 
 #endif /* CONCEPT_H_ */

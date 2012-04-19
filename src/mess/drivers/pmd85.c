@@ -183,11 +183,11 @@ I/O ports
 /* I/O ports */
 
 static ADDRESS_MAP_START( pmd85_io_map, AS_IO, 8, pmd85_state )
-	AM_RANGE( 0x00, 0xff) AM_READWRITE_LEGACY(pmd85_io_r, pmd85_io_w )
+	AM_RANGE( 0x00, 0xff) AM_READWRITE(pmd85_io_r, pmd85_io_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mato_io_map, AS_IO, 8, pmd85_state )
-	AM_RANGE( 0x00, 0xff) AM_READWRITE_LEGACY(mato_io_r, mato_io_w )
+	AM_RANGE( 0x00, 0xff) AM_READWRITE(mato_io_r, mato_io_w )
 ADDRESS_MAP_END
 
 /* memory w/r functions */

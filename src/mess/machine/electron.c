@@ -18,24 +18,24 @@ static cassette_image_device *cassette_device_image( running_machine &machine )
 	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
-static void electron_tape_start( electron_state *state )
+void electron_state::electron_tape_start()
 {
-	if ( state->m_ula.tape_running )
+	if (m_ula.tape_running )
 	{
 		return;
 	}
-	state->m_ula.tape_steps = 0;
-	state->m_ula.tape_value = 0x80808080;
-	state->m_ula.high_tone_set = 0;
-	state->m_ula.bit_count = 0;
-	state->m_ula.tape_running = 1;
-	state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
+	m_ula.tape_steps = 0;
+	m_ula.tape_value = 0x80808080;
+	m_ula.high_tone_set = 0;
+	m_ula.bit_count = 0;
+	m_ula.tape_running = 1;
+	m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
 }
 
-static void electron_tape_stop( electron_state *state )
+void electron_state::electron_tape_stop()
 {
-	state->m_ula.tape_running = 0;
-	state->m_tape_timer->reset(  );
+	m_ula.tape_running = 0;
+	m_tape_timer->reset();
 }
 
 #define TAPE_LOW	0x00;
@@ -114,7 +114,7 @@ static TIMER_CALLBACK(electron_tape_timer_handler)
 	}
 }
 
-static READ8_HANDLER( electron_read_keyboard )
+READ8_MEMBER(electron_state::electron_read_keyboard)
 {
 	UINT8 data = 0;
 	int i;
@@ -127,7 +127,7 @@ static READ8_HANDLER( electron_read_keyboard )
 	for( i = 0; i < 14; i++ )
 	{
 		if( !(offset & 1) )
-			data |= input_port_read(space->machine(), keynames[i]) & 0x0f;
+			data |= input_port_read(machine(), keynames[i]) & 0x0f;
 
 		offset = offset >> 1;
 	}
@@ -135,39 +135,38 @@ static READ8_HANDLER( electron_read_keyboard )
 	return data;
 }
 
-READ8_HANDLER( electron_jim_r )
+READ8_MEMBER(electron_state::electron_jim_r)
 {
 	return 0xff;
 }
 
-WRITE8_HANDLER( electron_jim_w )
+WRITE8_MEMBER(electron_state::electron_jim_w)
 {
 }
 
-READ8_HANDLER( electron_1mhz_r )
+READ8_MEMBER(electron_state::electron_1mhz_r)
 {
 	return 0xff;
 }
 
-WRITE8_HANDLER( electron_1mhz_w )
+WRITE8_MEMBER(electron_state::electron_1mhz_w)
 {
 }
 
-READ8_HANDLER( electron_ula_r )
+READ8_MEMBER(electron_state::electron_ula_r)
 {
-	electron_state *state = space->machine().driver_data<electron_state>();
-	UINT8 data = ((UINT8 *)space->machine().region("user1")->base())[0x43E00 + offset];
+	UINT8 data = ((UINT8 *)machine().region("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
-		data = state->m_ula.interrupt_status;
-		state->m_ula.interrupt_status &= ~0x02;
+		data = m_ula.interrupt_status;
+		m_ula.interrupt_status &= ~0x02;
 		break;
 	case 0x01:	/* Unknown */
 		break;
 	case 0x04:	/* Casette data shift register */
-		electron_interrupt_handler(space->machine(), INT_CLEAR, INT_RECEIVE_FULL );
-		data = state->m_ula.tape_byte;
+		electron_interrupt_handler(machine(), INT_CLEAR, INT_RECEIVE_FULL );
+		data = m_ula.tape_byte;
 		break;
 	}
 	logerror( "ULA: read offset %02x: %02x\n", offset, data );
@@ -177,26 +176,25 @@ READ8_HANDLER( electron_ula_r )
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
 static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
-WRITE8_HANDLER( electron_ula_w )
+WRITE8_MEMBER(electron_state::electron_ula_w)
 {
-	electron_state *state = space->machine().driver_data<electron_state>();
-	device_t *speaker = space->machine().device(BEEPER_TAG);
+	device_t *speaker = machine().device(BEEPER_TAG);
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt control */
-		state->m_ula.interrupt_control = data;
+		m_ula.interrupt_control = data;
 		break;
 	case 0x01:	/* Unknown */
 		break;
 	case 0x02:	/* Screen start address #1 */
-		state->m_ula.screen_start = ( state->m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
-		logerror( "screen_start changed to %04x\n", state->m_ula.screen_start );
+		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
+		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x03:	/* Screen start addres #2 */
-		state->m_ula.screen_start = ( state->m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
-		logerror( "screen_start changed to %04x\n", state->m_ula.screen_start );
+		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
+		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x04:	/* Cassette data shift register */
 		break;
@@ -207,85 +205,85 @@ WRITE8_HANDLER( electron_ula_w )
          * Rompages 10 and 11 both select the Basic ROM.
          * Rompages 8 and 9 both select the keyboard.
          */
-		if ( ( ( state->m_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
+		if ( ( ( m_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
 		{
-			state->m_ula.rompage = data & 0x0f;
-			if ( state->m_ula.rompage == 8 || state->m_ula.rompage == 9 )
+			m_ula.rompage = data & 0x0f;
+			if ( m_ula.rompage == 8 || m_ula.rompage == 9 )
 			{
-				state->m_ula.rompage = 8;
-				space->install_legacy_read_handler( 0x8000, 0xbfff, FUNC(electron_read_keyboard) );
+				m_ula.rompage = 8;
+				space.install_read_handler( 0x8000, 0xbfff, read8_delegate(FUNC(electron_state::electron_read_keyboard),this));
 			}
 			else
 			{
-				space->install_read_bank( 0x8000, 0xbfff, "bank2");
+				space.install_read_bank( 0x8000, 0xbfff, "bank2");
 			}
-			memory_set_bank(space->machine(), "bank2", state->m_ula.rompage);
+			memory_set_bank(machine(), "bank2", m_ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
-			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_DISPLAY_END );
+			electron_interrupt_handler( machine(), INT_CLEAR, INT_DISPLAY_END );
 		}
 		if ( data & 0x20 )
 		{
-			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_RTC );
+			electron_interrupt_handler( machine(), INT_CLEAR, INT_RTC );
 		}
 		if ( data & 0x40 )
 		{
-			electron_interrupt_handler( space->machine(), INT_CLEAR, INT_HIGH_TONE );
+			electron_interrupt_handler( machine(), INT_CLEAR, INT_HIGH_TONE );
 		}
 		if ( data & 0x80 )
 		{
 		}
 		break;
 	case 0x06:	/* Counter divider */
-		if ( state->m_ula.communication_mode == 0x01)
+		if ( m_ula.communication_mode == 0x01)
 		{
 			beep_set_frequency( speaker, 1000000 / ( 16 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:	/* Misc. */
-		state->m_ula.communication_mode = ( data >> 1 ) & 0x03;
-		switch( state->m_ula.communication_mode )
+		m_ula.communication_mode = ( data >> 1 ) & 0x03;
+		switch( m_ula.communication_mode )
 		{
 		case 0x00:	/* cassette input */
 			beep_set_state( speaker, 0 );
-			electron_tape_start(state);
+			electron_tape_start();
 			break;
 		case 0x01:	/* sound generation */
 			beep_set_state( speaker, 1 );
-			electron_tape_stop(state);
+			electron_tape_stop();
 			break;
 		case 0x02:	/* cassette output */
 			beep_set_state( speaker, 0 );
-			electron_tape_stop(state);
+			electron_tape_stop();
 			break;
 		case 0x03:	/* not used */
 			beep_set_state( speaker, 0 );
-			electron_tape_stop(state);
+			electron_tape_stop();
 			break;
 		}
-		state->m_ula.screen_mode = ( data >> 3 ) & 0x07;
-		state->m_ula.screen_base = electron_screen_base[ state->m_ula.screen_mode ];
-		state->m_ula.screen_size = 0x8000 - state->m_ula.screen_base;
-		state->m_ula.vram = (UINT8 *)space->get_read_ptr(state->m_ula.screen_base );
-		logerror( "ULA: screen mode set to %d\n", state->m_ula.screen_mode );
-		state->m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_device_image(space->machine())->change_state(state->m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
-		state->m_ula.capslock_mode = ( data >> 7 ) & 0x01;
+		m_ula.screen_mode = ( data >> 3 ) & 0x07;
+		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
+		m_ula.screen_size = 0x8000 - m_ula.screen_base;
+		m_ula.vram = (UINT8 *)space.get_read_ptr(m_ula.screen_base );
+		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
+		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
+		cassette_device_image(machine())->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
 		// video_update
-		state->m_ula.current_pal[i+10] = (state->m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
-		state->m_ula.current_pal[i+8] = (state->m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
-		state->m_ula.current_pal[i+2] = (state->m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
-		state->m_ula.current_pal[i] = (state->m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
+		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
+		m_ula.current_pal[i] = (m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
 		break;
 	case 0x09: case 0x0B: case 0x0D: case 0x0F:
 		// video_update
-		state->m_ula.current_pal[i+10] = (state->m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
-		state->m_ula.current_pal[i+8] = (state->m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
-		state->m_ula.current_pal[i+2] = (state->m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
-		state->m_ula.current_pal[i] = (state->m_ula.current_pal[i] & 0x04) | (((data & 0x10) >> 3) | ((data & 0x01)));
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
+		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
+		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
+		m_ula.current_pal[i] = (m_ula.current_pal[i] & 0x04) | (((data & 0x10) >> 3) | ((data & 0x01)));
 		break;
 	}
 }

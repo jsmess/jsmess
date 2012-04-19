@@ -516,11 +516,10 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 
 *******************************************************************************/
 
-READ8_HANDLER ( pmd85_io_r )
+READ8_MEMBER(pmd85_state::pmd85_io_r)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	i8251_device *uart = space->machine().device<i8251_device>("uart");
-	if (state->m_startup_mem_map)
+	i8251_device *uart = machine().device<i8251_device>("uart");
+	if (m_startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -531,23 +530,23 @@ READ8_HANDLER ( pmd85_io_r )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
+							return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (state->m_model)
+				switch (m_model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (state->m_rom_module_present)
+						if (m_rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-									return space->machine().device<i8255_device>("ppi8255_3")->read(*space, offset & 0x03);
+									return machine().device<i8255_device>("ppi8255_3")->read(space, offset & 0x03);
 							}
 						}
 						break;
@@ -562,16 +561,16 @@ READ8_HANDLER ( pmd85_io_r )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: return uart->data_r(*space, offset & 0x01);
-											case 0x01: return uart->status_r(*space, offset & 0x01);
+											case 0x00: return uart->data_r(space, offset & 0x01);
+											case 0x01: return uart->status_r(space, offset & 0x01);
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 0x03);
+										return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_r( space->machine().device("pit8253"), offset & 0x03);
+										return pit8253_r( machine().device("pit8253"), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return space->machine().device<i8255_device>("ppi8255_2")->read(*space, offset & 0x03);
+										return machine().device<i8255_device>("ppi8255_2")->read(space, offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -584,14 +583,13 @@ READ8_HANDLER ( pmd85_io_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( pmd85_io_w )
+WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	i8251_device *uart = space->machine().device<i8251_device>("uart");
-	if (state->m_startup_mem_map)
+	i8251_device *uart = machine().device<i8251_device>("uart");
+	if (m_startup_mem_map)
 	{
-		state->m_startup_mem_map = 0;
-		(*state->update_memory)(space->machine());
+		m_startup_mem_map = 0;
+		(*update_memory)(machine());
 	}
 
 	switch (offset & 0x0c)
@@ -600,30 +598,30 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
+							machine().device<i8255_device>("ppi8255_0")->write(space, offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
-								state->m_pmd853_memory_mapping = data & 0x01;
-								(*state->update_memory)(space->machine());
+								m_pmd853_memory_mapping = data & 0x01;
+								(*update_memory)(machine());
 							}
 							break;
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (state->m_model)
+				switch (m_model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (state->m_rom_module_present)
+						if (m_rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										space->machine().device<i8255_device>("ppi8255_3")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_3")->write(space, offset & 0x03, data);
 										break;
 							}
 						}
@@ -639,19 +637,19 @@ WRITE8_HANDLER ( pmd85_io_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: uart->data_w(*space, offset & 0x01, data); break;
-											case 0x01: uart->control_w(*space, offset & 0x01, data); break;
+											case 0x00: uart->data_w(space, offset & 0x01, data); break;
+											case 0x01: uart->control_w(space, offset & 0x01, data); break;
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_1")->write(space, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_w(space->machine().device("pit8253"), offset & 0x03, data);
+										pit8253_w(machine().device("pit8253"), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										space->machine().device<i8255_device>("ppi8255_2")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_2")->write(space, offset & 0x03, data);
 										break;
 							}
 							break;
@@ -672,10 +670,9 @@ WRITE8_HANDLER ( pmd85_io_w )
 
 *******************************************************************************/
 
- READ8_HANDLER ( mato_io_r )
+READ8_MEMBER(pmd85_state::mato_io_r)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	if (state->m_startup_mem_map)
+	if (m_startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -686,7 +683,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
+							return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 0x03);
 				}
 				break;
 	}
@@ -695,13 +692,12 @@ WRITE8_HANDLER ( pmd85_io_w )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( mato_io_w )
+WRITE8_MEMBER(pmd85_state::mato_io_w)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	if (state->m_startup_mem_map)
+	if (m_startup_mem_map)
 	{
-		state->m_startup_mem_map = 0;
-		(*state->update_memory)(space->machine());
+		m_startup_mem_map = 0;
+		(*update_memory)(machine());
 	}
 
 	switch (offset & 0x0c)
@@ -710,7 +706,7 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
+							return machine().device<i8255_device>("ppi8255_0")->write(space, offset & 0x03, data);
 							break;
 				}
 				break;

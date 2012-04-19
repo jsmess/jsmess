@@ -20,6 +20,12 @@ public:
 	UINT8 m_timer;
 	UINT8 m_printer_line[11][17];
 	UINT8 m_printer_line_color[11];
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(shifter_w);
+	DECLARE_WRITE8_MEMBER(printer_w);
+	DECLARE_WRITE8_MEMBER(status_w);
+	DECLARE_WRITE8_MEMBER(printer_ctrl_w);
 };
 
 

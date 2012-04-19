@@ -59,9 +59,9 @@
     mark cycle. Control must be returned at that time to the cassette routine
     in order to maintain data integrity.
 */
-static READ8_HANDLER( cassette_r )
+READ8_MEMBER(aquarius_state::cassette_r)
 {
-	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
+	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 	return ((cassette)->input() < +0.0) ? 0 : 1;
 }
 
@@ -71,10 +71,10 @@ static READ8_HANDLER( cassette_r )
     will appear on audio output. Sound port is a simple one bit I/O and therefore
     it must be toggled at a specific rate under software control.
 */
-static WRITE8_HANDLER( cassette_w )
+WRITE8_MEMBER(aquarius_state::cassette_w)
 {
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
-	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette->output( BIT(data, 0) ? +1.0 : -1.0);
@@ -93,9 +93,9 @@ static WRITE8_HANDLER( cassette_w )
         +                             +       +
     +++++                             +++++++++
 */
-static READ8_HANDLER( vsync_r )
+READ8_MEMBER(aquarius_state::vsync_r)
 {
-	screen_device *screen = space->machine().primary_screen;
+	screen_device *screen = machine().primary_screen;
 	return screen->vblank() ? 0 : 1;
 }
 
@@ -105,7 +105,7 @@ static READ8_HANDLER( vsync_r )
     map with the upper 16K. A 1 in this bit indicates swapping. This bit is reset
     after power up initialization.
 */
-static WRITE8_HANDLER( mapper_w )
+WRITE8_MEMBER(aquarius_state::mapper_w)
 {
 }
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( mapper_w )
     to send status from PRNHASK pin at bit D0. A 1 indicates printer is ready,
     0 means not ready.
 */
-static READ8_HANDLER( printer_r )
+READ8_MEMBER(aquarius_state::printer_r)
 {
 	return 1; /* ready */
 }
@@ -127,7 +127,7 @@ static READ8_HANDLER( printer_r )
     baudrate is variable. In BASIC this is a 1200 baud printer port for
     the 40 column thermal printer.
 */
-static WRITE8_HANDLER( printer_w )
+WRITE8_MEMBER(aquarius_state::printer_w)
 {
 }
 
@@ -143,18 +143,18 @@ static WRITE8_HANDLER( printer_w )
     Therefore the keyboard can be scanned by placing a specific scanning
     pattern in (A) or (B) and reading the result returned on rows.
 */
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER(aquarius_state::keyboard_r)
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(offset,  8)) result &= input_port_read(space->machine(), "ROW0");
-	if (!BIT(offset,  9)) result &= input_port_read(space->machine(), "ROW1");
-	if (!BIT(offset, 10)) result &= input_port_read(space->machine(), "ROW2");
-	if (!BIT(offset, 11)) result &= input_port_read(space->machine(), "ROW3");
-	if (!BIT(offset, 12)) result &= input_port_read(space->machine(), "ROW4");
-	if (!BIT(offset, 13)) result &= input_port_read(space->machine(), "ROW5");
-	if (!BIT(offset, 14)) result &= input_port_read(space->machine(), "ROW6");
-	if (!BIT(offset, 15)) result &= input_port_read(space->machine(), "ROW7");
+	if (!BIT(offset,  8)) result &= input_port_read(machine(), "ROW0");
+	if (!BIT(offset,  9)) result &= input_port_read(machine(), "ROW1");
+	if (!BIT(offset, 10)) result &= input_port_read(machine(), "ROW2");
+	if (!BIT(offset, 11)) result &= input_port_read(machine(), "ROW3");
+	if (!BIT(offset, 12)) result &= input_port_read(machine(), "ROW4");
+	if (!BIT(offset, 13)) result &= input_port_read(machine(), "ROW5");
+	if (!BIT(offset, 14)) result &= input_port_read(machine(), "ROW6");
+	if (!BIT(offset, 15)) result &= input_port_read(machine(), "ROW7");
 
 	return result;
 }
@@ -178,17 +178,15 @@ static READ8_HANDLER( keyboard_r )
     routine. For game cartridge the lock pattern is generated from data in the
     game cartridge itself.
 */
-static WRITE8_HANDLER( scrambler_w )
+WRITE8_MEMBER(aquarius_state::scrambler_w)
 {
-	aquarius_state *state = space->machine().driver_data<aquarius_state>();
-	state->m_scrambler = data;
+	m_scrambler = data;
 }
 
-static READ8_HANDLER( cartridge_r )
+READ8_MEMBER(aquarius_state::cartridge_r)
 {
-	aquarius_state *state = space->machine().driver_data<aquarius_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base() + 0xc000;
-	return rom[offset] ^ state->m_scrambler;
+	UINT8 *rom = machine().region("maincpu")->base() + 0xc000;
+	return rom[offset] ^ m_scrambler;
 }
 
 
@@ -197,15 +195,15 @@ static READ8_HANDLER( cartridge_r )
 ***************************************************************************/
 
 /* note: 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2 */
-static READ8_HANDLER( floppy_r )
+READ8_MEMBER(aquarius_state::floppy_r)
 {
-	logerror("%s: floppy_r[0x%02x]\n", space->machine().describe_context(), offset);
+	logerror("%s: floppy_r[0x%02x]\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( floppy_w )
+WRITE8_MEMBER(aquarius_state::floppy_w)
 {
-	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", space->machine().describe_context(), offset, data);
+	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", machine().describe_context(), offset, data);
 }
 
 
@@ -232,26 +230,26 @@ static DRIVER_INIT( aquarius )
 
 static ADDRESS_MAP_START( aquarius_mem, AS_PROGRAM, 8, aquarius_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE_LEGACY(aquarius_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE_LEGACY(aquarius_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP /* expansion ram */
-	AM_RANGE(0xc000, 0xffff) AM_READ_LEGACY(cartridge_r)
+	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquarius_io, AS_IO, 8, aquarius_state )
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(modem_r, modem_w)
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(cassette_r, cassette_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(vsync_r, mapper_w)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(printer_r, printer_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE_LEGACY(keyboard_r, scrambler_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquarius_qd_io, AS_IO, 8, aquarius_state )
 	AM_IMPORT_FROM(aquarius_io)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(floppy_r, floppy_w)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
 ADDRESS_MAP_END
 
 

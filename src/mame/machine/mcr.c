@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 #include "includes/mcr.h"
 
 #define VERBOSE 0
@@ -174,9 +174,6 @@ MACHINE_RESET( mcr )
 {
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
-
-	/* initialize the sound */
-	mcr_sound_reset(machine);
 }
 
 
@@ -223,33 +220,6 @@ TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
 		z80ctc_trg3_w(ctc, 1);
 		z80ctc_trg3_w(ctc, 0);
 	}
-}
-
-
-/*************************************
- *
- *  Generic MCR port write handlers
- *
- *************************************/
-
-WRITE8_MEMBER(mcr_state::mcr_control_port_w)
-{
-	/*
-        Bit layout is as follows:
-            D7 = n/c
-            D6 = cocktail flip
-            D5 = red LED
-            D4 = green LED
-            D3 = n/c
-            D2 = coin meter 3
-            D1 = coin meter 2
-            D0 = coin meter 1
-    */
-
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
-	coin_counter_w(machine(), 2, (data >> 2) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 

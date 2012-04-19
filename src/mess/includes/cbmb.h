@@ -55,13 +55,13 @@ public:
 	int m_old_level;
 	int m_irq_level;
 	int m_font;
+	DECLARE_WRITE8_MEMBER(cbmb_colorram_w);
 };
 
 /*----------- defined in machine/cbmb.c -----------*/
 
 extern const mos6526_interface cbmb_cia;
 
-WRITE8_HANDLER ( cbmb_colorram_w );
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );

@@ -30,22 +30,22 @@
 static ADDRESS_MAP_START(orion128_mem, AS_PROGRAM, 8, orion_state )
 	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank2")
-    AM_RANGE( 0xf400, 0xf4ff ) AM_READWRITE_LEGACY(orion128_system_r,orion128_system_w)  // Keyboard and cassette
-    AM_RANGE( 0xf500, 0xf5ff ) AM_READWRITE_LEGACY(orion128_romdisk_r,orion128_romdisk_w)
-    AM_RANGE( 0xf700, 0xf7ff ) AM_READWRITE_LEGACY(orion128_floppy_r,orion128_floppy_w)
+    AM_RANGE( 0xf400, 0xf4ff ) AM_READWRITE(orion128_system_r,orion128_system_w)  // Keyboard and cassette
+    AM_RANGE( 0xf500, 0xf5ff ) AM_READWRITE(orion128_romdisk_r,orion128_romdisk_w)
+    AM_RANGE( 0xf700, 0xf7ff ) AM_READWRITE(orion128_floppy_r,orion128_floppy_w)
     AM_RANGE( 0xf800, 0xffff ) AM_ROM
-    AM_RANGE( 0xf800, 0xf8ff ) AM_WRITE_LEGACY(orion128_video_mode_w)
-    AM_RANGE( 0xf900, 0xf9ff ) AM_WRITE_LEGACY(orion128_memory_page_w)
-    AM_RANGE( 0xfa00, 0xfaff ) AM_WRITE_LEGACY(orion128_video_page_w)
+    AM_RANGE( 0xf800, 0xf8ff ) AM_WRITE(orion128_video_mode_w)
+    AM_RANGE( 0xf900, 0xf9ff ) AM_WRITE(orion128_memory_page_w)
+    AM_RANGE( 0xfa00, 0xfaff ) AM_WRITE(orion128_video_page_w)
 ADDRESS_MAP_END
 
 /* Orion Z80 Card II */
 static ADDRESS_MAP_START( orion128_io , AS_IO, 8, orion_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf8, 0xf8) AM_WRITE_LEGACY(orion128_video_mode_w )
-	AM_RANGE( 0xf9, 0xf9) AM_WRITE_LEGACY(orion128_memory_page_w )
-	AM_RANGE( 0xfa, 0xfa) AM_WRITE_LEGACY(orion128_video_page_w )
+	AM_RANGE( 0xf8, 0xf8) AM_WRITE(orion128_video_mode_w )
+	AM_RANGE( 0xf9, 0xf9) AM_WRITE(orion128_memory_page_w )
+	AM_RANGE( 0xfa, 0xfa) AM_WRITE(orion128_video_page_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(orionz80_mem, AS_PROGRAM, 8, orion_state )
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 
 /* Orion Pro */
 static ADDRESS_MAP_START( orionz80_io , AS_IO, 8, orion_state )
-    AM_RANGE( 0x0000, 0xffff) AM_READWRITE_LEGACY(orionz80_io_r, orionz80_io_w )
+    AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionz80_io_r, orionz80_io_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(orionpro_mem, AS_PROGRAM, 8, orion_state )
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START(orionpro_mem, AS_PROGRAM, 8, orion_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( orionpro_io , AS_IO, 8, orion_state )
-    AM_RANGE( 0x0000, 0xffff) AM_READWRITE_LEGACY(orionpro_io_r, orionpro_io_w )
+    AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
 static const cassette_interface orion_cassette_interface =

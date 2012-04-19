@@ -21,7 +21,7 @@ static ADDRESS_MAP_START( lynx_mem , AS_PROGRAM, 8, lynx_state )
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_SHARE("mem_fd00")
 	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_SHARE("mem_fe00")
 	AM_RANGE(0xfff8, 0xfff8) AM_RAM
-	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE_LEGACY(lynx_memory_config_r, lynx_memory_config_w)
+	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE(lynx_memory_config_r, lynx_memory_config_w)
 	AM_RANGE(0xfffa, 0xffff) AM_READ_BANK("bank4") AM_WRITEONLY AM_SHARE("mem_fffa")
 ADDRESS_MAP_END
 

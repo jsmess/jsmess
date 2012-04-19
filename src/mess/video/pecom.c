@@ -12,32 +12,31 @@
 #include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
 
-WRITE8_HANDLER( pecom_cdp1869_w )
+WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {
-	pecom_state *state = space->machine().driver_data<pecom_state>();
 
-	UINT16 ma = state->m_cdp1802->get_memory_address();
+	UINT16 ma = m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
 	{
 	case 3:
-		state->m_cdp1869->out3_w(*space, ma, data);
+		m_cdp1869->out3_w(space, ma, data);
 		break;
 
 	case 4:
-		state->m_cdp1869->out4_w(*space, ma, data);
+		m_cdp1869->out4_w(space, ma, data);
 		break;
 
 	case 5:
-		state->m_cdp1869->out5_w(*space, ma, data);
+		m_cdp1869->out5_w(space, ma, data);
 		break;
 
 	case 6:
-		state->m_cdp1869->out6_w(*space, ma, data);
+		m_cdp1869->out6_w(space, ma, data);
 		break;
 
 	case 7:
-		state->m_cdp1869->out7_w(*space, ma, data);
+		m_cdp1869->out7_w(space, ma, data);
 		break;
 	}
 }

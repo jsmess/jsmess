@@ -121,23 +121,25 @@ public:
 	int m_joystick_port_select;
 	int m_joystick_data_select;
 	UINT8 m_joy_6b_packet[5];
+	DECLARE_WRITE8_MEMBER(pce_sf2_banking_w);
+	DECLARE_WRITE8_MEMBER(pce_cartridge_ram_w);
+	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
+	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
+	DECLARE_WRITE8_MEMBER(pce_cd_bram_w);
+	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
+	DECLARE_READ8_MEMBER(pce_cd_intf_r);
+	DECLARE_READ8_MEMBER(pce_cd_acard_r);
+	DECLARE_WRITE8_MEMBER(pce_cd_acard_w);
+	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
+	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
 };
 
 
 /*----------- defined in machine/pce.c -----------*/
 
 DEVICE_IMAGE_LOAD(pce_cart);
-WRITE8_HANDLER ( mess_pce_joystick_w );
- READ8_HANDLER ( mess_pce_joystick_r );
 
 extern const msm5205_interface pce_cd_msm5205_interface;
-WRITE8_HANDLER( pce_cd_bram_w );
-WRITE8_HANDLER( pce_cd_intf_w );
-READ8_HANDLER( pce_cd_intf_r );
-WRITE8_HANDLER( pce_cd_acard_w );
-READ8_HANDLER( pce_cd_acard_r );
-WRITE8_HANDLER( pce_cd_acard_wram_w );
-READ8_HANDLER( pce_cd_acard_wram_r );
 
 DRIVER_INIT( mess_pce );
 DRIVER_INIT( tg16 );

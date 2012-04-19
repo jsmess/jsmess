@@ -161,45 +161,41 @@ WRITE_LINE_MEMBER( at_state::pc_dma_hrq_changed )
 	i8237_hlda_w( m_dma8237_2, state );
 }
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(at_state::pc_dma_read_byte)
 {
-	at_state *st = space->machine().driver_data<at_state>();
 	UINT8 result;
-	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
-	result = space->read_byte(page_offset + offset);
+	result = space.read_byte(page_offset + offset);
 	return result;
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(at_state::pc_dma_write_byte)
 {
-	at_state *st = space->machine().driver_data<at_state>();
-	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
 
-static READ8_HANDLER( pc_dma_read_word )
+READ8_MEMBER(at_state::pc_dma_read_word)
 {
-	at_state *st = space->machine().driver_data<at_state>();
 	UINT16 result;
-	offs_t page_offset = (((offs_t) st->m_dma_offset[1][st->m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
 
-	result = space->read_word(page_offset + ( offset << 1 ) );
-	st->m_dma_high_byte = result & 0xFF00;
+	result = space.read_word(page_offset + ( offset << 1 ) );
+	m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_word )
+WRITE8_MEMBER(at_state::pc_dma_write_word)
 {
-	at_state *st = space->machine().driver_data<at_state>();
-	offs_t page_offset = (((offs_t) st->m_dma_offset[1][st->m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
 
-	space->write_word(page_offset + ( offset << 1 ), st->m_dma_high_byte | data);
+	space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
 }
 
 
@@ -242,8 +238,8 @@ I8237_INTERFACE( at_dma8237_1_config )
 {
 	DEVCB_DEVICE_LINE("dma8237_2",i8237_dreq0_w),
 	DEVCB_DRIVER_LINE_MEMBER(at_state, at_dma8237_out_eop),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(at_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(at_state, pc_dma_write_byte),
 	{ DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_0_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_1_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_2_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_3_dack_r) },
 	{ DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_0_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_1_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_2_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_3_dack_w) },
 	{ DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack3_w) }
@@ -254,8 +250,8 @@ I8237_INTERFACE( at_dma8237_2_config )
 {
 	DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_word),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_word),
+	DEVCB_DRIVER_MEMBER(at_state, pc_dma_read_word),
+	DEVCB_DRIVER_MEMBER(at_state, pc_dma_write_word),
 	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_5_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_6_dack_r), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_7_dack_r) },
 	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_5_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_6_dack_w), DEVCB_DRIVER_MEMBER(at_state, pc_dma8237_7_dack_w) },
 	{ DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack4_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack5_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack6_w), DEVCB_DRIVER_LINE_MEMBER(at_state, pc_dack7_w) }

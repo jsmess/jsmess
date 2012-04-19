@@ -46,6 +46,9 @@ public:
 	UINT8 m_df_on_databus;
 	
 	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
+	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
+	DECLARE_READ8_MEMBER(elwro800jr_io_r);
+	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
 };
 
 
@@ -81,14 +84,14 @@ static const struct upd765_interface elwro800jr_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static WRITE8_HANDLER(elwro800jr_fdc_control_w)
+WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	device_t *fdc = space->machine().device("upd765");
+	device_t *fdc = machine().device("upd765");
 
-	floppy_mon_w(floppy_get_device(space->machine(), 0), !BIT(data, 0));
-	floppy_mon_w(floppy_get_device(space->machine(), 1), !BIT(data, 1));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1,1);
+	floppy_mon_w(floppy_get_device(machine(), 0), !BIT(data, 0));
+	floppy_mon_w(floppy_get_device(machine(), 1), !BIT(data, 1));
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
 
 	upd765_tc_w(fdc, data & 0x04);
 
@@ -220,11 +223,10 @@ static const centronics_interface elwro800jr_centronics_interface =
  *  0x??FE, 0x??7F, 0x??7B (read): keyboard reading
  *************************************/
 
-static READ8_HANDLER(elwro800jr_io_r)
+READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 {
-	UINT8 *prom = space->machine().region("proms")->base();
+	UINT8 *prom = machine().region("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
-	elwro800_state *state = space->machine().driver_data<elwro800_state>();
 
 	if (!BIT(cs,0))
 	{
@@ -234,7 +236,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 		int i;
 		char port_name[6] = "LINE0";
 
-		if ( !state->m_NR )
+		if ( !m_NR )
 		{
 			for (i = 0; i < 9; mask >>= 1, i++)
 			{
@@ -248,24 +250,24 @@ static READ8_HANDLER(elwro800jr_io_r)
 					{
 						port_name[4] = '0' + (7 - i);
 					}
-					data &= (input_port_read(space->machine(), port_name));
+					data &= (input_port_read(machine(), port_name));
 				}
 			}
 
 			if ((offset & 0xff) == 0xfb)
 			{
-				data &= input_port_read(space->machine(), "LINE9");
+				data &= input_port_read(machine(), "LINE9");
 			}
 
 			/* cassette input from wav */
-			if ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
+			if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
 			{
 				data &= ~0x40;
 			}
 		}
 		else
 		{
-			data = input_port_read(space->machine(), "NETWORK ID");
+			data = input_port_read(machine(), "NETWORK ID");
 		}
 
 		return data;
@@ -277,13 +279,13 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-		return ppi->read(*space, (offset & 0x03) ^ 0x03);
+		i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+		return ppi->read(space, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine().device("upd765");
+		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
 			return upd765_data_r(fdc,0);
@@ -296,14 +298,14 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("i8251");
+		i8251_device *usart = machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
-			return usart->status_r(*space, 0);
+			return usart->status_r(space, 0);
 		}
 		else
 		{
-			return usart->data_r(*space, 0);
+			return usart->data_r(space, 0);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -317,9 +319,9 @@ static READ8_HANDLER(elwro800jr_io_r)
 	return 0x00;
 }
 
-static WRITE8_HANDLER(elwro800jr_io_w)
+WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 {
-	UINT8 *prom = space->machine().region("proms")->base();
+	UINT8 *prom = machine().region("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
@@ -330,18 +332,18 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,1))
 	{
 		// CF7
-		elwro800jr_mmu_w(space->machine(), data);
+		elwro800jr_mmu_w(machine(), data);
 	}
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-		ppi->write(*space, (offset & 0x03) ^ 0x03, data);
+		i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+		ppi->write(space, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine().device("upd765");
+		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
 			upd765_data_w(fdc, 0, data);
@@ -350,14 +352,14 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("i8251");
+		i8251_device *usart = machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
-			usart->control_w(*space, 0, data);
+			usart->control_w(space, 0, data);
 		}
 		else
 		{
-			usart->data_w(*space, 0, data);
+			usart->data_w(space, 0, data);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -384,7 +386,7 @@ static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8, elwro800_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(elwro800jr_io_r, elwro800jr_io_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(elwro800jr_io_r, elwro800jr_io_w)
 ADDRESS_MAP_END
 
 /*************************************

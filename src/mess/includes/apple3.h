@@ -47,6 +47,14 @@ public:
 	UINT8 m_last_n;
 	UINT8 *m_char_mem;
 	UINT32 *m_hgr_map;
+	DECLARE_READ8_MEMBER(apple3_c0xx_r);
+	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
+	DECLARE_READ8_MEMBER(apple3_00xx_r);
+	DECLARE_WRITE8_MEMBER(apple3_00xx_w);
+	DECLARE_READ8_MEMBER(apple3_indexed_read);
+	DECLARE_WRITE8_MEMBER(apple3_indexed_write);
+	UINT8 apple3_profile_r(offs_t offset);
+	void apple3_profile_w(offs_t offset, UINT8 data);
 };
 
 
@@ -60,11 +68,7 @@ MACHINE_RESET( apple3 );
 DRIVER_INIT( apple3 );
 INTERRUPT_GEN( apple3_interrupt );
 
-READ8_HANDLER( apple3_00xx_r );
-WRITE8_HANDLER( apple3_00xx_w );
 
-READ8_HANDLER( apple3_indexed_read );
-WRITE8_HANDLER( apple3_indexed_write );
 
 
 /*----------- defined in video/apple3.c -----------*/

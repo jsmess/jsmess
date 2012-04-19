@@ -292,19 +292,18 @@ SamRam
  bit 2-0: border colour
 */
 
-WRITE8_HANDLER(spectrum_port_fe_w)
+WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 	unsigned char Changed;
 
-	Changed = state->m_port_fe_data^data;
+	Changed = m_port_fe_data^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		spectrum_EventList_AddItemOffset(space->machine(), 0x0fe, data & 0x07, space->machine().device<cpu_device>("maincpu")->attotime_to_cycles(space->machine().primary_screen->scan_period() * space->machine().primary_screen->vpos()));
+		spectrum_EventList_AddItemOffset(machine(), 0x0fe, data & 0x07, machine().device<cpu_device>("maincpu")->attotime_to_cycles(machine().primary_screen->scan_period() * machine().primary_screen->vpos()));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -316,10 +315,10 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & (1<<3)) ? -1.0 : +1.0);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & (1<<3)) ? -1.0 : +1.0);
 	}
 
-	state->m_port_fe_data = data;
+	m_port_fe_data = data;
 }
 
 DIRECT_UPDATE_HANDLER(spectrum_direct)
@@ -336,21 +335,21 @@ DIRECT_UPDATE_HANDLER(spectrum_direct)
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
-READ8_HANDLER(spectrum_port_fe_r)
+READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 {
 	int lines = offset >> 8;
 	int data = 0xff;
 
-	int cs_extra1 = input_port_read_safe(space->machine(), "PLUS0", 0xff) & 0x1f;
-	int cs_extra2 = input_port_read_safe(space->machine(), "PLUS1", 0xff) & 0x1f;
-	int cs_extra3 = input_port_read_safe(space->machine(), "PLUS2", 0xff) & 0x1f;
-	int ss_extra1 = input_port_read_safe(space->machine(), "PLUS3", 0xff) & 0x1f;
-	int ss_extra2 = input_port_read_safe(space->machine(), "PLUS4", 0xff) & 0x1f;
+	int cs_extra1 = input_port_read_safe(machine(), "PLUS0", 0xff) & 0x1f;
+	int cs_extra2 = input_port_read_safe(machine(), "PLUS1", 0xff) & 0x1f;
+	int cs_extra3 = input_port_read_safe(machine(), "PLUS2", 0xff) & 0x1f;
+	int ss_extra1 = input_port_read_safe(machine(), "PLUS3", 0xff) & 0x1f;
+	int ss_extra2 = input_port_read_safe(machine(), "PLUS4", 0xff) & 0x1f;
 
 	/* Caps - V */
 	if ((lines & 1) == 0)
 	{
-		data &= input_port_read(space->machine(), "LINE0");
+		data &= input_port_read(machine(), "LINE0");
 		/* CAPS for extra keys */
 		if (cs_extra1 != 0x1f || cs_extra2 != 0x1f || cs_extra3 != 0x1f)
 			data &= ~0x01;
@@ -358,32 +357,32 @@ READ8_HANDLER(spectrum_port_fe_r)
 
 	/* A - G */
 	if ((lines & 2) == 0)
-		data &= input_port_read(space->machine(), "LINE1");
+		data &= input_port_read(machine(), "LINE1");
 
 	/* Q - T */
 	if ((lines & 4) == 0)
-		data &= input_port_read(space->machine(), "LINE2");
+		data &= input_port_read(machine(), "LINE2");
 
 	/* 1 - 5 */
 	if ((lines & 8) == 0)
-		data &= input_port_read(space->machine(), "LINE3") & cs_extra1;
+		data &= input_port_read(machine(), "LINE3") & cs_extra1;
 
 	/* 6 - 0 */
 	if ((lines & 16) == 0)
-		data &= input_port_read(space->machine(), "LINE4") & cs_extra2;
+		data &= input_port_read(machine(), "LINE4") & cs_extra2;
 
 	/* Y - P */
 	if ((lines & 32) == 0)
-		data &= input_port_read(space->machine(), "LINE5") & ss_extra1;
+		data &= input_port_read(machine(), "LINE5") & ss_extra1;
 
 	/* H - Enter */
 	if ((lines & 64) == 0)
-		data &= input_port_read(space->machine(), "LINE6");
+		data &= input_port_read(machine(), "LINE6");
 
 		/* B - Space */
 	if ((lines & 128) == 0)
 	{
-		data &= input_port_read(space->machine(), "LINE7") & cs_extra3 & ss_extra2;
+		data &= input_port_read(machine(), "LINE7") & cs_extra3 & ss_extra2;
 		/* SYMBOL SHIFT for extra keys */
 		if (ss_extra1 != 0x1f || ss_extra2 != 0x1f)
 			data &= ~0x02;
@@ -392,43 +391,42 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
+	if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
 	{
 		data &= ~0x40;
 	}
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
     Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (input_port_read(space->machine(), "CONFIG") & 0x80)
+	if (input_port_read(machine(), "CONFIG") & 0x80)
 		data ^= (0x40);
 
 	return data;
 }
 
 /* kempston joystick interface */
-READ8_HANDLER(spectrum_port_1f_r)
+READ8_MEMBER(spectrum_state::spectrum_port_1f_r)
 {
-	return input_port_read(space->machine(), "KEMPSTON") & 0x1f;
+	return input_port_read(machine(), "KEMPSTON") & 0x1f;
 }
 
 /* fuller joystick interface */
-READ8_HANDLER(spectrum_port_7f_r)
+READ8_MEMBER(spectrum_state::spectrum_port_7f_r)
 {
-	return input_port_read(space->machine(), "FULLER") | (0xff^0x8f);
+	return input_port_read(machine(), "FULLER") | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
-READ8_HANDLER(spectrum_port_df_r)
+READ8_MEMBER(spectrum_state::spectrum_port_df_r)
 {
-	return input_port_read(space->machine(), "MIKROGEN") | (0xff^0x1f);
+	return input_port_read(machine(), "MIKROGEN") | (0xff^0x1f);
 }
 
-static READ8_HANDLER ( spectrum_port_ula_r )
+READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-	int vpos = space->machine().primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 
-	return vpos<193 ? state->m_video_ram[(vpos&0xf8)<<2]:0xff;
+	return vpos<193 ? m_video_ram[(vpos&0xf8)<<2]:0xff;
 }
 
 /* Memory Maps */
@@ -443,11 +441,11 @@ ADDRESS_MAP_END
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, spectrum_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
-	AM_RANGE(0x1f, 0x1f) AM_READ_LEGACY(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ_LEGACY(spectrum_port_7f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ_LEGACY(spectrum_port_df_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(spectrum_port_ula_r) AM_MIRROR(0xfffe)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
+	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x01, 0x01) AM_READ(spectrum_port_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
 /* Input ports */

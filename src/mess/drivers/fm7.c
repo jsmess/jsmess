@@ -199,11 +199,10 @@ static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
  *   bit 7 - SYNDET
  *
  */
-static WRITE8_HANDLER( fm7_irq_mask_w )
+WRITE8_MEMBER(fm7_state::fm7_irq_mask_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_irq_mask = data;
-	logerror("IRQ mask set: 0x%02x\n",state->m_irq_mask);
+	m_irq_mask = data;
+	logerror("IRQ mask set: 0x%02x\n",m_irq_mask);
 }
 
 /*
@@ -219,18 +218,17 @@ static WRITE8_HANDLER( fm7_irq_mask_w )
  *   bit 6 - buzzer on for 205ms
  *   bit 7 - buzzer on/off
  */
-static READ8_HANDLER( fm7_irq_cause_r )
+READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8 ret = ~state->m_irq_flags;
+	UINT8 ret = ~m_irq_flags;
 
 	// Timer and Printer IRQ flags are cleared when this port is read
 	// Keyboard IRQ flag is cleared when the scancode is read from
 	// either keyboard data port (main CPU 0xfd01 or sub CPU 0xd401)
-	if(state->m_irq_flags & 0x04)
-		main_irq_clear_flag(space->machine(),IRQ_FLAG_TIMER);
-	if(state->m_irq_flags & 0x02)
-		main_irq_clear_flag(space->machine(),IRQ_FLAG_PRINTER);
+	if(m_irq_flags & 0x04)
+		main_irq_clear_flag(machine(),IRQ_FLAG_TIMER);
+	if(m_irq_flags & 0x02)
+		main_irq_clear_flag(machine(),IRQ_FLAG_PRINTER);
 
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
@@ -242,32 +240,31 @@ static TIMER_CALLBACK( fm7_beeper_off )
 	logerror("timed beeper off\n");
 }
 
-static WRITE8_HANDLER( fm7_beeper_w )
+WRITE8_MEMBER(fm7_state::fm7_beeper_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_speaker_active = data & 0x01;
+	m_speaker_active = data & 0x01;
 
-	if(!state->m_speaker_active)  // speaker not active, disable all beeper sound
+	if(!m_speaker_active)  // speaker not active, disable all beeper sound
 	{
-		beep_set_state(space->machine().device(BEEPER_TAG),0);
+		beep_set_state(machine().device(BEEPER_TAG),0);
 		return;
 	}
 
 	if(data & 0x80)
 	{
-		if(state->m_speaker_active)
-			beep_set_state(space->machine().device(BEEPER_TAG),1);
+		if(m_speaker_active)
+			beep_set_state(machine().device(BEEPER_TAG),1);
 	}
 	else
-		beep_set_state(space->machine().device(BEEPER_TAG),0);
+		beep_set_state(machine().device(BEEPER_TAG),0);
 
 	if(data & 0x40)
 	{
-		if(state->m_speaker_active)
+		if(m_speaker_active)
 		{
-			beep_set_state(space->machine().device(BEEPER_TAG),1);
+			beep_set_state(machine().device(BEEPER_TAG),1);
 			logerror("timed beeper on\n");
-			space->machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
+			machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
 		}
 	}
 	logerror("beeper state: %02x\n",data);
@@ -278,41 +275,38 @@ static WRITE8_HANDLER( fm7_beeper_w )
  *  Sub CPU: port 0xd403 (read-only)
  *  On read: timed buzzer sound
  */
-READ8_HANDLER( fm7_sub_beeper_r )
+READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->m_speaker_active)
+	if(m_speaker_active)
 	{
-		beep_set_state(space->machine().device(BEEPER_TAG),1);
+		beep_set_state(machine().device(BEEPER_TAG),1);
 		logerror("timed beeper on\n");
-		space->machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
+		machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
 	}
 	return 0xff;
 }
 
-static READ8_HANDLER( vector_r )
+READ8_MEMBER(fm7_state::vector_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* RAM = space->machine().region("maincpu")->base();
-	UINT8* ROM = space->machine().region("init")->base();
+	UINT8* RAM = machine().region("maincpu")->base();
+	UINT8* ROM = machine().region("init")->base();
 
-	if(state->m_init_rom_en)
+	if(m_init_rom_en)
 		return ROM[0x1ff0+offset];
 	else
 	{
-		if(state->m_type == SYS_FM7)
+		if(m_type == SYS_FM7)
 			return RAM[0xfff0+offset];
 		else
 			return RAM[0x3fff0+offset];
 	}
 }
 
-static WRITE8_HANDLER( vector_w )
+WRITE8_MEMBER(fm7_state::vector_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* RAM = space->machine().region("maincpu")->base();
+	UINT8* RAM = machine().region("maincpu")->base();
 
-	if(state->m_type == SYS_FM7)
+	if(m_type == SYS_FM7)
 		RAM[0xfff0+offset] = data;
 	else
 		RAM[0x3fff0+offset] = data;
@@ -324,17 +318,16 @@ static WRITE8_HANDLER( vector_w )
  *  bit 0 - attention IRQ active, clears flag when read.
  *  bit 1 - break key active
  */
-static READ8_HANDLER( fm7_fd04_r )
+READ8_MEMBER(fm7_state::fm7_fd04_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 
-	if(state->m_video.attn_irq != 0)
+	if(m_video.attn_irq != 0)
 	{
 		ret &= ~0x01;
-		state->m_video.attn_irq = 0;
+		m_video.attn_irq = 0;
 	}
-	if(state->m_break_flag != 0)
+	if(m_break_flag != 0)
 	{
 		ret &= ~0x02;
 	}
@@ -347,37 +340,35 @@ static READ8_HANDLER( fm7_fd04_r )
  *  On read, enables BASIC ROM at 0x8000 (default)
  *  On write, disables BASIC ROM, enables RAM (if more than 32kB)
  */
-static READ8_HANDLER( fm7_rom_en_r )
+READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* RAM = space->machine().region("maincpu")->base();
+	UINT8* RAM = machine().region("maincpu")->base();
 
-	state->m_basic_rom_en = 1;
-	if(state->m_type == SYS_FM7)
+	m_basic_rom_en = 1;
+	if(m_type == SYS_FM7)
 	{
-		space->install_read_bank(0x8000,0xfbff,"bank1");
-		space->nop_write(0x8000,0xfbff);
-		memory_set_bankptr(space->machine(),"bank1",RAM+0x38000);
+		space.install_read_bank(0x8000,0xfbff,"bank1");
+		space.nop_write(0x8000,0xfbff);
+		memory_set_bankptr(machine(),"bank1",RAM+0x38000);
 	}
 	else
-		fm7_mmr_refresh(space);
+		fm7_mmr_refresh(&space);
 	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
 
-static WRITE8_HANDLER( fm7_rom_en_w )
+WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* RAM = space->machine().region("maincpu")->base();
+	UINT8* RAM = machine().region("maincpu")->base();
 
-	state->m_basic_rom_en = 0;
-	if(state->m_type == SYS_FM7)
+	m_basic_rom_en = 0;
+	if(m_type == SYS_FM7)
 	{
-		space->install_readwrite_bank(0x8000,0xfbff,"bank1");
-		memory_set_bankptr(space->machine(),"bank1",RAM+0x8000);
+		space.install_readwrite_bank(0x8000,0xfbff,"bank1");
+		memory_set_bankptr(machine(),"bank1",RAM+0x8000);
 	}
 	else
-		fm7_mmr_refresh(space);
+		fm7_mmr_refresh(&space);
 	logerror("BASIC ROM disabled\n");
 }
 
@@ -387,18 +378,17 @@ static WRITE8_HANDLER( fm7_rom_en_w )
  *  Port is write-only.  Initiate ROM is on by default.
  *
  */
-static WRITE8_HANDLER( fm7_init_en_w )
+WRITE8_MEMBER(fm7_state::fm7_init_en_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(data & 0x02)
 	{
-		state->m_init_rom_en = 0;
-		fm7_mmr_refresh(space);
+		m_init_rom_en = 0;
+		fm7_mmr_refresh(&space);
 	}
 	else
 	{
-		state->m_init_rom_en = 1;
-		fm7_mmr_refresh(space);
+		m_init_rom_en = 1;
+		fm7_mmr_refresh(&space);
 	}
 }
 
@@ -418,10 +408,9 @@ static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
 	drvstate->m_fdc_drq_flag = state;
 }
 
-static READ8_HANDLER( fm7_fdc_r )
+READ8_MEMBER(fm7_state::fm7_fdc_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	device_t* dev = space->machine().device("fdc");
+	device_t* dev = machine().device("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -435,16 +424,16 @@ static READ8_HANDLER( fm7_fdc_r )
 		case 3:
 			return wd17xx_data_r(dev,offset);
 		case 4:
-			return state->m_fdc_side | 0xfe;
+			return m_fdc_side | 0xfe;
 		case 5:
-			return state->m_fdc_drive;
+			return m_fdc_drive;
 		case 6:
 			// FM-7 always returns 0xff for this register
 			return 0xff;
 		case 7:
-			if(state->m_fdc_irq_flag != 0)
+			if(m_fdc_irq_flag != 0)
 				ret |= 0x40;
-			if(state->m_fdc_drq_flag != 0)
+			if(m_fdc_drq_flag != 0)
 				ret |= 0x80;
 			return ret;
 	}
@@ -453,10 +442,9 @@ static READ8_HANDLER( fm7_fdc_r )
 	return 0x00;
 }
 
-static WRITE8_HANDLER( fm7_fdc_w )
+WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	device_t* dev = space->machine().device("fdc");
+	device_t* dev = machine().device("fdc");
 	switch(offset)
 	{
 		case 0:
@@ -472,21 +460,21 @@ static WRITE8_HANDLER( fm7_fdc_w )
 			wd17xx_data_w(dev,offset,data);
 			break;
 		case 4:
-			state->m_fdc_side = data & 0x01;
+			m_fdc_side = data & 0x01;
 			wd17xx_set_side(dev,data & 0x01);
 			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
 			break;
 		case 5:
-			state->m_fdc_drive = data;
+			m_fdc_drive = data;
 			if((data & 0x03) > 0x01)
 			{
-				state->m_fdc_drive = 0;
+				m_fdc_drive = 0;
 			}
 			else
 			{
 				wd17xx_set_drive(dev,data & 0x03);
-				floppy_mon_w(floppy_get_device(space->machine(), data & 0x03), !BIT(data, 7));
-				floppy_drive_set_ready_state(floppy_get_device(space->machine(), data & 0x03), data & 0x80,0);
+				floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
+				floppy_drive_set_ready_state(floppy_get_device(machine(), data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
 			}
 			break;
@@ -510,36 +498,34 @@ static WRITE8_HANDLER( fm7_fdc_w )
  *  CPU clock speed in bit 0 (0 = 1.2MHz, 1 = 2MHz)
  *  Clears keyboard IRQ flag
  */
-static READ8_HANDLER( fm7_keyboard_r )
+READ8_MEMBER(fm7_state::fm7_keyboard_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret;
 	switch(offset)
 	{
 		case 0:
-			ret = (state->m_current_scancode >> 1) & 0x80;
+			ret = (m_current_scancode >> 1) & 0x80;
 			ret |= 0x01; // 1 = 2MHz, 0 = 1.2MHz
 			return ret;
 		case 1:
-			main_irq_clear_flag(space->machine(),IRQ_FLAG_KEY);
-			return state->m_current_scancode & 0xff;
+			main_irq_clear_flag(machine(),IRQ_FLAG_KEY);
+			return m_current_scancode & 0xff;
 		default:
 			return 0x00;
 	}
 }
 
-READ8_HANDLER( fm7_sub_keyboard_r )
+READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret;
 	switch(offset)
 	{
 		case 0:
-			ret = (state->m_current_scancode >> 1) & 0x80;
+			ret = (m_current_scancode >> 1) & 0x80;
 			return ret;
 		case 1:
-			main_irq_clear_flag(space->machine(),IRQ_FLAG_KEY);
-			return state->m_current_scancode & 0xff;
+			main_irq_clear_flag(machine(),IRQ_FLAG_KEY);
+			return m_current_scancode & 0xff;
 		default:
 			return 0x00;
 	}
@@ -570,27 +556,26 @@ READ8_HANDLER( fm7_sub_keyboard_r )
  *
  *  ACK is received after 5us.
  */
-READ8_HANDLER( fm77av_key_encoder_r )
+READ8_MEMBER(fm7_state::fm77av_key_encoder_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 	switch(offset)
 	{
 		case 0x00:  // data register
-			if(state->m_encoder.rx_count > 0)
+			if(m_encoder.rx_count > 0)
 			{
-				ret = state->m_encoder.buffer[state->m_encoder.position];
-				state->m_encoder.position++;
-				state->m_encoder.rx_count--;
-				state->m_encoder.latch = 0;
+				ret = m_encoder.buffer[m_encoder.position];
+				m_encoder.position++;
+				m_encoder.rx_count--;
+				m_encoder.latch = 0;
 			}
-			if(state->m_encoder.rx_count > 0)
-				state->m_encoder.latch = 1;  // more data to receive
+			if(m_encoder.rx_count > 0)
+				m_encoder.latch = 1;  // more data to receive
 			break;
 		case 0x01:  // status register
-			if(state->m_encoder.latch != 0)
+			if(m_encoder.latch != 0)
 				ret &= ~0x80;
-			if(state->m_encoder.ack == 0)
+			if(m_encoder.ack == 0)
 				ret &= ~0x01;
 			break;
 	}
@@ -598,48 +583,48 @@ READ8_HANDLER( fm77av_key_encoder_r )
 	return ret;
 }
 
-static void fm77av_encoder_setup_command(fm7_state *state)
+void fm7_state::fm77av_encoder_setup_command()
 {
-	switch(state->m_encoder.buffer[0])
+	switch(m_encoder.buffer[0])
 	{
 		case 0:  // set scancode format
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 1:  // get scancode format
-			state->m_encoder.tx_count = 1;
+			m_encoder.tx_count = 1;
 			break;
 		case 2:  // set LED
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 3:  // get LED
-			state->m_encoder.tx_count = 1;
+			m_encoder.tx_count = 1;
 			break;
 		case 4:  // enable repeat
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 5:  // set repeat rate
-			state->m_encoder.tx_count = 3;
+			m_encoder.tx_count = 3;
 			break;
 		case 0x80:  // get/set RTC (at least two bytes, 9 if byte two = 0x01)
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 0x81:  // digitise
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 0x82:  // set screen mode
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		case 0x83:  // get screen mode
-			state->m_encoder.tx_count = 1;
+			m_encoder.tx_count = 1;
 			break;
 		case 0x84:  // set monitor brightness
-			state->m_encoder.tx_count = 2;
+			m_encoder.tx_count = 2;
 			break;
 		default:
-			state->m_encoder.tx_count = 0;
-			state->m_encoder.rx_count = 0;
-			state->m_encoder.position = 0;
-			logerror("ENC: Unknown command 0x%02x sent, ignoring\n",state->m_encoder.buffer[0]);
+			m_encoder.tx_count = 0;
+			m_encoder.rx_count = 0;
+			m_encoder.position = 0;
+			logerror("ENC: Unknown command 0x%02x sent, ignoring\n",m_encoder.buffer[0]);
 	}
 }
 
@@ -649,96 +634,95 @@ static TIMER_CALLBACK( fm77av_encoder_ack )
 	state->m_encoder.ack = 1;
 }
 
-static void fm77av_encoder_handle_command(fm7_state *state)
+void fm7_state::fm77av_encoder_handle_command()
 {
-	switch(state->m_encoder.buffer[0])
+	switch(m_encoder.buffer[0])
 	{
 		case 0:  // set keyboard scancode mode
-			state->m_key_scan_mode = state->m_encoder.buffer[1];
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Keyboard set to mode %i\n",state->m_encoder.buffer[1]);
+			m_key_scan_mode = m_encoder.buffer[1];
+			m_encoder.rx_count = 0;
+			logerror("ENC: Keyboard set to mode %i\n",m_encoder.buffer[1]);
 			break;
 		case 1:  // get keyboard scancode mode
-			state->m_encoder.buffer[0] = state->m_key_scan_mode;
-			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.buffer[0] = m_key_scan_mode;
+			m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 2:  // set LEDs
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 3:  // get LEDs
-			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 4:  // enable key repeat
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 5:  // set key repeat rate
-			state->m_key_repeat = state->m_encoder.buffer[2] * 10;
-			state->m_key_delay = state->m_encoder.buffer[1] * 10;
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Keyboard repeat rate set to %i/%i\n",state->m_encoder.buffer[1],state->m_encoder.buffer[2]);
+			m_key_repeat = m_encoder.buffer[2] * 10;
+			m_key_delay = m_encoder.buffer[1] * 10;
+			m_encoder.rx_count = 0;
+			logerror("ENC: Keyboard repeat rate set to %i/%i\n",m_encoder.buffer[1],m_encoder.buffer[2]);
 			break;
 		case 0x80:  // get/set RTC
-			if(state->m_encoder.buffer[1] == 0x01)
-				state->m_encoder.rx_count = 0;
+			if(m_encoder.buffer[1] == 0x01)
+				m_encoder.rx_count = 0;
 			else
-				state->m_encoder.rx_count = 7;
-			logerror("ENC: Command %02x %02x received\n",state->m_encoder.buffer[0],state->m_encoder.buffer[1]);
+				m_encoder.rx_count = 7;
+			logerror("ENC: Command %02x %02x received\n",m_encoder.buffer[0],m_encoder.buffer[1]);
 			break;
 		case 0x81:  // digitise
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 0x82:  // set screen mode
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 0x83:  // get screen mode
-			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 1;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 		case 0x84:  // set monitor brightness
-			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
+			m_encoder.rx_count = 0;
+			logerror("ENC: Command %02x received\n",m_encoder.buffer[0]);
 			break;
 	}
-	state->m_encoder.position = 0;
+	m_encoder.position = 0;
 }
 
-WRITE8_HANDLER( fm77av_key_encoder_w )
+WRITE8_MEMBER(fm7_state::fm77av_key_encoder_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_encoder.ack = 0;
+	m_encoder.ack = 0;
 	if(offset == 0) // data register
 	{
-		if(state->m_encoder.position == 0)  // first byte
+		if(m_encoder.position == 0)  // first byte
 		{
-			fm77av_encoder_setup_command(state);
+			fm77av_encoder_setup_command();
 		}
-		if(state->m_encoder.position == 1)  // second byte
+		if(m_encoder.position == 1)  // second byte
 		{
-			if(state->m_encoder.buffer[0] == 0x80 || state->m_encoder.buffer[1] == 0x01)
+			if(m_encoder.buffer[0] == 0x80 || m_encoder.buffer[1] == 0x01)
 			{
-				state->m_encoder.tx_count = 8; // 80 01 command is 9 bytes
+				m_encoder.tx_count = 8; // 80 01 command is 9 bytes
 			}
 		}
-		state->m_encoder.buffer[state->m_encoder.position] = data;
-		state->m_encoder.position++;
-		state->m_encoder.tx_count--;
-		if(state->m_encoder.tx_count == 0)  // last byte
-			fm77av_encoder_handle_command(state);
+		m_encoder.buffer[m_encoder.position] = data;
+		m_encoder.position++;
+		m_encoder.tx_count--;
+		if(m_encoder.tx_count == 0)  // last byte
+			fm77av_encoder_handle_command();
 
 		// wait 5us to set ACK flag
-		space->machine().scheduler().timer_set(attotime::from_usec(5), FUNC(fm77av_encoder_ack));
+		machine().scheduler().timer_set(attotime::from_usec(5), FUNC(fm77av_encoder_ack));
 
-		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,state->m_encoder.position);
+		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,m_encoder.position);
 	}
 }
 
-static READ8_HANDLER( fm7_cassette_printer_r )
+READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 {
 	// bit 7: cassette input
 	// bit 5: printer DET2
@@ -748,33 +732,33 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 1: printer error
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
-	double data = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
-	centronics_device* centronics = space->machine().device<centronics_device>("lpt");
+	double data = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	centronics_device* centronics = machine().device<centronics_device>("lpt");
 	UINT8 pdata;
 	int x;
 
 	if(data > 0.03)
 		ret |= 0x80;
 
-	if(space->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MOTOR_DISABLED)
+	if(machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MOTOR_DISABLED)
 		ret |= 0x80;  // cassette input is high when not in use.
 
 	ret |= 0x70;
 
-	if(input_port_read(space->machine(),"config") & 0x01)
+	if(input_port_read(machine(),"config") & 0x01)
 	{
 		ret |= 0x0f;
-		pdata = centronics->read(*space, 0);
+		pdata = centronics->read(space, 0);
 		for(x=0;x<6;x++)
 		{
 			if(~pdata & (1<<x))
-				if(input_port_read(space->machine(),"lptjoy") & (1 << x))
+				if(input_port_read(machine(),"lptjoy") & (1 << x))
 					ret &= ~0x08;
 		}
 	}
 	else
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(space->machine().device("lpt:printer:printer"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("lpt:printer:printer"));
 		if(image->exists())
 		{
 			if(centronics->pe_r())
@@ -792,10 +776,9 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	return ret;
 }
 
-static WRITE8_HANDLER( fm7_cassette_printer_w )
+WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	centronics_device* centronics = space->machine().device<centronics_device>("lpt");
+	centronics_device* centronics = machine().device<centronics_device>("lpt");
 	switch(offset)
 	{
 		case 0:
@@ -803,16 +786,16 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
 		// bit 6: printer strobe
 		// bit 1: cassette motor
 		// bit 0: cassette output
-			if((data & 0x01) != (state->m_cp_prev & 0x01))
-				space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? +1.0 : -1.0);
-			if((data & 0x02) != (state->m_cp_prev & 0x02))
-				space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			if((data & 0x01) != (m_cp_prev & 0x01))
+				machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? +1.0 : -1.0);
+			if((data & 0x02) != (m_cp_prev & 0x02))
+				machine().device<cassette_image_device>(CASSETTE_TAG)->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 			centronics->strobe_w(!(data & 0x40));
-			state->m_cp_prev = data;
+			m_cp_prev = data;
 			break;
 		case 1:
 		// Printer data
-			centronics->write(*space,0,data);
+			centronics->write(space,0,data);
 			break;
 	}
 }
@@ -821,11 +804,11 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
  *  Main CPU: 0xfd0b
  *   - bit 0: Boot mode: 0=BASIC, 1=DOS
  */
-static READ8_HANDLER( fm77av_boot_mode_r )
+READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 {
 	UINT8 ret = 0xff;
 
-	if(input_port_read(space->machine(),"DSW") & 0x02)
+	if(input_port_read(machine(),"DSW") & 0x02)
 		ret &= ~0x01;
 
 	return 0xff;
@@ -897,70 +880,62 @@ static void fm7_update_psg(running_machine &machine)
 	}
 }
 
-static READ8_HANDLER( fm7_psg_select_r )
+READ8_MEMBER(fm7_state::fm7_psg_select_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( fm7_psg_select_w )
+WRITE8_MEMBER(fm7_state::fm7_psg_select_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_psg_regsel = data & 0x03;
-	fm7_update_psg(space->machine());
+	m_psg_regsel = data & 0x03;
+	fm7_update_psg(machine());
 }
 
-static WRITE8_HANDLER( fm77av_ym_select_w )
+WRITE8_MEMBER(fm7_state::fm77av_ym_select_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_psg_regsel = data & 0x0f;
-	fm7_update_psg(space->machine());
+	m_psg_regsel = data & 0x0f;
+	fm7_update_psg(machine());
 }
 
-static READ8_HANDLER( fm7_psg_data_r )
+READ8_MEMBER(fm7_state::fm7_psg_data_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-//  fm7_update_psg(space->machine());
-	return state->m_psg_data;
+//  fm7_update_psg(machine());
+	return m_psg_data;
 }
 
-static WRITE8_HANDLER( fm7_psg_data_w )
+WRITE8_MEMBER(fm7_state::fm7_psg_data_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	state->m_psg_data = data;
-//  fm7_update_psg(space->machine());
+	m_psg_data = data;
+//  fm7_update_psg(machine());
 }
 
-static WRITE8_HANDLER( fm77av_bootram_w )
+WRITE8_MEMBER(fm7_state::fm77av_bootram_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(!(state->m_mmr.mode & 0x01))
+	if(!(m_mmr.mode & 0x01))
 		return;
-	state->m_boot_ram[offset] = data;
+	m_boot_ram[offset] = data;
 }
 
 // Shared RAM is only usable on the main CPU if the sub CPU is halted
-static READ8_HANDLER( fm7_main_shared_r )
+READ8_MEMBER(fm7_state::fm7_main_shared_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->m_video.sub_halt != 0)
-		return state->m_shared_ram[offset];
+	if(m_video.sub_halt != 0)
+		return m_shared_ram[offset];
 	else
 		return 0xff;
 }
 
-static WRITE8_HANDLER( fm7_main_shared_w )
+WRITE8_MEMBER(fm7_state::fm7_main_shared_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	if(state->m_video.sub_halt != 0)
-		state->m_shared_ram[offset] = data;
+	if(m_video.sub_halt != 0)
+		m_shared_ram[offset] = data;
 }
 
-static READ8_HANDLER( fm7_fmirq_r )
+READ8_MEMBER(fm7_state::fm7_fmirq_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT8 ret = 0xff;
 
-	if(state->m_fm77av_ym_irq != 0)
+	if(m_fm77av_ym_irq != 0)
 		ret &= ~0x08;
 
 	return ret;
@@ -976,7 +951,7 @@ static READ8_DEVICE_HANDLER( fm77av_joy_2_r )
 	return input_port_read(device->machine(),"joy2");
 }
 
-static READ8_HANDLER( fm7_unknown_r )
+READ8_MEMBER(fm7_state::fm7_unknown_r)
 {
 	// Port 0xFDFC is read by Dig Dug.  Controller port, perhaps?
 	// Must return 0xff for it to read the keyboard.
@@ -999,15 +974,14 @@ static READ8_HANDLER( fm7_unknown_r )
  *              - bit 0: boot RAM read-write/read-only
  *
  */
-static READ8_HANDLER( fm7_mmr_r )
+READ8_MEMBER(fm7_state::fm7_mmr_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(offset < 0x10)
 	{
-		return state->m_mmr.bank_addr[state->m_mmr.segment][offset];
+		return m_mmr.bank_addr[m_mmr.segment][offset];
 	}
 	if(offset == 0x13)
-		return state->m_mmr.mode;
+		return m_mmr.mode;
 	return 0xff;
 }
 
@@ -1028,40 +1002,40 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		switch(physical)
 		{
 			case 0x10:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram0_r),FUNC(fm7_vram0_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram0_r),state),write8_delegate(FUNC(fm7_state::fm7_vram0_w),state));
 				break;
 			case 0x11:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram1_r),FUNC(fm7_vram1_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram1_r),state),write8_delegate(FUNC(fm7_state::fm7_vram1_w),state));
 				break;
 			case 0x12:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram2_r),FUNC(fm7_vram2_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram2_r),state),write8_delegate(FUNC(fm7_state::fm7_vram2_w),state));
 				break;
 			case 0x13:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram3_r),FUNC(fm7_vram3_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram3_r),state),write8_delegate(FUNC(fm7_state::fm7_vram3_w),state));
 				break;
 			case 0x14:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram4_r),FUNC(fm7_vram4_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram4_r),state),write8_delegate(FUNC(fm7_state::fm7_vram4_w),state));
 				break;
 			case 0x15:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram5_r),FUNC(fm7_vram5_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram5_r),state),write8_delegate(FUNC(fm7_state::fm7_vram5_w),state));
 				break;
 			case 0x16:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram6_r),FUNC(fm7_vram6_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram6_r),state),write8_delegate(FUNC(fm7_state::fm7_vram6_w),state));
 				break;
 			case 0x17:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram7_r),FUNC(fm7_vram7_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram7_r),state),write8_delegate(FUNC(fm7_state::fm7_vram7_w),state));
 				break;
 			case 0x18:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram8_r),FUNC(fm7_vram8_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram8_r),state),write8_delegate(FUNC(fm7_state::fm7_vram8_w),state));
 				break;
 			case 0x19:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vram9_r),FUNC(fm7_vram9_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram9_r),state),write8_delegate(FUNC(fm7_state::fm7_vram9_w),state));
 				break;
 			case 0x1a:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vramA_r),FUNC(fm7_vramA_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramA_r),state),write8_delegate(FUNC(fm7_state::fm7_vramA_w),state));
 				break;
 			case 0x1b:
-				space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_vramB_r),FUNC(fm7_vramB_w));
+				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),state),write8_delegate(FUNC(fm7_state::fm7_vramB_w),state));
 				break;
 		}
 //      memory_set_bankptr(space->machine(),bank+1,RAM+(physical<<12)-0x10000);
@@ -1069,12 +1043,12 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical == 0x1c)
 	{
-		space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_console_ram_banked_r),FUNC(fm7_console_ram_banked_w));
+		space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_console_ram_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_console_ram_banked_w),state));
 		return;
 	}
 	if(physical == 0x1d)
 	{
-		space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_sub_ram_ports_banked_r),FUNC(fm7_sub_ram_ports_banked_w));
+		space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_r),state),write8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_w),state));
 		return;
 	}
 	if(physical == 0x35)
@@ -1147,33 +1121,32 @@ static void fm7_mmr_refresh(address_space* space)
 	}
 }
 
-static WRITE8_HANDLER( fm7_mmr_w )
+WRITE8_MEMBER(fm7_state::fm7_mmr_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	if(offset < 0x10)
 	{
-		state->m_mmr.bank_addr[state->m_mmr.segment][offset] = data;
-		if(state->m_mmr.enabled)
-			fm7_update_bank(space,offset,data);
-		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",state->m_mmr.segment,offset,data);
+		m_mmr.bank_addr[m_mmr.segment][offset] = data;
+		if(m_mmr.enabled)
+			fm7_update_bank(&space,offset,data);
+		logerror("MMR: Segment %i, bank %i, set to  0x%02x\n",m_mmr.segment,offset,data);
 		return;
 	}
 	switch(offset)
 	{
 		case 0x10:
-			state->m_mmr.segment = data & 0x07;
-			fm7_mmr_refresh(space);
-			logerror("MMR: Active segment set to %i\n",state->m_mmr.segment);
+			m_mmr.segment = data & 0x07;
+			fm7_mmr_refresh(&space);
+			logerror("MMR: Active segment set to %i\n",m_mmr.segment);
 			break;
 		case 0x12:
-			state->m_mmr.window_offset = data;
-			fm7_mmr_refresh(space);
+			m_mmr.window_offset = data;
+			fm7_mmr_refresh(&space);
 			logerror("MMR: Window offset set to %02x\n",data);
 			break;
 		case 0x13:
-			state->m_mmr.mode = data;
-			state->m_mmr.enabled = data & 0x80;
-			fm7_mmr_refresh(space);
+			m_mmr.mode = data;
+			m_mmr.enabled = data & 0x80;
+			fm7_mmr_refresh(&space);
 			logerror("MMR: Mode register set to %02x\n",data);
 			break;
 	}
@@ -1189,11 +1162,10 @@ static WRITE8_HANDLER( fm7_mmr_w )
  *
  *  Kanji ROM is visible at 0x20000 (first half only?)
  */
-static READ8_HANDLER( fm7_kanji_r )
+READ8_MEMBER(fm7_state::fm7_kanji_r)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* KROM = space->machine().region("kanji1")->base();
-	UINT32 addr = state->m_kanji_address << 1;
+	UINT8* KROM = machine().region("kanji1")->base();
+	UINT32 addr = m_kanji_address << 1;
 
 	switch(offset)
 	{
@@ -1211,20 +1183,19 @@ static READ8_HANDLER( fm7_kanji_r )
 	}
 }
 
-static WRITE8_HANDLER( fm7_kanji_w )
+WRITE8_MEMBER(fm7_state::fm7_kanji_w)
 {
-	fm7_state *state = space->machine().driver_data<fm7_state>();
 	UINT16 addr;
 
 	switch(offset)
 	{
 		case 0:
-			addr = ((data & 0xff) << 8) | (state->m_kanji_address & 0x00ff);
-			state->m_kanji_address = addr;
+			addr = ((data & 0xff) << 8) | (m_kanji_address & 0x00ff);
+			m_kanji_address = addr;
 			break;
 		case 1:
-			addr = (data & 0xff) | (state->m_kanji_address & 0xff00);
-			state->m_kanji_address = addr;
+			addr = (data & 0xff) | (m_kanji_address & 0xff00);
+			m_kanji_address = addr;
 			break;
 		case 2:
 		case 3:
@@ -1416,54 +1387,54 @@ static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE_LEGACY(fm7_psg_select_r,fm7_psg_select_w)
-	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE_LEGACY(fm7_psg_data_r, fm7_psg_data_w)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
 /*
@@ -1478,19 +1449,19 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_SHARE("shared_ram")
 	// I/O space (D400-D4FF)
-	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
-	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)
-	AM_RANGE(0xd403,0xd403) AM_READ_LEGACY(fm7_sub_beeper_r)
-	AM_RANGE(0xd404,0xd404) AM_READ_LEGACY(fm7_attn_irq_r)
-	AM_RANGE(0xd408,0xd408) AM_READWRITE_LEGACY(fm7_crt_r,fm7_crt_w)
-	AM_RANGE(0xd409,0xd409) AM_READWRITE_LEGACY(fm7_vram_access_r,fm7_vram_access_w)
-	AM_RANGE(0xd40a,0xd40a) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xd40e,0xd40f) AM_WRITE_LEGACY(fm7_vram_offset_w)
+	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
+	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
+	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1512,46 +1483,46 @@ static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
 	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0a) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0b,0xfd0b) AM_READ_LEGACY(fm77av_boot_mode_r)
-	AM_RANGE(0xfd0c,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd10) AM_WRITE_LEGACY(fm7_init_en_w)
-	AM_RANGE(0xfd11,0xfd11) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd12,0xfd12) AM_READWRITE_LEGACY(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
-	AM_RANGE(0xfd13,0xfd13) AM_WRITE_LEGACY(fm77av_sub_bank_w)
-	AM_RANGE(0xfd14,0xfd14) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd17,0xfd17) AM_READ_LEGACY(fm7_fmirq_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd2b) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd30,0xfd34) AM_WRITE_LEGACY(fm77av_analog_palette_w)
-	AM_RANGE(0xfd35,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfd7f) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
-	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_SHARE("boot_ram")
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_SHARE("boot_ram")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
 // Much of this is guesswork at the moment
 static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0x7fff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0x7fff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
 	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xafe4,0xafe4) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xafe6,0xafe6) AM_READWRITE_LEGACY(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xafe6,0xafe6) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
 ADDRESS_MAP_END
 
@@ -1562,20 +1533,20 @@ static ADDRESS_MAP_START( fm11_x86_mem, AS_PROGRAM, 8, fm7_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
@@ -1584,24 +1555,24 @@ static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
-	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
-	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8_LEGACY(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd05) AM_READ8_LEGACY(fm7_fd04_r,0x00ff)
-	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8_LEGACY(fm7_subintf_r,fm7_subintf_w,0xff00)
-//  AM_RANGE(0xfd06,0xfd0c) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8_LEGACY(fm7_rom_en_r,fm7_rom_en_w,0xff00)
-//  AM_RANGE(0xfd10,0xfd17) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8_LEGACY(fm7_fdc_r,fm7_fdc_w,0xffff)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8_LEGACY(fm7_kanji_r,fm7_kanji_w,0xffff)
-//  AM_RANGE(0xfd24,0xfd36) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd36,0xfd37) AM_WRITE8_LEGACY(fm7_multipage_w,0xff00)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8_LEGACY(fm7_palette_r,fm7_palette_w,0xffff)
-//  AM_RANGE(0xfd40,0xfdff) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd05) AM_READ8(fm7_fd04_r,0x00ff)
+	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8(fm7_subintf_r,fm7_subintf_w,0xff00)
+//  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8(fm7_rom_en_r,fm7_rom_en_w,0xff00)
+//  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8(fm7_fdc_r,fm7_fdc_w,0xffff)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8(fm7_kanji_r,fm7_kanji_w,0xffff)
+//  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd36,0xfd37) AM_WRITE8(fm7_multipage_w,0xff00)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8(fm7_palette_r,fm7_palette_w,0xffff)
+//  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xafff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xafff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xb000,0xffff) AM_ROM // subsystem ROM
 ADDRESS_MAP_END
 
@@ -1623,60 +1594,60 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
 	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0a) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0b,0xfd0b) AM_READ_LEGACY(fm77av_boot_mode_r)
-	AM_RANGE(0xfd0c,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE_LEGACY(fm7_psg_select_r,fm7_psg_select_w)
-	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE_LEGACY(fm7_psg_data_r, fm7_psg_data_w)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd10) AM_WRITE_LEGACY(fm7_init_en_w)
-	AM_RANGE(0xfd11,0xfd11) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd12,0xfd12) AM_READWRITE_LEGACY(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
-	AM_RANGE(0xfd13,0xfd13) AM_WRITE_LEGACY(fm77av_sub_bank_w)
-	AM_RANGE(0xfd14,0xfd14) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd15,0xfd15) AM_READWRITE_LEGACY(fm7_psg_select_r,fm77av_ym_select_w)
-	AM_RANGE(0xfd16,0xfd16) AM_READWRITE_LEGACY(fm7_psg_data_r,fm7_psg_data_w)
-	AM_RANGE(0xfd17,0xfd17) AM_READ_LEGACY(fm7_fmirq_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd2b) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd30,0xfd34) AM_WRITE_LEGACY(fm77av_analog_palette_w)
-	AM_RANGE(0xfd35,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfd7f) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
-	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd15,0xfd15) AM_READWRITE(fm7_psg_select_r,fm77av_ym_select_w)
+	AM_RANGE(0xfd16,0xfd16) AM_READWRITE(fm7_psg_data_r,fm7_psg_data_w)
+	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_SHARE("boot_ram")
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_SHARE("boot_ram")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
 	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_SHARE("shared_ram")
 	// I/O space (D400-D4FF)
-	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
-	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)
-	AM_RANGE(0xd403,0xd403) AM_READ_LEGACY(fm7_sub_beeper_r)
-	AM_RANGE(0xd404,0xd404) AM_READ_LEGACY(fm7_attn_irq_r)
-	AM_RANGE(0xd408,0xd408) AM_READWRITE_LEGACY(fm7_crt_r,fm7_crt_w)
-	AM_RANGE(0xd409,0xd409) AM_READWRITE_LEGACY(fm7_vram_access_r,fm7_vram_access_w)
-	AM_RANGE(0xd40a,0xd40a) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xd40e,0xd40f) AM_WRITE_LEGACY(fm7_vram_offset_w)
-	AM_RANGE(0xd410,0xd42b) AM_READWRITE_LEGACY(fm77av_alu_r, fm77av_alu_w)
-	AM_RANGE(0xd430,0xd430) AM_READWRITE_LEGACY(fm77av_video_flags_r,fm77av_video_flags_w)
-	AM_RANGE(0xd431,0xd432) AM_READWRITE_LEGACY(fm77av_key_encoder_r,fm77av_key_encoder_w)
+	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
+	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
+	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
+	AM_RANGE(0xd410,0xd42b) AM_READWRITE(fm77av_alu_r, fm77av_alu_w)
+	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0xd431,0xd432) AM_READWRITE(fm77av_key_encoder_r,fm77av_key_encoder_w)
 	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
 	AM_RANGE(0xd800,0xdfff) AM_ROMBANK("bank20")
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK("bank21")

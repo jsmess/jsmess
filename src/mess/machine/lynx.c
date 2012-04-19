@@ -826,7 +826,7 @@ if you just load the lower byte after a multiply by zero.
 - in divide, the remainder will have 2 possible errors, depending on its actual value (no further
 notes on these errors available) */
 
-static void lynx_divide( lynx_state *state )
+void lynx_state::lynx_divide()
 {
 	UINT32 left;
 	UINT16 right;
@@ -840,13 +840,13 @@ static void lynx_divide( lynx_state *state )
     Remainder (JK)LM
     */
 
-	left = state->m_suzy.data[MATH_H] | (state->m_suzy.data[MATH_G] << 8) | (state->m_suzy.data[MATH_F] << 16) | (state->m_suzy.data[MATH_E] << 24);
-	right = state->m_suzy.data[MATH_P] | (state->m_suzy.data[MATH_N] << 8);
+	left = m_suzy.data[MATH_H] | (m_suzy.data[MATH_G] << 8) | (m_suzy.data[MATH_F] << 16) | (m_suzy.data[MATH_E] << 24);
+	right = m_suzy.data[MATH_P] | (m_suzy.data[MATH_N] << 8);
 
-	state->m_suzy.accumulate_overflow = FALSE;
+	m_suzy.accumulate_overflow = FALSE;
 	if (right == 0)
 	{
-		state->m_suzy.accumulate_overflow = TRUE;	/* during divisions, this bit is used to detect denominator = 0 */
+		m_suzy.accumulate_overflow = TRUE;	/* during divisions, this bit is used to detect denominator = 0 */
 		res = 0xffffffff;
 		mod = 0; //?
 	}
@@ -856,18 +856,18 @@ static void lynx_divide( lynx_state *state )
 		mod = left % right;
 	}
 //  logerror("coprocessor %8x / %8x = %4x\n", left, right, res);
-	state->m_suzy.data[MATH_D] = res & 0xff;
-	state->m_suzy.data[MATH_C] = res >> 8;
-	state->m_suzy.data[MATH_B] = res >> 16;
-	state->m_suzy.data[MATH_A] = res >> 24;
+	m_suzy.data[MATH_D] = res & 0xff;
+	m_suzy.data[MATH_C] = res >> 8;
+	m_suzy.data[MATH_B] = res >> 16;
+	m_suzy.data[MATH_A] = res >> 24;
 
-	state->m_suzy.data[MATH_M] = mod & 0xff;
-	state->m_suzy.data[MATH_L] = mod >> 8;
-	state->m_suzy.data[MATH_K] = 0; // documentation states the hardware sets these to zero on divides
-	state->m_suzy.data[MATH_J] = 0;
+	m_suzy.data[MATH_M] = mod & 0xff;
+	m_suzy.data[MATH_L] = mod >> 8;
+	m_suzy.data[MATH_K] = 0; // documentation states the hardware sets these to zero on divides
+	m_suzy.data[MATH_J] = 0;
 }
 
-static void lynx_multiply( lynx_state *state )
+void lynx_state::lynx_multiply()
 {
 	UINT16 left, right;
 	UINT32 res, accu;
@@ -879,134 +879,133 @@ static void lynx_multiply( lynx_state *state )
                 EFGH
     Accumulate  JKLM
     */
-	state->m_suzy.accumulate_overflow = FALSE;
+	m_suzy.accumulate_overflow = FALSE;
 
-	left = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
-	right = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
+	left = m_suzy.data[MATH_B] | (m_suzy.data[MATH_A] << 8);
+	right = m_suzy.data[MATH_D] | (m_suzy.data[MATH_C] << 8);
 
 	res = left * right;
 
-	if (state->m_suzy.signed_math)
+	if (m_suzy.signed_math)
 	{
-		if (!(state->m_sign_AB + state->m_sign_CD))	/* different signs */
+		if (!(m_sign_AB + m_sign_CD))	/* different signs */
 			res = (res ^ 0xffffffff) + 1;
 	}
 
-	state->m_suzy.data[MATH_H] = res & 0xff;
-	state->m_suzy.data[MATH_G] = res >> 8;
-	state->m_suzy.data[MATH_F] = res >> 16;
-	state->m_suzy.data[MATH_E] = res >> 24;
+	m_suzy.data[MATH_H] = res & 0xff;
+	m_suzy.data[MATH_G] = res >> 8;
+	m_suzy.data[MATH_F] = res >> 16;
+	m_suzy.data[MATH_E] = res >> 24;
 
-	if (state->m_suzy.accumulate)
+	if (m_suzy.accumulate)
 	{
-		accu = state->m_suzy.data[MATH_M] | state->m_suzy.data[MATH_L] << 8 | state->m_suzy.data[MATH_K] << 16 | state->m_suzy.data[MATH_J] << 24;
+		accu = m_suzy.data[MATH_M] | m_suzy.data[MATH_L] << 8 | m_suzy.data[MATH_K] << 16 | m_suzy.data[MATH_J] << 24;
 		accu += res;
 
 		if (accu < res)
-			state->m_suzy.accumulate_overflow = TRUE;
+			m_suzy.accumulate_overflow = TRUE;
 
-		state->m_suzy.data[MATH_M] = accu;
-		state->m_suzy.data[MATH_L] = accu >> 8;
-		state->m_suzy.data[MATH_K] = accu >> 16;
-		state->m_suzy.data[MATH_J] = accu >> 24;
+		m_suzy.data[MATH_M] = accu;
+		m_suzy.data[MATH_L] = accu >> 8;
+		m_suzy.data[MATH_K] = accu >> 16;
+		m_suzy.data[MATH_J] = accu >> 24;
 	}
 }
 
-static READ8_HANDLER( suzy_read )
+READ8_MEMBER(lynx_state::suzy_read)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
 	UINT8 value = 0, input;
 
 	switch (offset)
 	{
 		case TILTACUML:
-			return state->m_blitter.tilt_accumulator & 0xff;
+			return m_blitter.tilt_accumulator & 0xff;
 		case TILTACUMH:
-			return state->m_blitter.tilt_accumulator>>8;
+			return m_blitter.tilt_accumulator>>8;
 		case HOFFL:
-			return state->m_blitter.xoff & 0xff;
+			return m_blitter.xoff & 0xff;
 		case HOFFH:
-			return state->m_blitter.xoff>>8;
+			return m_blitter.xoff>>8;
 		case VOFFL:
-			return state->m_blitter.yoff & 0xff;
+			return m_blitter.yoff & 0xff;
 		case VOFFH:
-			return state->m_blitter.yoff>>8;
+			return m_blitter.yoff>>8;
 		case VIDBASL:
-			return state->m_blitter.screen & 0xff;
+			return m_blitter.screen & 0xff;
 		case VIDBASH:
-			return state->m_blitter.screen>>8;
+			return m_blitter.screen>>8;
 		case COLLBASL:
-			return state->m_blitter.colbuf & 0xff;
+			return m_blitter.colbuf & 0xff;
 		case COLLBASH:
-			return state->m_blitter.colbuf>>8;
+			return m_blitter.colbuf>>8;
 		case SCBNEXTL:
-			return state->m_blitter.scb_next & 0xff;
+			return m_blitter.scb_next & 0xff;
 		case SCBNEXTH:
-			return state->m_blitter.scb_next>>8;
+			return m_blitter.scb_next>>8;
 		case SPRDLINEL:
-			return state->m_blitter.bitmap & 0xff;
+			return m_blitter.bitmap & 0xff;
 		case SPRDLINEH:
-			return state->m_blitter.bitmap>>8;
+			return m_blitter.bitmap>>8;
 		case HPOSSTRTL:
-			return state->m_blitter.x_pos & 0xff;
+			return m_blitter.x_pos & 0xff;
 		case HPOSSTRTH:
-			return state->m_blitter.x_pos>>8;
+			return m_blitter.x_pos>>8;
 		case VPOSSTRTL:
-			return state->m_blitter.y_pos & 0xff;
+			return m_blitter.y_pos & 0xff;
 		case VPOSSTRTH:
-			return state->m_blitter.y_pos>>8;
+			return m_blitter.y_pos>>8;
 		case SPRHSIZL:
-			return state->m_blitter.width & 0xff;
+			return m_blitter.width & 0xff;
 		case SPRHSIZH:
-			return state->m_blitter.width>>8;
+			return m_blitter.width>>8;
 		case SPRVSIZL:
-			return state->m_blitter.height & 0xff;
+			return m_blitter.height & 0xff;
 		case SPRVSIZH:
-			return state->m_blitter.height>>8;
+			return m_blitter.height>>8;
 		case STRETCHL:
-			return state->m_blitter.stretch & 0xff;
+			return m_blitter.stretch & 0xff;
 		case STRETCHH:
-			return state->m_blitter.stretch>>8;
+			return m_blitter.stretch>>8;
 		case TILTL:
-			return state->m_blitter.tilt & 0xff;
+			return m_blitter.tilt & 0xff;
 		case TILTH:
-			return state->m_blitter.tilt>>8;
+			return m_blitter.tilt>>8;
 		// case SPRDOFFL:
 		// case SPRVPOSL:
 		// case COLLOFFL:
 		case VSIZACUML:
-			return state->m_blitter.height_accumulator & 0xff;
+			return m_blitter.height_accumulator & 0xff;
 		case VSIZACUMH:
-			return state->m_blitter.height_accumulator>>8;
+			return m_blitter.height_accumulator>>8;
 		case HSIZOFFL:
-			return state->m_blitter.width_offset & 0xff;
+			return m_blitter.width_offset & 0xff;
 		case HSIZOFFH:
-			return state->m_blitter.width_offset>>8;
+			return m_blitter.width_offset>>8;
 		case VSIZOFFL:
-			return state->m_blitter.height_offset & 0xff;
+			return m_blitter.height_offset & 0xff;
 		case VSIZOFFH:
-			return state->m_blitter.height_offset>>8;
+			return m_blitter.height_offset>>8;
 		case SCBADRL:
-			return state->m_blitter.scb & 0xff;
+			return m_blitter.scb & 0xff;
 		case SCBADRH:
-			return state->m_blitter.scb>>8;
+			return m_blitter.scb>>8;
 		//case PROCADRL:
 		case SUZYHREV:
 			return 0x01; // must not be 0 for correct power up
 		case SPRSYS:
 			// math busy, last carry, unsafe access, and stop on current sprite bits not implemented.
-			if (state->m_suzy.accumulate_overflow)
+			if (m_suzy.accumulate_overflow)
 				value |= 0x40;
-			if (state->m_blitter.vstretch)
+			if (m_blitter.vstretch)
 				value |= 0x10;
-			if (state->m_blitter.lefthanded)
+			if (m_blitter.lefthanded)
 				value |= 0x08;
-			if (state->m_blitter.busy)
+			if (m_blitter.busy)
 				value |= 0x01;
 			break;
 		case JOYSTICK:
-			input = input_port_read(space->machine(), "JOY");
-			switch (state->m_rotate)
+			input = input_port_read(machine(), "JOY");
+			switch (m_rotate)
 			{
 				case 1:
 					value = input;
@@ -1025,7 +1024,7 @@ static READ8_HANDLER( suzy_read )
 					if (value & PAD_LEFT) input |= PAD_UP;
 					break;
 			}
-			if (state->m_blitter.lefthanded)
+			if (m_blitter.lefthanded)
 			{
 				value = input & 0x0f;
 				if (input & PAD_UP) value |= PAD_DOWN;
@@ -1037,11 +1036,11 @@ static READ8_HANDLER( suzy_read )
 				value = input;
 			break;
 		case SWITCHES:
-			value = input_port_read(space->machine(), "PAUSE");
+			value = input_port_read(machine(), "PAUSE");
 			break;
 		case RCART:
-			value = *(space->machine().region("user1")->base() + (state->m_suzy.high * state->m_granularity) + state->m_suzy.low);
-			state->m_suzy.low = (state->m_suzy.low + 1) & (state->m_granularity - 1);
+			value = *(machine().region("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
+			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
 			break;
 		//case RCART_BANK1: /* we need bank 1 emulation!!! */
 		case SPRCTL0:
@@ -1054,16 +1053,15 @@ static READ8_HANDLER( suzy_read )
 			value = 0;
 			break;
 		default:
-			value = state->m_suzy.data[offset];
+			value = m_suzy.data[offset];
 	}
 	//logerror("suzy read %.2x %.2x\n",offset,value);
 	return value;
 }
 
-static WRITE8_HANDLER( suzy_write )
+WRITE8_MEMBER(lynx_state::suzy_write)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
-	state->m_suzy.data[offset] = data;
+	m_suzy.data[offset] = data;
 	//logerror("suzy write %.2x %.2x\n",offset,data);
 	/* Additional effects of a write */
 	/* Even addresses are the LSB. Any CPU write to an LSB in 0x00-0x7f will set the MSB to 0. */
@@ -1071,152 +1069,152 @@ static WRITE8_HANDLER( suzy_write )
     F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
     C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
    if ((offset < 0x80) && !(offset & 0x01))
-	state->m_suzy.data[offset + 1] = 0;
+	m_suzy.data[offset + 1] = 0;
 
 	switch(offset)
 	{
 		//case TMPADRL:
 		//case TMPADRH:
 		case TILTACUML:
-			state->m_blitter.tilt_accumulator = data; // upper byte forced to zero see above.
+			m_blitter.tilt_accumulator = data; // upper byte forced to zero see above.
 			break;
 		case TILTACUMH:
-			state->m_blitter.tilt_accumulator &= 0xff;
-			state->m_blitter.tilt_accumulator |= data<<8;
+			m_blitter.tilt_accumulator &= 0xff;
+			m_blitter.tilt_accumulator |= data<<8;
 			break;
 		case HOFFL:
-			state->m_blitter.xoff = data;
+			m_blitter.xoff = data;
 			break;
 		case HOFFH:
-			state->m_blitter.xoff &= 0xff;
-			state->m_blitter.xoff |= data<<8;
+			m_blitter.xoff &= 0xff;
+			m_blitter.xoff |= data<<8;
 			break;
 		case VOFFL:
-			state->m_blitter.yoff = data;
+			m_blitter.yoff = data;
 			break;
 		case VOFFH:
-			state->m_blitter.yoff &= 0xff;
-			state->m_blitter.yoff |= data<<8;
+			m_blitter.yoff &= 0xff;
+			m_blitter.yoff |= data<<8;
 			break;
 		case VIDBASL:
-			state->m_blitter.screen = data;
+			m_blitter.screen = data;
 			break;
 		case VIDBASH:
-			state->m_blitter.screen &= 0xff;
-			state->m_blitter.screen |= data<<8;
+			m_blitter.screen &= 0xff;
+			m_blitter.screen |= data<<8;
 			break;
 		case COLLBASL:
-			state->m_blitter.colbuf = data;
+			m_blitter.colbuf = data;
 			break;
 		case COLLBASH:
-			state->m_blitter.colbuf &= 0xff;
-			state->m_blitter.colbuf |= data<<8;
+			m_blitter.colbuf &= 0xff;
+			m_blitter.colbuf |= data<<8;
 			break;
 		case SCBNEXTL:
-			state->m_blitter.scb_next = data;
+			m_blitter.scb_next = data;
 			break;
 		case SCBNEXTH:
-			state->m_blitter.scb_next &= 0xff;
-			state->m_blitter.scb_next |= data<<8;
+			m_blitter.scb_next &= 0xff;
+			m_blitter.scb_next |= data<<8;
 			break;
 		case SPRDLINEL:
-			state->m_blitter.bitmap = data;
+			m_blitter.bitmap = data;
 			break;
 		case SPRDLINEH:
-			state->m_blitter.bitmap &= 0xff;
-			state->m_blitter.bitmap |= data<<8;
+			m_blitter.bitmap &= 0xff;
+			m_blitter.bitmap |= data<<8;
 			break;
 		case HPOSSTRTL:
-			state->m_blitter.x_pos = data;
+			m_blitter.x_pos = data;
 		case HPOSSTRTH:
-			state->m_blitter.x_pos &= 0xff;
-			state->m_blitter.x_pos |= data<<8;
+			m_blitter.x_pos &= 0xff;
+			m_blitter.x_pos |= data<<8;
 		case VPOSSTRTL:
-			state->m_blitter.y_pos = data;
+			m_blitter.y_pos = data;
 		case VPOSSTRTH:
-			state->m_blitter.y_pos &= 0xff;
-			state->m_blitter.y_pos |= data<<8;
+			m_blitter.y_pos &= 0xff;
+			m_blitter.y_pos |= data<<8;
 		case SPRHSIZL:
-			state->m_blitter.width = data;
+			m_blitter.width = data;
 			break;
 		case SPRHSIZH:
-			state->m_blitter.width &= 0xff;
-			state->m_blitter.width |= data<<8;
+			m_blitter.width &= 0xff;
+			m_blitter.width |= data<<8;
 			break;
 		case SPRVSIZL:
-			state->m_blitter.height = data;
+			m_blitter.height = data;
 			break;
 		case SPRVSIZH:
-			state->m_blitter.height &= 0xff;
-			state->m_blitter.height |= data<<8;
+			m_blitter.height &= 0xff;
+			m_blitter.height |= data<<8;
 			break;
 		case STRETCHL:
-			state->m_blitter.stretch = data;
+			m_blitter.stretch = data;
 			break;
 		case STRETCHH:
-			state->m_blitter.stretch &= 0xff;
-			state->m_blitter.stretch |= data<<8;
+			m_blitter.stretch &= 0xff;
+			m_blitter.stretch |= data<<8;
 			break;
 		case TILTL:
-			state->m_blitter.tilt = data;
+			m_blitter.tilt = data;
 			break;
 		case TILTH:
-			state->m_blitter.tilt &= 0xff;
-			state->m_blitter.tilt |= data<<8;
+			m_blitter.tilt &= 0xff;
+			m_blitter.tilt |= data<<8;
 			break;
 		// case SPRDOFFL:
 		// case SPRVPOSL:
 		// case COLLOFFL:
 		case VSIZACUML:
-			state->m_blitter.height_accumulator = data;
+			m_blitter.height_accumulator = data;
 			break;
 		case VSIZACUMH:
-			state->m_blitter.height_accumulator &= 0xff;
-			state->m_blitter.height_accumulator |= data<<8;
+			m_blitter.height_accumulator &= 0xff;
+			m_blitter.height_accumulator |= data<<8;
 			break;
 		case HSIZOFFL:
-			state->m_blitter.width_offset = data;
+			m_blitter.width_offset = data;
 			break;
 		case HSIZOFFH:
-			state->m_blitter.width_offset &= 0xff;
-			state->m_blitter.width_offset |= data<<8;
+			m_blitter.width_offset &= 0xff;
+			m_blitter.width_offset |= data<<8;
 			break;
 		case VSIZOFFL:
-			state->m_blitter.height_offset = data;
+			m_blitter.height_offset = data;
 			break;
 		case VSIZOFFH:
-			state->m_blitter.height_offset &= 0xff;
-			state->m_blitter.height_offset |= data<<8;
+			m_blitter.height_offset &= 0xff;
+			m_blitter.height_offset |= data<<8;
 			break;
 		case SCBADRL:
-			state->m_blitter.scb = data;
+			m_blitter.scb = data;
 			break;
 		case SCBADRH:
-			state->m_blitter.scb &= 0xff;
-			state->m_blitter.scb |= data<<8;
+			m_blitter.scb &= 0xff;
+			m_blitter.scb |= data<<8;
 			break;
 		//case PROCADRL:
 
 		/* Writing to M (0x6c) will also clear the accumulator overflow bit */
 		case MATH_M:
-			state->m_suzy.accumulate_overflow = FALSE;
+			m_suzy.accumulate_overflow = FALSE;
 			break;
 		case MATH_C:
 			/* If we are going to perform a signed multiplication, we store the sign and convert the number
             to an unsigned one */
-			if (state->m_suzy.signed_math)
+			if (m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
-				factor = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
+				factor = m_suzy.data[MATH_D] | (m_suzy.data[MATH_C] << 8);
 				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
 				{
 					temp = (factor ^ 0xffff) + 1;
-					state->m_sign_CD = - 1;
-					state->m_suzy.data[MATH_D] = temp & 0xff;
-					state->m_suzy.data[MATH_C] = temp >> 8;
+					m_sign_CD = - 1;
+					m_suzy.data[MATH_D] = temp & 0xff;
+					m_suzy.data[MATH_C] = temp >> 8;
 				}
 				else
-					state->m_sign_CD = 1;
+					m_sign_CD = 1;
 			}
 			break;
 		case MATH_D:
@@ -1225,58 +1223,58 @@ static WRITE8_HANDLER( suzy_write )
         Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
         Here I assume the sign flag gets updated. */
 			if (data)
-				state->m_sign_CD = 1;
+				m_sign_CD = 1;
 			break;
 		/* Writing to A will start a 16 bit multiply */
 		/* If we are going to perform a signed multiplication, we also store the sign and convert the
         number to an unsigned one */
 		case MATH_A:
-			if (state->m_suzy.signed_math)
+			if (m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
-				factor = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
+				factor = m_suzy.data[MATH_B] | (m_suzy.data[MATH_A] << 8);
 				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
 				{
 					temp = (factor ^ 0xffff) + 1;
-					state->m_sign_AB = - 1;
-					state->m_suzy.data[MATH_B] = temp & 0xff;
-					state->m_suzy.data[MATH_A] = temp >> 8;
+					m_sign_AB = - 1;
+					m_suzy.data[MATH_B] = temp & 0xff;
+					m_suzy.data[MATH_A] = temp >> 8;
 				}
 				else
-					state->m_sign_AB = 1;
+					m_sign_AB = 1;
 			}
-			lynx_multiply(state);
+			lynx_multiply();
 			break;
 		/* Writing to E will start a 16 bit divide */
 		case MATH_E:
-			lynx_divide(state);
+			lynx_divide();
 			break;
 		case SPRCTL0:
-			state->m_blitter.spr_ctl0 = data;
+			m_blitter.spr_ctl0 = data;
 			break;
 		case SPRCTL1:
-			state->m_blitter.spr_ctl1 = data;
+			m_blitter.spr_ctl1 = data;
 			break;
 		case SPRCOLL:
-			state->m_blitter.spr_coll = data;
+			m_blitter.spr_coll = data;
 			break;
 		case SUZYBUSEN:
 			logerror("write to SUSYBUSEN %x \n", data);
 			break;
 		case SPRSYS:
-				state->m_suzy.signed_math = (data & 0x80) ? 1:0;
-				state->m_suzy.accumulate = (data & 0x40) ? 1:0;
-				state->m_blitter.no_collide = (data & 0x20) ? 1:0;
-				state->m_blitter.vstretch = (data & 0x10) ? 1:0;
-				state->m_blitter.lefthanded = (data & 0x08) ? 1:0;
+				m_suzy.signed_math = (data & 0x80) ? 1:0;
+				m_suzy.accumulate = (data & 0x40) ? 1:0;
+				m_blitter.no_collide = (data & 0x20) ? 1:0;
+				m_blitter.vstretch = (data & 0x10) ? 1:0;
+				m_blitter.lefthanded = (data & 0x08) ? 1:0;
 				// unsafe access clear and sprite engine stop request are not enabled
 				if (data & 0x02) logerror("sprite engine stop request\n");
 				break;
 		case SPRGO:
-			if ((data & 0x01) && state->m_suzy.data[SUZYBUSEN])
+			if ((data & 0x01) && m_suzy.data[SUZYBUSEN])
 			{
-				//state->m_blitter.time = space->machine().time();
-				lynx_blitter(space->machine());
+				//m_blitter.time = machine().time();
+				lynx_blitter(machine());
 			}
 			break;
 		case JOYSTICK:
@@ -1524,82 +1522,82 @@ static TIMER_CALLBACK(lynx_timer_shot)
 	}
 }
 
-static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
+UINT8 lynx_state::lynx_timer_read(int which, int offset)
 {
 	UINT8 value = 0;
 
 	switch (offset)
 	{
 		case 0:
-			value = state->m_timer[which].bakup;
+			value = m_timer[which].bakup;
 			break;
 		case 1:
-			value = state->m_timer[which].cntrl1;
+			value = m_timer[which].cntrl1;
 			break;
 		case 2:
-			if ((state->m_timer[which].cntrl1 & 0x07) == 0x07) // linked timer
+			if ((m_timer[which].cntrl1 & 0x07) == 0x07) // linked timer
 			{
-				value = state->m_timer[which].counter;
+				value = m_timer[which].counter;
 			}
 			else
 			{
-				if ( state->m_timer[which].timer_active )
+				if ( m_timer[which].timer_active )
 				{
-					value = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07)));
+					value = (UINT8) (m_timer[which].timer->remaining().as_ticks(1000000>>(m_timer[which].cntrl1 & 0x07)));
 					value -= value ? 1 : 0;
 				}
 			}
 			break;
 
 		case 3:
-			value = state->m_timer[which].cntrl2;
+			value = m_timer[which].cntrl2;
 			break;
 	}
 	// logerror("timer %d read %x %.2x\n", which, offset, value);
 	return value;
 }
 
-static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 data)
+void lynx_state::lynx_timer_write(int which, int offset, UINT8 data)
 {
 	//logerror("timer %d write %x %.2x\n", which, offset, data);
 	attotime t;
 
-	if ( state->m_timer[which].timer_active && ((state->m_timer[which].cntrl1 & 0x07) != 0x07))
+	if ( m_timer[which].timer_active && ((m_timer[which].cntrl1 & 0x07) != 0x07))
 	{
-		state->m_timer[which].counter = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07)));
-		state->m_timer[which].counter -= (state->m_timer[which].counter) ? 1 : 0;
+		m_timer[which].counter = (UINT8) (m_timer[which].timer->remaining().as_ticks(1000000>>(m_timer[which].cntrl1 & 0x07)));
+		m_timer[which].counter -= (m_timer[which].counter) ? 1 : 0;
 	}
 
 	switch (offset)
 	{
 		case 0:
-			state->m_timer[which].bakup = data;
+			m_timer[which].bakup = data;
 			break;
 		case 1:
-			state->m_timer[which].cntrl1 = data;
+			m_timer[which].cntrl1 = data;
 			if (data & 0x40) // reset timer done
-				state->m_timer[which].cntrl2 &= ~0x08;
+				m_timer[which].cntrl2 &= ~0x08;
 			break;
 		case 2:
-			state->m_timer[which].counter = data;
+			m_timer[which].counter = data;
 			break;
 		case 3:
-			state->m_timer[which].cntrl2 = (state->m_timer[which].cntrl2 & ~0x08) | (data & 0x08);
+			m_timer[which].cntrl2 = (m_timer[which].cntrl2 & ~0x08) | (data & 0x08);
 			break;
 	}
 
 	/* Update timers */
 	//if ( offset < 3 )
 	//{
-		state->m_timer[which].timer->reset();
-		state->m_timer[which].timer_active = 0;
-		if ((state->m_timer[which].cntrl1 & 0x08) && !(state->m_timer[which].cntrl2 & 0x08))		// if enable count
+		m_timer[which].timer->reset();
+		m_timer[which].timer_active = 0;
+		if ((m_timer[which].cntrl1 & 0x08) && !(m_timer[which].cntrl2 & 0x08))		// if enable count
 		{
-			if ((state->m_timer[which].cntrl1 & 0x07) != 0x07)  // if not set to link mode
+			if ((m_timer[which].cntrl1 & 0x07) != 0x07)  // if not set to link mode
 			{
-				t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].counter + 1));
-				state->m_timer[which].timer->adjust(t, which);
-				state->m_timer[which].timer_active = 1;
+				t = (attotime::from_hz(lynx_time_factor(m_timer[which].cntrl1 & 0x07)) * (m_timer[which].counter + 1));
+				m_timer[which].timer->adjust(t, which);
+				m_timer[which].timer_active = 1;
 			}
 		}
 	//}
@@ -1678,28 +1676,27 @@ static  READ8_HANDLER(lynx_uart_r)
 	return value;
 }
 
-static WRITE8_HANDLER(lynx_uart_w)
+WRITE8_MEMBER(lynx_state::lynx_uart_w)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
 	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
 	{
 		case 0x8c:
-			state->m_uart.serctl = data;
+			m_uart.serctl = data;
 			break;
 
 		case 0x8d:
-			if (state->m_uart.sending)
+			if (m_uart.sending)
 			{
-				state->m_uart.buffer = data;
-				state->m_uart.buffer_loaded = TRUE;
+				m_uart.buffer = data;
+				m_uart.buffer_loaded = TRUE;
 			}
 			else
 			{
-				state->m_uart.sending = TRUE;
-				state->m_uart.data_to_send = data;
+				m_uart.sending = TRUE;
+				m_uart.data_to_send = data;
 				// timing not accurate, baude rate should be calculated from timer 4 backup value and clock rate
-				space->machine().scheduler().timer_set(attotime::from_usec(11*16), FUNC(lynx_uart_timer));
+				machine().scheduler().timer_set(attotime::from_usec(11*16), FUNC(lynx_uart_timer));
 			}
 			break;
 	}
@@ -1713,9 +1710,8 @@ static WRITE8_HANDLER(lynx_uart_w)
 ****************************************/
 
 
-static READ8_HANDLER( mikey_read )
+READ8_MEMBER(lynx_state::mikey_read)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
 	UINT8 direction, value = 0x00;
 
 	switch (offset)
@@ -1728,7 +1724,7 @@ static READ8_HANDLER( mikey_read )
 	case 0x14: case 0x15: case 0x16: case 0x17:
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		value = lynx_timer_read(state, offset >> 2, offset & 0x03);
+		value = lynx_timer_read(offset >> 2, offset & 0x03);
 		break;
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
@@ -1736,12 +1732,12 @@ static READ8_HANDLER( mikey_read )
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		value = lynx_audio_read(state->m_audio, offset);
+		value = lynx_audio_read(m_audio, offset);
 		break;
 
 	case 0x80:
 	case 0x81:
-		value = state->m_mikey.data[0x81]; // both registers access the same interupt status byte
+		value = m_mikey.data[0x81]; // both registers access the same interupt status byte
 		// logerror( "mikey read %.2x %.2x\n", offset, value );
 		break;
 
@@ -1759,13 +1755,13 @@ static READ8_HANDLER( mikey_read )
 		break;
 
 	case 0x8b:
-		direction = state->m_mikey.data[0x8a];
-		value |= (direction & 0x01) ? (state->m_mikey.data[offset] & 0x01) : 0x01;	// External Power input
-		value |= (direction & 0x02) ? (state->m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
-		value |= (direction & 0x04) ? (state->m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
+		direction = m_mikey.data[0x8a];
+		value |= (direction & 0x01) ? (m_mikey.data[offset] & 0x01) : 0x01;	// External Power input
+		value |= (direction & 0x02) ? (m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
+		value |= (direction & 0x04) ? (m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
 		// REST read returns actual rest state anded with rest output bit
-		value |= (direction & 0x08) ? (((state->m_mikey.data[offset] & 0x08) && (state->m_mikey.vb_rest)) ? 0x00 : 0x08) : 0x00;	// rest output
-		value |= (direction & 0x10) ? (state->m_mikey.data[offset] & 0x10) : 0x10;	// audin input
+		value |= (direction & 0x08) ? (((m_mikey.data[offset] & 0x08) && (m_mikey.vb_rest)) ? 0x00 : 0x08) : 0x00;	// rest output
+		value |= (direction & 0x10) ? (m_mikey.data[offset] & 0x10) : 0x10;	// audin input
 		/* Hack: we disable COMLynx  */
 		value |= 0x04;
 		/* B5, B6 & B7 are not used */
@@ -1773,19 +1769,18 @@ static READ8_HANDLER( mikey_read )
 
 	case 0x8c:
 	case 0x8d:
-		value = lynx_uart_r(space, offset);
+		value = lynx_uart_r(&space, offset);
 		break;
 
 	default:
-		value = state->m_mikey.data[offset];
+		value = m_mikey.data[offset];
 		//logerror( "mikey read %.2x %.2x\n", offset, value );
 	}
 	return value;
 }
 
-static WRITE8_HANDLER( mikey_write )
+WRITE8_MEMBER(lynx_state::mikey_write)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
 	switch (offset)
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03:
@@ -1796,7 +1791,7 @@ static WRITE8_HANDLER( mikey_write )
 	case 0x14: case 0x15: case 0x16: case 0x17:
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		lynx_timer_write(state, offset >> 2, offset & 3, data);
+		lynx_timer_write(offset >> 2, offset & 3, data);
 		return;
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
@@ -1804,44 +1799,44 @@ static WRITE8_HANDLER( mikey_write )
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		lynx_audio_write(state->m_audio, offset, data);
+		lynx_audio_write(m_audio, offset, data);
 		return;
 
 	case 0x80:
-		state->m_mikey.data[0x81] &= ~data; // clear interrupt source
+		m_mikey.data[0x81] &= ~data; // clear interrupt source
 		// logerror("mikey write %.2x %.2x\n", offset, data);
-		if (!state->m_mikey.data[0x81])
-			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+		if (!m_mikey.data[0x81])
+			cputag_set_input_line(machine(), "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
 	case 0x81:
-		state->m_mikey.data[0x81] |= data;
+		m_mikey.data[0x81] |= data;
 		if (data)
 		{
-			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 			logerror("direct write to interupt register\n");
 		}
 		break;
 
 	case 0x87:
-		state->m_mikey.data[offset] = data;
+		m_mikey.data[offset] = data;
 		if (data & 0x02)		// Power (1 = on)
 		{
 			if (data & 0x01)	// Cart Address Strobe
 			{
-				state->m_suzy.high <<= 1;
-				if (state->m_mikey.data[0x8b] & 0x02)
-					state->m_suzy.high |= 1;
-				state->m_suzy.high &= 0xff;
-				state->m_suzy.low = 0;
+				m_suzy.high <<= 1;
+				if (m_mikey.data[0x8b] & 0x02)
+					m_suzy.high |= 1;
+				m_suzy.high &= 0xff;
+				m_suzy.low = 0;
 			}
 		}
 		else
 		{
-			state->m_suzy.high = 0;
-			state->m_suzy.low = 0;
+			m_suzy.high = 0;
+			m_suzy.low = 0;
 		}
 		break;
 
@@ -1853,41 +1848,41 @@ static WRITE8_HANDLER( mikey_write )
 	case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-		state->m_mikey.data[offset] = data;
+		m_mikey.data[offset] = data;
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		state->m_palette[offset & 0x0f] = space->machine().pens[
-			((state->m_mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
-			((state->m_mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
-			((state->m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
+		m_palette[offset & 0x0f] = machine().pens[
+			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
+			((m_mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
+			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
 		break;
 
 	/* TODO: properly implement these writes */
 	case 0x8b:
-		state->m_mikey.data[offset] = data;
-		if (state->m_mikey.data[0x8a] & 0x10)
-			logerror("Trying to enable bank 1 write. %d\n", state->m_mikey.data[offset] & 0x10);
+		m_mikey.data[offset] = data;
+		if (m_mikey.data[0x8a] & 0x10)
+			logerror("Trying to enable bank 1 write. %d\n", m_mikey.data[offset] & 0x10);
 		break;
 
 	//case 0x90: // SDONEACK - Suzy Done Acknowledge
 	case 0x91: // CPUSLEEP - CPU Bus Request Disable
-		state->m_mikey.data[offset] = data;
-		if (!data && state->m_blitter.busy)
+		m_mikey.data[offset] = data;
+		if (!data && m_blitter.busy)
 		{
-			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 			/* A write of '0' to this address will reset the CPU bus request flip flop */
 		}
 		break;
 	case 0x94: case 0x95:
-		state->m_mikey.data[offset]=data;
+		m_mikey.data[offset]=data;
 		break;
 	case 0x9c: case 0x9d: case 0x9e:
-		state->m_mikey.data[offset]=data;
+		m_mikey.data[offset]=data;
 		logerror("Mtest%d write: %x\n", offset&0x3, data);
 		break;
 
 	default:
-		state->m_mikey.data[offset]=data;
+		m_mikey.data[offset]=data;
 		//logerror("mikey write %.2x %.2x\n",offset,data);
 		break;
 	}
@@ -1899,42 +1894,40 @@ static WRITE8_HANDLER( mikey_write )
 
 ****************************************/
 
-READ8_HANDLER( lynx_memory_config_r )
+READ8_MEMBER(lynx_state::lynx_memory_config_r)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
-	return state->m_memory_config;
+	return m_memory_config;
 }
 
-WRITE8_HANDLER( lynx_memory_config_w )
+WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 {
-	lynx_state *state = space->machine().driver_data<lynx_state>();
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
      * when these are safe in the cpu */
-	state->m_memory_config = data;
+	m_memory_config = data;
 
 	if (data & 1) {
-		space->install_readwrite_bank(0xfc00, 0xfcff, "bank1");
+		space.install_readwrite_bank(0xfc00, 0xfcff, "bank1");
 	} else {
-		space->install_legacy_readwrite_handler(0xfc00, 0xfcff, FUNC(suzy_read), FUNC(suzy_write));
+		space.install_readwrite_handler(0xfc00, 0xfcff, read8_delegate(FUNC(lynx_state::suzy_read),this), write8_delegate(FUNC(lynx_state::suzy_write),this));
 	}
 	if (data & 2) {
-		space->install_readwrite_bank(0xfd00, 0xfdff, "bank2");
+		space.install_readwrite_bank(0xfd00, 0xfdff, "bank2");
 	} else {
-		space->install_legacy_readwrite_handler(0xfd00, 0xfdff, FUNC(mikey_read), FUNC(mikey_write));
+		space.install_readwrite_handler(0xfd00, 0xfdff, read8_delegate(FUNC(lynx_state::mikey_read),this), write8_delegate(FUNC(lynx_state::mikey_write),this));
 	}
 
 	if (data & 1)
-		memory_set_bankptr(space->machine(), "bank1", state->m_mem_fc00);
+		memory_set_bankptr(machine(), "bank1", m_mem_fc00);
 	if (data & 2)
-		memory_set_bankptr(space->machine(), "bank2", state->m_mem_fd00);
-	memory_set_bank(space->machine(), "bank3", (data & 4) ? 1 : 0);
-	memory_set_bank(space->machine(), "bank4", (data & 8) ? 1 : 0);
+		memory_set_bankptr(machine(), "bank2", m_mem_fd00);
+	memory_set_bank(machine(), "bank3", (data & 4) ? 1 : 0);
+	memory_set_bank(machine(), "bank4", (data & 8) ? 1 : 0);
 }
 
 static void lynx_reset(running_machine &machine)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	lynx_memory_config_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	state->lynx_memory_config_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1966,7 +1959,7 @@ static void lynx_reset(running_machine &machine)
 
 static void lynx_postload(lynx_state *state)
 {
-	lynx_memory_config_w( state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
+	state->lynx_memory_config_w( *state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
 }
 
 MACHINE_START( lynx )

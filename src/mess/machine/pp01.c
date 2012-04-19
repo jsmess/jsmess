@@ -13,10 +13,9 @@
 #include "machine/ram.h"
 
 
-WRITE8_HANDLER( pp01_video_write_mode_w )
+WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
 {
-	pp01_state *state = space->machine().driver_data<pp01_state>();
-	state->m_video_write_mode = data & 0x0f;
+	m_video_write_mode = data & 0x0f;
 }
 
 static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
@@ -55,35 +54,36 @@ static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT
 	}
 }
 
-static WRITE8_HANDLER (pp01_video_r_1_w)
+WRITE8_MEMBER(pp01_state::pp01_video_r_1_w)
 {
-	pp01_video_w(space->machine(),0,offset,data,0);
+	pp01_video_w(machine(),0,offset,data,0);
 }
-static WRITE8_HANDLER (pp01_video_g_1_w)
+WRITE8_MEMBER(pp01_state::pp01_video_g_1_w)
 {
-	pp01_video_w(space->machine(),1,offset,data,0);
+	pp01_video_w(machine(),1,offset,data,0);
 }
-static WRITE8_HANDLER (pp01_video_b_1_w)
+WRITE8_MEMBER(pp01_state::pp01_video_b_1_w)
 {
-	pp01_video_w(space->machine(),2,offset,data,0);
+	pp01_video_w(machine(),2,offset,data,0);
 }
 
-static WRITE8_HANDLER (pp01_video_r_2_w)
+WRITE8_MEMBER(pp01_state::pp01_video_r_2_w)
 {
-	pp01_video_w(space->machine(),0,offset,data,1);
+	pp01_video_w(machine(),0,offset,data,1);
 }
-static WRITE8_HANDLER (pp01_video_g_2_w)
+WRITE8_MEMBER(pp01_state::pp01_video_g_2_w)
 {
-	pp01_video_w(space->machine(),1,offset,data,1);
+	pp01_video_w(machine(),1,offset,data,1);
 }
-static WRITE8_HANDLER (pp01_video_b_2_w)
+WRITE8_MEMBER(pp01_state::pp01_video_b_2_w)
 {
-	pp01_video_w(space->machine(),2,offset,data,1);
+	pp01_video_w(machine(),2,offset,data,1);
 }
 
 
 static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 {
+	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT8 *mem = machine.region("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
@@ -96,22 +96,22 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 		space->install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
 			case 0xe6 :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_r_1_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_1_w),state));
 					break;
 			case 0xe7 :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_r_2_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_2_w),state));
 					break;
 			case 0xea :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_g_1_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_1_w),state));
 					break;
 			case 0xeb :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_g_2_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_2_w),state));
 					break;
 			case 0xee :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_b_1_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_1_w),state));
 					break;
 			case 0xef :
-					space->install_legacy_write_handler(startaddr, endaddr, FUNC(pp01_video_b_2_w));
+					space->install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_2_w),state));
 					break;
 
 			default :
@@ -141,17 +141,15 @@ MACHINE_RESET( pp01 )
 	}
 }
 
-WRITE8_HANDLER (pp01_mem_block_w)
+WRITE8_MEMBER(pp01_state::pp01_mem_block_w)
 {
-	pp01_state *state = space->machine().driver_data<pp01_state>();
-	state->m_memory_block[offset] = data;
-	pp01_set_memory(space->machine(), offset, data);
+	m_memory_block[offset] = data;
+	pp01_set_memory(machine(), offset, data);
 }
 
-READ8_HANDLER (pp01_mem_block_r)
+READ8_MEMBER(pp01_state::pp01_mem_block_r)
 {
-	pp01_state *state = space->machine().driver_data<pp01_state>();
-	return	state->m_memory_block[offset];
+	return	m_memory_block[offset];
 }
 
 MACHINE_START(pp01)

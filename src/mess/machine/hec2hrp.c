@@ -122,10 +122,10 @@ void hector_minidisc_init(running_machine &machine)
 
 }
 
-READ8_HANDLER( hector_179x_register_r)
+READ8_MEMBER(hec2hrp_state::hector_179x_register_r)
 {
 int data=0;
-device_t *fdc = space->machine().device("wd179x");
+device_t *fdc = machine().device("wd179x");
 
 	switch (offset & 0x0ff)
 	{
@@ -148,9 +148,9 @@ device_t *fdc = space->machine().device("wd179x");
 
 	return data;
 }
-WRITE8_HANDLER( hector_179x_register_w)
+WRITE8_MEMBER(hec2hrp_state::hector_179x_register_w)
 {
-device_t *fdc = space->machine().device("wd179x");
+device_t *fdc = machine().device("wd179x");
 switch (offset)
 	{
 		/* minidisc floppy disc interface */
@@ -171,7 +171,7 @@ switch (offset)
 			/*General purpose port (0x08) for the minidisk I/O */
 			{
 			// Rom page bank switching
-			memory_set_bank(space->machine(), "bank2",BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
+			memory_set_bank(machine(), "bank2",BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
 
 			// Set drive number
 			if (BIT(data, 6)) wd17xx_set_drive(fdc, 0);  // Set the correct drive number 0
@@ -186,255 +186,247 @@ switch (offset)
 		break;
 	}
 }
-WRITE8_HANDLER( hector_switch_bank_w )
+WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	if (offset==0x00)	{	/* 0x800 et 0x000=> video page, HR*/
-							if (isHectoreXtend(space->machine()))
-								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
-							if (state->m_flag_clk ==1)
+							if (isHectoreXtend(machine()))
+								memory_set_bank(machine(), "bank1", HECTOR_BANK_VIDEO);
+							if (m_flag_clk ==1)
 							{
-								state->m_flag_clk=0;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_flag_clk=0;
+								machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 						}
 	if (offset==0x04)	{	/* 0x804 => video page, BR*/
-							state->m_hector_flag_hr=0;
-							if (isHectoreXtend(space->machine()))
-								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
-							if (state->m_flag_clk ==0)
+							m_hector_flag_hr=0;
+							if (isHectoreXtend(machine()))
+								memory_set_bank(machine(), "bank1", HECTOR_BANK_VIDEO);
+							if (m_flag_clk ==0)
 							{
-								state->m_flag_clk=1;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_flag_clk=1;
+								machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 	if (offset==0x08)	{	/* 0x808 => base page, HR*/
-							if (isHectoreXtend(space->machine()))
-								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
-							if (state->m_flag_clk ==1)
+							if (isHectoreXtend(machine()))
+								memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
+							if (m_flag_clk ==1)
 							{
-								state->m_flag_clk=0;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_flag_clk=0;
+								machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 
 						}
 	if (offset==0x0c)	{	/* 0x80c => base page, BR*/
-							state->m_hector_flag_hr=0;
-							if (isHectoreXtend(space->machine()))
-								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
-							if (state->m_flag_clk ==0)
+							m_hector_flag_hr=0;
+							if (isHectoreXtend(machine()))
+								memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
+							if (m_flag_clk ==0)
 							{
-								state->m_flag_clk=1;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_flag_clk=1;
+								machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 }
 
-WRITE8_HANDLER( hector_keyboard_w )
+WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
 {
 	/*nothing to do => read function manage the value*/
 }
 
-READ8_HANDLER( hector_keyboard_r )
+READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	UINT8 data = 0xff;
-	running_machine &machine = space->machine();
-
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (offset ==7) /* Only when joy reading*/
 	{
 		/* Read special key for analog joystick emulation only (button and pot are analog signal!) and the reset */
-		data=input_port_read(machine, keynames[8]);
+		data=input_port_read(machine(), keynames[8]);
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-		  if (isHectorHR(machine)) /* aviable for HR and up */
+		  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		  if (isHectorHR(machine())) /* aviable for HR and up */
 			{
-				state->m_hector_flag_hr=1;
-				if (isHectoreXtend(machine))
+				m_hector_flag_hr=1;
+				if (isHectoreXtend(machine()))
 					{
-						memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-						memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+						memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
+						memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
 					}
 				//RESET DISC II unit
-				if (isHectorWithDisc2(machine) )
-					hector_disc2_reset(machine);
+				if (isHectorWithDisc2(machine()) )
+					hector_disc2_reset(machine());
 
 				/* floppy md master reset */
-				if (isHectorWithMiniDisc(machine))
-					wd17xx_mr_w(machine.device("wd179x"), 1);
+				if (isHectorWithMiniDisc(machine()))
+					wd17xx_mr_w(machine().device("wd179x"), 1);
 
 			}
 
 		  else /* aviable for BR machines */
-			state->m_hector_flag_hr=0;
+			m_hector_flag_hr=0;
 
 
 		/*Common flag*/
-		state->m_hector_flag_80c = 0;
-		state->m_flag_clk = 0;
+		m_hector_flag_80c = 0;
+		m_flag_clk = 0;
 		}
 
-		state->m_actions = 0;
+		m_actions = 0;
 		if (data & 0x02) /* Fire(0)*/
-			state->m_actions += 1;
+			m_actions += 1;
 
 		if (data & 0x04) /* Fire(1)*/
-			state->m_actions += 2;
+			m_actions += 2;
 
 		if (data & 0x08) /* Pot(0)+*/
-			state->m_pot0 += 1;
-		if (state->m_pot0>128) state->m_pot0 = 128;
+			m_pot0 += 1;
+		if (m_pot0>128) m_pot0 = 128;
 
 		if (data & 0x10) /* Pot(0)-*/
-			state->m_pot0 -= 1;
+			m_pot0 -= 1;
 
-		if (state->m_pot0>250) state->m_pot0 = 0;
+		if (m_pot0>250) m_pot0 = 0;
 
 		if (data & 0x20) /* Pot(1)+*/
-			state->m_pot1 += 1;
-		if (state->m_pot1>128) state->m_pot1 = 128;
+			m_pot1 += 1;
+		if (m_pot1>128) m_pot1 = 128;
 
 		if (data & 0x40) /* Pot(1)-*/
-			state->m_pot1 -= 1;
+			m_pot1 -= 1;
 
-		if (state->m_pot1>250) state->m_pot1 = 0;
+		if (m_pot1>250) m_pot1 = 0;
 	}
 
 	/* in all case return the request value*/
-	return input_port_read(space->machine(), keynames[offset]);
+	return input_port_read(machine(), keynames[offset]);
 }
 
-WRITE8_HANDLER( hector_sn_2000_w )
+WRITE8_MEMBER(hec2hrp_state::hector_sn_2000_w)
 {
-	Mise_A_Jour_Etat(space->machine(), 0x2000+ offset, data);
-	Update_Sound(space, data);
+	Mise_A_Jour_Etat(machine(), 0x2000+ offset, data);
+	Update_Sound(&space, data);
 }
-WRITE8_HANDLER( hector_sn_2800_w )
+WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
 {
-	Mise_A_Jour_Etat(space->machine(), 0x2800+ offset, data);
-	Update_Sound(space, data);
+	Mise_A_Jour_Etat(machine(), 0x2800+ offset, data);
+	Update_Sound(&space, data);
 }
-READ8_HANDLER( hector_cassette_r )
+READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	double level;
 	UINT8 value=0;
 
-	if ((state->m_state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
+	if ((m_state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
 	{
-		state->m_Data_K7 =  0x00;  /* No cassette => clear bit*/
-		switch (state->m_state3000 & 0x38 )
+		m_Data_K7 =  0x00;  /* No cassette => clear bit*/
+		switch (m_state3000 & 0x38 )
 		{
-			case 0x08: value = (state->m_actions & 1) ? 0x80 : 0; break;
-			case 0x10: value = state->m_pot0; break;
-			case 0x20: value = (state->m_actions & 2) ? 0x80 : 0; break;
-			case 0x28: value = state->m_pot1; break;
+			case 0x08: value = (m_actions & 1) ? 0x80 : 0; break;
+			case 0x10: value = m_pot0; break;
+			case 0x20: value = (m_actions & 2) ? 0x80 : 0; break;
+			case 0x28: value = m_pot1; break;
 			default: value = 0; break;
 		}
 	}
 	else
 	{
-		if (state->m_write_cassette == 0)
+		if (m_write_cassette == 0)
 		{
 			/* Accee a la cassette*/
-			level = (cassette_device_image(space->machine())->input());
+			level = (cassette_device_image(machine())->input());
 
 			/* Travail du 741 en trigger*/
 			if  (level < -0.08)
-				state->m_cassette_bit = 0x00;
+				m_cassette_bit = 0x00;
 			if (level > +0.08)
-				state->m_cassette_bit = 0x01;
+				m_cassette_bit = 0x01;
 		}
-		/* Programme du sn7474 (bascule) : Changement ??tat bit Data K7 ?? chaque front montant de state->m_cassette_bit*/
-		if ((state->m_cassette_bit != state->m_cassette_bit_mem) && (state->m_cassette_bit !=0))
+		/* Programme du sn7474 (bascule) : Changement ??tat bit Data K7 ?? chaque front montant de m_cassette_bit*/
+		if ((m_cassette_bit != m_cassette_bit_mem) && (m_cassette_bit !=0))
 		{
-			if (state->m_Data_K7 == 0x00)
-				state->m_Data_K7 =  0x80;/* En poids fort*/
+			if (m_Data_K7 == 0x00)
+				m_Data_K7 =  0x80;/* En poids fort*/
 			else
-				state->m_Data_K7 =  0x00;
+				m_Data_K7 =  0x00;
 		}
-		value = ( state->m_CK_signal & 0x7F ) + state->m_Data_K7;
-		state->m_cassette_bit_mem = state->m_cassette_bit;  /* Memorisation etat bit cassette*/
+		value = ( m_CK_signal & 0x7F ) + m_Data_K7;
+		m_cassette_bit_mem = m_cassette_bit;  /* Memorisation etat bit cassette*/
 	}
 	return value;
 }
-WRITE8_HANDLER( hector_sn_3000_w )
+WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
-	state->m_state3000 = data & 0xf8; /* except bit 0 to 2*/
-	if ((data & 7) != state->m_oldstate3000 )
+	m_state3000 = data & 0xf8; /* except bit 0 to 2*/
+	if ((data & 7) != m_oldstate3000 )
 	{
 		/* Update sn76477 only when necessary!*/
-		Mise_A_Jour_Etat( space->machine(), 0x3000, data & 7 );
-		Update_Sound(space, data & 7);
+		Mise_A_Jour_Etat( machine(), 0x3000, data & 7 );
+		Update_Sound(&space, data & 7);
 	}
-	state->m_oldstate3000 = data & 7;
+	m_oldstate3000 = data & 7;
 }
 
 /* Color Interface */
-WRITE8_HANDLER( hector_color_a_w )
+WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 
 	if (data & 0x40)
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
-		if (state->m_write_cassette==0)
+		if (m_write_cassette==0)
 		{
-				cassette_device_image(space->machine())->change_state(
+				cassette_device_image(machine())->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
-			// cassette_device_image(space->machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
+			// cassette_device_image(machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
 		}
 	}
 	else
 	{	/* stop motor*/
-		cassette_device_image(space->machine())->set_state(CASSETTE_STOPPED);
-		state->m_write_cassette=0;
-		state->m_counter_write =0;
+		cassette_device_image(machine())->set_state(CASSETTE_STOPPED);
+		m_write_cassette=0;
+		m_counter_write =0;
 	}
-	if (((data & 0x80) != (state->m_oldstate1000 & 0x80)) && ((state->m_oldstate1000 & 7)==(data & 7)) ) /* Bit7 had change but not the color statement*/
+	if (((data & 0x80) != (m_oldstate1000 & 0x80)) && ((m_oldstate1000 & 7)==(data & 7)) ) /* Bit7 had change but not the color statement*/
 	{
 		/* Bit 7 => Write bit for cassette!*/
-		state->m_counter_write +=1;
+		m_counter_write +=1;
 
-		if (state->m_counter_write > 5)
+		if (m_counter_write > 5)
 		{
 			/* Wait several cycle before lauch the record to prevent somes bugs*/
-			state->m_counter_write = 6;
-			if (state->m_write_cassette==0)
+			m_counter_write = 6;
+			if (m_write_cassette==0)
 			{	/* C'est la 1er fois => record*/
-							cassette_device_image(space->machine())->change_state(
+							cassette_device_image(machine())->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
-				cassette_device_image(space->machine())->set_state(CASSETTE_RECORD);
-				state->m_write_cassette=1;
+				cassette_device_image(machine())->set_state(CASSETTE_RECORD);
+				m_write_cassette=1;
 			}
 		}
 		/* cassette data */
-		cassette_device_image(space->machine())->output(((data & 0x80) == 0x80) ? -1.0 : +1.0);
+		cassette_device_image(machine())->output(((data & 0x80) == 0x80) ? -1.0 : +1.0);
 	}
 
 	/* Other bit : color definition*/
-	state->m_hector_color[0] =  data        & 0x07 ;
-	state->m_hector_color[2] = ((data >> 3)  & 0x07) | (state->m_hector_color[2] & 0x40);
+	m_hector_color[0] =  data        & 0x07 ;
+	m_hector_color[2] = ((data >> 3)  & 0x07) | (m_hector_color[2] & 0x40);
 
-	state->m_oldstate1000=data; /* For next step*/
+	m_oldstate1000=data; /* For next step*/
 }
 
-WRITE8_HANDLER( hector_color_b_w )
+WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
-	device_t *discrete = space->machine().device("discrete");
-	state->m_hector_color[1] =  data        & 0x07;
-	state->m_hector_color[3] = (data >> 3)  & 0x07;
+	device_t *discrete = machine().device("discrete");
+	m_hector_color[1] =  data        & 0x07;
+	m_hector_color[3] = (data >> 3)  & 0x07;
 
 	/* Half light on color 2 only on HR machines:*/
-	if (data & 0x40) state->m_hector_color[2] |= 8; else state->m_hector_color[2] &= 7;
+	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
 	discrete_sound_w(discrete, NODE_01,  (data & 0x80) ? 0:1 );
@@ -456,9 +448,8 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 ********************************************************************************/
 
 /*******************  READ PIO 8255 *******************/
-READ8_HANDLER( hector_io_8255_r)
+READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 
 	/* 8255 in mode 0 */
 	UINT8 data =0;
@@ -467,11 +458,11 @@ READ8_HANDLER( hector_io_8255_r)
 
 
 	if ((offset & 0x3) == 0x0) /* Port A */
-		data = state->m_hector_port_a;
+		data = m_hector_port_a;
 
 	if ((offset & 0x3) == 0x1) /* Port B */
 	{
-		data = state->m_hector_port_b;
+		data = m_hector_port_b;
 		#ifdef DEBUG_TRACE_COM_HECTOR
 			printf("\nLecture data par Hector %x (portB)",data);
 		#endif
@@ -479,24 +470,24 @@ READ8_HANDLER( hector_io_8255_r)
 
 	if ((offset & 0x3) == 0x2) /* Port C */
 	{
-		data_l = (state->m_hector_port_c_l & 0x0f);
-		data_h = (state->m_hector_port_c_h & 0xf0);
+		data_l = (m_hector_port_c_l & 0x0f);
+		data_h = (m_hector_port_c_h & 0xf0);
 
-		if (BIT(state->m_hector_port_cmd, 0))					/* Quartet inf en entree ?*/
-			data_l = (state->m_hector_port_c_l & 0x0f);  /*no change*/
+		if (BIT(m_hector_port_cmd, 0))					/* Quartet inf en entree ?*/
+			data_l = (m_hector_port_c_l & 0x0f);  /*no change*/
 
-		if (BIT(state->m_hector_port_cmd, 3))					/* Quartet sup en entree ?*/
+		if (BIT(m_hector_port_cmd, 3))					/* Quartet sup en entree ?*/
 		{
-			state->m_hector_port_c_h = (state->m_hector_port_c_h & 0x0c0);	/* Clear bits 4 & 5*/
+			m_hector_port_c_h = (m_hector_port_c_h & 0x0c0);	/* Clear bits 4 & 5*/
 
-			if (state->m_hector_disc2_data_w_ready != 0x00)
-				state->m_hector_port_c_h = state->m_hector_port_c_h + 0x010;	// PC4 (data write ready from Disc II to Hector)
+			if (m_hector_disc2_data_w_ready != 0x00)
+				m_hector_port_c_h = m_hector_port_c_h + 0x010;	// PC4 (data write ready from Disc II to Hector)
 
-			if (state->m_hector_disc2_data_r_ready != 0x00)
-				state->m_hector_port_c_h = state->m_hector_port_c_h + 0x020;	// PC5 (data read ready from Hector to Disc2)
+			if (m_hector_disc2_data_r_ready != 0x00)
+				m_hector_port_c_h = m_hector_port_c_h + 0x020;	// PC5 (data read ready from Hector to Disc2)
 
-			state->m_hector_port_c_h = state->m_hector_port_c_h & 0x07F;		// PC7 (printer busy=0)
-			data_h =  state->m_hector_port_c_h;
+			m_hector_port_c_h = m_hector_port_c_h & 0x07F;		// PC7 (printer busy=0)
+			data_h =  m_hector_port_c_h;
 		}
 		data= data_l + data_h;
 	}
@@ -505,20 +496,19 @@ READ8_HANDLER( hector_io_8255_r)
 
 /*******************  WRITE PIO 8255 *******************/
 
-WRITE8_HANDLER( hector_io_8255_w)
+WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	/* 8255 in mode 0 */
 	if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
 	{
-		state->m_hector_port_a = data;
+		m_hector_port_a = data;
 		/* Port A => to printer*/
 		/*  Caution : The strobe connection to the printer seems not be used
         So, all what is send to the Disc2 unit will be printed too! */
 
-		if (BIT(state->m_hector_port_c_l, 0)) {		// PC0 (bit X0)= strobe printer !
-			printer_image_device *printer = space->machine().device<printer_image_device>("printer");
-			printer->output(state->m_hector_port_a);
+		if (BIT(m_hector_port_c_l, 0)) {		// PC0 (bit X0)= strobe printer !
+			printer_image_device *printer = machine().device<printer_image_device>("printer");
+			printer->output(m_hector_port_a);
 		}
 
 #ifdef DEBUG_TRACE_COM_HECTOR
@@ -527,84 +517,82 @@ WRITE8_HANDLER( hector_io_8255_w)
 	}
 
 	if ((offset & 0x3) == 0x1) /* Port B */
-		state->m_hector_port_b = data;
+		m_hector_port_b = data;
 
 
 	if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 	{
-		if (!BIT(state->m_hector_port_cmd, 0))	 /* cmd -> Quartet inf en sortie ?*/
+		if (!BIT(m_hector_port_cmd, 0))	 /* cmd -> Quartet inf en sortie ?*/
 		{
-			state->m_hector_port_c_l = data & 0x0f;
+			m_hector_port_c_l = data & 0x0f;
 			// Utilizing bits port C : PC0 for the printer : strobe!
-			if (BIT(state->m_hector_port_c_l  , 0))		// PC0 (bit X0)= true
+			if (BIT(m_hector_port_c_l  , 0))		// PC0 (bit X0)= true
 			{
 				/* Port A => to printer*/
-				//printer_output(space->machine().device("printer"), state->m_hector_port_a);
+				//printer_output(machine().device("printer"), m_hector_port_a);
 			}
 			// Utilizing bits port C : PC1 // PC2  for the communication with disc2
-			if (!BIT(state->m_hector_port_c_l  , 1))		// PC1 (bit X1)= true
+			if (!BIT(m_hector_port_c_l  , 1))		// PC1 (bit X1)= true
 			{
-				// Lecture effectuee => RAZ memoire donnee state->m_hector_disc2_data_write dispo
-				state->m_hector_port_b = state->m_hector_disc2_data_write; // Mep sur port B si 2eme 74374 existant !
-				state->m_hector_disc2_data_w_ready = 0x00;
+				// Lecture effectuee => RAZ memoire donnee m_hector_disc2_data_write dispo
+				m_hector_port_b = m_hector_disc2_data_write; // Mep sur port B si 2eme 74374 existant !
+				m_hector_disc2_data_w_ready = 0x00;
 				#ifdef DEBUG_TRACE_COM_HECTOR
-					printf("\nEcriture port B vers state->m_hector_disc2_data_write suite a PC1");
+					printf("\nEcriture port B vers m_hector_disc2_data_write suite a PC1");
 				#endif
 			}
-			if (!BIT(state->m_hector_port_c_l, 2))		// PC2 (bit X2)= true
+			if (!BIT(m_hector_port_c_l, 2))		// PC2 (bit X2)= true
 			{
-				state->m_hector_disc2_data_read = state->m_hector_port_a; /* mise en place de l'info presente sur le port A */
-				state->m_hector_disc2_data_r_ready = 0x08;		 /* memorisation de l'info */
+				m_hector_disc2_data_read = m_hector_port_a; /* mise en place de l'info presente sur le port A */
+				m_hector_disc2_data_r_ready = 0x08;		 /* memorisation de l'info */
 				#ifdef DEBUG_TRACE_COM_HECTOR
-					printf("\nEcriture port A pour state->m_hector_disc2_data_read suite a PC2");
+					printf("\nEcriture port A pour m_hector_disc2_data_read suite a PC2");
 				#endif
 			}
 		}
-		if (!BIT(state->m_hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/
-			state->m_hector_port_c_h = (data & 0xf0);
+		if (!BIT(m_hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/
+			m_hector_port_c_h = (data & 0xf0);
 	}
 
 	if ((offset & 0x3) == 0x3) /* Port commande */
 	{
-		state->m_hector_port_cmd = data;
+		m_hector_port_cmd = data;
 	}
 }
 /* End of 8255 managing */
 
 
 /*******************  Ecriture PIO specifique machine MX40 *******************/
-WRITE8_HANDLER( hector_mx40_io_port_w)
+WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 /* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE0);
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE1);
-		state->m_hector_flag_80c=0;
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE1);
+		m_hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x44) /* Port page 2  => 42 pour MX80*/
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE2);
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
-		state->m_hector_flag_80c=0;/* No 80c in 40c !*/
+		m_hector_flag_80c=0;/* No 80c in 40c !*/
 }
 
 /*******************  Ecriture PIO specifique machine MX80 *******************/
-WRITE8_HANDLER( hector_mx80_io_port_w)
+WRITE8_MEMBER(hec2hrp_state::hector_mx80_io_port_w)
 {
-	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE0);
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE1);
-		state->m_hector_flag_80c=0;
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE1);
+		m_hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x42) /* Port page 2  => port different du MX40*/
-		memory_set_bank(space->machine(), "bank2", HECTORMX_BANK_PAGE2);
+		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
-		state->m_hector_flag_80c=1;
+		m_hector_flag_80c=1;
 }
 
 /********************************************************************************

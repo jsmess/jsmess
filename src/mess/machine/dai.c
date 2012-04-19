@@ -29,11 +29,10 @@
 
 /* Memory */
 
-WRITE8_HANDLER( dai_stack_interrupt_circuit_w )
+WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 {
-	dai_state *state = space->machine().driver_data<dai_state>();
-	tms5501_sensor (state->m_tms5501, 1);
-	tms5501_sensor (state->m_tms5501, 0);
+	tms5501_sensor (m_tms5501, 1);
+	tms5501_sensor (m_tms5501, 0);
 }
 
 static void dai_update_memory(running_machine &machine, int dai_rom_bank)
@@ -187,17 +186,17 @@ MACHINE_RESET( dai )
                 bit 6-7         ROM bank switching
 ***************************************************************************/
 
-READ8_HANDLER( dai_io_discrete_devices_r )
+READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
 {
 	UINT8 data = 0x00;
 
 	switch(offset & 0x000f) {
 	case 0x00:
-		data = input_port_read(space->machine(), "IN8");
+		data = input_port_read(machine(), "IN8");
 		data |= 0x08;			// serial ready
-		if (space->machine().rand()&0x01)
+		if (machine().rand()&0x01)
 			data |= 0x40;		// random number generator
-		if (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input() > 0.01)
+		if (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > 0.01)
 			data |= 0x80;		// tape input
 		break;
 
@@ -210,30 +209,29 @@ READ8_HANDLER( dai_io_discrete_devices_r )
 	return data;
 }
 
-WRITE8_HANDLER( dai_io_discrete_devices_w )
+WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 {
-	dai_state *state = space->machine().driver_data<dai_state>();
 	switch(offset & 0x000f) {
 	case 0x04:
-		dai_set_volume(state->m_sound, offset, data);
+		dai_set_volume(m_sound, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
-		dai_set_volume(state->m_sound, offset, data);
+		dai_set_volume(m_sound, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
 		break;
 
 	case 0x06:
-		state->m_paddle_select = (data&0x06)>>2;
-		state->m_paddle_enable = (data&0x08)>>3;
-		state->m_cassette_motor[0] = (data&0x10)>>4;
-		state->m_cassette_motor[1] = (data&0x20)>>5;
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(state->m_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? -1.0 : 1.0);
-		dai_update_memory (space->machine(), (data&0xc0)>>6);
+		m_paddle_select = (data&0x06)>>2;
+		m_paddle_enable = (data&0x08)>>3;
+		m_cassette_motor[0] = (data&0x10)>>4;
+		m_cassette_motor[1] = (data&0x20)>>5;
+		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(m_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? -1.0 : 1.0);
+		dai_update_memory (machine(), (data&0xc0)>>6);
 		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");
 		LOG_DAI_PORT_W (offset, (data&0x08)>>3, "discrete devices - paddle enable");
 		LOG_DAI_PORT_W (offset, (data&0x10)>>4, "discrete devices - cassette motor 1");
@@ -253,13 +251,13 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 
 ***************************************************************************/
 
-READ8_HANDLER( dai_amd9511_r )
+READ8_MEMBER(dai_state::dai_amd9511_r)
 {
 	/* optional and no present at this moment */
 	return 0xff;
 }
 
-WRITE8_HANDLER( dai_amd9511_w )
+WRITE8_MEMBER(dai_state::dai_amd9511_w)
 {
 	logerror ("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }

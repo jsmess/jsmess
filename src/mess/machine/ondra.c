@@ -20,19 +20,19 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 }
 
 
-static READ8_HANDLER( ondra_keyboard_r )
+READ8_MEMBER(ondra_state::ondra_keyboard_r)
 {
 	UINT8 retVal = 0x00;
 	UINT8 ondra_keyboard_line = offset & 0x000f;
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	double valcas = (cassette_device_image(space->machine())->input());
+	double valcas = (cassette_device_image(machine())->input());
 	if ( valcas < 0.00) {
 		retVal = 0x80;
 	}
 	if (ondra_keyboard_line > 9) {
 		retVal |= 0x1f;
 	} else {
-		retVal |= input_port_read(space->machine(), keynames[ondra_keyboard_line]);
+		retVal |= input_port_read(machine(), keynames[ondra_keyboard_line]);
 	}
 	return retVal;
 }
@@ -54,25 +54,24 @@ static void ondra_update_banks(running_machine &machine)
 		memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0xe000);
 	} else {
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xe000, 0xffff);
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0xe000, 0xffff, FUNC(ondra_keyboard_r));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0xe000, 0xffff, read8_delegate(FUNC(ondra_state::ondra_keyboard_r),state));
 	}
 }
 
-WRITE8_HANDLER( ondra_port_03_w )
+WRITE8_MEMBER(ondra_state::ondra_port_03_w)
 {
-	ondra_state *state = space->machine().driver_data<ondra_state>();
-	state->m_video_enable = data & 1;
-	state->m_bank1_status = (data >> 1) & 1;
-	state->m_bank2_status = (data >> 2) & 1;
-	ondra_update_banks(space->machine());
-	cassette_device_image(space->machine())->output(((data >> 3) & 1) ? -1.0 : +1.0);
+	m_video_enable = data & 1;
+	m_bank1_status = (data >> 1) & 1;
+	m_bank2_status = (data >> 2) & 1;
+	ondra_update_banks(machine());
+	cassette_device_image(machine())->output(((data >> 3) & 1) ? -1.0 : +1.0);
 }
 
-WRITE8_HANDLER( ondra_port_09_w )
+WRITE8_MEMBER(ondra_state::ondra_port_09_w)
 {
 }
 
-WRITE8_HANDLER( ondra_port_0a_w )
+WRITE8_MEMBER(ondra_state::ondra_port_0a_w)
 {
 }
 

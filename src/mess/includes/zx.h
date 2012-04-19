@@ -46,6 +46,7 @@ public:
 	UINT8 m_charline_ptr;
 	int m_offs1;
 	void zx_ula_bkgnd(UINT8 color);
+	DECLARE_WRITE8_MEMBER(zx_ram_w);
 };
 
 

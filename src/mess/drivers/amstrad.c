@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 are not fully decoded by the CPC h/w. Doing it this way means
 I can decode it myself and a lot of  software should work */
 static ADDRESS_MAP_START(amstrad_io, AS_IO, 8, amstrad_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(amstrad_cpc_io_r, amstrad_cpc_io_w )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(amstrad_cpc_io_r, amstrad_cpc_io_w )
 ADDRESS_MAP_END
 
 
@@ -773,8 +773,8 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portA read */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portB read */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portA read */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portB read */
 	DEVCB_NULL,					/* portA write */
 	DEVCB_NULL					/* portB write */
 };

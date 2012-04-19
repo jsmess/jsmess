@@ -77,11 +77,11 @@ static ADDRESS_MAP_START( dai_mem , AS_PROGRAM, 8, dai_state )
 	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK("bank2")
-	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE_LEGACY(dai_stack_interrupt_circuit_w )
+	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE(dai_stack_interrupt_circuit_w )
 	AM_RANGE( 0xf800, 0xf8ff) AM_RAM
-	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE_LEGACY(dai_amd9511_r, dai_amd9511_w )
+	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE(dai_amd9511_r, dai_amd9511_w )
 	AM_RANGE( 0xfc00, 0xfcff) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w )
-	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE_LEGACY(dai_io_discrete_devices_r, dai_io_discrete_devices_w )
+	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE(dai_io_discrete_devices_r, dai_io_discrete_devices_w )
 	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0xff00, 0xffff) AM_DEVREADWRITE_LEGACY("tms5501", tms5501_r, tms5501_w )
 ADDRESS_MAP_END

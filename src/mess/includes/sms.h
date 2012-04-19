@@ -130,30 +130,52 @@ public:
 		bool m_93c46_enabled;
 		UINT8 m_93c46_lines;
 	} m_cartridge[MAX_CARTRIDGES];
+	DECLARE_WRITE8_MEMBER(sms_input_write);
+	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
+	DECLARE_READ8_MEMBER(sms_fm_detect_r);
+	DECLARE_WRITE8_MEMBER(sms_io_control_w);
+	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_READ8_MEMBER(sms_input_port_0_r);
+	DECLARE_READ8_MEMBER(sms_input_port_1_r);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_0_w);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_0_w);
+	DECLARE_READ8_MEMBER(gg_input_port_2_r);
+	DECLARE_READ8_MEMBER(sms_sscope_r);
+	DECLARE_WRITE8_MEMBER(sms_sscope_w);
+	DECLARE_READ8_MEMBER(sms_mapper_r);
+	DECLARE_WRITE8_MEMBER(sms_tvdraw_axis_w);
+	DECLARE_READ8_MEMBER(sms_tvdraw_status_r);
+	DECLARE_READ8_MEMBER(sms_tvdraw_data_r);
+	DECLARE_WRITE8_MEMBER(sms_93c46_w);
+	DECLARE_READ8_MEMBER(sms_93c46_r);
+	DECLARE_WRITE8_MEMBER(sms_mapper_w);
+	DECLARE_WRITE8_MEMBER(sms_korean_zemina_banksw_w);
+	DECLARE_WRITE8_MEMBER(sms_codemasters_page0_w);
+	DECLARE_WRITE8_MEMBER(sms_codemasters_page1_w);
+	DECLARE_WRITE8_MEMBER(sms_4pak_page0_w);
+	DECLARE_WRITE8_MEMBER(sms_4pak_page1_w);
+	DECLARE_WRITE8_MEMBER(sms_4pak_page2_w);
+	DECLARE_WRITE8_MEMBER(sms_janggun_bank0_w);
+	DECLARE_WRITE8_MEMBER(sms_janggun_bank1_w);
+	DECLARE_WRITE8_MEMBER(sms_janggun_bank2_w);
+	DECLARE_WRITE8_MEMBER(sms_janggun_bank3_w);
+	DECLARE_WRITE8_MEMBER(sms_bios_w);
+	DECLARE_WRITE8_MEMBER(sms_cartram2_w);
+	DECLARE_WRITE8_MEMBER(sms_cartram_w);
+	DECLARE_WRITE8_MEMBER(gg_sio_w);
+	DECLARE_READ8_MEMBER(gg_sio_r);
+	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
+	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
+	DECLARE_READ8_MEMBER(sms_store_select1);
+	DECLARE_READ8_MEMBER(sms_store_select2);
+	DECLARE_READ8_MEMBER(sms_store_control_r);
+	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 };
 
 
 /*----------- defined in machine/sms.c -----------*/
 
 /* Function prototypes */
-WRITE8_HANDLER( sms_cartram_w );
-WRITE8_HANDLER( sms_cartram2_w );
-WRITE8_HANDLER( sms_fm_detect_w );
-READ8_HANDLER( sms_fm_detect_r );
-READ8_HANDLER( sms_input_port_0_r );
-READ8_HANDLER( sms_input_port_1_r );
-WRITE8_HANDLER( sms_ym2413_register_port_0_w );
-WRITE8_HANDLER( sms_ym2413_data_port_0_w );
-WRITE8_HANDLER( sms_io_control_w );
-READ8_HANDLER( sms_count_r );
-WRITE8_HANDLER( sms_sscope_w );
-READ8_HANDLER( sms_sscope_r );
-WRITE8_HANDLER( sms_mapper_w );
-READ8_HANDLER( sms_mapper_r );
-WRITE8_HANDLER( sms_bios_w );
-WRITE8_HANDLER( gg_sio_w );
-READ8_HANDLER( gg_sio_r );
-READ8_HANDLER( gg_input_port_2_r );
 
 INPUT_CHANGED( lgun1_changed );
 INPUT_CHANGED( lgun2_changed );
@@ -167,12 +189,6 @@ DEVICE_IMAGE_LOAD( sms_cart );
 MACHINE_START( sms );
 MACHINE_RESET( sms );
 
-READ8_HANDLER( sms_store_cart_select_r );
-WRITE8_HANDLER( sms_store_cart_select_w );
-READ8_HANDLER( sms_store_select1 );
-READ8_HANDLER( sms_store_select2 );
-READ8_HANDLER( sms_store_control_r );
-WRITE8_HANDLER( sms_store_control_w );
 
 #define IO_EXPANSION    (0x80)	/* Expansion slot enable (1= disabled, 0= enabled) */
 #define IO_CARTRIDGE    (0x40)	/* Cartridge slot enable (1= disabled, 0= enabled) */

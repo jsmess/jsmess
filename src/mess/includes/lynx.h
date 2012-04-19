@@ -126,6 +126,17 @@ public:
 	UART m_uart;
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_bitmap_temp;
+	DECLARE_READ8_MEMBER(suzy_read);
+	DECLARE_WRITE8_MEMBER(suzy_write);
+	DECLARE_WRITE8_MEMBER(lynx_uart_w);
+	DECLARE_READ8_MEMBER(mikey_read);
+	DECLARE_WRITE8_MEMBER(mikey_write);
+	DECLARE_READ8_MEMBER(lynx_memory_config_r);
+	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
+	void lynx_divide();
+	void lynx_multiply();
+	UINT8 lynx_timer_read(int which, int offset);
+	void lynx_timer_write(int which, int offset, UINT8 data);
 };
 
 
@@ -134,8 +145,6 @@ public:
 MACHINE_START( lynx );
 MACHINE_RESET( lynx );
 
-READ8_HANDLER( lynx_memory_config_r );
-WRITE8_HANDLER( lynx_memory_config_w );
 void lynx_timer_count_down(running_machine &machine, int nr);
 
 INTERRUPT_GEN( lynx_frame_int );

@@ -18,19 +18,19 @@
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine().primary_screen->vpos()); } while (0)
 
 
-static WRITE8_HANDLER( zx_ram_w )
+WRITE8_MEMBER(zx_state::zx_ram_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
 	{
-		space->write_byte(offset | 0xc000, data);
+		space.write_byte(offset | 0xc000, data);
 		RAM[offset | 0xc000] = data;
 	}
 	else
 	{
-		space->write_byte(offset | 0xc000, 0);
+		space.write_byte(offset | 0xc000, 0);
 		RAM[offset | 0xc000] = 0;
 	}
 }
@@ -44,10 +44,11 @@ READ8_MEMBER( zx_state::zx_ram_r )
 
 DRIVER_INIT( zx )
 {
+	zx_state *state = machine.driver_data<zx_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	space->install_legacy_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, FUNC(zx_ram_w));
+	space->install_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),state));
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
 }
 

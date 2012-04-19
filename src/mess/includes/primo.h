@@ -23,16 +23,16 @@ public:
 	UINT16 m_video_memory_base;
 	UINT8 m_port_FD;
 	int m_nmi;
+	DECLARE_READ8_MEMBER(primo_be_1_r);
+	DECLARE_READ8_MEMBER(primo_be_2_r);
+	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
+	DECLARE_WRITE8_MEMBER(primo_ki_2_w);
+	DECLARE_WRITE8_MEMBER(primo_FD_w);
 };
 
 
 /*----------- defined in machine/primo.c -----------*/
 
-extern READ8_HANDLER ( primo_be_1_r );
-extern READ8_HANDLER ( primo_be_2_r );
-extern WRITE8_HANDLER ( primo_ki_1_w );
-extern WRITE8_HANDLER ( primo_ki_2_w );
-extern WRITE8_HANDLER ( primo_FD_w );
 extern DRIVER_INIT ( primo32 );
 extern DRIVER_INIT ( primo48 );
 extern DRIVER_INIT ( primo64 );

@@ -63,24 +63,24 @@ MACHINE_START( orion128 )
 	state->m_video_mode_mask = 7;
 }
 
-READ8_HANDLER ( orion128_system_r )
+READ8_MEMBER(orion_state::orion128_system_r)
 {
-	return space->machine().device<i8255_device>("ppi8255_2")->read(*space, offset & 3);
+	return machine().device<i8255_device>("ppi8255_2")->read(space, offset & 3);
 }
 
-WRITE8_HANDLER ( orion128_system_w )
+WRITE8_MEMBER(orion_state::orion128_system_w)
 {
-	space->machine().device<i8255_device>("ppi8255_2")->write(*space, offset & 3, data);
+	machine().device<i8255_device>("ppi8255_2")->write(space, offset & 3, data);
 }
 
-READ8_HANDLER ( orion128_romdisk_r )
+READ8_MEMBER(orion_state::orion128_romdisk_r)
 {
-	return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 3);
+	return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 3);
 }
 
-WRITE8_HANDLER ( orion128_romdisk_w )
+WRITE8_MEMBER(orion_state::orion128_romdisk_w)
 {
-	space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 3, data);
+	machine().device<i8255_device>("ppi8255_1")->write(space, offset & 3, data);
 }
 
 static void orion_set_video_mode(running_machine &machine, int width)
@@ -89,72 +89,69 @@ static void orion_set_video_mode(running_machine &machine, int width)
 		machine.primary_screen->configure(width, 256, visarea, machine.primary_screen->frame_period().attoseconds);
 }
 
-WRITE8_HANDLER ( orion128_video_mode_w )
+WRITE8_MEMBER(orion_state::orion128_video_mode_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	if ((data & 0x80)!=(state->m_orion128_video_mode & 0x80))
+	if ((data & 0x80)!=(m_orion128_video_mode & 0x80))
 	{
 		if ((data & 0x80)==0x80)
 		{
-			if (state->m_video_mode_mask == 31)
+			if (m_video_mode_mask == 31)
 			{
-				state->m_orion128_video_width = SCREEN_WIDTH_512;
-				orion_set_video_mode(space->machine(),512);
+				m_orion128_video_width = SCREEN_WIDTH_512;
+				orion_set_video_mode(machine(),512);
 			}
 			else
 			{
-				state->m_orion128_video_width = SCREEN_WIDTH_480;
-				orion_set_video_mode(space->machine(),480);
+				m_orion128_video_width = SCREEN_WIDTH_480;
+				orion_set_video_mode(machine(),480);
 			}
 		}
 		else
 		{
-			state->m_orion128_video_width = SCREEN_WIDTH_384;
-			orion_set_video_mode(space->machine(),384);
+			m_orion128_video_width = SCREEN_WIDTH_384;
+			orion_set_video_mode(machine(),384);
 		}
 	}
 
-	state->m_orion128_video_mode = data;
+	m_orion128_video_mode = data;
 }
 
-WRITE8_HANDLER ( orion128_video_page_w )
+WRITE8_MEMBER(orion_state::orion128_video_page_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	if (state->m_orion128_video_page != data)
+	if (m_orion128_video_page != data)
 	{
-		if ((data & 0x80)!=(state->m_orion128_video_page & 0x80))
+		if ((data & 0x80)!=(m_orion128_video_page & 0x80))
 		{
 			if ((data & 0x80)==0x80)
 			{
-				if (state->m_video_mode_mask == 31)
+				if (m_video_mode_mask == 31)
 				{
-					state->m_orion128_video_width = SCREEN_WIDTH_512;
-					orion_set_video_mode(space->machine(),512);
+					m_orion128_video_width = SCREEN_WIDTH_512;
+					orion_set_video_mode(machine(),512);
 				}
 				else
 				{
-					state->m_orion128_video_width = SCREEN_WIDTH_480;
-					orion_set_video_mode(space->machine(),480);
+					m_orion128_video_width = SCREEN_WIDTH_480;
+					orion_set_video_mode(machine(),480);
 				}
 			}
 			else
 			{
-				state->m_orion128_video_width = SCREEN_WIDTH_384;
-				orion_set_video_mode(space->machine(),384);
+				m_orion128_video_width = SCREEN_WIDTH_384;
+				orion_set_video_mode(machine(),384);
 			}
 		}
 	}
-	state->m_orion128_video_page = data;
+	m_orion128_video_page = data;
 }
 
 
-WRITE8_HANDLER ( orion128_memory_page_w )
+WRITE8_MEMBER(orion_state::orion128_memory_page_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	if (data!=state->m_orion128_memory_page )
+	if (data!=m_orion128_memory_page )
 	{
-		memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer() + (data & 3) * 0x10000);
-		state->m_orion128_memory_page = (data & 3);
+		memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer() + (data & 3) * 0x10000);
+		m_orion128_memory_page = (data & 3);
 	}
 }
 
@@ -171,17 +168,17 @@ MACHINE_RESET ( orion128 )
 	radio86_init_keyboard(machine);
 }
 
-static WRITE8_HANDLER ( orion_disk_control_w )
+WRITE8_MEMBER(orion_state::orion_disk_control_w)
 {
-	device_t *fdc = space->machine().device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 
 	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
 	wd17xx_set_drive(fdc,data & 3);
 }
 
-READ8_HANDLER ( orion128_floppy_r )
+READ8_MEMBER(orion_state::orion128_floppy_r)
 {
-	device_t *fdc = space->machine().device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 
 	switch(offset)
 	{
@@ -197,9 +194,9 @@ READ8_HANDLER ( orion128_floppy_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( orion128_floppy_w )
+WRITE8_MEMBER(orion_state::orion128_floppy_w)
 {
-	device_t *fdc = space->machine().device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 
 	switch(offset)
 	{
@@ -216,11 +213,11 @@ WRITE8_HANDLER ( orion128_floppy_w )
 		case 0x20 : orion_disk_control_w(space, offset, data);break;
 	}
 }
-static READ8_HANDLER ( orionz80_floppy_rtc_r )
+READ8_MEMBER(orion_state::orionz80_floppy_rtc_r)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		return space->machine().device<mc146818_device>("rtc")->read(*space,offset-0x60);
+		return machine().device<mc146818_device>("rtc")->read(space,offset-0x60);
 	}
 	else
 	{
@@ -228,11 +225,11 @@ static READ8_HANDLER ( orionz80_floppy_rtc_r )
 	}
 }
 
-static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
+WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		space->machine().device<mc146818_device>("rtc")->write(*space,offset-0x60,data);
+		machine().device<mc146818_device>("rtc")->write(space,offset-0x60,data);
 	}
 	else
 	{
@@ -247,25 +244,24 @@ MACHINE_START( orionz80 )
 	state->m_video_mode_mask = 7;
 }
 
-WRITE8_HANDLER ( orionz80_sound_w )
+WRITE8_MEMBER(orion_state::orionz80_sound_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
-	if (state->m_speaker == 0)
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	if (m_speaker == 0)
 	{
-		state->m_speaker = data;
+		m_speaker = data;
 	}
 	else
 	{
-		state->m_speaker = 0 ;
+		m_speaker = 0 ;
 	}
-	speaker_level_w(speaker,state->m_speaker);
+	speaker_level_w(speaker,m_speaker);
 
 }
 
-static WRITE8_HANDLER ( orionz80_sound_fe_w )
+WRITE8_MEMBER(orion_state::orionz80_sound_fe_w)
 {
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 
@@ -294,19 +290,19 @@ static void orionz80_switch_bank(running_machine &machine)
 
 	if ((state->m_orionz80_dispatcher & 0x20) == 0)
 	{
-		space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
-		space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
-		space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_w));
-		space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
-		space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
-		space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_r));
+		space->install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),state));
+		space->install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),state));
+		space->install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orionz80_floppy_rtc_w),state));
+		space->install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),state));
+		space->install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),state));
+		space->install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orionz80_floppy_rtc_r),state));
 
-		space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
-		space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionz80_memory_page_w));
-		space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
-		space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(orionz80_dispatcher_w));
+		space->install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),state));
+		space->install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionz80_memory_page_w),state));
+		space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),state));
+		space->install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_state::orionz80_dispatcher_w),state));
 		space->unmap_write(0xfc00, 0xfeff);
-		space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
+		space->install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),state));
 
 		memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
 		memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0xf800);
@@ -321,18 +317,16 @@ static void orionz80_switch_bank(running_machine &machine)
 	}
 }
 
-WRITE8_HANDLER ( orionz80_memory_page_w )
+WRITE8_MEMBER(orion_state::orionz80_memory_page_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	state->m_orionz80_memory_page = data & 7;
-	orionz80_switch_bank(space->machine());
+	m_orionz80_memory_page = data & 7;
+	orionz80_switch_bank(machine());
 }
 
-WRITE8_HANDLER ( orionz80_dispatcher_w )
+WRITE8_MEMBER(orion_state::orionz80_dispatcher_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	state->m_orionz80_dispatcher = data;
-	orionz80_switch_bank(space->machine());
+	m_orionz80_dispatcher = data;
+	orionz80_switch_bank(machine());
 }
 
 MACHINE_RESET ( orionz80 )
@@ -344,19 +338,19 @@ MACHINE_RESET ( orionz80 )
 	space->install_write_bank(0x4000, 0xefff, "bank2");
 	space->install_write_bank(0xf000, 0xf3ff, "bank3");
 
-	space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
-	space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
-	space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_w));
-	space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
-	space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
-	space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orionz80_floppy_rtc_r));
+	space->install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),state));
+	space->install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),state));
+	space->install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orionz80_floppy_rtc_w),state));
+	space->install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),state));
+	space->install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),state));
+	space->install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orionz80_floppy_rtc_r),state));
 
-	space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
-	space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionz80_memory_page_w));
-	space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
-	space->install_legacy_write_handler(0xfb00, 0xfbff, FUNC(orionz80_dispatcher_w));
+	space->install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),state));
+	space->install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionz80_memory_page_w),state));
+	space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),state));
+	space->install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_state::orionz80_dispatcher_w),state));
 	space->unmap_write(0xfc00, 0xfeff);
-	space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
+	space->install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),state));
 
 
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0xf800);
@@ -384,16 +378,16 @@ INTERRUPT_GEN( orionz80_interrupt )
 	}
 }
 
-READ8_HANDLER ( orionz80_io_r )
+READ8_MEMBER(orion_state::orionz80_io_r)
 {
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (space->machine().device("ay8912"), 0);
+		return ay8910_r (machine().device("ay8912"), 0);
 	}
 	return 0xff;
 }
 
-WRITE8_HANDLER ( orionz80_io_w )
+WRITE8_MEMBER(orion_state::orionz80_io_w)
 {
 	switch (offset & 0xff)
 	{
@@ -406,10 +400,10 @@ WRITE8_HANDLER ( orionz80_io_w )
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(space->machine().device("ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(machine().device("ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(space->machine().device("ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(machine().device("ay8912"), 0, data);
 					  break;
 	}
 }
@@ -418,7 +412,7 @@ WRITE8_HANDLER ( orionz80_io_w )
 
 
 
-static WRITE8_HANDLER ( orionpro_memory_page_w );
+
 
 static void orionpro_bank_switch(running_machine &machine)
 {
@@ -487,20 +481,20 @@ static void orionpro_bank_switch(running_machine &machine)
 	{
 		memory_set_bankptr(machine, "bank6", ram + 0x10000 * 0 + 0xf000);
 
-		space->install_legacy_write_handler(0xf400, 0xf4ff, FUNC(orion128_system_w));
-		space->install_legacy_write_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_w));
+		space->install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),state));
+		space->install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),state));
 		space->unmap_write(0xf600, 0xf6ff);
-		space->install_legacy_write_handler(0xf700, 0xf7ff, FUNC(orion128_floppy_w));
-		space->install_legacy_read_handler(0xf400, 0xf4ff, FUNC(orion128_system_r));
-		space->install_legacy_read_handler(0xf500, 0xf5ff, FUNC(orion128_romdisk_r));
+		space->install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orion128_floppy_w),state));
+		space->install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),state));
+		space->install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),state));
 		space->unmap_read(0xf600, 0xf6ff);
-		space->install_legacy_read_handler(0xf700, 0xf7ff, FUNC(orion128_floppy_r));
+		space->install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orion128_floppy_r),state));
 
-		space->install_legacy_write_handler(0xf800, 0xf8ff, FUNC(orion128_video_mode_w));
-		space->install_legacy_write_handler(0xf900, 0xf9ff, FUNC(orionpro_memory_page_w));
-		space->install_legacy_write_handler(0xfa00, 0xfaff, FUNC(orion128_video_page_w));
+		space->install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),state));
+		space->install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionpro_memory_page_w),state));
+		space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),state));
 		space->unmap_write(0xfb00, 0xfeff);
-		space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
+		space->install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),state));
 
 
 		memory_set_bankptr(machine, "bank8", ram + 0x10000 * 0 + 0xf800);
@@ -522,11 +516,10 @@ static void orionpro_bank_switch(running_machine &machine)
 	}
 }
 
-static WRITE8_HANDLER ( orionpro_memory_page_w )
+WRITE8_MEMBER(orion_state::orionpro_memory_page_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	state->m_orionpro_128_page = data;
-	orionpro_bank_switch(space->machine());
+	m_orionpro_128_page = data;
+	orionpro_bank_switch(machine());
 }
 
 MACHINE_RESET ( orionpro )
@@ -555,20 +548,19 @@ MACHINE_RESET ( orionpro )
 	state->m_orionpro_pseudo_color = 0;
 }
 
-READ8_HANDLER ( orionpro_io_r )
+READ8_MEMBER(orion_state::orionpro_io_r)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	device_t *fdc = space->machine().device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 
 	switch (offset & 0xff)
 	{
 		case 0x00 : return 0x56;
-		case 0x04 : return state->m_orionpro_ram0_segment;
-		case 0x05 : return state->m_orionpro_ram1_segment;
-		case 0x06 : return state->m_orionpro_ram2_segment;
-		case 0x08 : return state->m_orionpro_page;
-		case 0x09 : return state->m_orionpro_rom2_segment;
-		case 0x0a : return state->m_orionpro_dispatcher;
+		case 0x04 : return m_orionpro_ram0_segment;
+		case 0x05 : return m_orionpro_ram1_segment;
+		case 0x06 : return m_orionpro_ram2_segment;
+		case 0x08 : return m_orionpro_page;
+		case 0x09 : return m_orionpro_rom2_segment;
+		case 0x0a : return m_orionpro_dispatcher;
 		case 0x10 : return wd17xx_status_r(fdc,0);
 		case 0x11 : return wd17xx_track_r(fdc,0);
 		case 0x12 : return wd17xx_sector_r(fdc,0);
@@ -585,24 +577,23 @@ READ8_HANDLER ( orionpro_io_r )
 	}
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (space->machine().device("ay8912"), 0);
+		return ay8910_r (machine().device("ay8912"), 0);
 	}
 	return 0xff;
 }
 
-WRITE8_HANDLER ( orionpro_io_w )
+WRITE8_MEMBER(orion_state::orionpro_io_w)
 {
-	orion_state *state = space->machine().driver_data<orion_state>();
-	device_t *fdc = space->machine().device("wd1793");
+	device_t *fdc = machine().device("wd1793");
 
 	switch (offset & 0xff)
 	{
-		case 0x04 : state->m_orionpro_ram0_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x05 : state->m_orionpro_ram1_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x06 : state->m_orionpro_ram2_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x08 : state->m_orionpro_page = data;		  orionpro_bank_switch(space->machine()); break;
-		case 0x09 : state->m_orionpro_rom2_segment = data; orionpro_bank_switch(space->machine()); break;
-		case 0x0a : state->m_orionpro_dispatcher = data;   orionpro_bank_switch(space->machine()); break;
+		case 0x04 : m_orionpro_ram0_segment = data; orionpro_bank_switch(machine()); break;
+		case 0x05 : m_orionpro_ram1_segment = data; orionpro_bank_switch(machine()); break;
+		case 0x06 : m_orionpro_ram2_segment = data; orionpro_bank_switch(machine()); break;
+		case 0x08 : m_orionpro_page = data;		  orionpro_bank_switch(machine()); break;
+		case 0x09 : m_orionpro_rom2_segment = data; orionpro_bank_switch(machine()); break;
+		case 0x0a : m_orionpro_dispatcher = data;   orionpro_bank_switch(machine()); break;
 		case 0x10 : wd17xx_command_w(fdc,0,data); break;
 		case 0x11 : wd17xx_track_w(fdc,0,data);break;
 		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
@@ -618,18 +609,18 @@ WRITE8_HANDLER ( orionpro_io_w )
 		case 0x2a : orion128_romdisk_w(space,2,data); break;
 		case 0x2b : orion128_romdisk_w(space,3,data); break;
 		case 0xf8 : orion128_video_mode_w(space,0,data);break;
-		case 0xf9 : state->m_orionpro_128_page = data;	  orionpro_bank_switch(space->machine()); break;
+		case 0xf9 : m_orionpro_128_page = data;	  orionpro_bank_switch(machine()); break;
 		case 0xfa : orion128_video_page_w(space,0,data);break;
-		case 0xfc : state->m_orionpro_pseudo_color = data;break;
+		case 0xfc : m_orionpro_pseudo_color = data;break;
 		case 0xfe : orionz80_sound_fe_w(space,0,data);break;
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(space->machine().device("ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(machine().device("ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(space->machine().device("ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(machine().device("ay8912"), 0, data);
 					  break;
 	}
 }

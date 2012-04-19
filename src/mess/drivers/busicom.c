@@ -19,74 +19,70 @@ static UINT8 get_bit_selected(UINT32 val,int num)
 	}
 	return 0;
 }
-static READ8_HANDLER(keyboard_r)
+READ8_MEMBER(busicom_state::keyboard_r)
 {
-	busicom_state *state = space->machine().driver_data<busicom_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
-	return input_port_read(space->machine(),keynames[get_bit_selected(state->m_keyboard_shifter & 0x3ff,10)]);
+	return input_port_read(machine(),keynames[get_bit_selected(m_keyboard_shifter & 0x3ff,10)]);
 }
 
-static READ8_HANDLER(printer_r)
+READ8_MEMBER(busicom_state::printer_r)
 {
-	busicom_state *state = space->machine().driver_data<busicom_state>();
 	UINT8 retVal = 0;
-	if (state->m_drum_index==0) retVal |= 1;
-	retVal |= input_port_read(space->machine(),"PAPERADV") & 1 ? 8 : 0;
+	if (m_drum_index==0) retVal |= 1;
+	retVal |= input_port_read(machine(),"PAPERADV") & 1 ? 8 : 0;
 	return retVal;
 }
 
 
-static WRITE8_HANDLER(shifter_w)
+WRITE8_MEMBER(busicom_state::shifter_w)
 {
-	busicom_state *state = space->machine().driver_data<busicom_state>();
 	if (BIT(data,0)) {
-		state->m_keyboard_shifter <<= 1;
-		state->m_keyboard_shifter |= BIT(data,1);
+		m_keyboard_shifter <<= 1;
+		m_keyboard_shifter |= BIT(data,1);
 	}
 	if (BIT(data,2)) {
-		state->m_printer_shifter <<= 1;
-		state->m_printer_shifter |= BIT(data,1);
+		m_printer_shifter <<= 1;
+		m_printer_shifter |= BIT(data,1);
 	}
 }
 
-static WRITE8_HANDLER(printer_w)
+WRITE8_MEMBER(busicom_state::printer_w)
 {
-	busicom_state *state = space->machine().driver_data<busicom_state>();
 	int i,j;
 	if (BIT(data,0)) {
-		logerror("color : %02x %02x %d\n",BIT(data,0),data,state->m_drum_index);
-		state->m_printer_line_color[10] = 1;
+		logerror("color : %02x %02x %d\n",BIT(data,0),data,m_drum_index);
+		m_printer_line_color[10] = 1;
 
 	}
 	if (BIT(data,1)) {
 		for(i=3;i<18;i++) {
-			if(BIT(state->m_printer_shifter,i)) {
-				state->m_printer_line[10][i-3] = state->m_drum_index + 1;
+			if(BIT(m_printer_shifter,i)) {
+				m_printer_line[10][i-3] = m_drum_index + 1;
 			}
 		}
-		if(BIT(state->m_printer_shifter,0)) {
-			state->m_printer_line[10][15] = state->m_drum_index + 13 + 1;
+		if(BIT(m_printer_shifter,0)) {
+			m_printer_line[10][15] = m_drum_index + 13 + 1;
 		}
-		if(BIT(state->m_printer_shifter,1)) {
-			state->m_printer_line[10][16] = state->m_drum_index + 26 + 1;
+		if(BIT(m_printer_shifter,1)) {
+			m_printer_line[10][16] = m_drum_index + 26 + 1;
 		}
 	}
 	if (BIT(data,3)) {
 
 		for(j=0;j<10;j++) {
 			for(i=0;i<17;i++) {
-				state->m_printer_line[j][i] = state->m_printer_line[j+1][i];
-				state->m_printer_line_color[j] = state->m_printer_line_color[j+1];
+				m_printer_line[j][i] = m_printer_line[j+1][i];
+				m_printer_line_color[j] = m_printer_line_color[j+1];
 			}
 		}
 		for(i=0;i<17;i++) {
-			state->m_printer_line[10][i] = 0;
+			m_printer_line[10][i] = 0;
 		}
-		state->m_printer_line_color[10] = 0;
+		m_printer_line_color[10] = 0;
 
 	}
 }
-static WRITE8_HANDLER(status_w)
+WRITE8_MEMBER(busicom_state::status_w)
 {
 #if 0
 	UINT8 mem_lamp = BIT(data,0);
@@ -96,7 +92,7 @@ static WRITE8_HANDLER(status_w)
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
-static WRITE8_HANDLER(printer_ctrl_w)
+WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
@@ -112,11 +108,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( busicom_io , AS_IO, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(shifter_w) // ROM0 I/O
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(keyboard_r,printer_ctrl_w) // ROM1 I/O
-	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(printer_r)  // ROM2 I/O
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(printer_w) // RAM0 output
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(status_w)  // RAM1 output
+	AM_RANGE(0x00, 0x00) AM_WRITE(shifter_w) // ROM0 I/O
+	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
+	AM_RANGE(0x02, 0x02) AM_READ(printer_r)  // ROM2 I/O
+	AM_RANGE(0x10, 0x10) AM_WRITE(printer_w) // RAM0 output
+	AM_RANGE(0x11, 0x11) AM_WRITE(status_w)  // RAM1 output
 ADDRESS_MAP_END
 
 /* Input ports */

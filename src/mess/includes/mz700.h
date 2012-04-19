@@ -52,6 +52,28 @@ public:
 	UINT16 m_mz800_ramaddr;
 	UINT8 m_mz800_palette[4];
 	UINT8 m_mz800_palette_bank;
+	DECLARE_READ8_MEMBER(mz700_e008_r);
+	DECLARE_WRITE8_MEMBER(mz700_e008_w);
+	DECLARE_READ8_MEMBER(mz800_bank_0_r);
+	DECLARE_WRITE8_MEMBER(mz700_bank_0_w);
+	DECLARE_WRITE8_MEMBER(mz800_bank_0_w);
+	DECLARE_READ8_MEMBER(mz800_bank_1_r);
+	DECLARE_WRITE8_MEMBER(mz700_bank_1_w);
+	DECLARE_WRITE8_MEMBER(mz700_bank_2_w);
+	DECLARE_WRITE8_MEMBER(mz700_bank_3_w);
+	DECLARE_WRITE8_MEMBER(mz700_bank_4_w);
+	DECLARE_WRITE8_MEMBER(mz700_bank_5_w);
+	DECLARE_WRITE8_MEMBER(mz700_bank_6_w);
+	DECLARE_READ8_MEMBER(mz800_crtc_r);
+	DECLARE_WRITE8_MEMBER(mz800_write_format_w);
+	DECLARE_WRITE8_MEMBER(mz800_read_format_w);
+	DECLARE_WRITE8_MEMBER(mz800_display_mode_w);
+	DECLARE_WRITE8_MEMBER(mz800_scroll_border_w);
+	DECLARE_READ8_MEMBER(mz800_ramdisk_r);
+	DECLARE_WRITE8_MEMBER(mz800_ramdisk_w);
+	DECLARE_WRITE8_MEMBER(mz800_ramaddr_w);
+	DECLARE_WRITE8_MEMBER(mz800_palette_w);
+	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
 };
 
 
@@ -67,30 +89,10 @@ DRIVER_INIT( mz800 );
 MACHINE_START( mz700 );
 
 /* bank switching */
-WRITE8_HANDLER( mz700_bank_0_w );
-WRITE8_HANDLER( mz700_bank_1_w );
-WRITE8_HANDLER( mz700_bank_2_w );
-WRITE8_HANDLER( mz700_bank_3_w );
-WRITE8_HANDLER( mz700_bank_4_w );
-WRITE8_HANDLER( mz700_bank_5_w );
-WRITE8_HANDLER( mz700_bank_6_w );
 
 /* bankswitching, mz800 only */
-READ8_HANDLER( mz800_bank_0_r );
-READ8_HANDLER( mz800_bank_1_r );
-WRITE8_HANDLER( mz800_bank_0_w );
 
 
-READ8_HANDLER( mz800_crtc_r );
-READ8_HANDLER( mz800_ramdisk_r );
-
-WRITE8_HANDLER( mz800_write_format_w );
-WRITE8_HANDLER( mz800_read_format_w );
-WRITE8_HANDLER( mz800_display_mode_w );
-WRITE8_HANDLER( mz800_scroll_border_w );
-WRITE8_HANDLER( mz800_ramdisk_w );
-WRITE8_HANDLER( mz800_ramaddr_w );
-WRITE8_HANDLER( mz800_palette_w );
 
 
 /*----------- defined in video/mz700.c -----------*/
@@ -99,7 +101,6 @@ PALETTE_INIT( mz700 );
 SCREEN_UPDATE_IND16( mz700 );
 VIDEO_START( mz800 );
 SCREEN_UPDATE_IND16( mz800 );
-WRITE8_HANDLER( mz800_cgram_w );
 
 
 #endif /* MZ700_H_ */

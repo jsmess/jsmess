@@ -18,6 +18,8 @@ public:
 
 	required_shared_ptr<UINT8> m_memory;
 	required_shared_ptr<UINT8> m_video_ram;
+	DECLARE_READ8_MEMBER(orao_io_r);
+	DECLARE_WRITE8_MEMBER(orao_io_w);
 };
 
 
@@ -28,8 +30,6 @@ extern MACHINE_RESET( orao );
 
 extern DRIVER_INIT( orao103 );
 
-extern READ8_HANDLER( orao_io_r );
-extern WRITE8_HANDLER( orao_io_w );
 
 
 /*----------- defined in video/orao.c -----------*/

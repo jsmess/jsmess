@@ -20,6 +20,8 @@ public:
 	optional_shared_ptr<UINT8> m_video_ram;
 	UINT8 m_s_code;
 	UINT8 m_llc1_key_state;
+	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
+	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
 };
 
 
@@ -36,8 +38,6 @@ extern const z80ctc_interface llc2_ctc_intf;
 
 extern DRIVER_INIT( llc2 );
 extern MACHINE_RESET( llc2 );
-extern WRITE8_HANDLER(llc2_rom_disable_w);
-extern WRITE8_HANDLER(llc2_basic_enable_w);
 
 /*----------- defined in video/llc.c -----------*/
 

@@ -212,20 +212,19 @@ ADDRESS_MAP_END
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
-static  READ8_HANDLER(pcw_keyboard_r)
+READ8_MEMBER(pcw_state::pcw_keyboard_r)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
 	};
 
-	return input_port_read(space->machine(), keynames[offset]);
+	return input_port_read(machine(), keynames[offset]);
 }
 
-static READ8_HANDLER(pcw_keyboard_data_r)
+READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	return state->m_mcu_keyboard_data[offset];
+	return m_mcu_keyboard_data[offset];
 }
 
 /* -----------------------------------------------------------------------
@@ -234,6 +233,7 @@ static READ8_HANDLER(pcw_keyboard_data_r)
 
 static void pcw_update_read_memory_block(running_machine &machine, int block, int bank)
 {
+	pcw_state *state = machine.driver_data<pcw_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	char block_name[10];
 
@@ -243,9 +243,8 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		space->install_legacy_read_handler(
-			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, FUNC(
-			pcw_keyboard_data_r));
+		space->install_read_handler(
+			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),state));
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
@@ -357,77 +356,70 @@ static int pcw_get_sys_status(running_machine &machine)
 	return state->m_interrupt_counter | (input_port_read(machine, "EXTRA") & (0x040 | 0x010)) | (state->m_system_status & 0x20);
 }
 
-static READ8_HANDLER(pcw_interrupt_counter_r)
+READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 	int data;
 
 	/* from Jacob Nevins docs */
 
 	/* get data */
-	data = pcw_get_sys_status(space->machine());
+	data = pcw_get_sys_status(machine());
 	/* clear int counter */
-	state->m_interrupt_counter = 0;
+	m_interrupt_counter = 0;
 	/* check interrupts */
-	pcw_update_irqs(space->machine());
+	pcw_update_irqs(machine());
 	/* return data */
 	//LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
 }
 
 
-static WRITE8_HANDLER(pcw_bank_select_w)
+WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 	//LOG(("BANK: %2x %x\n",offset, data));
-	state->m_banks[offset] = data;
+	m_banks[offset] = data;
 
-	pcw_update_mem(space->machine(), offset, data);
-//  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",state->m_banks[0],state->m_banks[1],state->m_banks[2],state->m_banks[3],state->m_bank_force);
+	pcw_update_mem(machine(), offset, data);
+//  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
-static WRITE8_HANDLER(pcw_bank_force_selection_w)
+WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_bank_force = data;
+	m_bank_force = data;
 
-	pcw_update_mem(space->machine(), 0, state->m_banks[0]);
-	pcw_update_mem(space->machine(), 1, state->m_banks[1]);
-	pcw_update_mem(space->machine(), 2, state->m_banks[2]);
-	pcw_update_mem(space->machine(), 3, state->m_banks[3]);
+	pcw_update_mem(machine(), 0, m_banks[0]);
+	pcw_update_mem(machine(), 1, m_banks[1]);
+	pcw_update_mem(machine(), 2, m_banks[2]);
+	pcw_update_mem(machine(), 3, m_banks[3]);
 }
 
 
-static WRITE8_HANDLER(pcw_roller_ram_addr_w)
+WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 	/*
     Address of roller RAM. b7-5: bank (0-7). b4-1: address / 512. */
 
-	state->m_roller_ram_addr = (((data>>5) & 0x07)<<14) |
+	m_roller_ram_addr = (((data>>5) & 0x07)<<14) |
 							((data & 0x01f)<<9);
-	LOG(("Roller-RAM: Address set to 0x%05x\n",state->m_roller_ram_addr));
+	LOG(("Roller-RAM: Address set to 0x%05x\n",m_roller_ram_addr));
 }
 
-static WRITE8_HANDLER(pcw_pointer_table_top_scan_w)
+WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_roller_ram_offset = data;
-	LOG(("Roller-RAM: offset set to 0x%05x\n",state->m_roller_ram_offset));
+	m_roller_ram_offset = data;
+	LOG(("Roller-RAM: offset set to 0x%05x\n",m_roller_ram_offset));
 }
 
-static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
+WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_vdu_video_control_register = data;
+	m_vdu_video_control_register = data;
 	LOG(("Roller-RAM: control reg set to 0x%02x\n",data));
 }
 
-static WRITE8_HANDLER(pcw_system_control_w)
+WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	device_t *fdc = space->machine().device("upd765");
-	device_t *speaker = space->machine().device(BEEPER_TAG);
+	device_t *fdc = machine().device("upd765");
+	device_t *speaker = machine().device(BEEPER_TAG);
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -435,15 +427,15 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* end bootstrap */
 		case 0:
 		{
-			state->m_boot = 0;
-			pcw_update_mem(space->machine(), 0, state->m_banks[0]);
+			m_boot = 0;
+			pcw_update_mem(machine(), 0, m_banks[0]);
 		}
 		break;
 
 		/* reboot */
 		case 1:
 		{
-			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 			popmessage("SYS: Reboot");
 		}
 		break;
@@ -451,16 +443,16 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* connect fdc interrupt to nmi */
 		case 2:
 		{
-			int fdc_previous_interrupt_code = state->m_fdc_interrupt_code;
+			int fdc_previous_interrupt_code = m_fdc_interrupt_code;
 
-			state->m_fdc_interrupt_code = 0;
+			m_fdc_interrupt_code = 0;
 
 			/* previously connected to INT? */
 			if (fdc_previous_interrupt_code == 1)
 			{
 				/* yes */
 
-				pcw_update_irqs(space->machine());
+				pcw_update_irqs(machine());
 			}
 
 		}
@@ -470,10 +462,10 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* connect fdc interrupt to interrupt */
 		case 3:
 		{
-			int fdc_previous_interrupt_code = state->m_fdc_interrupt_code;
+			int fdc_previous_interrupt_code = m_fdc_interrupt_code;
 
 			/* connect to INT */
-			state->m_fdc_interrupt_code = 1;
+			m_fdc_interrupt_code = 1;
 
 			/* previously connected to NMI? */
 			if (fdc_previous_interrupt_code == 0)
@@ -481,11 +473,11 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				state->m_nmi_flag = 0;
+				m_nmi_flag = 0;
 			}
 
 			/* re-issue interrupt */
-			pcw_update_irqs(space->machine());
+			pcw_update_irqs(machine());
 		}
 		break;
 
@@ -493,9 +485,9 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* connect fdc interrupt to neither */
 		case 4:
 		{
-			int fdc_previous_interrupt_code = state->m_fdc_interrupt_code;
+			int fdc_previous_interrupt_code = m_fdc_interrupt_code;
 
-			state->m_fdc_interrupt_code = 2;
+			m_fdc_interrupt_code = 2;
 
 			/* previously connected to NMI or INT? */
 			if ((fdc_previous_interrupt_code == 0) || (fdc_previous_interrupt_code == 1))
@@ -503,9 +495,9 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* Clear NMI */
-				state->m_nmi_flag = 0;
+				m_nmi_flag = 0;
 			}
-			pcw_update_irqs(space->machine());
+			pcw_update_irqs(machine());
 
 		}
 		break;
@@ -542,20 +534,20 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* disc motor on */
 		case 9:
 		{
-			floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
-			floppy_mon_w(floppy_get_device(space->machine(), 1), CLEAR_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1,1);
+			floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
+			floppy_mon_w(floppy_get_device(machine(), 1), CLEAR_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
 		}
 		break;
 
 		/* disc motor off */
 		case 10:
 		{
-			floppy_mon_w(floppy_get_device(space->machine(), 0), ASSERT_LINE);
-			floppy_mon_w(floppy_get_device(space->machine(), 1), ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 0,1);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 0,1);
+			floppy_mon_w(floppy_get_device(machine(), 0), ASSERT_LINE);
+			floppy_mon_w(floppy_get_device(machine(), 1), ASSERT_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 0,1);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 0,1);
 		}
 		break;
 
@@ -576,17 +568,17 @@ static WRITE8_HANDLER(pcw_system_control_w)
 	}
 }
 
-static READ8_HANDLER(pcw_system_status_r)
+READ8_MEMBER(pcw_state::pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	UINT8 ret = pcw_get_sys_status(space->machine());
+	UINT8 ret = pcw_get_sys_status(machine());
 
 	return ret;
 }
 
 /* read from expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-static  READ8_HANDLER(pcw_expansion_r)
+READ8_MEMBER(pcw_state::pcw_expansion_r)
 {
 	logerror("pcw expansion r: %04x\n",offset+0x080);
 
@@ -595,9 +587,9 @@ static  READ8_HANDLER(pcw_expansion_r)
 		case 0x0e0:
 		{
 			/* spectravideo joystick */
-			if (input_port_read(space->machine(), "EXTRA") & 0x020)
+			if (input_port_read(machine(), "EXTRA") & 0x020)
 			{
-				return input_port_read(space->machine(), "SPECTRAVIDEO");
+				return input_port_read(machine(), "SPECTRAVIDEO");
 			}
 			else
 			{
@@ -609,7 +601,7 @@ static  READ8_HANDLER(pcw_expansion_r)
 		{
 
 			/* kempston joystick */
-			return input_port_read(space->machine(), "KEMPSTON");
+			return input_port_read(machine(), "KEMPSTON");
 		}
 
 		case 0x0e1:
@@ -637,14 +629,14 @@ static  READ8_HANDLER(pcw_expansion_r)
 
 /* write to expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-static WRITE8_HANDLER(pcw_expansion_w)
+WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 {
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
 }
 
-static READ8_HANDLER(pcw_fdc_r)
+READ8_MEMBER(pcw_state::pcw_fdc_r)
 {
-	device_t *fdc = space->machine().device("upd765");
+	device_t *fdc = machine().device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -654,9 +646,9 @@ static READ8_HANDLER(pcw_fdc_r)
 	return upd765_status_r(fdc, 0);
 }
 
-static WRITE8_HANDLER(pcw_fdc_w)
+WRITE8_MEMBER(pcw_state::pcw_fdc_w)
 {
-	device_t *fdc = space->machine().device("upd765");
+	device_t *fdc = machine().device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -681,19 +673,17 @@ static void pcw_printer_fire_pins(running_machine &machine, UINT16 pins)
 //      state->m_printer_headpos++;
 }
 
-static WRITE8_HANDLER(pcw_printer_data_w)
+WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_printer_data = data;
-	upi41_master_w(space->machine().device("printer_mcu"),0,data);
+	m_printer_data = data;
+	upi41_master_w(machine().device("printer_mcu"),0,data);
 	logerror("PRN [0xFC]: Sent command %02x\n",data);
 }
 
-static WRITE8_HANDLER(pcw_printer_command_w)
+WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_printer_command = data;
-	upi41_master_w(space->machine().device("printer_mcu"),1,data);
+	m_printer_command = data;
+	upi41_master_w(machine().device("printer_mcu"),1,data);
 	logerror("PRN [0xFD]: Sent command %02x\n",data);
 }
 
@@ -704,9 +694,9 @@ static WRITE8_HANDLER(pcw_printer_command_w)
 // 3 = bad command
 // 5 = print error
 // anything else = no printer
-static  READ8_HANDLER(pcw_printer_data_r)
+READ8_MEMBER(pcw_state::pcw_printer_data_r)
 {
-	return upi41_master_r(space->machine().device("printer_mcu"),0);
+	return upi41_master_r(machine().device("printer_mcu"),0);
 }
 
 // printer status
@@ -718,9 +708,9 @@ static  READ8_HANDLER(pcw_printer_data_r)
 // bit 2 - paper is present
 // bit 1 - busy
 // bit 0 - controller fault
-static  READ8_HANDLER(pcw_printer_status_r)
+READ8_MEMBER(pcw_state::pcw_printer_status_r)
 {
-	return upi41_master_r(space->machine().device("printer_mcu"),1);
+	return upi41_master_r(machine().device("printer_mcu"),1);
 }
 
 /* MCU handlers */
@@ -809,79 +799,74 @@ static TIMER_CALLBACK(pcw_pins_callback)
 	state->m_printer_p2 |= 0x40;
 }
 
-static READ8_HANDLER(mcu_printer_p1_r)
+READ8_MEMBER(pcw_state::mcu_printer_p1_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 //  logerror("PRN: MCU reading data from P1\n");
-	return state->m_printer_pins & 0x00ff;
+	return m_printer_pins & 0x00ff;
 }
 
-static WRITE8_HANDLER(mcu_printer_p1_w)
+WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_printer_pins = (state->m_printer_pins & 0x0100) | data;
-	//popmessage("PRN: Print head position = %i",state->m_printer_headpos);
-	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,state->m_printer_pins,~state->m_printer_pins & 0x1ff);
+	m_printer_pins = (m_printer_pins & 0x0100) | data;
+	//popmessage("PRN: Print head position = %i",m_printer_headpos);
+	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,m_printer_pins,~m_printer_pins & 0x1ff);
 }
 
-static READ8_HANDLER(mcu_printer_p2_r)
+READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 {
 	UINT8 ret = 0x00;
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 //  logerror("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
-	ret |= (state->m_printer_p2 & 0x70);
-	ret |= (state->m_printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
+	ret |= (m_printer_p2 & 0x70);
+	ret |= (m_printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
 	ret |= 0x0e;
 	return ret;
 }
 
-static WRITE8_HANDLER(mcu_printer_p2_w)
+WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 
 	//logerror("PRN: MCU writing %02x to P2\n",data);
-	state->m_printer_p2 = data & 0x70;
+	m_printer_p2 = data & 0x70;
 
 	// handle shift/store
-	state->m_printer_serial = data & 0x04;  // data
+	m_printer_serial = data & 0x04;  // data
 	if((data & 0x02) != 0)  // clock
 	{
-		state->m_printer_shift <<= 1;
-		if(state->m_printer_serial == 0)
-			state->m_printer_shift &= ~0x01;
+		m_printer_shift <<= 1;
+		if(m_printer_serial == 0)
+			m_printer_shift &= ~0x01;
 		else
-			state->m_printer_shift |= 0x01;
+			m_printer_shift |= 0x01;
 	}
 	if((data & 0x08) != 0)  // strobe
 	{
-		logerror("Strobe active [%02x]\n",state->m_printer_shift);
-		state->m_printer_shift_output = state->m_printer_shift;
-		state->m_prn_stepper->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.00000001));
+		logerror("Strobe active [%02x]\n",m_printer_shift);
+		m_printer_shift_output = m_printer_shift;
+		m_prn_stepper->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.00000001));
 	}
 
 	if(data & 0x40)
-		state->m_prn_pins->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.0000000068));
+		m_prn_pins->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.0000000068));
 
 	if(data & 0x01)
-		state->m_printer_pins |= 0x0100;
+		m_printer_pins |= 0x0100;
 	else
-		state->m_printer_pins &= ~0x0100;
-	state->m_printer_p2_prev = data;
+		m_printer_pins &= ~0x0100;
+	m_printer_p2_prev = data;
 }
 
 // Paper sensor
-static READ8_HANDLER(mcu_printer_t1_r)
+READ8_MEMBER(pcw_state::mcu_printer_t1_r)
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-static READ8_HANDLER(mcu_printer_t0_r)
+READ8_MEMBER(pcw_state::mcu_printer_t0_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
 
-	if(state->m_printer_headpos == 0)
+	if(m_printer_headpos == 0)
 		return 0;
 	else
 		return 1;
@@ -894,79 +879,74 @@ static READ8_HANDLER(mcu_printer_t0_r)
  *       bit 1: keyboard serial clock
  *       bit 0: keyboard serial data
  */
-static void mcu_transmit_serial(pcw_state *state, UINT8 bit)
+void pcw_state::mcu_transmit_serial(UINT8 bit)
 {
 	int seq;
 
 	/* Keyboard data is sent in serial from the MCU through the keyboard port, to the ASIC
        Sends a string of 12-bit sequences, first 4 bits are the RAM location (from &3ff0),
        then 8 bits for the data to be written there. */
-	seq = state->m_mcu_transmit_count % 12;
+	seq = m_mcu_transmit_count % 12;
 	if(seq < 4)
 	{
 		if(bit == 0)
-			state->m_mcu_selected &= ~(8 >> seq);
+			m_mcu_selected &= ~(8 >> seq);
 		else
-			state->m_mcu_selected |= (8 >> seq);
+			m_mcu_selected |= (8 >> seq);
 	}
 	else
 	{
 		seq -= 4;
 		if(bit == 0)
-			state->m_mcu_buffer &= ~(128 >> seq);
+			m_mcu_buffer &= ~(128 >> seq);
 		else
-			state->m_mcu_buffer |= (128 >> seq);
+			m_mcu_buffer |= (128 >> seq);
 	}
-	state->m_mcu_transmit_count++;
-	if(state->m_mcu_transmit_count >= 12)
+	m_mcu_transmit_count++;
+	if(m_mcu_transmit_count >= 12)
 	{
-		state->m_mcu_keyboard_data[state->m_mcu_selected] = state->m_mcu_buffer;
-		state->m_mcu_transmit_count = 0;
+		m_mcu_keyboard_data[m_mcu_selected] = m_mcu_buffer;
+		m_mcu_transmit_count = 0;
 	}
 }
 
-static READ8_HANDLER(mcu_kb_scan_r)
+READ8_MEMBER(pcw_state::mcu_kb_scan_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	return state->m_kb_scan_row & 0xff;
+	return m_kb_scan_row & 0xff;
 }
 
-static WRITE8_HANDLER(mcu_kb_scan_w)
+WRITE8_MEMBER(pcw_state::mcu_kb_scan_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	state->m_kb_scan_row = (state->m_kb_scan_row & 0xff00) | data;
+	m_kb_scan_row = (m_kb_scan_row & 0xff00) | data;
 }
 
-static READ8_HANDLER(mcu_kb_scan_high_r)
+READ8_MEMBER(pcw_state::mcu_kb_scan_high_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	return (state->m_kb_scan_row & 0xff00) >> 8;
+	return (m_kb_scan_row & 0xff00) >> 8;
 }
 
-static WRITE8_HANDLER(mcu_kb_scan_high_w)
+WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	if((state->m_mcu_prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
+	if((m_mcu_prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
 	{
-		mcu_transmit_serial(state, data & 0x01);
-		state->m_mcu_transmit_reset_seq = 0;
+		mcu_transmit_serial(data & 0x01);
+		m_mcu_transmit_reset_seq = 0;
 	}
 
-	if((state->m_mcu_prev & 0x01) != (data & 0x01))  // two high->low transitions on the data pin signals the beginning of a new transfer
+	if((m_mcu_prev & 0x01) != (data & 0x01))  // two high->low transitions on the data pin signals the beginning of a new transfer
 	{
-		state->m_mcu_transmit_reset_seq++;
-		if(state->m_mcu_transmit_reset_seq > 3)
-			state->m_mcu_transmit_count = 0;
+		m_mcu_transmit_reset_seq++;
+		if(m_mcu_transmit_reset_seq > 3)
+			m_mcu_transmit_count = 0;
 	}
 
-	state->m_kb_scan_row = (state->m_kb_scan_row & 0x00ff) | ((data & 0xff) << 8);
-	state->m_mcu_prev = data;
+	m_kb_scan_row = (m_kb_scan_row & 0x00ff) | ((data & 0xff) << 8);
+	m_mcu_prev = data;
 }
 
-static READ8_HANDLER(mcu_kb_data_r)
+READ8_MEMBER(pcw_state::mcu_kb_data_r)
 {
-	pcw_state *state = space->machine().driver_data<pcw_state>();
-	UINT16 scan_bits = ((state->m_kb_scan_row & 0xf000) >> 4) | (state->m_kb_scan_row & 0xff);
+	UINT16 scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
 
 	for(x=0;x<12;x++)
@@ -979,18 +959,18 @@ static READ8_HANDLER(mcu_kb_data_r)
 	return 0xff;
 }
 
-static READ8_HANDLER(mcu_kb_t1_r)
+READ8_MEMBER(pcw_state::mcu_kb_t1_r)
 {
 	return 1;
 }
 
-static READ8_HANDLER(mcu_kb_t0_r)
+READ8_MEMBER(pcw_state::mcu_kb_t0_r)
 {
 	return 0;
 }
 
 /* TODO: Implement parallel port! */
-static  READ8_HANDLER(pcw9512_parallel_r)
+READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 {
 	if (offset==1)
 	{
@@ -1002,54 +982,54 @@ static  READ8_HANDLER(pcw9512_parallel_r)
 }
 
 /* TODO: Implement parallel port! */
-static WRITE8_HANDLER(pcw9512_parallel_w)
+WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 {
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }
 
 static ADDRESS_MAP_START(pcw_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE_LEGACY(pcw_fdc_r,					pcw_fdc_w)
-	AM_RANGE(0x080, 0x0ef) AM_READWRITE_LEGACY(pcw_expansion_r,			pcw_expansion_w)
-	AM_RANGE(0x0f0, 0x0f3) AM_WRITE_LEGACY(								pcw_bank_select_w)
-	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE_LEGACY(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
-	AM_RANGE(0x0f5, 0x0f5) AM_WRITE_LEGACY(								pcw_roller_ram_addr_w)
-	AM_RANGE(0x0f6, 0x0f6) AM_WRITE_LEGACY(								pcw_pointer_table_top_scan_w)
-	AM_RANGE(0x0f7, 0x0f7) AM_WRITE_LEGACY(								pcw_vdu_video_control_register_w)
-	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE_LEGACY(pcw_system_status_r,		pcw_system_control_w)
-	AM_RANGE(0x0fc, 0x0fc) AM_READWRITE_LEGACY(pcw_printer_data_r,			pcw_printer_data_w)
-	AM_RANGE(0x0fd, 0x0fd) AM_READWRITE_LEGACY(pcw_printer_status_r,		pcw_printer_command_w)
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
+	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
+	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
+	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
+	AM_RANGE(0x0f5, 0x0f5) AM_WRITE(								pcw_roller_ram_addr_w)
+	AM_RANGE(0x0f6, 0x0f6) AM_WRITE(								pcw_pointer_table_top_scan_w)
+	AM_RANGE(0x0f7, 0x0f7) AM_WRITE(								pcw_vdu_video_control_register_w)
+	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE(pcw_system_status_r,		pcw_system_control_w)
+	AM_RANGE(0x0fc, 0x0fc) AM_READWRITE(pcw_printer_data_r,			pcw_printer_data_w)
+	AM_RANGE(0x0fd, 0x0fd) AM_READWRITE(pcw_printer_status_r,		pcw_printer_command_w)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE_LEGACY(pcw_fdc_r,					pcw_fdc_w)
-	AM_RANGE(0x080, 0x0ef) AM_READWRITE_LEGACY(pcw_expansion_r,			pcw_expansion_w)
-	AM_RANGE(0x0f0, 0x0f3) AM_WRITE_LEGACY(								pcw_bank_select_w)
-	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE_LEGACY(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
-	AM_RANGE(0x0f5, 0x0f5) AM_WRITE_LEGACY(								pcw_roller_ram_addr_w)
-	AM_RANGE(0x0f6, 0x0f6) AM_WRITE_LEGACY(								pcw_pointer_table_top_scan_w)
-	AM_RANGE(0x0f7, 0x0f7) AM_WRITE_LEGACY(								pcw_vdu_video_control_register_w)
-	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE_LEGACY(pcw_system_status_r,		pcw_system_control_w)
-	AM_RANGE(0x0fc, 0x0fd) AM_READWRITE_LEGACY(pcw9512_parallel_r,			pcw9512_parallel_w)
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
+	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
+	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
+	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
+	AM_RANGE(0x0f5, 0x0f5) AM_WRITE(								pcw_roller_ram_addr_w)
+	AM_RANGE(0x0f6, 0x0f6) AM_WRITE(								pcw_pointer_table_top_scan_w)
+	AM_RANGE(0x0f7, 0x0f7) AM_WRITE(								pcw_vdu_video_control_register_w)
+	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE(pcw_system_status_r,		pcw_system_control_w)
+	AM_RANGE(0x0fc, 0x0fd) AM_READWRITE(pcw9512_parallel_r,			pcw9512_parallel_w)
 ADDRESS_MAP_END
 
 /* i8041 MCU */
 static ADDRESS_MAP_START(pcw_printer_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE_LEGACY(mcu_printer_p2_r,mcu_printer_p2_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE_LEGACY(mcu_printer_p1_r, mcu_printer_p1_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(mcu_printer_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(mcu_printer_t0_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_printer_p2_r,mcu_printer_p2_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_p1_r, mcu_printer_p1_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_printer_t1_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_printer_t0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE_LEGACY(mcu_kb_scan_r,mcu_kb_scan_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE_LEGACY(mcu_kb_scan_high_r,mcu_kb_scan_high_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(mcu_kb_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(mcu_kb_t0_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_LEGACY(mcu_kb_data_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_kb_scan_r,mcu_kb_scan_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_kb_scan_high_r,mcu_kb_scan_high_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_kb_t1_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_kb_t0_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(mcu_kb_data_r)
 ADDRESS_MAP_END
 
 

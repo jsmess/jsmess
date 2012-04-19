@@ -76,7 +76,7 @@ static void primo_update_memory(running_machine &machine)
 
 *******************************************************************************/
 
-READ8_HANDLER( primo_be_1_r )
+READ8_MEMBER(primo_state::primo_be_1_r)
 {
 	UINT8 data = 0x00;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -84,47 +84,46 @@ READ8_HANDLER( primo_be_1_r )
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (space->machine().primary_screen->vblank()) ? 0x20 : 0x00;
+	data |= (machine().primary_screen->vblank()) ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 
 	// bit 3 - I3 (external bus)
 
 	// bit 2 - cassette
-	data |= ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < 0.1) ? 0x04 : 0x00;
+	data |= ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (input_port_read(space->machine(), "RESET")) ? 0x02 : 0x00;
+	data |= (input_port_read(machine(), "RESET")) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (input_port_read(space->machine(), portnames[(offset & 0x0030) >> 4]) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
+	data |= (input_port_read(machine(), portnames[(offset & 0x0030) >> 4]) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
 
-READ8_HANDLER( primo_be_2_r )
+READ8_MEMBER(primo_state::primo_be_2_r)
 {
-	primo_state *state = space->machine().driver_data<primo_state>();
 	UINT8 data = 0xff;
 
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	if (!state->m_iec->clk_r())
+	if (!m_iec->clk_r())
 		data &= ~0x20;
 
 	// bit 4 - SDATA
-	if (!state->m_iec->data_r())
+	if (!m_iec->data_r())
 		data &= ~0x10;
 
 	// bit 3 - SRQ
-	if (!state->m_iec->srq_r())
+	if (!m_iec->srq_r())
 		data &= ~0x08;
 
 	// bit 2 - joystic 2 (not implemeted yet)
 
 	// bit 1 - ATN
-	if (!state->m_iec->atn_r())
+	if (!m_iec->atn_r())
 		data &= ~0x02;
 
 	// bit 0 - joystic 1 (not implemeted yet)
@@ -133,12 +132,11 @@ READ8_HANDLER( primo_be_2_r )
 	return data;
 }
 
-WRITE8_HANDLER( primo_ki_1_w )
+WRITE8_MEMBER(primo_state::primo_ki_1_w)
 {
-	primo_state *state = space->machine().driver_data<primo_state>();
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 	// bit 7 - NMI generator enable/disable
-	state->m_nmi = (data & 0x80) ? 1 : 0;
+	m_nmi = (data & 0x80) ? 1 : 0;
 
 	// bit 6 - joystick register shift (not emulated)
 
@@ -149,9 +147,9 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 	// bit 3 - display buffer
 	if (data & 0x08)
-		state->m_video_memory_base |= 0x2000;
+		m_video_memory_base |= 0x2000;
 	else
-		state->m_video_memory_base &= 0xdfff;
+		m_video_memory_base &= 0xdfff;
 
 	// bit 2 - V.24 (1) / tape control (not emulated)
 
@@ -159,50 +157,48 @@ WRITE8_HANDLER( primo_ki_1_w )
 	switch (data & 0x03)
 	{
 		case 0:
-			space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
+			machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
 			break;
 		case 1:
 		case 2:
-			space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(0.0);
+			machine().device<cassette_image_device>(CASSETTE_TAG)->output(0.0);
 			break;
 		case 3:
-			space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(1.0);
+			machine().device<cassette_image_device>(CASSETTE_TAG)->output(1.0);
 			break;
 	}
 }
 
-WRITE8_HANDLER( primo_ki_2_w )
+WRITE8_MEMBER(primo_state::primo_ki_2_w)
 {
-	primo_state *state = space->machine().driver_data<primo_state>();
 
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	state->m_iec->clk_w(!BIT(data, 5));
+	m_iec->clk_w(!BIT(data, 5));
 
 	// bit 4 - SDATA
-	state->m_iec->data_w(!BIT(data, 4));
+	m_iec->data_w(!BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	state->m_iec->srq_w(!BIT(data, 2));
+	m_iec->srq_w(!BIT(data, 2));
 
 	// bit 1 - ATN
-	state->m_iec->atn_w(!BIT(data, 1));
+	m_iec->atn_w(!BIT(data, 1));
 
 	// bit 0 - not used
 
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
-WRITE8_HANDLER( primo_FD_w )
+WRITE8_MEMBER(primo_state::primo_FD_w)
 {
-	primo_state *state = space->machine().driver_data<primo_state>();
-	if (!input_port_read(space->machine(), "MEMORY_EXPANSION"))
+	if (!input_port_read(machine(), "MEMORY_EXPANSION"))
 	{
-		state->m_port_FD = data;
-		primo_update_memory(space->machine());
+		m_port_FD = data;
+		primo_update_memory(machine());
 	}
 }
 

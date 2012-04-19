@@ -64,19 +64,17 @@ PALETTE_INIT( aquarius )
 		colortable_entry_set_value(machine.colortable, i, aquarius_palette[i]);
 }
 
-WRITE8_HANDLER( aquarius_videoram_w )
+WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)
 {
-	aquarius_state *state = space->machine().driver_data<aquarius_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( aquarius_colorram_w )
+WRITE8_MEMBER(aquarius_state::aquarius_colorram_w)
 {
-	aquarius_state *state = space->machine().driver_data<aquarius_state>();
-	state->m_colorram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO(aquarius_gettileinfo)

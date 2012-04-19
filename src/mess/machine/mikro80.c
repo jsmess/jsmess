@@ -32,47 +32,41 @@ DRIVER_INIT(radio99)
 	state->m_key_mask = 0xff;
 }
 
-READ8_HANDLER (mikro80_8255_portb_r )
+READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
 {
-	mikro80_state *state = space->machine().driver_data<mikro80_state>();
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(space->machine(),"LINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(space->machine(),"LINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(space->machine(),"LINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(space->machine(),"LINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(space->machine(),"LINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(space->machine(),"LINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(space->machine(),"LINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(space->machine(),"LINE7"); }
-	return key & state->m_key_mask;
+	if ((m_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine(),"LINE0"); }
+	if ((m_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine(),"LINE1"); }
+	if ((m_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine(),"LINE2"); }
+	if ((m_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine(),"LINE3"); }
+	if ((m_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine(),"LINE4"); }
+	if ((m_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine(),"LINE5"); }
+	if ((m_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine(),"LINE6"); }
+	if ((m_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine(),"LINE7"); }
+	return key & m_key_mask;
 }
 
-READ8_HANDLER (mikro80_8255_portc_r )
+READ8_MEMBER(mikro80_state::mikro80_8255_portc_r)
 {
-	return input_port_read(space->machine(), "LINE8");
+	return input_port_read(machine(), "LINE8");
 }
 
-WRITE8_HANDLER (mikro80_8255_porta_w )
+WRITE8_MEMBER(mikro80_state::mikro80_8255_porta_w)
 {
-	mikro80_state *state = space->machine().driver_data<mikro80_state>();
-	state->m_keyboard_mask = data ^ 0xff;
+	m_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_HANDLER (mikro80_8255_portc_w )
+WRITE8_MEMBER(mikro80_state::mikro80_8255_portc_w)
 {
 }
-
-static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset); }
-static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset); }
-static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset, data); }
 
 I8255_INTERFACE( mikro80_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(mikro80_8255_porta_device_w),
-	DEVCB_HANDLER(mikro80_8255_portb_device_r),
+	DEVCB_DRIVER_MEMBER(mikro80_state, mikro80_8255_porta_w),
+	DEVCB_DRIVER_MEMBER(mikro80_state, mikro80_8255_portb_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(mikro80_8255_portc_device_r),
+	DEVCB_DRIVER_MEMBER(mikro80_state, mikro80_8255_portc_r),
 	DEVCB_NULL,
 };
 
@@ -91,28 +85,28 @@ MACHINE_RESET( mikro80 )
 }
 
 
-READ8_HANDLER( mikro80_keyboard_r )
+READ8_MEMBER(mikro80_state::mikro80_keyboard_r)
 {
-	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-	return ppi->read(*space, offset^0x03);
+	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+	return ppi->read(space, offset^0x03);
 }
 
-WRITE8_HANDLER( mikro80_keyboard_w )
+WRITE8_MEMBER(mikro80_state::mikro80_keyboard_w)
 {
-	i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-	ppi->write(*space, offset^0x03, data);
-}
-
-
-WRITE8_HANDLER( mikro80_tape_w )
-{
-	space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data & 0x01 ? 1 : -1);
+	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+	ppi->write(space, offset^0x03, data);
 }
 
 
-READ8_HANDLER( mikro80_tape_r )
+WRITE8_MEMBER(mikro80_state::mikro80_tape_w)
 {
-	double level = space->machine().device<cassette_image_device>(CASSETTE_TAG)->input();
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(data & 0x01 ? 1 : -1);
+}
+
+
+READ8_MEMBER(mikro80_state::mikro80_tape_r)
+{
+	double level = machine().device<cassette_image_device>(CASSETTE_TAG)->input();
 	if (level <  0) {
 			return 0x00;
 	}

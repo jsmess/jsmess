@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
 	AM_RANGE(0x0000, 0xbfff) AM_NOP
 
 	/* Cassette interface I/O space: */
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(apple1_cassette_r, apple1_cassette_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(apple1_cassette_r, apple1_cassette_w)
 	/* Cassette interface ROM: */
 	AM_RANGE(0xc100, 0xc1ff) AM_ROM
 

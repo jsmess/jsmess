@@ -100,6 +100,12 @@ public:
 
 	UINT8 *m_ram_0000;
 	UINT8 m_ram_disabled_by_beta;
+	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
+	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
+	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
+	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
+	DECLARE_READ8_MEMBER(spectrum_port_df_r);
+	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
 };
 
 
@@ -111,11 +117,6 @@ INPUT_PORTS_EXTERN( spec_plus );
 MACHINE_CONFIG_EXTERN( spectrum );
 MACHINE_RESET( spectrum );
 
-READ8_HANDLER(spectrum_port_1f_r);
-READ8_HANDLER(spectrum_port_7f_r);
-READ8_HANDLER(spectrum_port_df_r);
-READ8_HANDLER(spectrum_port_fe_r);
-WRITE8_HANDLER(spectrum_port_fe_w);
 
 /*----------- defined in drivers/spec128.c -----------*/
 

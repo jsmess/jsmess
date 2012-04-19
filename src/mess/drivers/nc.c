@@ -585,49 +585,45 @@ static ADDRESS_MAP_START(nc_map, AS_PROGRAM, 8, nc_state )
 ADDRESS_MAP_END
 
 
-static  READ8_HANDLER(nc_memory_management_r)
+READ8_MEMBER(nc_state::nc_memory_management_r)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
-	return state->m_memory_config[offset];
+	return m_memory_config[offset];
 }
 
-static WRITE8_HANDLER(nc_memory_management_w)
+WRITE8_MEMBER(nc_state::nc_memory_management_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	LOG(("Memory management W: %02x %02x\n",offset,data));
-        state->m_memory_config[offset] = data;
+        m_memory_config[offset] = data;
 
-        nc_refresh_memory_config(space->machine());
+        nc_refresh_memory_config(machine());
 }
 
-static WRITE8_HANDLER(nc_irq_mask_w)
+WRITE8_MEMBER(nc_state::nc_irq_mask_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	LOG(("irq mask w: %02x\n", data));
 	LOG_DEBUG(("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7))));
 
 	/* writing mask clears ints that are to be masked? */
-	state->m_irq_mask = data;
+	m_irq_mask = data;
 
-	nc_update_interrupts(space->machine());
+	nc_update_interrupts(machine());
 }
 
-static WRITE8_HANDLER(nc_irq_status_w)
+WRITE8_MEMBER(nc_state::nc_irq_status_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	LOG(("irq status w: %02x\n", data));
 	data = data^0x0ff;
 
-	if (state->m_type == NC_TYPE_200)
+	if (m_type == NC_TYPE_200)
 	{
 		/* Russell Marks confirms that on the NC200, the key scan interrupt must be explicitly
         cleared. It is not automatically cleared when reading 0x0b9 */
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
-			state->m_keyboard_timer->reset(attotime::from_msec(10));
+			m_keyboard_timer->reset(attotime::from_msec(10));
 
-			nc_update_interrupts(space->machine());
+			nc_update_interrupts(machine());
 		}
 	}
 
@@ -638,28 +634,26 @@ static WRITE8_HANDLER(nc_irq_status_w)
                 /* clearing keyboard int? */
                 ((data & (1<<3))!=0) &&
                 /* keyboard int request? */
-                ((state->m_irq_status & (1<<3))!=0)
+                ((m_irq_status & (1<<3))!=0)
            )
         {
 			/* set timer to occur again */
-			state->m_keyboard_timer->reset(attotime::from_msec(10));
+			m_keyboard_timer->reset(attotime::from_msec(10));
         }
 #endif
-        state->m_irq_status &=~data;
+        m_irq_status &=~data;
 
-        nc_update_interrupts(space->machine());
+        nc_update_interrupts(machine());
 }
 
-static READ8_HANDLER(nc_irq_status_r)
+READ8_MEMBER(nc_state::nc_irq_status_r)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
-        return ~((state->m_irq_status & (~state->m_irq_latch_mask)) | state->m_irq_latch);
+        return ~((m_irq_status & (~m_irq_latch_mask)) | m_irq_latch);
 }
 
 
-static READ8_HANDLER(nc_key_data_in_r)
+READ8_MEMBER(nc_state::nc_key_data_in_r)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
@@ -668,15 +662,15 @@ static READ8_HANDLER(nc_key_data_in_r)
 	if (offset==9)
 	{
 		/* reading 0x0b9 will clear int and re-start scan procedure! */
-		state->m_irq_status &= ~(1<<3);
+		m_irq_status &= ~(1<<3);
 
 		/* set timer to occur again */
-		state->m_keyboard_timer->reset(attotime::from_msec(10));
+		m_keyboard_timer->reset(attotime::from_msec(10));
 
-		nc_update_interrupts(space->machine());
+		nc_update_interrupts(machine());
 	}
 
-	return input_port_read(space->machine(), keynames[offset]);
+	return input_port_read(machine(), keynames[offset]);
 }
 
 
@@ -712,9 +706,8 @@ static void nc_sound_update(running_machine &machine, int channel)
 	beep_set_frequency(machine.device(beep_device), frequency);
 }
 
-static WRITE8_HANDLER(nc_sound_w)
+WRITE8_MEMBER(nc_state::nc_sound_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	LOG(("sound w: %04x %02x\n", offset, data));
 
 	switch (offset)
@@ -722,38 +715,38 @@ static WRITE8_HANDLER(nc_sound_w)
 		case 0x0:
 		{
 		   /* update period value */
-		   state->m_sound_channel_periods[0]  =
-				(state->m_sound_channel_periods[0] & 0x0ff00) | (data & 0x0ff);
+		   m_sound_channel_periods[0]  =
+				(m_sound_channel_periods[0] & 0x0ff00) | (data & 0x0ff);
 
-		   nc_sound_update(space->machine(), 0);
+		   nc_sound_update(machine(), 0);
 		}
 		break;
 
 		case 0x01:
 		{
-		   state->m_sound_channel_periods[0] =
-				(state->m_sound_channel_periods[0] & 0x0ff) | ((data & 0x0ff)<<8);
+		   m_sound_channel_periods[0] =
+				(m_sound_channel_periods[0] & 0x0ff) | ((data & 0x0ff)<<8);
 
-		   nc_sound_update(space->machine(), 0);
+		   nc_sound_update(machine(), 0);
 		}
 		break;
 
 		case 0x02:
 		{
 		   /* update period value */
-		   state->m_sound_channel_periods[1]  =
-				(state->m_sound_channel_periods[1] & 0x0ff00) | (data & 0x0ff);
+		   m_sound_channel_periods[1]  =
+				(m_sound_channel_periods[1] & 0x0ff00) | (data & 0x0ff);
 
-		   nc_sound_update(space->machine(), 1);
+		   nc_sound_update(machine(), 1);
 		}
 		break;
 
 		case 0x03:
 		{
-		   state->m_sound_channel_periods[1] =
-				(state->m_sound_channel_periods[1] & 0x0ff) | ((data & 0x0ff)<<8);
+		   m_sound_channel_periods[1] =
+				(m_sound_channel_periods[1] & 0x0ff) | ((data & 0x0ff)<<8);
 
-		   nc_sound_update(space->machine(), 1);
+		   nc_sound_update(machine(), 1);
 		}
 		break;
 
@@ -782,25 +775,24 @@ static TIMER_CALLBACK(nc_serial_timer_callback)
 	uart->receive_clock();
 }
 
-static WRITE8_HANDLER(nc_uart_control_w)
+WRITE8_MEMBER(nc_state::nc_uart_control_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	/* update printer state */
-	nc_printer_update(space->machine(), data);
+	nc_printer_update(machine(), data);
 
 	/* on/off changed state? */
-	if (((state->m_uart_control ^ data) & (1<<3))!=0)
+	if (((m_uart_control ^ data) & (1<<3))!=0)
 	{
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			devtag_reset(space->machine(), "uart");
+			devtag_reset(machine(), "uart");
 		}
 	}
 
-	state->m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
+	m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
 
-	state->m_uart_control = data;
+	m_uart_control = data;
 }
 
 /* NC100 printer emulation */
@@ -820,30 +812,28 @@ static void nc_printer_update(running_machine &machine, UINT8 data)
 
 
 
-static WRITE8_HANDLER(nc100_display_memory_start_w)
+WRITE8_MEMBER(nc_state::nc100_display_memory_start_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	/* bit 7: A15 */
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4: A12 */
 	/* bit 3-0: not used */
-	state->m_display_memory_start = (data & 0x0f0)<<(12-4);
+	m_display_memory_start = (data & 0x0f0)<<(12-4);
 
-	LOG(("disp memory w: %04x\n", (int) state->m_display_memory_start));
+	LOG(("disp memory w: %04x\n", (int) m_display_memory_start));
 }
 
 
-static WRITE8_HANDLER(nc100_uart_control_w)
+WRITE8_MEMBER(nc_state::nc100_uart_control_w)
 {
-	//nc_state *state = space->machine().driver_data<nc_state>();
 	nc_uart_control_w(space, offset,data);
 
 //  /* is this correct?? */
 //  if (data & (1<<3))
 //  {
 //      /* clear latched irq's */
-//      state->m_irq_latch &= ~3;
+//      m_irq_latch &= ~3;
 //      nc_update_interrupts(machine);
 //  }
 }
@@ -972,34 +962,32 @@ static MACHINE_START( nc100 )
 }
 
 
-static WRITE8_HANDLER(nc100_poweroff_control_w)
+WRITE8_MEMBER(nc_state::nc100_poweroff_control_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	/* bits 7-1: not used */
 	/* bit 0: 1 = no effect, 0 = power off */
-	state->m_poweroff_control = data;
+	m_poweroff_control = data;
 	LOG(("nc poweroff control: %02x\n",data));
 }
 
 
 /* nc100 version of card/battery status */
-static  READ8_HANDLER(nc100_card_battery_status_r)
+READ8_MEMBER(nc_state::nc100_card_battery_status_r)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
-	centronics_device *printer = space->machine().device<centronics_device>("centronics");
+	centronics_device *printer = machine().device<centronics_device>("centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
 	nc_card_battery_status |= printer->ack_r();
 	nc_card_battery_status |= printer->busy_r() << 1;
 
-	if (state->m_card_status)
+	if (m_card_status)
 	{
 		/* card present */
 		nc_card_battery_status &=~(1<<7);
 	}
 
-	if (input_port_read(space->machine(), "EXTRA") & 0x02)
+	if (input_port_read(machine(), "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1013,7 +1001,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 	return nc_card_battery_status;
 }
 
-static WRITE8_HANDLER(nc100_memory_card_wait_state_w)
+WRITE8_MEMBER(nc_state::nc100_memory_card_wait_state_w)
 {
 	LOG(("nc100 memory card wait state: %02x\n",data));
 }
@@ -1023,18 +1011,18 @@ static WRITE8_HANDLER(nc100_memory_card_wait_state_w)
 static ADDRESS_MAP_START(nc100_io, AS_IO, 8, nc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_WRITE_LEGACY(nc100_display_memory_start_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE_LEGACY(nc_memory_management_r, nc_memory_management_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nc100_memory_card_wait_state_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(nc100_uart_control_w)
+	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
+	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_device, write)
-	AM_RANGE(0x50, 0x53) AM_WRITE_LEGACY(nc_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nc_irq_mask_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nc100_poweroff_control_w)
-	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(nc_irq_status_r, nc_irq_status_w)
-	AM_RANGE(0x91, 0x9f) AM_READ_LEGACY(nc_irq_status_r)
-	AM_RANGE(0xa0, 0xaf) AM_READ_LEGACY(nc100_card_battery_status_r)
-	AM_RANGE(0xb0, 0xb9) AM_READ_LEGACY(nc_key_data_in_r)
+	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
+	AM_RANGE(0x91, 0x9f) AM_READ(nc_irq_status_r)
+	AM_RANGE(0xa0, 0xaf) AM_READ(nc100_card_battery_status_r)
+	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
@@ -1186,16 +1174,15 @@ void nc150_init_machine(running_machine &machine)
 /* NC200 hardware */
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER(nc200_display_memory_start_w)
+WRITE8_MEMBER(nc_state::nc200_display_memory_start_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	/* bit 7: A15 */
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4-0: not used */
-	state->m_display_memory_start = (data & 0x0e0)<<(12-4);
+	m_display_memory_start = (data & 0x0e0)<<(12-4);
 
-	LOG(("disp memory w: %04x\n", (int) state->m_display_memory_start));
+	LOG(("disp memory w: %04x\n", (int) m_display_memory_start));
 }
 #endif
 
@@ -1381,9 +1368,8 @@ NC200:
 
 
 /* nc200 version of card/battery status */
-static  READ8_HANDLER(nc200_card_battery_status_r)
+READ8_MEMBER(nc_state::nc200_card_battery_status_r)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
 	int nc_card_battery_status = 0x0ff;
 
 	/* enough power */
@@ -1394,13 +1380,13 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
     and there is enough power for disk usage */
 	nc_card_battery_status &=~((1<<5) | (1<<2) | (1<<0));
 
-	if (state->m_card_status)
+	if (m_card_status)
 	{
 		/* card present */
 		nc_card_battery_status&=~(1<<7);
 	}
 
-	if (input_port_read(space->machine(), "EXTRA") & 0x02)
+	if (input_port_read(machine(), "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1415,9 +1401,9 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
   bit 0: Parallel interface BUSY
  */
 
-static READ8_HANDLER(nc200_printer_status_r)
+READ8_MEMBER(nc_state::nc200_printer_status_r)
 {
-	centronics_device *printer = space->machine().device<centronics_device>("centronics");
+	centronics_device *printer = machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
 	result |= printer->busy_r();
@@ -1426,22 +1412,21 @@ static READ8_HANDLER(nc200_printer_status_r)
 }
 
 
-static WRITE8_HANDLER(nc200_uart_control_w)
+WRITE8_MEMBER(nc_state::nc200_uart_control_w)
 {
-	nc_state *state = space->machine().driver_data<nc_state>();
-	/* int reset_fdc = (state->m_uart_control^data) & (1<<5); */
+	/* int reset_fdc = (m_uart_control^data) & (1<<5); */
 
 	nc_uart_control_w(space, offset,data);
 
 	if (data & (1<<3))
 	{
-		state->m_nc200_uart_interrupt_irq &=~3;
+		m_nc200_uart_interrupt_irq &=~3;
 
-		nc200_refresh_uart_interrupt(space->machine());
+		nc200_refresh_uart_interrupt(machine());
 	}
 
 	/* bit 5 is used in disk interface */
-	LOG_DEBUG(("bit 5: PC: %04x %02x\n", cpu_get_pc(space->machine().device("maincpu")), data & (1 << 5)));
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n", cpu_get_pc(machine().device("maincpu")), data & (1 << 5)));
 }
 
 
@@ -1457,10 +1442,10 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 /* bit 1: disk motor??  */
 /* bit 0: UPD765 Terminal Count input */
 
-static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
+WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
 {
-	device_t *fdc = space->machine().device("upd765");
-	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(space->machine().device("maincpu")), data));
+	device_t *fdc = machine().device("upd765");
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(machine().device("maincpu")), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
@@ -1471,27 +1456,27 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 /* bit 2: backlight: 1=off, 0=on */
 /* bit 1 cleared to zero in disk code */
 /* bit 0 seems to be the same as nc100 */
-static WRITE8_HANDLER(nc200_poweroff_control_w)
+WRITE8_MEMBER(nc_state::nc200_poweroff_control_w)
 {
-	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", cpu_get_pc(space->machine().device("maincpu")), data));
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", cpu_get_pc(machine().device("maincpu")), data));
 
-	nc200_video_set_backlight(space->machine(), ((data ^ (1 << 2)) >> 2) & 0x01);
+	nc200_video_set_backlight(machine(), ((data ^ (1 << 2)) >> 2) & 0x01);
 }
 
 static ADDRESS_MAP_START(nc200_io, AS_IO, 8, nc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE_LEGACY(nc100_display_memory_start_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE_LEGACY(nc_memory_management_r, nc_memory_management_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nc200_memory_card_wait_state_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(nc200_uart_control_w)
+	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
+	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_device, write)
-	AM_RANGE(0x50, 0x53) AM_WRITE_LEGACY(nc_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nc_irq_mask_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nc200_poweroff_control_w)
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(nc200_printer_status_r)
-	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(nc_irq_status_r, nc_irq_status_w)
-	AM_RANGE(0xa0, 0xa0) AM_READ_LEGACY(nc200_card_battery_status_r)
-	AM_RANGE(0xb0, 0xb9) AM_READ_LEGACY(nc_key_data_in_r)
+	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)
+	AM_RANGE(0x80, 0x80) AM_READ(nc200_printer_status_r)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
+	AM_RANGE(0xa0, 0xa0) AM_READ(nc200_card_battery_status_r)
+	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("mc", mc146818_device, read, write)

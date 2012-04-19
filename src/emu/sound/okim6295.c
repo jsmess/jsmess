@@ -46,11 +46,6 @@
 // device type definition
 const device_type OKIM6295 = &device_creator<okim6295_device>;
 
-// ADPCM state and tables
-bool adpcm_state::s_tables_computed = false;
-const INT8 adpcm_state::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
-int adpcm_state::s_diff_lookup[49*16];
-
 // volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
 // that seems to map to a 5-bit volume control. Any volume parameter beyond the 9th index
 // results in silent playback.
@@ -301,24 +296,24 @@ void okim6295_device::write_command(UINT8 command)
 			{
 				okim_voice &voice = m_voice[voicenum];
 
-				// determine the start/stop positions
-				offs_t base = m_command * 8;
-
-				offs_t start = m_direct->read_raw_byte(base + 0) << 16;
-				start |= m_direct->read_raw_byte(base + 1) << 8;
-				start |= m_direct->read_raw_byte(base + 2) << 0;
-				start &= 0x3ffff;
-
-				offs_t stop = m_direct->read_raw_byte(base + 3) << 16;
-				stop |= m_direct->read_raw_byte(base + 4) << 8;
-				stop |= m_direct->read_raw_byte(base + 5) << 0;
-				stop &= 0x3ffff;
-
-				// set up the voice to play this sample
-				if (start < stop)
+				if (!voice.m_playing) // fixes Got-cha and Steel Force
 				{
-					if (!voice.m_playing) // fixes Got-cha and Steel Force
+					// determine the start/stop positions
+					offs_t base = m_command * 8;
+
+					offs_t start = m_direct->read_raw_byte(base + 0) << 16;
+					start |= m_direct->read_raw_byte(base + 1) << 8;
+					start |= m_direct->read_raw_byte(base + 2) << 0;
+					start &= 0x3ffff;
+
+					offs_t stop = m_direct->read_raw_byte(base + 3) << 16;
+					stop |= m_direct->read_raw_byte(base + 4) << 8;
+					stop |= m_direct->read_raw_byte(base + 5) << 0;
+					stop &= 0x3ffff;
+
+					if (start < stop)
 					{
+						// set up the voice to play this sample
 						voice.m_playing = true;
 						voice.m_base_offset = start;
 						voice.m_sample = 0;
@@ -328,15 +323,16 @@ void okim6295_device::write_command(UINT8 command)
 						voice.m_adpcm.reset();
 						voice.m_volume = s_volume_table[command & 0x0f];
 					}
-					else
-						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
-				}
 
-				// invalid samples go here
+					// invalid samples go here
+					else
+					{
+						logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
+					}
+				}
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
-					voice.m_playing = false;
+					logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
 				}
 			}
 
@@ -422,87 +418,3 @@ void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 	}
 }
 
-
-
-//**************************************************************************
-//  ADPCM STATE HELPER
-//**************************************************************************
-
-//-------------------------------------------------
-//  reset - reset the ADPCM state
-//-------------------------------------------------
-
-void adpcm_state::reset()
-{
-	// reset the signal/step
-	m_signal = -2;
-	m_step = 0;
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
-//-------------------------------------------------
-
-INT16 adpcm_state::clock(UINT8 nibble)
-{
-	// update the signal
-	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
-
-	// clamp to the maximum
-	if (m_signal > 2047)
-		m_signal = 2047;
-	else if (m_signal < -2048)
-		m_signal = -2048;
-
-	// adjust the step size and clamp
-	m_step += s_index_shift[nibble & 7];
-	if (m_step > 48)
-		m_step = 48;
-	else if (m_step < 0)
-		m_step = 0;
-
-	// return the signal
-	return m_signal;
-}
-
-
-//-------------------------------------------------
-//  compute_tables - precompute tables for faster
-//  sound generation
-//-------------------------------------------------
-
-void adpcm_state::compute_tables()
-{
-	// skip if we already did it
-	if (s_tables_computed)
-		return;
-	s_tables_computed = true;
-
-	// nibble to bit map
-	static const INT8 nbl2bit[16][4] =
-	{
-		{ 1, 0, 0, 0}, { 1, 0, 0, 1}, { 1, 0, 1, 0}, { 1, 0, 1, 1},
-		{ 1, 1, 0, 0}, { 1, 1, 0, 1}, { 1, 1, 1, 0}, { 1, 1, 1, 1},
-		{-1, 0, 0, 0}, {-1, 0, 0, 1}, {-1, 0, 1, 0}, {-1, 0, 1, 1},
-		{-1, 1, 0, 0}, {-1, 1, 0, 1}, {-1, 1, 1, 0}, {-1, 1, 1, 1}
-	};
-
-	// loop over all possible steps
-	for (int step = 0; step <= 48; step++)
-	{
-		// compute the step value
-		int stepval = floor(16.0 * pow(11.0 / 10.0, (double)step));
-
-		// loop over all nibbles and compute the difference
-		for (int nib = 0; nib < 16; nib++)
-		{
-			s_diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
-				(stepval   * nbl2bit[nib][1] +
-				 stepval/2 * nbl2bit[nib][2] +
-				 stepval/4 * nbl2bit[nib][3] +
-				 stepval/8);
-		}
-	}
-}

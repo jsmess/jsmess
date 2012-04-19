@@ -24,9 +24,9 @@ static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pecom64_io, AS_IO, 8, pecom_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(pecom_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(pecom_keyboard_r)
-	AM_RANGE(0x03, 0x07) AM_WRITE_LEGACY(pecom_cdp1869_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
+	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r)
+	AM_RANGE(0x03, 0x07) AM_WRITE(pecom_cdp1869_w)
 ADDRESS_MAP_END
 
 /* Input ports */

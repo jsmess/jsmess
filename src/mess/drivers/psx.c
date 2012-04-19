@@ -49,6 +49,8 @@ public:
 	UINT8 m_cd_io_status;
 	UINT8 m_cd_param[8];
 	UINT8 m_cd_result[8];
+	DECLARE_READ8_MEMBER(psx_cd_r);
+	DECLARE_WRITE8_MEMBER(psx_cd_w);
 };
 
 
@@ -670,23 +672,23 @@ static void cd_dma_write( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
-static READ8_HANDLER( psx_cd_r )
+READ8_MEMBER(psx1_state::psx_cd_r)
 {
-	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 
 	return psxcd->read_byte(offset);
 }
 
-static WRITE8_HANDLER( psx_cd_w )
+WRITE8_MEMBER(psx1_state::psx_cd_w)
 {
-	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 
 	psxcd->write_byte(offset, data);
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8_LEGACY(psx_cd_r, psx_cd_w, 0xffffffff)
+	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8(psx_cd_r, psx_cd_w, 0xffffffff)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x80600000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */

@@ -42,9 +42,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( llc2_io, AS_IO, 8, llc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xE0, 0xE3) AM_WRITE_LEGACY(llc2_rom_disable_w)
+	AM_RANGE(0xE0, 0xE3) AM_WRITE(llc2_rom_disable_w)
 	AM_RANGE(0xE8, 0xEB) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0xEC, 0xEC) AM_WRITE_LEGACY(llc2_basic_enable_w)
+	AM_RANGE(0xEC, 0xEC) AM_WRITE(llc2_basic_enable_w)
 	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 

@@ -95,6 +95,21 @@ public:
 	sound_stream *m_sh_channel;
 	UINT16 m_sh_count;
 	//ef9341_t ef9341;
+	DECLARE_READ8_MEMBER(odyssey2_t0_r);
+	DECLARE_READ8_MEMBER(odyssey2_bus_r);
+	DECLARE_WRITE8_MEMBER(odyssey2_bus_w);
+	DECLARE_READ8_MEMBER(g7400_bus_r);
+	DECLARE_WRITE8_MEMBER(g7400_bus_w);
+	DECLARE_READ8_MEMBER(odyssey2_getp1);
+	DECLARE_WRITE8_MEMBER(odyssey2_putp1);
+	DECLARE_READ8_MEMBER(odyssey2_getp2);
+	DECLARE_WRITE8_MEMBER(odyssey2_putp2);
+	DECLARE_READ8_MEMBER(odyssey2_getbus);
+	DECLARE_WRITE8_MEMBER(odyssey2_putbus);
+	DECLARE_READ8_MEMBER(odyssey2_video_r);
+	DECLARE_WRITE8_MEMBER(odyssey2_video_w);
+	DECLARE_WRITE8_MEMBER(odyssey2_lum_w);
+	DECLARE_READ8_MEMBER(odyssey2_t1_r);
 };
 
 
@@ -105,10 +120,6 @@ extern const UINT8 odyssey2_colors[];
 VIDEO_START( odyssey2 );
 SCREEN_UPDATE_IND16( odyssey2 );
 PALETTE_INIT( odyssey2 );
-READ8_HANDLER ( odyssey2_t1_r );
-READ8_HANDLER ( odyssey2_video_r );
-WRITE8_HANDLER ( odyssey2_video_w );
-WRITE8_HANDLER ( odyssey2_lum_w );
 
 STREAM_UPDATE( odyssey2_sh_update );
 
@@ -123,23 +134,12 @@ DRIVER_INIT( odyssey2 );
 MACHINE_RESET( odyssey2 );
 
 /* i/o ports */
-READ8_HANDLER ( odyssey2_bus_r );
-WRITE8_HANDLER ( odyssey2_bus_w );
 
-READ8_HANDLER( odyssey2_getp1 );
-WRITE8_HANDLER ( odyssey2_putp1 );
 
-READ8_HANDLER( odyssey2_getp2 );
-WRITE8_HANDLER ( odyssey2_putp2 );
 
-READ8_HANDLER( odyssey2_getbus );
-WRITE8_HANDLER ( odyssey2_putbus );
 
-READ8_HANDLER( odyssey2_t0_r );
 void odyssey2_the_voice_lrq_callback( device_t *device, int state );
 
-READ8_HANDLER ( g7400_bus_r );
-WRITE8_HANDLER ( g7400_bus_w );
 
 int odyssey2_cart_verify(const UINT8 *cartdata, size_t size);
 

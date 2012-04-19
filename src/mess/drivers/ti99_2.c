@@ -95,6 +95,8 @@ public:
 	int m_KeyRow;
 	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
 	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
+	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
+	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
 };
 
 
@@ -267,22 +269,21 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
 }
 
 /* read keys in the current row */
-static  READ8_HANDLER ( ti99_2_read_kbd )
+READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
 {
-	ti99_2_state *state = space->machine().driver_data<ti99_2_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(space->machine(), keynames[state->m_KeyRow]);
+	return input_port_read(machine(), keynames[m_KeyRow]);
 }
 
-static  READ8_HANDLER ( ti99_2_read_misc_cru )
+READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
 {
 	return 0;
 }
 
 static ADDRESS_MAP_START(ti99_2_io, AS_IO, 8, ti99_2_state )
-	AM_RANGE(0x0E00, 0x0E7f) AM_READ_LEGACY(ti99_2_read_kbd)
-	AM_RANGE(0x0E80, 0x0Eff) AM_READ_LEGACY(ti99_2_read_misc_cru)
+	AM_RANGE(0x0E00, 0x0E7f) AM_READ(ti99_2_read_kbd)
+	AM_RANGE(0x0E80, 0x0Eff) AM_READ(ti99_2_read_misc_cru)
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
 	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
 ADDRESS_MAP_END

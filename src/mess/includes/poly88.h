@@ -27,6 +27,9 @@ public:
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
+	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
+	DECLARE_READ8_MEMBER(poly88_keyboard_r);
+	DECLARE_WRITE8_MEMBER(poly88_intr_w);
 };
 
 
@@ -35,9 +38,6 @@ public:
 DRIVER_INIT(poly88);
 MACHINE_RESET(poly88);
 INTERRUPT_GEN( poly88_interrupt );
-READ8_HANDLER(poly88_keyboard_r);
-WRITE8_HANDLER(poly88_intr_w);
-WRITE8_HANDLER(poly88_baud_rate_w);
 
 extern const i8251_interface poly88_usart_interface;
 

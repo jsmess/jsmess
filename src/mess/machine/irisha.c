@@ -66,16 +66,15 @@ static READ8_DEVICE_HANDLER (irisha_8255_portc_r )
 	return 0;
 }
 
-READ8_HANDLER (irisha_keyboard_r)
+READ8_MEMBER(irisha_state::irisha_keyboard_r)
 {
-	irisha_state *state = space->machine().driver_data<irisha_state>();
 	UINT8 keycode;
-	if (state->m_keyboard_cnt!=0 && state->m_keyboard_cnt<11) {
-		keycode = input_port_read(space->machine(), keynames[state->m_keyboard_cnt-1]) ^ 0xff;
+	if (m_keyboard_cnt!=0 && m_keyboard_cnt<11) {
+		keycode = input_port_read(machine(), keynames[m_keyboard_cnt-1]) ^ 0xff;
 	} else {
 		keycode = 0xff;
 	}
-	state->m_keyboard_cnt++;
+	m_keyboard_cnt++;
 	return keycode;
 }
 

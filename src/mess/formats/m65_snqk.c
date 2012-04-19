@@ -289,10 +289,10 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
         {
             RAM[0xbff0+i] = snapshot_buff[base++];
             if (i < 4)
-                microtan_bffx_w(space, i, RAM[0xbff0+i]);
+                state->microtan_bffx_w(*space, i, RAM[0xbff0+i]);
         }
 
-        microtan_sound_w(space, 0, snapshot_buff[base++]);
+        state->microtan_sound_w(*space, 0, snapshot_buff[base++]);
         state->m_chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */

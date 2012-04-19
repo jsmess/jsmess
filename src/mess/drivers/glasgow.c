@@ -80,6 +80,8 @@ public:
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
+	DECLARE_READ16_MEMBER(read_test);
+	DECLARE_READ16_MEMBER(read_board_amsterd);
 };
 
 
@@ -190,7 +192,7 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER(read_test)
+READ16_MEMBER(glasgow_state::read_test)
 {
 	logerror("read test Offset = %x Data = %x\n  ",offset,data);
 	return 0xffff;    // Mephisto need it for working
@@ -253,7 +255,7 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 }
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER(read_board_amsterd)
+READ16_MEMBER(glasgow_state::read_board_amsterd)
 {
 	logerror("read board amsterdam Offset = %x \n  ", offset);
 	return 0xffff;

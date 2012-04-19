@@ -114,21 +114,27 @@ public:
 	int m_hector_flag_result;
 	int m_print;
 	UINT8 m_hector_videoram_hrx[0x04000];
+	DECLARE_READ8_MEMBER(hector_179x_register_r);
+	DECLARE_WRITE8_MEMBER(hector_179x_register_w);
+	DECLARE_WRITE8_MEMBER(hector_switch_bank_w);
+	DECLARE_WRITE8_MEMBER(hector_keyboard_w);
+	DECLARE_READ8_MEMBER(hector_keyboard_r);
+	DECLARE_WRITE8_MEMBER(hector_sn_2000_w);
+	DECLARE_WRITE8_MEMBER(hector_sn_2800_w);
+	DECLARE_READ8_MEMBER(hector_cassette_r);
+	DECLARE_WRITE8_MEMBER(hector_sn_3000_w);
+	DECLARE_WRITE8_MEMBER(hector_color_a_w);
+	DECLARE_WRITE8_MEMBER(hector_color_b_w);
+	DECLARE_READ8_MEMBER(hector_io_8255_r);
+	DECLARE_WRITE8_MEMBER(hector_io_8255_w);
+	DECLARE_WRITE8_MEMBER(hector_mx40_io_port_w);
+	DECLARE_WRITE8_MEMBER(hector_mx80_io_port_w);
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
 
 /* Protoype of memory Handler*/
 WRITE8_HANDLER( hector_switch_bank_rom_w );
-WRITE8_HANDLER( hector_switch_bank_w );
-READ8_HANDLER( hector_keyboard_r );
-WRITE8_HANDLER( hector_keyboard_w );
-WRITE8_HANDLER( hector_sn_2000_w );
-WRITE8_HANDLER( hector_sn_2800_w );
-WRITE8_HANDLER( hector_sn_3000_w );
-READ8_HANDLER( hector_cassette_r );
-WRITE8_HANDLER( hector_color_a_w );
-WRITE8_HANDLER( hector_color_b_w );
 
 void hector_init( running_machine &machine);
 void hector_reset(running_machine &machine, int hr, int with_D2);
@@ -136,12 +142,6 @@ void hector_disc2_reset( running_machine &machine);
 
 /* Prototype of I/O Handler*/
 READ8_HANDLER( hector_mx_io_port_r );
-WRITE8_HANDLER( hector_mx80_io_port_w );
-WRITE8_HANDLER( hector_mx40_io_port_w );
- READ8_HANDLER( hector_io_8255_r);
-WRITE8_HANDLER( hector_io_8255_w);
- READ8_HANDLER( hector_179x_register_r);
-WRITE8_HANDLER( hector_179x_register_w);
 /*----------- defined in video/hec2video.c -----------*/
 
 void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;

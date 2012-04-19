@@ -21,6 +21,14 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	int m_keyboard_mask;
 	int m_key_mask;
+	DECLARE_READ8_MEMBER(mikro80_8255_portb_r);
+	DECLARE_READ8_MEMBER(mikro80_8255_portc_r);
+	DECLARE_WRITE8_MEMBER(mikro80_8255_porta_w);
+	DECLARE_WRITE8_MEMBER(mikro80_8255_portc_w);
+	DECLARE_READ8_MEMBER(mikro80_keyboard_r);
+	DECLARE_WRITE8_MEMBER(mikro80_keyboard_w);
+	DECLARE_WRITE8_MEMBER(mikro80_tape_w);
+	DECLARE_READ8_MEMBER(mikro80_tape_r);
 };
 
 
@@ -31,15 +39,7 @@ extern const i8255_interface mikro80_ppi8255_interface;
 extern DRIVER_INIT( mikro80 );
 extern DRIVER_INIT( radio99 );
 extern MACHINE_RESET( mikro80 );
-extern READ8_HANDLER( mikro80_keyboard_r );
-extern WRITE8_HANDLER( mikro80_keyboard_w );
-extern READ8_HANDLER( mikro80_tape_r );
-extern WRITE8_HANDLER( mikro80_tape_w );
 
-extern READ8_HANDLER (mikro80_8255_portb_r );
-extern READ8_HANDLER (mikro80_8255_portc_r );
-extern WRITE8_HANDLER (mikro80_8255_porta_w );
-extern WRITE8_HANDLER (mikro80_8255_portc_w );
 /*----------- defined in video/mikro80.c -----------*/
 
 extern VIDEO_START( mikro80 );

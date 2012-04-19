@@ -4,6 +4,8 @@
   yet another Data East / Tumble Pop derived hardware
   this one seems similar to (but not identical to)
   the crospang.c hardware from F2 system
+  also very close to gotcha.c, which was also a Para
+  board.
 
   todo: refresh rate & audio balance
         verify dipswitches - difficulty & unknown dips
@@ -289,8 +291,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc003, 0xc003) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
 	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
 ADDRESS_MAP_END
@@ -305,7 +306,7 @@ static void silvmil_irqhandler( device_t *device, int irq )
 
 static const ym2151_interface silvmil_ym2151_interface =
 {
-	silvmil_irqhandler
+	DEVCB_LINE(silvmil_irqhandler)
 };
 
 

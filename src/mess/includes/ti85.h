@@ -57,6 +57,43 @@ public:
 	int m_ti_number_of_frames;
 	UINT8 * m_frames;
 	UINT8 * m_bios;
+	DECLARE_READ8_MEMBER(ti85_port_0000_r);
+	DECLARE_READ8_MEMBER(ti8x_keypad_r);
+	DECLARE_READ8_MEMBER(ti85_port_0006_r);
+	DECLARE_READ8_MEMBER(ti8x_serial_r);
+	DECLARE_READ8_MEMBER(ti86_port_0005_r);
+	DECLARE_READ8_MEMBER(ti83_port_0000_r);
+	DECLARE_READ8_MEMBER(ti8x_plus_serial_r);
+	DECLARE_WRITE8_MEMBER(ti81_port_0007_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0000_w);
+	DECLARE_WRITE8_MEMBER(ti8x_keypad_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0002_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0003_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0004_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0005_w);
+	DECLARE_WRITE8_MEMBER(ti85_port_0006_w);
+	DECLARE_WRITE8_MEMBER(ti8x_serial_w);
+	DECLARE_WRITE8_MEMBER(ti86_port_0005_w);
+	DECLARE_WRITE8_MEMBER(ti86_port_0006_w);
+	DECLARE_WRITE8_MEMBER(ti82_port_0002_w);
+	DECLARE_WRITE8_MEMBER(ti83_port_0000_w);
+	DECLARE_WRITE8_MEMBER(ti83_port_0002_w);
+	DECLARE_WRITE8_MEMBER(ti83_port_0003_w);
+	DECLARE_WRITE8_MEMBER(ti8x_plus_serial_w);
+	DECLARE_WRITE8_MEMBER(ti83p_port_0002_w);
+	DECLARE_WRITE8_MEMBER(ti83p_port_0003_w);
+	DECLARE_WRITE8_MEMBER(ti83p_port_0004_w);
+	DECLARE_WRITE8_MEMBER(ti83p_port_0006_w);
+	DECLARE_WRITE8_MEMBER(ti83p_port_0007_w);
+	DECLARE_READ8_MEMBER( ti85_port_0002_r );
+	DECLARE_READ8_MEMBER( ti85_port_0003_r );
+	DECLARE_READ8_MEMBER( ti85_port_0004_r );
+	DECLARE_READ8_MEMBER( ti85_port_0005_r );
+	DECLARE_READ8_MEMBER( ti86_port_0006_r );
+	DECLARE_READ8_MEMBER( ti82_port_0002_r );
+	DECLARE_READ8_MEMBER( ti83_port_0002_r );
+	DECLARE_READ8_MEMBER( ti83_port_0003_r );
+	DECLARE_READ8_MEMBER( ti83p_port_0002_r );
 };
 
 
@@ -72,43 +109,6 @@ NVRAM_HANDLER( ti86 );
 
 SNAPSHOT_LOAD( ti8x );
 
-WRITE8_HANDLER( ti81_port_0007_w );
- READ8_HANDLER( ti85_port_0000_r );
- READ8_HANDLER( ti8x_keypad_r );
- READ8_HANDLER( ti85_port_0002_r );
- READ8_HANDLER( ti85_port_0003_r );
- READ8_HANDLER( ti85_port_0004_r );
- READ8_HANDLER( ti85_port_0005_r );
- READ8_HANDLER( ti85_port_0006_r );
- READ8_HANDLER( ti8x_serial_r );
- READ8_HANDLER( ti86_port_0005_r );
- READ8_HANDLER( ti86_port_0006_r );
- READ8_HANDLER( ti82_port_0002_r );
- READ8_HANDLER( ti83_port_0000_r );
- READ8_HANDLER( ti83_port_0002_r );
- READ8_HANDLER( ti83_port_0003_r );
- READ8_HANDLER( ti8x_plus_serial_r );
- READ8_HANDLER( ti83p_port_0002_r );
-WRITE8_HANDLER( ti85_port_0000_w );
-WRITE8_HANDLER( ti8x_keypad_w );
-WRITE8_HANDLER( ti85_port_0002_w );
-WRITE8_HANDLER( ti85_port_0003_w );
-WRITE8_HANDLER( ti85_port_0004_w );
-WRITE8_HANDLER( ti85_port_0005_w );
-WRITE8_HANDLER( ti85_port_0006_w );
-WRITE8_HANDLER( ti8x_serial_w );
-WRITE8_HANDLER( ti86_port_0005_w );
-WRITE8_HANDLER( ti86_port_0006_w );
-WRITE8_HANDLER( ti82_port_0002_w );
-WRITE8_HANDLER( ti83_port_0000_w );
-WRITE8_HANDLER( ti83_port_0002_w );
-WRITE8_HANDLER( ti83_port_0003_w );
-WRITE8_HANDLER( ti8x_plus_serial_w );
-WRITE8_HANDLER( ti83p_port_0002_w );
-WRITE8_HANDLER( ti83p_port_0003_w );
-WRITE8_HANDLER( ti83p_port_0004_w );
-WRITE8_HANDLER( ti83p_port_0006_w );
-WRITE8_HANDLER( ti83p_port_0007_w );
 
 /*----------- defined in video/ti85.c -----------*/
 

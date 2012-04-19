@@ -67,6 +67,16 @@ public:
 	UINT8	m_de;
 
 	static const floppy_format_type floppy_formats[];
+	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
+	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
+	DECLARE_READ8_MEMBER(einstein_80col_state_r);
+	DECLARE_WRITE8_MEMBER(einstein_keyboard_line_write);
+	DECLARE_READ8_MEMBER(einstein_keyboard_data_read);
+	DECLARE_WRITE8_MEMBER(einstein_rom_w);
+	DECLARE_READ8_MEMBER(einstein_kybintmsk_r);
+	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
+	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
+	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
 };
 
 

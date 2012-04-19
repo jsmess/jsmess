@@ -1013,10 +1013,10 @@ static const ay8910_interface msx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_a_r),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_b_r),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_a_w),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_b_w)
+	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_a_r),
+	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_b_r),
+	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_a_w),
+	DEVCB_DRIVER_MEMBER(msx_state, msx_psg_port_b_w)
 };
 
 #define MSX_XBORDER_PIXELS		15

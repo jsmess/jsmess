@@ -137,18 +137,17 @@ void samcoupe_update_memory(address_space *space)
 }
 
 
-WRITE8_HANDLER( samcoupe_ext_mem_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (offset & 1)
-		state->m_hext = data;
+		m_hext = data;
 	else
-		state->m_lext = data;
+		m_lext = data;
 
 	/* external RAM enabled? */
-	if (state->m_hmpr & HMPR_MCNTRL)
+	if (m_hmpr & HMPR_MCNTRL)
 	{
 		samcoupe_install_ext_mem(space_program);
 	}

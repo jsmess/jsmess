@@ -54,6 +54,8 @@ public:
 		DECLARE_WRITE_LINE_MEMBER( d8253_clk0_out );
 		DECLARE_WRITE_LINE_MEMBER( d8253_clk1_out );
 		DECLARE_WRITE_LINE_MEMBER( d8253_clk2_out );
+		
+		DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
 
 		void							set_z80_interrupt(int src, int state);
 

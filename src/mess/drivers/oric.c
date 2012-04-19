@@ -69,7 +69,7 @@ Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, oric_state )
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE( 0x0310, 0x031b) AM_READWRITE_LEGACY(oric_microdisc_r, oric_microdisc_w )
+	AM_RANGE( 0x0310, 0x031b) AM_READWRITE(oric_microdisc_r, oric_microdisc_w )
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia",  acia6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
@@ -339,7 +339,7 @@ static const ay8910_interface oric_ay_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, oric_psg_porta_write),
+	DEVCB_DRIVER_MEMBER(oric_state, oric_psg_porta_write),
 	DEVCB_NULL,
 };
 
