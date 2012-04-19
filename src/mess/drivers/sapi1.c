@@ -11,29 +11,44 @@
         According to wikipedia, e800+ is the videoram area, and the
         number of columns is 64.
 
+        19/04/2012 Connected sapizps3 to a terminal. It is trying to
+        load a 128-byte boot sector from a floppy disk.
+        Modernised driver.
+        Connected sapizps2 to ascii keyboard. System is now usable.
+        According to wikipedia, sapi1 & 2 have cassette facility,
+        while sapi3 uses 8 inch floppy disk.
+
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "cpu/z80/z80.h"
 #include "includes/sapi1.h"
-#include "machine/ram.h"
 
 
 /* switch out the rom shadow */
-WRITE8_MEMBER(sapi1_state::sapizps3_00_w)
+WRITE8_MEMBER( sapi1_state::sapi3_00_w )
 {
 	memory_set_bank(machine(), "bank1", 0);
 }
 
+READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)
+{
+	return (m_term_data) ? 0 : 1;
+}
+
+READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
 /* to stop execution in random ram */
-READ8_MEMBER(sapi1_state::sapizps3_25_r)
+READ8_MEMBER( sapi1_state::sapi3_25_r )
 {
 	return m_zps3_25;
 }
 
-WRITE8_MEMBER(sapi1_state::sapizps3_25_w)
+WRITE8_MEMBER( sapi1_state::sapi3_25_w )
 {
 	m_zps3_25 = data & 0xfc; //??
 }
@@ -56,9 +71,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sapi1_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8, sapi1_state )
+static ADDRESS_MAP_START(sapi2_mem, AS_PROGRAM, 8, sapi1_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x2700, 0x27ff) AM_READ(sapi2_keyboard_status_r)
+	AM_RANGE(0x2800, 0x28ff) AM_READ(sapi2_keyboard_data_r)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("sapi_video_ram") // AND-1 (video RAM)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sapi3_mem, AS_PROGRAM, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xe7ff) AM_RAM
@@ -68,11 +95,12 @@ static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapizps3_io, AS_IO, 8, sapi1_state )
+static ADDRESS_MAP_START( sapi3_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapizps3_00_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapizps3_25_r,sapizps3_25_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
+	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -128,6 +156,17 @@ static INPUT_PORTS_START( sapi1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 INPUT_PORTS_END
 
+WRITE8_MEMBER( sapi1_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(sapi1_state, kbd_put)
+};
+
+
 /* Machine driver */
 static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	/* basic machine hardware */
@@ -156,27 +195,35 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapizps3, sapi1_state )
+static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, terminal_intf)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sapi3, sapi1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sapizps3_mem)
-	MCFG_CPU_IO_MAP(sapizps3_io)
+	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
+	MCFG_CPU_IO_MAP(sapi3_io)
 
 	MCFG_MACHINE_START( sapi1 )
 	MCFG_MACHINE_RESET( sapizps3 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*6, 24*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*9-1)
-	MCFG_SCREEN_UPDATE_STATIC(sapizps3)
+	//MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_REFRESH_RATE(50)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	//MCFG_SCREEN_SIZE(80*6, 24*9)
+	//MCFG_SCREEN_VISIBLE_AREA(0, 80*6-1, 0, 24*9-1)
+	//MCFG_VIDEO_START(sapizps3)
+	//MCFG_SCREEN_UPDATE_STATIC(sapizps3)
+	//MCFG_PALETTE_LENGTH(2)
+	//MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(sapizps3)
+	/* video hardware */
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -220,7 +267,7 @@ ROM_START( sapizps3 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1985, sapi1,	0,	0,	sapi1,		sapi1,	sapi1,	 "Tesla", "SAPI-1 ZPS 1",	 GAME_NO_SOUND)
-COMP( 1985, sapizps2,sapi1,	0,	sapi1,		sapi1,	sapi1,	 "Tesla", "SAPI-1 ZPS 2",	 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, sapizps3,sapi1,	0,	sapizps3,	sapi1,	sapizps3, "Tesla", "SAPI-1 ZPS 3",	 GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT       INIT      COMPANY    FULLNAME       FLAGS */
+COMP( 1985, sapi1,    0,       0,      sapi1,      sapi1,      sapi1,    "Tesla", "SAPI-1 ZPS 1", GAME_NO_SOUND_HW)
+COMP( 1985, sapizps2, sapi1,   0,      sapi2,      sapi1,      sapi1,    "Tesla", "SAPI-1 ZPS 2", GAME_NO_SOUND_HW)
+COMP( 1985, sapizps3, sapi1,   0,      sapi3,      sapi1,      sapizps3, "Tesla", "SAPI-1 ZPS 3", GAME_NOT_WORKING | GAME_NO_SOUND_HW)

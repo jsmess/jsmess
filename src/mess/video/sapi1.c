@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 
-#include "emu.h"
 #include "includes/sapi1.h"
 
 static const UINT8 MHB2501[] = {
