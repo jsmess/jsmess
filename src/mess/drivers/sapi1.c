@@ -22,22 +22,20 @@
 
 
 /* switch out the rom shadow */
-static WRITE8_HANDLER( sapizps3_00_w )
+WRITE8_MEMBER(sapi1_state::sapizps3_00_w)
 {
-	memory_set_bank(space->machine(), "bank1", 0);
+	memory_set_bank(machine(), "bank1", 0);
 }
 
 /* to stop execution in random ram */
-static READ8_HANDLER( sapizps3_25_r )
+READ8_MEMBER(sapi1_state::sapizps3_25_r)
 {
-	sapi1_state *state = space->machine().driver_data<sapi1_state>();
-	return state->m_zps3_25;
+	return m_zps3_25;
 }
 
-static WRITE8_HANDLER( sapizps3_25_w )
+WRITE8_MEMBER(sapi1_state::sapizps3_25_w)
 {
-	sapi1_state *state = space->machine().driver_data<sapi1_state>();
-	state->m_zps3_25 = data & 0xfc; //??
+	m_zps3_25 = data & 0xfc; //??
 }
 
 
@@ -48,7 +46,7 @@ static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READWRITE_LEGACY(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard
+	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
@@ -73,8 +71,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sapizps3_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sapizps3_00_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE_LEGACY(sapizps3_25_r,sapizps3_25_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sapizps3_00_w)
+	AM_RANGE(0x25, 0x25) AM_READWRITE(sapizps3_25_r,sapizps3_25_w)
 ADDRESS_MAP_END
 
 /* Input ports */

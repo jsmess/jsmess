@@ -324,16 +324,16 @@ static const i8251_interface d71051_intf =
 //  YM-2164
 //-------------------------------------------------
 
-static void ibm_mfc_ym_irq(device_t *device, int state)
-{
-	isa8_ibm_mfc_device *mfc = downcast<isa8_ibm_mfc_device *>(device->owner());
 
-	mfc->set_z80_interrupt(Z80_IRQ_YM, state);
+WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
+{
+	set_z80_interrupt(Z80_IRQ_YM, state);
 }
 
 static const ym2151_interface ibm_mfc_ym2151_interface =
 {
-	ibm_mfc_ym_irq
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ibm_mfc_ym_irq),
+	DEVCB_NULL
 };
 
 

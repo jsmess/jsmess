@@ -83,10 +83,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vtech2_io, AS_IO, 8, vtech2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x1f) AM_READWRITE_LEGACY(laser_fdc_r, laser_fdc_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(laser_bank_select_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(laser_bg_mode_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(laser_two_color_w)
+	AM_RANGE(0x10, 0x1f) AM_READWRITE(laser_fdc_r, laser_fdc_w)
+	AM_RANGE(0x40, 0x43) AM_WRITE(laser_bank_select_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(laser_bg_mode_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE(laser_two_color_w)
 ADDRESS_MAP_END
 
 /* 2008-05 FP:

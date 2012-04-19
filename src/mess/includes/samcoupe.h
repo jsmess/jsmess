@@ -61,6 +61,24 @@ public:
 	UINT8 m_mouse_data[9];
 	int m_mouse_x, m_mouse_y;
 	UINT8 *m_videoram;
+	DECLARE_WRITE8_MEMBER(samcoupe_ext_mem_w);
+	DECLARE_READ8_MEMBER(samcoupe_disk_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_disk_w);
+	DECLARE_READ8_MEMBER(samcoupe_pen_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_clut_w);
+	DECLARE_READ8_MEMBER(samcoupe_status_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_line_int_w);
+	DECLARE_READ8_MEMBER(samcoupe_lmpr_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_lmpr_w);
+	DECLARE_READ8_MEMBER(samcoupe_hmpr_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_hmpr_w);
+	DECLARE_READ8_MEMBER(samcoupe_vmpr_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_vmpr_w);
+	DECLARE_READ8_MEMBER(samcoupe_midi_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_midi_w);
+	DECLARE_READ8_MEMBER(samcoupe_keyboard_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_border_w);
+	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
 };
 
 
@@ -74,7 +92,6 @@ void samcoupe_irq(device_t *device, UINT8 src);
 void samcoupe_update_memory(address_space *space);
 UINT8 samcoupe_mouse_r(running_machine &machine);
 
-WRITE8_HANDLER( samcoupe_ext_mem_w );
 MACHINE_START( samcoupe );
 MACHINE_RESET( samcoupe );
 

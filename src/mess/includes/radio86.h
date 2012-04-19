@@ -30,6 +30,10 @@ public:
 	UINT8 m_romdisk_lsb;
 	UINT8 m_romdisk_msb;
 	UINT8 m_disk_sel;
+	DECLARE_READ8_MEMBER(radio_cpu_state_r);
+	DECLARE_READ8_MEMBER(radio_io_r);
+	DECLARE_WRITE8_MEMBER(radio_io_w);
+	DECLARE_WRITE8_MEMBER(radio86_pagesel);
 };
 
 
@@ -45,10 +49,7 @@ extern DRIVER_INIT( radio86 );
 extern DRIVER_INIT( radioram );
 extern MACHINE_RESET( radio86 );
 
-extern READ8_HANDLER (radio_cpu_state_r );
 
-extern READ8_HANDLER (radio_io_r );
-extern WRITE8_HANDLER(radio_io_w );
 
 extern const i8255_interface radio86_ppi8255_interface_1;
 extern const i8255_interface radio86_ppi8255_interface_2;
@@ -62,7 +63,6 @@ extern const i8275_interface partner_i8275_interface;
 extern const i8275_interface mikrosha_i8275_interface;
 extern const i8275_interface apogee_i8275_interface;
 
-extern WRITE8_HANDLER ( radio86_pagesel );
 extern const i8257_interface radio86_dma;
 
 

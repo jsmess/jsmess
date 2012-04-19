@@ -209,10 +209,9 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
    bit 6 - Disk change signal from disk drive
    bit 7 - DRQ from WD1770
 */
-static READ8_HANDLER( exdos_card_r )
+READ8_MEMBER(ep_state::exdos_card_r)
 {
-	ep_state *ep = space->machine().driver_data<ep_state>();
-	return ep->exdos_card_value;
+	return exdos_card_value;
 }
 
 
@@ -225,9 +224,9 @@ static READ8_HANDLER( exdos_card_r )
    bit 6 - disk change reset
    bit 7 - in use
 */
-static WRITE8_HANDLER( exdos_card_w )
+WRITE8_MEMBER(ep_state::exdos_card_w)
 {
-	device_t *fdc = space->machine().device("wd1770");
+	device_t *fdc = machine().device("wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);
@@ -254,7 +253,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( enterprise_io, AS_IO, 8, ep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("wd1770", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE_LEGACY(exdos_card_r, exdos_card_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(epnick_reg_w)
 	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE_LEGACY("custom", dave_reg_r, dave_reg_w)
 ADDRESS_MAP_END

@@ -19,12 +19,11 @@ static TIMER_CALLBACK(poly88_usart_timer_callback)
 	device_set_input_line(machine.device("maincpu"), 0, HOLD_LINE);
 }
 
-WRITE8_HANDLER(poly88_baud_rate_w)
+WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
 {
-	poly88_state *state = space->machine().driver_data<poly88_state>();
 	logerror("poly88_baud_rate_w %02x\n",data);
-	state->m_usart_timer = space->machine().scheduler().timer_alloc(FUNC(poly88_usart_timer_callback));
-	state->m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
+	m_usart_timer = machine().scheduler().timer_alloc(FUNC(poly88_usart_timer_callback));
+	m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 
 }
 
@@ -246,18 +245,17 @@ const i8251_interface poly88_usart_interface=
 	DEVCB_NULL
 };
 
-READ8_HANDLER(poly88_keyboard_r)
+READ8_MEMBER(poly88_state::poly88_keyboard_r)
 {
-	poly88_state *state = space->machine().driver_data<poly88_state>();
-	UINT8 retVal = state->m_last_code;
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	state->m_last_code = 0x00;
+	UINT8 retVal = m_last_code;
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	m_last_code = 0x00;
 	return retVal;
 }
 
-WRITE8_HANDLER(poly88_intr_w)
+WRITE8_MEMBER(poly88_state::poly88_intr_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( poly88 )

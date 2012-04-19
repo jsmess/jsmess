@@ -42,6 +42,11 @@ public:
 	int m_repeat;
 	int m_repeater;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(microtan_sound_r);
+	DECLARE_WRITE8_MEMBER(microtan_sound_w);
+	DECLARE_READ8_MEMBER(microtan_bffx_r);
+	DECLARE_WRITE8_MEMBER(microtan_bffx_w);
+	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
 };
 
 
@@ -58,16 +63,10 @@ QUICKLOAD_LOAD( microtan_hexfile );
 
 INTERRUPT_GEN( microtan_interrupt );
 
-READ8_HANDLER ( microtan_bffx_r );
-READ8_HANDLER ( microtan_sound_r );
-
-WRITE8_HANDLER ( microtan_bffx_w );
-WRITE8_HANDLER ( microtan_sound_w );
 
 
 /*----------- defined in video/microtan.c -----------*/
 
-extern WRITE8_HANDLER ( microtan_videoram_w );
 
 extern VIDEO_START( microtan );
 extern SCREEN_UPDATE_IND16( microtan );

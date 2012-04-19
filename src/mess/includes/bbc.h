@@ -219,6 +219,46 @@ public:
 	int *m_videoULA_pallet_lookup;
 
 	void (*m_draw_function)(running_machine &machine);
+	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
+	DECLARE_WRITE8_MEMBER(bbc_page_selectb_w);
+	DECLARE_WRITE8_MEMBER(bbc_memoryb3_w);
+	DECLARE_WRITE8_MEMBER(bbc_memoryb4_w);
+	DECLARE_WRITE8_MEMBER(bbc_page_selectbp_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp1_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp2_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp4_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp4_128_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp6_128_w);
+	DECLARE_READ8_MEMBER(bbcm_ACCCON_read);
+	DECLARE_WRITE8_MEMBER(bbcm_ACCCON_write);
+	DECLARE_WRITE8_MEMBER(page_selectbm_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm1_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm7_w);
+	DECLARE_READ8_MEMBER(bbcm_r);
+	DECLARE_WRITE8_MEMBER(bbcm_w);
+	DECLARE_WRITE8_MEMBER(bbc_SerialULA_w);
+	DECLARE_READ8_MEMBER(bbc_i8271_read);
+	DECLARE_WRITE8_MEMBER(bbc_i8271_write);
+	DECLARE_WRITE8_MEMBER(bbc_wd177x_status_w);
+	DECLARE_READ8_MEMBER(bbc_wd1770_read);
+	DECLARE_WRITE8_MEMBER(bbc_wd1770_write);
+	DECLARE_WRITE8_MEMBER(bbc_opus_status_w);
+	DECLARE_READ8_MEMBER(bbc_opus_read);
+	DECLARE_WRITE8_MEMBER(bbc_opus_write);
+	DECLARE_READ8_MEMBER(bbcm_wd1770_read);
+	DECLARE_WRITE8_MEMBER(bbcm_wd1770_write);
+	DECLARE_READ8_MEMBER(bbcm_wd1770l_read);
+	DECLARE_WRITE8_MEMBER(bbcm_wd1770l_write);
+	DECLARE_READ8_MEMBER(bbc_disc_r);
+	DECLARE_WRITE8_MEMBER(bbc_disc_w);
+	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
+	DECLARE_WRITE8_MEMBER(bbc_6845_w);
+	DECLARE_READ8_MEMBER(bbc_6845_r);
+	DECLARE_READ8_MEMBER(bbc_fe_r);
 };
 
 
@@ -247,56 +287,25 @@ MACHINE_RESET( bbcm );
 INTERRUPT_GEN( bbcb_keyscan );
 INTERRUPT_GEN( bbcm_keyscan );
 
-WRITE8_HANDLER ( bbc_memorya1_w );
-WRITE8_HANDLER ( bbc_page_selecta_w );
-
-WRITE8_HANDLER ( bbc_memoryb3_w );
-WRITE8_HANDLER ( bbc_memoryb4_w );
-WRITE8_HANDLER ( bbc_page_selectb_w );
 
 
-WRITE8_HANDLER ( bbc_memorybp1_w );
-WRITE8_HANDLER ( bbc_memorybp2_w );
-WRITE8_HANDLER ( bbc_memorybp4_w );
-WRITE8_HANDLER ( bbc_memorybp4_128_w );
-WRITE8_HANDLER ( bbc_memorybp6_128_w );
-WRITE8_HANDLER ( bbc_page_selectbp_w );
 
 
-WRITE8_HANDLER ( bbc_memorybm1_w );
-WRITE8_HANDLER ( bbc_memorybm2_w );
-WRITE8_HANDLER ( bbc_memorybm4_w );
-WRITE8_HANDLER ( bbc_memorybm5_w );
-WRITE8_HANDLER ( bbc_memorybm7_w );
-READ8_HANDLER  ( bbcm_r );
-WRITE8_HANDLER ( bbcm_w );
-READ8_HANDLER  ( bbcm_ACCCON_read );
-WRITE8_HANDLER ( bbcm_ACCCON_write );
+
 
 
 /* disc support */
 
 DEVICE_IMAGE_LOAD ( bbcb_cart );
 
-READ8_HANDLER  ( bbc_disc_r );
-WRITE8_HANDLER ( bbc_disc_w );
-
-READ8_HANDLER  ( bbc_wd1770_read );
-WRITE8_HANDLER ( bbc_wd1770_write );
-
-READ8_HANDLER  ( bbc_opus_read );
-WRITE8_HANDLER ( bbc_opus_write );
 
 
-READ8_HANDLER  ( bbcm_wd1770l_read );
-WRITE8_HANDLER ( bbcm_wd1770l_write );
-READ8_HANDLER  ( bbcm_wd1770_read );
-WRITE8_HANDLER ( bbcm_wd1770_write );
+
+
 
 
 /* tape support */
 
-WRITE8_HANDLER ( bbc_SerialULA_w );
 
 extern const i8271_interface bbc_i8271_interface;
 extern const uPD7002_interface bbc_uPD7002;
@@ -315,10 +324,7 @@ void bbc_setscreenstart(running_machine &machine, int b4, int b5);
 void bbcbp_setvideoshadow(running_machine &machine, int vdusel);
 
 
-WRITE8_HANDLER ( bbc_videoULA_w );
 
-WRITE8_HANDLER ( bbc_6845_w );
-READ8_HANDLER ( bbc_6845_r );
 
 
 #endif /* BBC_H_ */

@@ -22,7 +22,7 @@
 #define XSIZE (state->m_reg[0]&~3)
 #define XPOS state->m_reg[2]
 #define YPOS state->m_reg[3]
-#define BANK state->m_reg[0x26]
+#define BANK m_reg[0x26]
 
 static TIMER_CALLBACK(svision_pet_timer)
 {
@@ -59,8 +59,8 @@ static TIMER_DEVICE_CALLBACK(svision_pet_timer_dev)
 void svision_irq(running_machine &machine)
 {
 	svision_state *state = machine.driver_data<svision_state>();
-	int irq = state->m_svision.timer_shot && (BANK & 2);
-	irq = irq || (*state->m_dma_finished && (BANK & 4));
+	int irq = state->m_svision.timer_shot && (state->BANK & 2);
+	irq = irq || (*state->m_dma_finished && (state->BANK & 4));
 
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -73,56 +73,54 @@ static TIMER_CALLBACK(svision_timer)
     svision_irq( machine );
 }
 
-static READ8_HANDLER(svision_r)
+READ8_MEMBER(svision_state::svision_r)
 {
-	svision_state *state = space->machine().driver_data<svision_state>();
-	int data = state->m_reg[offset];
+	int data = m_reg[offset];
 	switch (offset)
 	{
 		case 0x20:
-			data = input_port_read(space->machine(), "JOY");
+			data = input_port_read(machine(), "JOY");
 			break;
 		case 0x21:
 			data &= ~0xf;
-			data |= state->m_reg[0x22] & 0xf;
-			if (state->m_pet.on)
+			data |= m_reg[0x22] & 0xf;
+			if (m_pet.on)
 			{
-				if (!state->m_pet.clock)
+				if (!m_pet.clock)
 					data &= ~4;
-				if (!state->m_pet.data)
+				if (!m_pet.data)
 					data &= ~8;
 			}
 			break;
 		case 0x27:
 			data &= ~3;
-			if (state->m_svision.timer_shot)
+			if (m_svision.timer_shot)
 				data|=1;
-			if (*state->m_dma_finished)
+			if (*m_dma_finished)
 				data|=2;
 			break;
 		case 0x24:
-			state->m_svision.timer_shot = FALSE;
-			svision_irq(space->machine());
+			m_svision.timer_shot = FALSE;
+			svision_irq(machine());
 			break;
 		case 0x25:
-			*state->m_dma_finished = FALSE;
-			svision_irq(space->machine());
+			*m_dma_finished = FALSE;
+			svision_irq(machine());
 			break;
 		default:
-			logerror("%.6f svision read %04x %02x\n", space->machine().time().as_double(),offset,data);
+			logerror("%.6f svision read %04x %02x\n", machine().time().as_double(),offset,data);
 			break;
 	}
 
 	return data;
 }
 
-static WRITE8_HANDLER(svision_w)
+WRITE8_MEMBER(svision_state::svision_w)
 {
-	svision_state *state = space->machine().driver_data<svision_state>();
 	int value;
 	int delay;
 
-	state->m_reg[offset] = data;
+	m_reg[offset] = data;
 
 	switch (offset)
 	{
@@ -130,9 +128,9 @@ static WRITE8_HANDLER(svision_w)
 		case 3:
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
-			logerror("%.6f svision write %04x %02x\n", space->machine().time().as_double(),offset,data);
-			memory_set_bankptr(space->machine(), "bank1", space->machine().region("user1")->base() + ((state->m_reg[0x26] & 0xe0) << 9));
-			svision_irq(space->machine());
+			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(),offset,data);
+			memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + ((m_reg[0x26] & 0xe0) << 9));
+			svision_irq(machine());
 			break;
 		case 0x23: /* delta hero irq routine write */
 			value = data;
@@ -142,28 +140,28 @@ static WRITE8_HANDLER(svision_w)
 				delay = 16384;
 			else
 				delay = 256;
-			state->m_svision.timer1->enable(TRUE);
-			state->m_svision.timer1->reset(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
+			m_svision.timer1->enable(TRUE);
+			m_svision.timer1->reset(machine().device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
-			svision_soundport_w(state->m_sound, 0, offset & 3, data);
+			svision_soundport_w(m_sound, 0, offset & 3, data);
 			break;
 		case 0x14: case 0x15: case 0x16: case 0x17:
-			svision_soundport_w(state->m_sound, 1, offset & 3, data);
+			svision_soundport_w(m_sound, 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(state->m_sound, offset - 0x18, data);
+			svision_sounddma_w(m_sound, offset - 0x18, data);
 			break;
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(state->m_sound, offset - 0x28, data);
+			svision_noise_w(m_sound, offset - 0x28, data);
 			break;
 		default:
-			logerror("%.6f svision write %04x %02x\n", space->machine().time().as_double(), offset, data);
+			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
 			break;
 	}
 }
 
-static READ8_HANDLER(tvlink_r)
+READ8_MEMBER(svision_state::tvlink_r)
 {
 	switch(offset)
 	{
@@ -180,29 +178,28 @@ static READ8_HANDLER(tvlink_r)
 	}
 }
 
-static WRITE8_HANDLER(tvlink_w)
+WRITE8_MEMBER(svision_state::tvlink_w)
 {
-	svision_state *state = space->machine().driver_data<svision_state>();
 	switch (offset)
 	{
 		case 0x0e:
-			state->m_reg[offset] = data;
-			state->m_tvlink.palette_on = data & 1;
-			if (state->m_tvlink.palette_on)
+			m_reg[offset] = data;
+			m_tvlink.palette_on = data & 1;
+			if (m_tvlink.palette_on)
 			{
 				// hack, normally initialising with palette from ram
-				state->m_tvlink.palette[0] = MAKE12_RGB32(163/16,172/16,115/16); // these are the tron colors messured from screenshot
-				state->m_tvlink.palette[1] = MAKE12_RGB32(163/16,155/16,153/16);
-				state->m_tvlink.palette[2] = MAKE12_RGB32(77/16,125/16,73/16);
-				state->m_tvlink.palette[3] = MAKE12_RGB32(59/16,24/16,20/16);
+				m_tvlink.palette[0] = MAKE12_RGB32(163/16,172/16,115/16); // these are the tron colors messured from screenshot
+				m_tvlink.palette[1] = MAKE12_RGB32(163/16,155/16,153/16);
+				m_tvlink.palette[2] = MAKE12_RGB32(77/16,125/16,73/16);
+				m_tvlink.palette[3] = MAKE12_RGB32(59/16,24/16,20/16);
 			}
 			else
 			{
 				// cleaner to use colors from compile time palette, or compose from "fixed" palette values
-				state->m_tvlink.palette[0]=MAKE12_RGB32(0,0,0);
-				state->m_tvlink.palette[1]=MAKE12_RGB32(5*16/256,18*16/256,9*16/256);
-				state->m_tvlink.palette[2]=MAKE12_RGB32(48*16/256,76*16/256,100*16/256);
-				state->m_tvlink.palette[3]=MAKE12_RGB32(190*16/256,190*16/256,190*16/256);
+				m_tvlink.palette[0]=MAKE12_RGB32(0,0,0);
+				m_tvlink.palette[1]=MAKE12_RGB32(5*16/256,18*16/256,9*16/256);
+				m_tvlink.palette[2]=MAKE12_RGB32(48*16/256,76*16/256,100*16/256);
+				m_tvlink.palette[3]=MAKE12_RGB32(190*16/256,190*16/256,190*16/256);
 			}
 			break;
 		default:
@@ -213,19 +210,19 @@ static WRITE8_HANDLER(tvlink_w)
 				if (offset == 0x803 && data == 0x07)
 				{
 					/* tron hack */
-					state->m_reg[0x0804]=0x00;
-					state->m_reg[0x0805]=0x01;
-					state->m_reg[0x0806]=0x00;
-					state->m_reg[0x0807]=0x00;
+					m_reg[0x0804]=0x00;
+					m_reg[0x0805]=0x01;
+					m_reg[0x0806]=0x00;
+					m_reg[0x0807]=0x00;
 				}
-				c = state->m_reg[0x800] | (state->m_reg[0x804] << 8);
-				state->m_tvlink.palette[0] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
-				c = state->m_reg[0x801] | (state->m_reg[0x805] << 8);
-				state->m_tvlink.palette[1] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
-				c = state->m_reg[0x802] | (state->m_reg[0x806]<<8);
-				state->m_tvlink.palette[2]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
-				c = state->m_reg[0x803] | (state->m_reg[0x807]<<8);
-				state->m_tvlink.palette[3]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				c = m_reg[0x800] | (m_reg[0x804] << 8);
+				m_tvlink.palette[0] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				c = m_reg[0x801] | (m_reg[0x805] << 8);
+				m_tvlink.palette[1] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				c = m_reg[0x802] | (m_reg[0x806]<<8);
+				m_tvlink.palette[2]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				c = m_reg[0x803] | (m_reg[0x807]<<8);
+				m_tvlink.palette[3]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
 				/* writes to palette effect video color immediately */
 				/* some writes modify other registers, */
 				/* encoding therefor not known (rgb8 or rgb9) */
@@ -235,7 +232,7 @@ static WRITE8_HANDLER(tvlink_w)
 
 static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8, svision_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
-	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE_LEGACY(svision_r, svision_w) AM_SHARE("reg")
+	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_SHARE("reg")
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x6000, 0x7fff) AM_NOP
 	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -244,7 +241,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8, svision_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
-	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE_LEGACY(tvlink_r, tvlink_w) AM_SHARE("reg")
+	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_SHARE("reg")
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x6000, 0x7fff) AM_NOP
 	AM_RANGE( 0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -359,7 +356,7 @@ static SCREEN_UPDATE_IND16( svision )
 	int x, y, i, j=XPOS/4+YPOS*0x30;
 	UINT8 *videoram = state->m_videoram;
 
-	if (BANK&8)
+	if (state->BANK&8)
 	{
 		for (y=0; y<160; y++)
 		{
@@ -391,7 +388,7 @@ static SCREEN_UPDATE_RGB32( tvlink )
 	int x, y, i, j = XPOS/4+YPOS*0x30;
 	UINT8 *videoram = state->m_videoram;
 
-	if (BANK & 8)
+	if (state->BANK & 8)
 	{
 		for (y = 0; y < 160; y++)
 		{
@@ -420,7 +417,7 @@ static SCREEN_UPDATE_RGB32( tvlink )
 static INTERRUPT_GEN( svision_frame_int )
 {
 	svision_state *state = device->machine().driver_data<svision_state>();
-	if (BANK&1)
+	if (state->BANK&1)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
 	svision_sound_decrement(state->m_sound);

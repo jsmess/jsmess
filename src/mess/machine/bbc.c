@@ -34,15 +34,15 @@ Model A memory handling functions
 *************************/
 
 /* for the model A just address the 4 on board ROM sockets */
-WRITE8_HANDLER ( bbc_page_selecta_w )
+WRITE8_MEMBER(bbc_state::bbc_page_selecta_w)
 {
-	memory_set_bankptr(space->machine(),"bank4",space->machine().region("user1")->base()+((data&0x03)<<14));
+	memory_set_bankptr(machine(),"bank4",machine().region("user1")->base()+((data&0x03)<<14));
 }
 
 
-WRITE8_HANDLER ( bbc_memorya1_w )
+WRITE8_MEMBER(bbc_state::bbc_memorya1_w)
 {
-	space->machine().region("maincpu")->base()[offset]=data;
+	machine().region("maincpu")->base()[offset]=data;
 }
 
 /*************************
@@ -51,31 +51,29 @@ Model B memory handling functions
 
 /* the model B address all 16 of the ROM sockets */
 /* I have set bank 1 as a special case to load different DFS roms selectable from MESS's DIP settings var:bbc_DFSTypes */
-WRITE8_HANDLER ( bbc_page_selectb_w )
+WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	state->m_rombank=data&0x0f;
-	if (state->m_rombank!=1)
+	m_rombank=data&0x0f;
+	if (m_rombank!=1)
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->m_rombank << 14));
+		memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + (m_rombank << 14));
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user2")->base() + ((state->m_DFSType) << 14));
+		memory_set_bankptr(machine(), "bank4", machine().region("user2")->base() + ((m_DFSType) << 14));
 	}
 }
 
 
-WRITE8_HANDLER ( bbc_memoryb3_w )
+WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_RAMSize)
+	if (m_RAMSize)
 	{
-		space->machine().region("maincpu")->base()[offset + 0x4000] = data;
+		machine().region("maincpu")->base()[offset + 0x4000] = data;
 	}
 	else
 	{
-		space->machine().region("maincpu")->base()[offset] = data;
+		machine().region("maincpu")->base()[offset] = data;
 	}
 
 }
@@ -90,20 +88,19 @@ static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1}
 static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
 static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
-WRITE8_HANDLER ( bbc_memoryb4_w )
+WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_rombank == 1)
+	if (m_rombank == 1)
 	{
 		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (state->m_DFSType == 3) space->machine().region("user2")->base()[((state->m_DFSType) << 14) + offset] = data;
+		if (m_DFSType == 3) machine().region("user2")->base()[((m_DFSType) << 14) + offset] = data;
 	} else
 	{
-		switch (state->m_SWRAMtype)
+		switch (m_SWRAMtype)
 		{
-			case 1:	if (bbc_SWRAMtype1[state->m_userport]) space->machine().region("user1")->base()[(state->m_userport << 14) + offset] = data;
-			case 2:	if (bbc_SWRAMtype2[state->m_rombank])  space->machine().region("user1")->base()[(state->m_rombank << 14) + offset] = data;
-			case 3:	if (bbc_SWRAMtype3[state->m_rombank])  space->machine().region("user1")->base()[(state->m_rombank << 14) + offset] = data;
+			case 1:	if (bbc_SWRAMtype1[m_userport]) machine().region("user1")->base()[(m_userport << 14) + offset] = data;
+			case 2:	if (bbc_SWRAMtype2[m_rombank])  machine().region("user1")->base()[(m_rombank << 14) + offset] = data;
+			case 3:	if (bbc_SWRAMtype3[m_rombank])  machine().region("user1")->base()[(m_rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -130,35 +127,34 @@ static int vdudriverset(running_machine &machine)
 
 /* the model B Plus addresses all 16 of the ROM sockets plus the extra 12K of ram at 0x8000
    and 20K of shadow ram at 0x3000 */
-WRITE8_HANDLER ( bbc_page_selectbp_w )
+WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	if ((offset&0x04)==0)
 	{
-		state->m_pagedRAM = (data >> 7) & 0x01;
-		state->m_rombank =  data & 0x0f;
+		m_pagedRAM = (data >> 7) & 0x01;
+		m_rombank =  data & 0x0f;
 
-		if (state->m_pagedRAM)
+		if (m_pagedRAM)
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
-			memory_set_bankptr(space->machine(), "bank4", space->machine().region("maincpu")->base() + 0x8000);
+			memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + 0x8000);
 		}
 		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
-			memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + (state->m_rombank << 14));
+			memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + (m_rombank << 14));
 		};
 
 		/* set the rom to be read from b000 to bfff */
-		memory_set_bank(space->machine(), "bank6", state->m_rombank);
+		memory_set_bank(machine(), "bank6", m_rombank);
 	}
 	else
 	{
 		//the video display should now use this flag to display the shadow ram memory
-		state->m_vdusel=(data>>7)&0x01;
-		bbcbp_setvideoshadow(space->machine(), state->m_vdusel);
+		m_vdusel=(data>>7)&0x01;
+		bbcbp_setvideoshadow(machine(), m_vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
-		memory_set_bankptr(space->machine(), "bank2", space->machine().region("maincpu")->base()+0x3000);
+		memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base()+0x3000);
 	}
 }
 
@@ -167,9 +163,9 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
    the writes to this memory are just done the normal
    way */
 
-WRITE8_HANDLER ( bbc_memorybp1_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 {
-	space->machine().region("maincpu")->base()[offset]=data;
+	machine().region("maincpu")->base()[offset]=data;
 }
 
 
@@ -209,18 +205,17 @@ DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 }
 
 
-WRITE8_HANDLER ( bbc_memorybp2_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	UINT8 *ram = space->machine().region("maincpu")->base();
-	if (state->m_vdusel==0)
+	UINT8 *ram = machine().region("maincpu")->base();
+	if (m_vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
 		ram[offset + 0x3000] = data;
 	}
 	else
 	{
-		if (vdudriverset(space->machine()))
+		if (vdudriverset(machine()))
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset + 0xb000] = data;
@@ -236,12 +231,11 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 
 /* if the pagedRAM is set write to RAM between 0x8000 to 0xafff
 otherwise this area contains ROM so no write is required */
-WRITE8_HANDLER ( bbc_memorybp4_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybp4_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_pagedRAM)
+	if (m_pagedRAM)
 	{
-		space->machine().region("maincpu")->base()[offset+0x8000]=data;
+		machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
 }
 
@@ -257,28 +251,26 @@ which could either be sideways ROM or sideways RAM */
 static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
 
 
-WRITE8_HANDLER ( bbc_memorybp4_128_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_pagedRAM)
+	if (m_pagedRAM)
 	{
-		space->machine().region("maincpu")->base()[offset+0x8000]=data;
+		machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
-		if (bbc_b_plus_sideways_ram_banks[state->m_rombank])
+		if (bbc_b_plus_sideways_ram_banks[m_rombank])
 		{
-			space->machine().region("user1")->base()[offset+(state->m_rombank<<14)]=data;
+			machine().region("user1")->base()[offset+(m_rombank<<14)]=data;
 		}
 	}
 }
 
-WRITE8_HANDLER ( bbc_memorybp6_128_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybp6_128_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (bbc_b_plus_sideways_ram_banks[state->m_rombank])
+	if (bbc_b_plus_sideways_ram_banks[m_rombank])
 	{
-		space->machine().region("user1")->base()[offset+(state->m_rombank<<14)+0x3000]=data;
+		machine().region("user1")->base()[offset+(m_rombank<<14)+0x3000]=data;
 	}
 }
 
@@ -336,70 +328,68 @@ if the program counter is anywhere else main ram is accessed.
 */
 
 
-READ8_HANDLER ( bbcm_ACCCON_read )
+READ8_MEMBER(bbc_state::bbcm_ACCCON_read)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	logerror("ACCCON read %d\n",offset);
-	return state->m_ACCCON;
+	return m_ACCCON;
 }
 
-WRITE8_HANDLER ( bbcm_ACCCON_write )
+WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	int tempIRR;
-	state->m_ACCCON=data;
+	m_ACCCON=data;
 
 	logerror("ACCCON write  %d %d \n",offset,data);
 
-	tempIRR=state->m_ACCCON_IRR;
+	tempIRR=m_ACCCON_IRR;
 
 
-	state->m_ACCCON_IRR=(data>>7)&1;
-	state->m_ACCCON_TST=(data>>6)&1;
-	state->m_ACCCON_IFJ=(data>>5)&1;
-	state->m_ACCCON_ITU=(data>>4)&1;
-	state->m_ACCCON_Y  =(data>>3)&1;
-	state->m_ACCCON_X  =(data>>2)&1;
-	state->m_ACCCON_E  =(data>>1)&1;
-	state->m_ACCCON_D  =(data>>0)&1;
+	m_ACCCON_IRR=(data>>7)&1;
+	m_ACCCON_TST=(data>>6)&1;
+	m_ACCCON_IFJ=(data>>5)&1;
+	m_ACCCON_ITU=(data>>4)&1;
+	m_ACCCON_Y  =(data>>3)&1;
+	m_ACCCON_X  =(data>>2)&1;
+	m_ACCCON_E  =(data>>1)&1;
+	m_ACCCON_D  =(data>>0)&1;
 
-	if (tempIRR!=state->m_ACCCON_IRR)
+	if (tempIRR!=m_ACCCON_IRR)
 	{
-		state->check_interrupts();
+		check_interrupts();
 	}
 
-	if (state->m_ACCCON_Y)
+	if (m_ACCCON_Y)
 	{
-		memory_set_bankptr(space->machine(), "bank7", space->machine().region("maincpu")->base() + 0x9000);
-	}
-	else
-	{
-		memory_set_bankptr(space->machine(), "bank7", space->machine().region("user1")->base() + 0x40000);
-	}
-
-	bbcbp_setvideoshadow(space->machine(), state->m_ACCCON_D);
-
-
-	if (state->m_ACCCON_X)
-	{
-		memory_set_bankptr(space->machine(), "bank2", space->machine().region( "maincpu" )->base() + 0xb000 );
+		memory_set_bankptr(machine(), "bank7", machine().region("maincpu")->base() + 0x9000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank2", space->machine().region( "maincpu" )->base() + 0x3000 );
+		memory_set_bankptr(machine(), "bank7", machine().region("user1")->base() + 0x40000);
+	}
+
+	bbcbp_setvideoshadow(machine(), m_ACCCON_D);
+
+
+	if (m_ACCCON_X)
+	{
+		memory_set_bankptr(machine(), "bank2", machine().region( "maincpu" )->base() + 0xb000 );
+	}
+	else
+	{
+		memory_set_bankptr(machine(), "bank2", machine().region( "maincpu" )->base() + 0x3000 );
 	}
 
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
 	/* if 0 the I/O is paged for both reads and writes */
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
-	if (state->m_ACCCON_TST)
+	if (m_ACCCON_TST)
 	{
-		memory_set_bankptr(space->machine(), "bank8", space->machine().region("user1")->base()+0x43c00);
-		space->install_read_bank(0xFC00,0xFEFF,"bank8");
+		memory_set_bankptr(machine(), "bank8", machine().region("user1")->base()+0x43c00);
+		space.install_read_bank(0xFC00,0xFEFF,"bank8");
 	}
 	else
 	{
-		space->install_legacy_read_handler(0xFC00,0xFEFF,FUNC(bbcm_r));
+		space.install_read_handler(0xFC00,0xFEFF,read8_delegate(FUNC(bbc_state::bbcm_r),this));
 	}
 
 }
@@ -413,29 +403,28 @@ static int bbcm_vdudriverset(running_machine &machine)
 }
 
 
-static WRITE8_HANDLER ( page_selectbm_w )
+WRITE8_MEMBER(bbc_state::page_selectbm_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	state->m_pagedRAM = (data & 0x80) >> 7;
-	state->m_rombank = data & 0x0f;
+	m_pagedRAM = (data & 0x80) >> 7;
+	m_rombank = data & 0x0f;
 
-	if (state->m_pagedRAM)
+	if (m_pagedRAM)
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("maincpu")->base() + 0x8000);
-		memory_set_bank(space->machine(), "bank5", state->m_rombank);
+		memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + 0x8000);
+		memory_set_bank(machine(), "bank5", m_rombank);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank4", space->machine().region("user1")->base() + ((state->m_rombank) << 14));
-		memory_set_bank(space->machine(), "bank5", state->m_rombank);
+		memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + ((m_rombank) << 14));
+		memory_set_bank(machine(), "bank5", m_rombank);
 	}
 }
 
 
 
-WRITE8_HANDLER ( bbc_memorybm1_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
 {
-	space->machine().region("maincpu")->base()[offset] = data;
+	machine().region("maincpu")->base()[offset] = data;
 }
 
 
@@ -463,17 +452,16 @@ DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 
 
 
-WRITE8_HANDLER ( bbc_memorybm2_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	UINT8 *ram = space->machine().region("maincpu")->base();
-	if (state->m_ACCCON_X)
+	UINT8 *ram = machine().region("maincpu")->base();
+	if (m_ACCCON_X)
 	{
 		ram[offset + 0xb000] = data;
 	}
 	else
 	{
-		if (state->m_ACCCON_E && bbcm_vdudriverset(space->machine()))
+		if (m_ACCCON_E && bbcm_vdudriverset(machine()))
 		{
 			ram[offset + 0xb000] = data;
 		}
@@ -490,39 +478,36 @@ static const unsigned short bbc_master_sideways_ram_banks[16]=
 };
 
 
-WRITE8_HANDLER ( bbc_memorybm4_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_pagedRAM)
+	if (m_pagedRAM)
 	{
-		space->machine().region("maincpu")->base()[offset+0x8000]=data;
+		machine().region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
-		if (bbc_master_sideways_ram_banks[state->m_rombank])
+		if (bbc_master_sideways_ram_banks[m_rombank])
 		{
-			space->machine().region("user1")->base()[offset+(state->m_rombank<<14)]=data;
+			machine().region("user1")->base()[offset+(m_rombank<<14)]=data;
 		}
 	}
 }
 
 
-WRITE8_HANDLER ( bbc_memorybm5_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (bbc_master_sideways_ram_banks[state->m_rombank])
+	if (bbc_master_sideways_ram_banks[m_rombank])
 	{
-		space->machine().region("user1")->base()[offset+(state->m_rombank<<14)+0x1000]=data;
+		machine().region("user1")->base()[offset+(m_rombank<<14)+0x1000]=data;
 	}
 }
 
 
-WRITE8_HANDLER ( bbc_memorybm7_w )
+WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	if (state->m_ACCCON_Y)
+	if (m_ACCCON_Y)
 	{
-		space->machine().region("maincpu")->base()[offset+0x9000]=data;
+		machine().region("maincpu")->base()[offset+0x9000]=data;
 	}
 }
 
@@ -550,15 +535,14 @@ WRITE8_HANDLER ( bbc_memorybm7_w )
 &E0-&FF Tube ULA        Tube system interface   Tube system interface   32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
-READ8_HANDLER ( bbcm_r )
+READ8_MEMBER(bbc_state::bbcm_r)
 {
-	//bbc_state *state = space->machine().driver_data<bbc_state>();
 long myo;
 
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
-//  if ( state->m_ACCCON_TST )
+//  if ( m_ACCCON_TST )
 //  {
-//      return space->machine().region("user1")->base()[offset+0x43c00];
+//      return machine().region("user1")->base()[offset+0x43c00];
 //  };
 
 	if (offset<=0x0ff) /* FRED */
@@ -574,30 +558,30 @@ long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = space->machine().device<via6522_device>("via6522_1");
+		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			acia6850_device *acia = space->machine().device<acia6850_device>("acia6850");
+			acia6850_device *acia = machine().device<acia6850_device>("acia6850");
 
 			if ((myo - 0x08) & 1)
-				return acia->status_read(*space,0);
+				return acia->status_read(space,0);
 			else
-				return acia->data_read(*space,0);
+				return acia->data_read(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(space->machine().device("upd7002"), myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;						/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);	/* ACCCON */
 		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;						/* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(*space,myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(*space,myo-0x60);
+		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(space,myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(space,myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf)) return 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
@@ -607,37 +591,36 @@ long myo;
 	return 0xfe;
 }
 
-WRITE8_HANDLER ( bbcm_w )
+WRITE8_MEMBER(bbc_state::bbcm_w)
 {
-	//bbc_state *state = space->machine().driver_data<bbc_state>();
 long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = space->machine().device<via6522_device>("via6522_1");
+		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			acia6850_device *acia = space->machine().device<acia6850_device>("acia6850");
+			acia6850_device *acia = machine().device<acia6850_device>("acia6850");
 
 			if ((myo - 0x08) & 1)
-				acia->control_write(*space, 0, data);
+				acia->control_write(space, 0, data);
 			else
-				acia->data_write(*space, 0, data);
+				acia->data_write(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(space->machine().device("upd7002"),myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data);	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);	/* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);	/* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                   /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(*space,myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(*space,myo-0x60, data);
+		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(space,myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(space,myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
 		//if ((myo>=0xa0) && (myo<=0xbf))
 		//if ((myo>=0xc0) && (myo<=0xdf))
@@ -1416,9 +1399,9 @@ static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
 
 
 
-WRITE8_HANDLER ( bbc_SerialULA_w )
+WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 {
-	BBC_Cassette_motor(space->machine(), (data & 0x80) >> 7);
+	BBC_Cassette_motor(machine(), (data & 0x80) >> 7);
 }
 
 /**************************************
@@ -1457,10 +1440,10 @@ const i8271_interface bbc_i8271_interface=
 };
 
 
-static READ8_HANDLER( bbc_i8271_read )
+READ8_MEMBER(bbc_state::bbc_i8271_read)
 {
 	int ret;
-	device_t *i8271 = space->machine().device("i8271");
+	device_t *i8271 = machine().device("i8271");
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
 	{
@@ -1484,9 +1467,9 @@ static READ8_HANDLER( bbc_i8271_read )
 	return ret;
 }
 
-static WRITE8_HANDLER( bbc_i8271_write )
+WRITE8_MEMBER(bbc_state::bbc_i8271_write)
 {
-	device_t *i8271 = space->machine().device("i8271");
+	device_t *i8271 = machine().device("i8271");
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)
@@ -1605,11 +1588,10 @@ const wd17xx_interface bbc_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static WRITE8_HANDLER(bbc_wd177x_status_w)
+WRITE8_MEMBER(bbc_state::bbc_wd177x_status_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	device_t *fdc = space->machine().device("wd177x");
-	state->m_drive_control = data;
+	device_t *fdc = machine().device("wd177x");
+	m_drive_control = data;
 
 	/* set drive */
 	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1621,16 +1603,16 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 3));
 
-	state->m_1770_IntEnabled=(((data>>4) & 0x01)==0);
+	m_1770_IntEnabled=(((data>>4) & 0x01)==0);
 
 }
 
 
 
-READ8_HANDLER ( bbc_wd1770_read )
+READ8_MEMBER(bbc_state::bbc_wd1770_read)
 {
 	int retval=0xff;
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	switch (offset)
 	{
 	case 4:
@@ -1653,9 +1635,9 @@ READ8_HANDLER ( bbc_wd1770_read )
 	return retval;
 }
 
-WRITE8_HANDLER ( bbc_wd1770_write )
+WRITE8_MEMBER(bbc_state::bbc_wd1770_write)
 {
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1716,11 +1698,10 @@ AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write    )
 **********************************************/
 
 
-static WRITE8_HANDLER( bbc_opus_status_w )
+WRITE8_MEMBER(bbc_state::bbc_opus_status_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	device_t *fdc = space->machine().device("wd177x");
-	state->m_drive_control = data;
+	device_t *fdc = machine().device("wd177x");
+	m_drive_control = data;
 
 	/* set drive */
 	if ((data>>1) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1732,17 +1713,16 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 5));
 
-	state->m_1770_IntEnabled=(data>>4) & 0x01;
+	m_1770_IntEnabled=(data>>4) & 0x01;
 
 }
 
-READ8_HANDLER( bbc_opus_read )
+READ8_MEMBER(bbc_state::bbc_opus_read)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	logerror("wd177x read: $%02X\n", offset);
 
-	if (state->m_DFSType==6)
+	if (m_DFSType==6)
 	{
 		if (offset<0x100)
 		{
@@ -1761,19 +1741,18 @@ READ8_HANDLER( bbc_opus_read )
 		}
 		else
 		{
-			return space->machine().region("disks")->base()[offset + (state->m_opusbank << 8)];
+			return machine().region("disks")->base()[offset + (m_opusbank << 8)];
 		}
 	}
 	return 0xff;
 }
 
-WRITE8_HANDLER (bbc_opus_write)
+WRITE8_MEMBER(bbc_state::bbc_opus_write)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
-	if (state->m_DFSType==6)
+	if (m_DFSType==6)
 	{
 		if (offset<0x100)
 		{
@@ -1795,16 +1774,16 @@ WRITE8_HANDLER (bbc_opus_write)
 					bbc_opus_status_w(space, 0,data);
 					break;
 				case 0xfe:
-					state->m_opusbank=(state->m_opusbank & 0xff) | (data<<8);
+					m_opusbank=(m_opusbank & 0xff) | (data<<8);
 					break;
 				case 0xff:
-					state->m_opusbank=(state->m_opusbank & 0xff00) | data;
+					m_opusbank=(m_opusbank & 0xff00) | data;
 					break;
 			}
 		}
 		else
 		{
-			space->machine().region("disks")->base()[offset + (state->m_opusbank << 8)] = data;
+			machine().region("disks")->base()[offset + (m_opusbank << 8)] = data;
 		}
 	}
 }
@@ -1815,10 +1794,10 @@ BBC MASTER DISC SUPPORT
 ***************************************/
 
 
-READ8_HANDLER ( bbcm_wd1770_read )
+READ8_MEMBER(bbc_state::bbcm_wd1770_read)
 {
 	int retval=0xff;
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	switch (offset)
 	{
 	case 0:
@@ -1840,9 +1819,9 @@ READ8_HANDLER ( bbcm_wd1770_read )
 }
 
 
-WRITE8_HANDLER ( bbcm_wd1770_write )
+WRITE8_MEMBER(bbc_state::bbcm_wd1770_write)
 {
-	device_t *fdc = space->machine().device("wd177x");
+	device_t *fdc = machine().device("wd177x");
 	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1864,17 +1843,15 @@ WRITE8_HANDLER ( bbcm_wd1770_write )
 }
 
 
-READ8_HANDLER ( bbcm_wd1770l_read )
+READ8_MEMBER(bbc_state::bbcm_wd1770l_read)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	return state->m_drive_control;
+	return m_drive_control;
 }
 
-WRITE8_HANDLER ( bbcm_wd1770l_write )
+WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	device_t *fdc = space->machine().device("wd177x");
-	state->m_drive_control = data;
+	device_t *fdc = machine().device("wd177x");
+	m_drive_control = data;
 
 	/* set drive */
 	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
@@ -1886,8 +1863,8 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 	/* set density */
 	wd17xx_dden_w(fdc, BIT(data, 5));
 
-//  state->m_1770_IntEnabled=(((data>>4) & 0x01)==0);
-	state->m_1770_IntEnabled=1;
+//  m_1770_IntEnabled=(((data>>4) & 0x01)==0);
+	m_1770_IntEnabled=1;
 
 }
 
@@ -1896,10 +1873,9 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 DFS Hardware mapping for different Disc Controller types
 ***************************************/
 
-READ8_HANDLER( bbc_disc_r )
+READ8_MEMBER(bbc_state::bbc_disc_r)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	switch (state->m_DFSType){
+	switch (m_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
 		return bbc_i8271_read(space, offset);
@@ -1920,10 +1896,9 @@ READ8_HANDLER( bbc_disc_r )
 	return 0x0ff;
 }
 
-WRITE8_HANDLER ( bbc_disc_w )
+WRITE8_MEMBER(bbc_state::bbc_disc_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
-	switch (state->m_DFSType){
+	switch (m_DFSType){
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
 		bbc_i8271_write(space, offset,data);

@@ -87,28 +87,24 @@ MACHINE_RESET( bk0010 )
 	state->m_scrool = 01330;
 }
 
-READ16_HANDLER (bk_key_state_r)
+READ16_MEMBER(bk_state::bk_key_state_r)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	return state->m_kbd_state;
+	return m_kbd_state;
 }
-READ16_HANDLER (bk_key_code_r)
+READ16_MEMBER(bk_state::bk_key_code_r)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	state->m_kbd_state &= ~0x80; // mark reading done
-	state->m_key_pressed = 0;
-	return state->m_key_code;
+	m_kbd_state &= ~0x80; // mark reading done
+	m_key_pressed = 0;
+	return m_key_code;
 }
-READ16_HANDLER (bk_vid_scrool_r)
+READ16_MEMBER(bk_state::bk_vid_scrool_r)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	return state->m_scrool;
+	return m_scrool;
 }
 
-READ16_HANDLER (bk_key_press_r)
+READ16_MEMBER(bk_state::bk_key_press_r)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	double level = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	UINT16 cas;
 	if (level < 0)
 	{
@@ -119,61 +115,58 @@ READ16_HANDLER (bk_key_press_r)
 		cas = 0x20;
 	}
 
-	return 0x8080 | state->m_key_pressed | cas;
+	return 0x8080 | m_key_pressed | cas;
 }
 
-WRITE16_HANDLER(bk_key_state_w)
+WRITE16_MEMBER(bk_state::bk_key_state_w)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	state->m_kbd_state = (state->m_kbd_state & ~0x40) | (data & 0x40);
+	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
 }
 
-WRITE16_HANDLER(bk_vid_scrool_w)
+WRITE16_MEMBER(bk_state::bk_vid_scrool_w)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
-	state->m_scrool = data;
+	m_scrool = data;
 }
 
-WRITE16_HANDLER(bk_key_press_w)
+WRITE16_MEMBER(bk_state::bk_key_press_w)
 {
 }
 
-READ16_HANDLER (bk_floppy_cmd_r)
+READ16_MEMBER(bk_state::bk_floppy_cmd_r)
 {
 	return 0;
 }
 
-WRITE16_HANDLER(bk_floppy_cmd_w)
+WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
 {
-	bk_state *state = space->machine().driver_data<bk_state>();
 	if ((data & 1) == 1)
 	{
-		state->m_drive = 0;
+		m_drive = 0;
 	}
 	if ((data & 2) == 2)
 	{
-		state->m_drive = 1;
+		m_drive = 1;
 	}
 	if ((data & 4) == 4)
 	{
-		state->m_drive = 2;
+		m_drive = 2;
 	}
 	if ((data & 8) == 8)
 	{
-		state->m_drive = 3;
+		m_drive = 3;
 	}
 	if (data == 0)
 	{
-		state->m_drive = -1;
+		m_drive = -1;
 	}
 }
 
-READ16_HANDLER (bk_floppy_data_r)
+READ16_MEMBER(bk_state::bk_floppy_data_r)
 {
 	return 0;
 }
 
-WRITE16_HANDLER(bk_floppy_data_w)
+WRITE16_MEMBER(bk_state::bk_floppy_data_w)
 {
 }
 

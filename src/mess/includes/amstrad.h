@@ -112,25 +112,27 @@ public:
 	int m_printer_bit8_selected;
 	unsigned char m_Psg_FunctionSelected;
 	int m_previous_ppi_portc_w;
+	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_4000_w);
+	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_6000_w);
+	DECLARE_READ8_MEMBER(amstrad_plus_asic_4000_r);
+	DECLARE_READ8_MEMBER(amstrad_plus_asic_6000_r);
+	DECLARE_WRITE8_MEMBER(aleste_msx_mapper);
+	DECLARE_READ8_MEMBER(amstrad_cpc_io_r);
+	DECLARE_WRITE8_MEMBER(amstrad_cpc_io_w);
+	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
+	void amstrad_plus_seqcheck(int data);
 };
 
 
 /*----------- defined in machine/amstrad.c -----------*/
 
-READ8_HANDLER ( amstrad_cpc_io_r );
-WRITE8_HANDLER ( amstrad_cpc_io_w );
 
-WRITE8_HANDLER( amstrad_plus_asic_4000_w );
-WRITE8_HANDLER( amstrad_plus_asic_6000_w );
-READ8_HANDLER( amstrad_plus_asic_4000_r );
-READ8_HANDLER( amstrad_plus_asic_6000_r );
 
 READ8_DEVICE_HANDLER( amstrad_ppi_porta_r );
 READ8_DEVICE_HANDLER( amstrad_ppi_portb_r );
 WRITE8_DEVICE_HANDLER( amstrad_ppi_porta_w );
 WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
 
-READ8_HANDLER ( amstrad_psg_porta_read );
 
 WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
 WRITE_LINE_DEVICE_HANDLER( cpc_irq_w );

@@ -23,7 +23,7 @@
 #include "devices/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
-	AM_RANGE(0x0000, 0x00FF) AM_READWRITE_LEGACY(apple3_00xx_r, apple3_00xx_w)
+	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
 	AM_RANGE(0x0100, 0x01FF) AM_RAMBANK("bank2")
 	AM_RANGE(0x0200, 0x1FFF) AM_RAMBANK("bank3")
 	AM_RANGE(0x2000, 0x9FFF) AM_RAMBANK("bank4")
@@ -36,10 +36,10 @@ ADDRESS_MAP_END
  * different memory locations */
 static const m6502_interface apple3_m6502_interface =
 {
-	apple3_indexed_read,	/* read_indexed_func */
-	apple3_indexed_write,	/* write_indexed_func */
-	DEVCB_NULL,				/* port_read_func */
-	DEVCB_NULL				/* port_write_func */
+	NULL,	/* read_indexed_func */
+	NULL,	/* write_indexed_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read),				/* port_read_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write)				/* port_write_func */
 };
 
 static const floppy_interface apple3_floppy_interface =

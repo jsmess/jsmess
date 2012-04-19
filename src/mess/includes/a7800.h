@@ -53,6 +53,12 @@ public:
 	int m_p2_one_button;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(a7800_RAM0_w);
+	DECLARE_WRITE8_MEMBER(a7800_cart_w);
+	DECLARE_READ8_MEMBER(a7800_TIA_r);
+	DECLARE_WRITE8_MEMBER(a7800_TIA_w);
+	DECLARE_READ8_MEMBER(a7800_MARIA_r);
+	DECLARE_WRITE8_MEMBER(a7800_MARIA_w);
 };
 
 
@@ -61,8 +67,6 @@ public:
 VIDEO_START( a7800 );
 SCREEN_UPDATE_IND16( a7800 );
 TIMER_DEVICE_CALLBACK( a7800_interrupt );
- READ8_HANDLER( a7800_MARIA_r );
-WRITE8_HANDLER( a7800_MARIA_w );
 
 
 /*----------- defined in machine/a7800.c -----------*/
@@ -77,10 +81,6 @@ void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigne
 DEVICE_START( a7800_cart );
 DEVICE_IMAGE_LOAD( a7800_cart );
 
- READ8_HANDLER( a7800_TIA_r );
-WRITE8_HANDLER( a7800_TIA_w );
-WRITE8_HANDLER( a7800_RAM0_w );
-WRITE8_HANDLER( a7800_cart_w );
 
 DRIVER_INIT( a7800_ntsc );
 DRIVER_INIT( a7800_pal );

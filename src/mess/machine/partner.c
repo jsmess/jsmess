@@ -80,8 +80,8 @@ static void partner_window_2(running_machine &machine, UINT8 bank_num, UINT16 of
 	}
 }
 
-static READ8_HANDLER ( partner_floppy_r ) {
-	device_t *fdc = space->machine().device("wd1793");
+READ8_MEMBER(partner_state::partner_floppy_r){
+	device_t *fdc = machine().device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -96,8 +96,8 @@ static READ8_HANDLER ( partner_floppy_r ) {
 	}
 }
 
-static WRITE8_HANDLER ( partner_floppy_w ) {
-	device_t *fdc = space->machine().device("wd1793");
+WRITE8_MEMBER(partner_state::partner_floppy_w){
+	device_t *fdc = machine().device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -107,17 +107,17 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 			default   : wd17xx_data_w(fdc,0,data);break;
 		}
 	} else {
-		floppy_mon_w(floppy_get_device(space->machine(), 0), 1);
-		floppy_mon_w(floppy_get_device(space->machine(), 1), 1);
+		floppy_mon_w(floppy_get_device(machine(), 0), 1);
+		floppy_mon_w(floppy_get_device(machine(), 1), 1);
 		if (((data >> 6) & 1)==1) {
 			wd17xx_set_drive(fdc,0);
-			floppy_mon_w(floppy_get_device(space->machine(), 0), 0);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1, 1);
+			floppy_mon_w(floppy_get_device(machine(), 0), 0);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
 			wd17xx_set_drive(fdc,1);
-			floppy_mon_w(floppy_get_device(space->machine(), 1), 0);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1, 1);
+			floppy_mon_w(floppy_get_device(machine(), 1), 0);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
 		}
 		wd17xx_set_side(fdc,data >> 7);
 	}
@@ -130,8 +130,8 @@ static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 	switch(state->m_win_mem_page) {
 		case 2 :
 				// FDD
-				space->install_legacy_write_handler(0xdc00, 0xddff, FUNC(partner_floppy_w));
-				space->install_legacy_read_handler (0xdc00, 0xddff, FUNC(partner_floppy_r));
+				space->install_write_handler(0xdc00, 0xddff, write8_delegate(FUNC(partner_state::partner_floppy_w),state));
+				space->install_read_handler (0xdc00, 0xddff, read8_delegate(FUNC(partner_state::partner_floppy_r),state));
 				break;
 		case 4 :
 				// Timer
@@ -346,18 +346,16 @@ static void partner_bank_switch(running_machine &machine)
 	}
 }
 
-WRITE8_HANDLER ( partner_win_memory_page_w )
+WRITE8_MEMBER(partner_state::partner_win_memory_page_w)
 {
-	partner_state *state = space->machine().driver_data<partner_state>();
-	state->m_win_mem_page = ~data;
-	partner_bank_switch(space->machine());
+	m_win_mem_page = ~data;
+	partner_bank_switch(machine());
 }
 
-WRITE8_HANDLER (partner_mem_page_w )
+WRITE8_MEMBER(partner_state::partner_mem_page_w)
 {
-	partner_state *state = space->machine().driver_data<partner_state>();
-	state->m_mem_page = (data >> 4) & 0x0f;
-	partner_bank_switch(space->machine());
+	m_mem_page = (data >> 4) & 0x0f;
+	partner_bank_switch(machine());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( hrq_w )

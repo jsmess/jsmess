@@ -20,6 +20,8 @@ public:
 	unsigned short m_colortable[1][4];
 	UINT8 m_ppi_port_outputs[2][3];
 	UINT8 m_startup_mem_map;
+	DECLARE_READ8_MEMBER(lviv_io_r);
+	DECLARE_WRITE8_MEMBER(lviv_io_w);
 };
 
 
@@ -28,8 +30,6 @@ public:
 extern const i8255_interface lviv_ppi8255_interface_0;
 extern const i8255_interface lviv_ppi8255_interface_1;
 
- READ8_HANDLER ( lviv_io_r );
-WRITE8_HANDLER ( lviv_io_w );
 MACHINE_RESET( lviv );
 SNAPSHOT_LOAD( lviv );
 

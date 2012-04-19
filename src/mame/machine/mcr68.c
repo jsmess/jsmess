@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 #include "includes/mcr.h"
 #include "includes/mcr68.h"
 
@@ -171,9 +171,6 @@ static void mcr68_common_init(running_machine &machine)
 
 	/* initialize the clock */
 	state->m_m6840_internal_counter_period = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10);
-
-	/* initialize the sound */
-	mcr_sound_reset(machine);
 }
 
 
@@ -296,7 +293,7 @@ WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
 	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	drvstate->csdeluxe_data_w(*space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
+	drvstate->m_chip_squeak_deluxe->write(*space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
 }
 
 

@@ -2131,8 +2131,8 @@ static const upd765_interface fdc_interface =
 
 static const ym2151_interface x68k_ym2151_interface =
 {
-	x68k_fm_irq,
-	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
+	DEVCB_LINE(x68k_fm_irq),
+	DEVCB_HANDLER(x68k_ct_w)  // CT1, CT2 from YM2151 port 0x1b
 };
 
 static const okim6258_interface x68k_okim6258_interface =

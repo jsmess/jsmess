@@ -1295,10 +1295,10 @@ void gb_video_reset( running_machine &machine, int mode )
 		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(gb_video_init_vbl));
 
 		/* Initialize some video registers */
-		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
+		state->gb_video_w( *space, 0x0, 0x91 );    /* LCDCONT */
+		state->gb_video_w( *space, 0x7, 0xFC );    /* BGRDPAL */
+		state->gb_video_w( *space, 0x8, 0xFC );    /* SPR0PAL */
+		state->gb_video_w( *space, 0x9, 0xFC );    /* SPR1PAL */
 
 		CURLINE = state->m_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
@@ -1973,66 +1973,61 @@ static void gb_lcd_switch_on( running_machine &machine )
 	state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 }
 
-READ8_HANDLER( gb_video_r )
+READ8_MEMBER(gb_state::gb_video_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	return state->m_lcd.gb_vid_regs[offset];
+	return m_lcd.gb_vid_regs[offset];
 }
 
-READ8_HANDLER( gb_vram_r )
+READ8_MEMBER(gb_state::gb_vram_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	return ( state->m_lcd.vram_locked == LOCKED ) ? 0xFF : state->m_lcd.gb_vram_ptr[offset];
+	return ( m_lcd.vram_locked == LOCKED ) ? 0xFF : m_lcd.gb_vram_ptr[offset];
 }
 
-WRITE8_HANDLER( gb_vram_w )
+WRITE8_MEMBER(gb_state::gb_vram_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	if ( state->m_lcd.vram_locked == LOCKED )
+	if ( m_lcd.vram_locked == LOCKED )
 	{
 		return;
 	}
-	state->m_lcd.gb_vram_ptr[offset] = data;
+	m_lcd.gb_vram_ptr[offset] = data;
 }
 
-READ8_HANDLER( gb_oam_r )
+READ8_MEMBER(gb_state::gb_oam_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	return ( state->m_lcd.oam_locked == LOCKED ) ? 0xFF : state->m_lcd.gb_oam->base()[offset];
+	return ( m_lcd.oam_locked == LOCKED ) ? 0xFF : m_lcd.gb_oam->base()[offset];
 }
 
-WRITE8_HANDLER( gb_oam_w )
+WRITE8_MEMBER(gb_state::gb_oam_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
-	if ( state->m_lcd.oam_locked == LOCKED || offset >= 0xa0 )
+	if ( m_lcd.oam_locked == LOCKED || offset >= 0xa0 )
 	{
 		return;
 	}
-	state->m_lcd.gb_oam->base()[offset] = data;
+	m_lcd.gb_oam->base()[offset] = data;
 }
 
-WRITE8_HANDLER ( gb_video_w )
+WRITE8_MEMBER(gb_state::gb_video_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
+	gb_state *state = machine().driver_data<gb_state>();
 	switch (offset)
 	{
 	case 0x00:						/* LCDC - LCD Control */
-		state->m_lcd.gb_chrgen = state->m_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
-		state->m_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		state->m_lcd.gb_bgdtab = state->m_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800 );
-		state->m_lcd.gb_wndtab = state->m_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800 );
+		m_lcd.gb_chrgen = m_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
+		m_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
+		m_lcd.gb_bgdtab = m_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800 );
+		m_lcd.gb_wndtab = m_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800 );
 		/* if LCD controller is switched off, set STAT and LY to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
 			LCDSTAT &= ~0x03;
 			CURLINE = 0;
-			state->m_lcd.oam_locked = UNLOCKED;
-			state->m_lcd.vram_locked = UNLOCKED;
+			m_lcd.oam_locked = UNLOCKED;
+			m_lcd.vram_locked = UNLOCKED;
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) )
 		{
-			gb_lcd_switch_on(space->machine());
+			gb_lcd_switch_on(machine());
 		}
 		break;
 	case 0x01:						/* STAT - LCD Status */
@@ -2058,7 +2053,7 @@ WRITE8_HANDLER ( gb_video_w )
                - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 2, after m2int) - don't trigger
                - 0x20 -> 0x00/0x08/0x10/0x20/0x40 (mode 3, after m2int) - don't trigger
             */
-			if ( ! state->m_lcd.mode_irq && ( ( state->m_lcd.mode == 1 ) ||
+			if ( ! m_lcd.mode_irq && ( ( m_lcd.mode == 1 ) ||
 				( ( LCDSTAT & 0x40 ) && ! ( data & 0x68 ) ) ||
 				( ! ( LCDSTAT & 0x40 ) && ( data & 0x40 ) && ( LCDSTAT & 0x04 ) ) ||
 				( ! ( LCDSTAT & 0x48 ) && ( data & 0x08 ) ) ||
@@ -2066,16 +2061,16 @@ WRITE8_HANDLER ( gb_video_w )
 				( ( LCDSTAT & 0x60 ) == 0x20 && ( data & 0x40 ) )
 				) )
 			{
-					cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+					cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 			}
 			/*
                - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
                - 0x20 -> 0x00/0x10/0x20/0x40 (mode 0, after m2int) - trigger (stat bug)
                - 0x00 -> 0xXX (mode 0) - trigger stat bug
             */
-			if ( state->m_lcd.mode_irq && state->m_lcd.mode == 0 )
+			if ( m_lcd.mode_irq && m_lcd.mode == 0 )
 			{
-				cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+				cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 			}
 		}
 		break;
@@ -2086,67 +2081,66 @@ WRITE8_HANDLER ( gb_video_w )
 		{
 			if ( CURLINE == data )
 			{
-				if ( state->m_lcd.state != GB_LCD_STATE_LYXX_M0_INC && state->m_lcd.state != GB_LCD_STATE_LY9X_M1_INC )
+				if ( m_lcd.state != GB_LCD_STATE_LYXX_M0_INC && m_lcd.state != GB_LCD_STATE_LY9X_M1_INC )
 				{
 					LCDSTAT |= 0x04;
 					/* Generate lcd interrupt if requested */
 					if ( LCDSTAT & 0x40 )
 					{
-						cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+						cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 					}
 				}
 			}
 			else
 			{
 				LCDSTAT &= 0xFB;
-				state->m_lcd.triggering_line_irq = 0;
+				m_lcd.triggering_line_irq = 0;
 			}
 		}
 		break;
 	case 0x06:						/* DMA - DMA Transfer and Start Address */
 		{
-			UINT8 *P = state->m_lcd.gb_oam->base();
+			UINT8 *P = m_lcd.gb_oam->base();
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
-				*P++ = space->read_byte(offset++);
+				*P++ = space.read_byte(offset++);
 		}
 		return;
 	case 0x07:						/* BGP - Background Palette */
-		(*state->update_scanline)(space->machine());
-		state->m_lcd.gb_bpal[0] = data & 0x3;
-		state->m_lcd.gb_bpal[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_bpal[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
+		(*update_scanline)(machine());
+		m_lcd.gb_bpal[0] = data & 0x3;
+		m_lcd.gb_bpal[1] = (data & 0xC) >> 2;
+		m_lcd.gb_bpal[2] = (data & 0x30) >> 4;
+		m_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:						/* OBP0 - Object Palette 0 */
-//      (*state->update_scanline)( machine );
-		state->m_lcd.gb_spal0[0] = data & 0x3;
-		state->m_lcd.gb_spal0[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_spal0[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
+//      (*update_scanline)( machine );
+		m_lcd.gb_spal0[0] = data & 0x3;
+		m_lcd.gb_spal0[1] = (data & 0xC) >> 2;
+		m_lcd.gb_spal0[2] = (data & 0x30) >> 4;
+		m_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:						/* OBP1 - Object Palette 1 */
-//      (*state->update_scanline)( machine );
-		state->m_lcd.gb_spal1[0] = data & 0x3;
-		state->m_lcd.gb_spal1[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_spal1[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
+//      (*update_scanline)( machine );
+		m_lcd.gb_spal1[0] = data & 0x3;
+		m_lcd.gb_spal1[1] = (data & 0xC) >> 2;
+		m_lcd.gb_spal1[2] = (data & 0x30) >> 4;
+		m_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x02:						/* SCY - Scroll Y */
 	case 0x03:						/* SCX - Scroll X */
-		(*state->update_scanline)(space->machine());
+		(*update_scanline)(machine());
 	case 0x0A:						/* WY - Window Y position */
 	case 0x0B:						/* WX - Window X position */
 		break;
 	default:						/* Unknown register, no change */
 		return;
 	}
-	state->m_lcd.gb_vid_regs[ offset ] = data;
+	m_lcd.gb_vid_regs[ offset ] = data;
 }
 
-READ8_HANDLER( gbc_video_r )
+READ8_MEMBER(gb_state::gbc_video_r)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
 	switch( offset )
 	{
 	case 0x11:	/* FF51 */
@@ -2156,41 +2150,41 @@ READ8_HANDLER( gbc_video_r )
 		return 0xFF;
 	case 0x29:	/* FF69 */
 	case 0x2B:	/* FF6B */
-		if ( state->m_lcd.pal_locked == LOCKED )
+		if ( m_lcd.pal_locked == LOCKED )
 		{
 			return 0xFF;
 		}
 		break;
 	}
-	return state->m_lcd.gb_vid_regs[offset];
+	return m_lcd.gb_vid_regs[offset];
 }
 
-WRITE8_HANDLER ( gbc_video_w )
+WRITE8_MEMBER(gb_state::gbc_video_w)
 {
-	gb_state *state = space->machine().driver_data<gb_state>();
+	gb_state *state = machine().driver_data<gb_state>();
 	switch( offset )
 	{
 	case 0x00:      /* LCDC - LCD Control */
-		state->m_lcd.gb_chrgen = state->m_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
-		state->m_lcd.gbc_chrgen = state->m_lcd.gb_vram->base() + ((data & 0x10) ? 0x2000 : 0x2800);
-		state->m_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		state->m_lcd.gb_bgdtab = state->m_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800);
-		state->m_lcd.gbc_bgdtab = state->m_lcd.gb_vram->base() + ((data & 0x08) ? 0x3C00 : 0x3800);
-		state->m_lcd.gb_wndtab = state->m_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800);
-		state->m_lcd.gbc_wndtab = state->m_lcd.gb_vram->base() + ((data & 0x40) ? 0x3C00 : 0x3800);
+		m_lcd.gb_chrgen = m_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
+		m_lcd.gbc_chrgen = m_lcd.gb_vram->base() + ((data & 0x10) ? 0x2000 : 0x2800);
+		m_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
+		m_lcd.gb_bgdtab = m_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800);
+		m_lcd.gbc_bgdtab = m_lcd.gb_vram->base() + ((data & 0x08) ? 0x3C00 : 0x3800);
+		m_lcd.gb_wndtab = m_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800);
+		m_lcd.gbc_wndtab = m_lcd.gb_vram->base() + ((data & 0x40) ? 0x3C00 : 0x3800);
 		/* if LCD controller is switched off, set STAT to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
 			LCDSTAT &= ~0x03;
 			CURLINE = 0;
-			state->m_lcd.oam_locked = UNLOCKED;
-			state->m_lcd.vram_locked = UNLOCKED;
-			state->m_lcd.pal_locked = UNLOCKED;
+			m_lcd.oam_locked = UNLOCKED;
+			m_lcd.vram_locked = UNLOCKED;
+			m_lcd.pal_locked = UNLOCKED;
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) )
 		{
-			gb_lcd_switch_on(space->machine());
+			gb_lcd_switch_on(machine());
 		}
 		break;
 	case 0x01:      /* STAT - LCD Status */
@@ -2200,22 +2194,22 @@ WRITE8_HANDLER ( gbc_video_w )
 			/*
                - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
             */
-			if ( state->m_lcd.mode_irq && state->m_lcd.mode == 0 && ( LCDSTAT & 0x28 ) == 0x20 && ( data & 0x08 ) )
+			if ( m_lcd.mode_irq && m_lcd.mode == 0 && ( LCDSTAT & 0x28 ) == 0x20 && ( data & 0x08 ) )
 			{
-				cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+				cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 			}
 			/* Check if line irqs are being disabled */
 			if ( ! ( data & 0x40 ) )
 			{
-				state->m_lcd.delayed_line_irq = 0;
+				m_lcd.delayed_line_irq = 0;
 			}
 			/* Check if line irqs are being enabled */
 			if ( ! ( LCDSTAT & 0x40 ) && ( data & 0x40 ) )
 			{
 				if ( CMPLINE == CURLINE )
 				{
-					state->m_lcd.line_irq = 1;
-					cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+					m_lcd.line_irq = 1;
+					cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 				}
 			}
 		}
@@ -2223,48 +2217,48 @@ WRITE8_HANDLER ( gbc_video_w )
 	case 0x05:                      /* LYC */
 		if ( CMPLINE != data )
 		{
-			if ( ( state->m_lcd.state != GB_LCD_STATE_LYXX_M0_PRE_INC && CURLINE == data ) ||
-			     ( state->m_lcd.state == GB_LCD_STATE_LYXX_M0_INC && state->m_lcd.triggering_line_irq ) )
+			if ( ( m_lcd.state != GB_LCD_STATE_LYXX_M0_PRE_INC && CURLINE == data ) ||
+			     ( m_lcd.state == GB_LCD_STATE_LYXX_M0_INC && m_lcd.triggering_line_irq ) )
 			{
 				LCDSTAT |= 0x04;
 				/* Generate lcd interrupt if requested */
 				if ( LCDSTAT & 0x40 )
 				{
-					cputag_set_input_line( space->machine(), "maincpu", LCD_INT, ASSERT_LINE );
+					cputag_set_input_line( machine(), "maincpu", LCD_INT, ASSERT_LINE );
 				}
 			}
 			else
 			{
 				LCDSTAT &= 0xFB;
-				state->m_lcd.triggering_line_irq = 0;
-				state->m_lcd.cmp_line = data;
+				m_lcd.triggering_line_irq = 0;
+				m_lcd.cmp_line = data;
 			}
 		}
 		break;
 	case 0x07:      /* BGP - GB background palette */
-		(*state->update_scanline)(space->machine());
-		state->m_lcd.gb_bpal[0] = data & 0x3;
-		state->m_lcd.gb_bpal[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_bpal[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
+		(*update_scanline)(machine());
+		m_lcd.gb_bpal[0] = data & 0x3;
+		m_lcd.gb_bpal[1] = (data & 0xC) >> 2;
+		m_lcd.gb_bpal[2] = (data & 0x30) >> 4;
+		m_lcd.gb_bpal[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x08:      /* OBP0 - GB Object 0 palette */
-		state->m_lcd.gb_spal0[0] = data & 0x3;
-		state->m_lcd.gb_spal0[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_spal0[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
+		m_lcd.gb_spal0[0] = data & 0x3;
+		m_lcd.gb_spal0[1] = (data & 0xC) >> 2;
+		m_lcd.gb_spal0[2] = (data & 0x30) >> 4;
+		m_lcd.gb_spal0[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x09:      /* OBP1 - GB Object 1 palette */
-		state->m_lcd.gb_spal1[0] = data & 0x3;
-		state->m_lcd.gb_spal1[1] = (data & 0xC) >> 2;
-		state->m_lcd.gb_spal1[2] = (data & 0x30) >> 4;
-		state->m_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
+		m_lcd.gb_spal1[0] = data & 0x3;
+		m_lcd.gb_spal1[1] = (data & 0xC) >> 2;
+		m_lcd.gb_spal1[2] = (data & 0x30) >> 4;
+		m_lcd.gb_spal1[3] = (data & 0xC0) >> 6;
 		break;
 	case 0x0c:		/* Undocumented register involved in selecting gb/gbc mode */
 		logerror( "Write to undocumented register: %X = %X\n", offset, data );
 		break;
 	case 0x0F:		/* VBK - VRAM bank select */
-		state->m_lcd.gb_vram_ptr = state->m_lcd.gb_vram->base() + ( data & 0x01 ) * 0x2000;
+		m_lcd.gb_vram_ptr = m_lcd.gb_vram->base() + ( data & 0x01 ) * 0x2000;
 		data |= 0xFE;
 		break;
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */
@@ -2281,15 +2275,15 @@ WRITE8_HANDLER ( gbc_video_w )
 	case 0x15:      /* HDMA5 - HBL General DMA - Mode, Length */
 		if( !(data & 0x80) )
 		{
-			if( state->m_lcd.hdma_enabled )
+			if( m_lcd.hdma_enabled )
 			{
-				state->m_lcd.hdma_enabled = 0;
+				m_lcd.hdma_enabled = 0;
 				data = HDMA5 & 0x80;
 			}
 			else
 			{
 				/* General DMA */
-				gbc_hdma( space->machine(), ((data & 0x7F) + 1) * 0x10 );
+				gbc_hdma( machine(), ((data & 0x7F) + 1) * 0x10 );
 //              cpunum_set_reg( 0, LR35902_DMA_CYCLES, 4 + ( ( ( data & 0x7F ) + 1 ) * 32 ) );
 				data = 0xff;
 			}
@@ -2297,35 +2291,35 @@ WRITE8_HANDLER ( gbc_video_w )
 		else
 		{
 			/* H-Blank DMA */
-			state->m_lcd.hdma_enabled = 1;
+			m_lcd.hdma_enabled = 1;
 			data &= 0x7f;
-			state->m_lcd.gb_vid_regs[offset] = data;
+			m_lcd.gb_vid_regs[offset] = data;
 			/* Check if HDMA should be immediately performed */
-			if ( state->m_lcd.hdma_possible )
+			if ( m_lcd.hdma_possible )
 			{
-				gbc_hdma( space->machine(), 0x10 );
+				gbc_hdma( machine(), 0x10 );
 //              cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
-				state->m_lcd.hdma_possible = 0;
+				m_lcd.hdma_possible = 0;
 			}
 		}
 		break;
 	case 0x28:      /* BCPS - Background palette specification */
 		GBCBCPS = data;
 		if (data & 0x01)
-			GBCBCPD = state->m_lcd.cgb_bpal[( data >> 1 ) & 0x1F] >> 8;
+			GBCBCPD = m_lcd.cgb_bpal[( data >> 1 ) & 0x1F] >> 8;
 		else
-			GBCBCPD = state->m_lcd.cgb_bpal[( data >> 1 ) & 0x1F] & 0xFF;
+			GBCBCPD = m_lcd.cgb_bpal[( data >> 1 ) & 0x1F] & 0xFF;
 		break;
 	case 0x29:      /* BCPD - background palette data */
-		if ( state->m_lcd.pal_locked == LOCKED )
+		if ( m_lcd.pal_locked == LOCKED )
 		{
 			return;
 		}
 		GBCBCPD = data;
 		if (GBCBCPS & 0x01)
-			state->m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((data << 8) | (state->m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
+			m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((data << 8) | (m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
 		else
-			state->m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((state->m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
+			m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] = ((m_lcd.cgb_bpal[( GBCBCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
 		if( GBCBCPS & 0x80 )
 		{
 			GBCBCPS++;
@@ -2335,20 +2329,20 @@ WRITE8_HANDLER ( gbc_video_w )
 	case 0x2A:      /* OCPS - Object palette specification */
 		GBCOCPS = data;
 		if (data & 0x01)
-			GBCOCPD = state->m_lcd.cgb_spal[( data >> 1 ) & 0x1F] >> 8;
+			GBCOCPD = m_lcd.cgb_spal[( data >> 1 ) & 0x1F] >> 8;
 		else
-			GBCOCPD = state->m_lcd.cgb_spal[( data >> 1 ) & 0x1F] & 0xFF;
+			GBCOCPD = m_lcd.cgb_spal[( data >> 1 ) & 0x1F] & 0xFF;
 		break;
 	case 0x2B:      /* OCPD - Object palette data */
-		if ( state->m_lcd.pal_locked == LOCKED )
+		if ( m_lcd.pal_locked == LOCKED )
 		{
 			return;
 		}
 		GBCOCPD = data;
 		if (GBCOCPS & 0x01)
-			state->m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((data << 8) | (state->m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
+			m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((data << 8) | (m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF)) & 0x7FFF;
 		else
-			state->m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((state->m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
+			m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] = ((m_lcd.cgb_spal[( GBCOCPS >> 1 ) & 0x1F] & 0xFF00) | data) & 0x7FFF;
 		if( GBCOCPS & 0x80 )
 		{
 			GBCOCPS++;
@@ -2362,7 +2356,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		data = 0xFE | ( data & 0x01 );
 		if ( data & 0x01 )
 		{
-			state->m_lcd.gbc_mode = 0;
+			m_lcd.gbc_mode = 0;
 		}
 		break;
 	case 0x32:
@@ -2386,7 +2380,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		return;
 	}
 
-	state->m_lcd.gb_vid_regs[offset] = data;
+	m_lcd.gb_vid_regs[offset] = data;
 }
 
 

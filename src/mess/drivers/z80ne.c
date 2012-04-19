@@ -142,18 +142,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80ne_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
+	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80net_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xea, 0xea) AM_READ_LEGACY(lx388_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
+	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
+	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
+	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80netf_mem, AS_PROGRAM, 8, z80ne_state )
@@ -172,11 +172,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80netf_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd0, 0xd7) AM_DEVREADWRITE_LEGACY("wd1771", lx390_fdc_r, lx390_fdc_w)
-	AM_RANGE(0xea, 0xea) AM_READ_LEGACY(lx388_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
+	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
+	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
+	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 

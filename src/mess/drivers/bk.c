@@ -23,10 +23,10 @@ static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // ROM
     AM_RANGE( 0xc000, 0xdfff ) AM_ROM  // ROM
     AM_RANGE( 0xe000, 0xfeff ) AM_ROM  // ROM
-    AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE_LEGACY(bk_key_state_r,bk_key_state_w)
-    AM_RANGE( 0xffb2, 0xffb3 ) AM_READ_LEGACY(bk_key_code_r)
-    AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE_LEGACY(bk_vid_scrool_r,bk_vid_scrool_w)
-    AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE_LEGACY(bk_key_press_r,bk_key_press_w)
+    AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE(bk_key_state_r,bk_key_state_w)
+    AM_RANGE( 0xffb2, 0xffb3 ) AM_READ(bk_key_code_r)
+    AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE(bk_vid_scrool_r,bk_vid_scrool_w)
+    AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE(bk_key_press_r,bk_key_press_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bk0010fd_mem, AS_PROGRAM, 16, bk_state )
@@ -36,12 +36,12 @@ static ADDRESS_MAP_START(bk0010fd_mem, AS_PROGRAM, 16, bk_state )
     AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
     AM_RANGE( 0xa000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xfdff ) AM_ROM  // ROM
-    AM_RANGE( 0xfe58, 0xfe59 ) AM_READWRITE_LEGACY(bk_floppy_cmd_r,bk_floppy_cmd_w)
-    AM_RANGE( 0xfe5a, 0xfe5b ) AM_READWRITE_LEGACY(bk_floppy_data_r,bk_floppy_data_w)
-    AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE_LEGACY(bk_key_state_r,bk_key_state_w)
-    AM_RANGE( 0xffb2, 0xffb3 ) AM_READ_LEGACY(bk_key_code_r)
-    AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE_LEGACY(bk_vid_scrool_r,bk_vid_scrool_w)
-    AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE_LEGACY(bk_key_press_r,bk_key_press_w)
+    AM_RANGE( 0xfe58, 0xfe59 ) AM_READWRITE(bk_floppy_cmd_r,bk_floppy_cmd_w)
+    AM_RANGE( 0xfe5a, 0xfe5b ) AM_READWRITE(bk_floppy_data_r,bk_floppy_data_w)
+    AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE(bk_key_state_r,bk_key_state_w)
+    AM_RANGE( 0xffb2, 0xffb3 ) AM_READ(bk_key_code_r)
+    AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE(bk_vid_scrool_r,bk_vid_scrool_w)
+    AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE(bk_key_press_r,bk_key_press_w)
 ADDRESS_MAP_END
 
 /* Input ports */

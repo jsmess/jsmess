@@ -506,9 +506,9 @@ static void cassette_toggle_output(running_machine &machine)
 	cassette_device_image(machine)->output(state->m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
-READ8_HANDLER( apple1_cassette_r )
+READ8_MEMBER(apple1_state::apple1_cassette_r)
 {
-	cassette_toggle_output(space->machine());
+	cassette_toggle_output(machine());
 
 	if (offset <= 0x7f)
 	{
@@ -517,7 +517,7 @@ READ8_HANDLER( apple1_cassette_r )
            always comes from the corresponding cassette ROM location
            in $C100-$C17F. */
 
-		return space->read_byte(0xc100 + offset);
+		return space.read_byte(0xc100 + offset);
 	}
     else
 	{
@@ -534,14 +534,14 @@ READ8_HANDLER( apple1_cassette_r )
 		/* (Don't try putting a non-zero "noise threshhold" here,
            because it can cause tape header bits on real cassette
            images to be misread as data bits.) */
-		if (cassette_device_image(space->machine())->input() > 0.0)
-			return space->read_byte(0xc100 + (offset & ~1));
+		if (cassette_device_image(machine())->input() > 0.0)
+			return space.read_byte(0xc100 + (offset & ~1));
 		else
-			return space->read_byte(0xc100 + offset);
+			return space.read_byte(0xc100 + offset);
 	}
 }
 
-WRITE8_HANDLER( apple1_cassette_w )
+WRITE8_MEMBER(apple1_state::apple1_cassette_w)
 {
 	/* Writes toggle the output flip-flop in the same way that reads
        do; other than that they have no effect.  Any repeated accesses
@@ -550,5 +550,5 @@ WRITE8_HANDLER( apple1_cassette_w )
        However, we still have to handle writes, since they may be done
        by user code. */
 
-	cassette_toggle_output(space->machine());
+	cassette_toggle_output(machine());
 }

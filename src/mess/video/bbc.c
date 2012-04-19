@@ -107,18 +107,17 @@ static void set_pixel_lookup(bbc_state *state)
 }
 
 
-WRITE8_HANDLER ( bbc_videoULA_w )
+WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 
 	// Make sure vpos is never <0 2008-10-11 PHS.
-	int vpos=space->machine().primary_screen->vpos();
+	int vpos=machine().primary_screen->vpos();
 	if(vpos==0)
-	  space->machine().primary_screen->update_partial(vpos);
+	  machine().primary_screen->update_partial(vpos);
 	else
-	  space->machine().primary_screen->update_partial(vpos -1 );
+	  machine().primary_screen->update_partial(vpos -1 );
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,space->machine().primary_screen->vpos() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().primary_screen->vpos() );
 
 
 	switch (offset&0x01)
@@ -126,28 +125,28 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 	// Set the control register in the Video ULA
 	case 0:
 		{
-		state->m_videoULA_Reg=data;
-		state->m_videoULA_master_cursor_size=    (state->m_videoULA_Reg>>7)&0x01;
-		state->m_videoULA_width_of_cursor=       (state->m_videoULA_Reg>>5)&0x03;
-		state->m_videoULA_6845_clock_rate=       (state->m_videoULA_Reg>>4)&0x01;
-		state->m_videoULA_characters_per_line=   (state->m_videoULA_Reg>>2)&0x03;
-		state->m_videoULA_teletext_normal_select=(state->m_videoULA_Reg>>1)&0x01;
-		state->m_videoULA_flash_colour_select=    state->m_videoULA_Reg    &0x01;
+		m_videoULA_Reg=data;
+		m_videoULA_master_cursor_size=    (m_videoULA_Reg>>7)&0x01;
+		m_videoULA_width_of_cursor=       (m_videoULA_Reg>>5)&0x03;
+		m_videoULA_6845_clock_rate=       (m_videoULA_Reg>>4)&0x01;
+		m_videoULA_characters_per_line=   (m_videoULA_Reg>>2)&0x03;
+		m_videoULA_teletext_normal_select=(m_videoULA_Reg>>1)&0x01;
+		m_videoULA_flash_colour_select=    m_videoULA_Reg    &0x01;
 
-		state->m_videoULA_pallet_lookup=state->m_videoULA_flash_colour_select?state->m_videoULA_pallet0:state->m_videoULA_pallet1;
+		m_videoULA_pallet_lookup=m_videoULA_flash_colour_select?m_videoULA_pallet0:m_videoULA_pallet1;
 
-		state->m_emulation_cursor_size=width_of_cursor_set[state->m_videoULA_width_of_cursor|(state->m_videoULA_master_cursor_size<<2)];
+		m_emulation_cursor_size=width_of_cursor_set[m_videoULA_width_of_cursor|(m_videoULA_master_cursor_size<<2)];
 
 		// this is the number of BBC pixels held in each byte
-		if (state->m_videoULA_teletext_normal_select)
+		if (m_videoULA_teletext_normal_select)
 		{
-			state->m_pixels_per_byte=6;
+			m_pixels_per_byte=6;
 		} else {
-			state->m_pixels_per_byte=pixels_per_byte_set[state->m_videoULA_characters_per_line|(state->m_videoULA_6845_clock_rate<<2)];
+			m_pixels_per_byte=pixels_per_byte_set[m_videoULA_characters_per_line|(m_videoULA_6845_clock_rate<<2)];
 		}
-		mc6845_device *mc6845 = state->machine().device<mc6845_device>("mc6845");
-		mc6845->set_hpixels_per_column(state->m_pixels_per_byte);
-		if (state->m_videoULA_6845_clock_rate)
+		mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
+		mc6845->set_hpixels_per_column(m_pixels_per_byte);
+		if (m_videoULA_6845_clock_rate)
 			mc6845->set_clock(2000000);
 		else
 			mc6845->set_clock(1000000);
@@ -157,8 +156,8 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 	case 1:
 		int tpal=(data>>4)&0x0f;
 		int tcol=data&0x0f;
-		state->m_videoULA_pallet0[tpal]=tcol;
-		state->m_videoULA_pallet1[tpal]=tcol<8?tcol:tcol^7;
+		m_videoULA_pallet0[tpal]=tcol;
+		m_videoULA_pallet1[tpal]=tcol<8?tcol:tcol^7;
 		break;
 	}
 }
@@ -302,30 +301,30 @@ void bbc_draw_RGB_in(device_t *device, int offset,int data)
  * memory interface to BBC's 6845
  ************************************************************************/
 
-WRITE8_HANDLER ( bbc_6845_w )
+WRITE8_MEMBER(bbc_state::bbc_6845_w)
 {
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+	mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
 	switch(offset & 1)
 	{
 		case 0 :
-			mc6845->address_w(*space,0,data);
+			mc6845->address_w(space,0,data);
 			break;
 		case 1 :
-			mc6845->register_w(*space,0,data);
+			mc6845->register_w(space,0,data);
 			break;
 	}
 	return;
 }
 
-READ8_HANDLER (bbc_6845_r)
+READ8_MEMBER(bbc_state::bbc_6845_r)
 {
 
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+	mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
 
 	switch (offset&1)
 	{
-		case 0: return mc6845->status_r(*space,0); break;
-		case 1: return mc6845->register_r(*space,0); break;
+		case 0: return mc6845->status_r(space,0); break;
+		case 1: return mc6845->register_r(space,0); break;
 	}
 	return 0;
 }
@@ -581,16 +580,16 @@ static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 
 
 
-WRITE8_HANDLER ( bbc_6845_w )
+WRITE8_MEMBER(bbc_state::bbc_6845_w)
 {
-    mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+    mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
     switch(offset & 1)
     {
         case 0 :
-            mc6845->address_w(*space,0,data);
+            mc6845->address_w(space,0,data);
             break;
         case 1 :
-            mc6845->register_w(*space,0,data);
+            mc6845->register_w(space,0,data);
             break;
     }
     return;

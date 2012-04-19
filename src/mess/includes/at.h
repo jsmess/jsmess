@@ -159,6 +159,10 @@ public:
 
 	UINT8 m_channel_check;
 	UINT8 m_nmi_enabled;
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ8_MEMBER(pc_dma_read_word);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
 };
 
 

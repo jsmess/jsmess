@@ -161,19 +161,19 @@ static TIMER_CALLBACK( radio86_reset )
 }
 
 
-READ8_HANDLER (radio_cpu_state_r )
+READ8_MEMBER(radio86_state::radio_cpu_state_r)
 {
-	return cpu_get_reg(&space->device(), I8085_STATUS);
+	return cpu_get_reg(&space.device(), I8085_STATUS);
 }
 
-READ8_HANDLER (radio_io_r )
+READ8_MEMBER(radio86_state::radio_io_r)
 {
-	return space->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
+	return machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
 }
 
-WRITE8_HANDLER(radio_io_w )
+WRITE8_MEMBER(radio86_state::radio_io_w)
 {
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )
@@ -187,10 +187,9 @@ MACHINE_RESET( radio86 )
 }
 
 
-WRITE8_HANDLER ( radio86_pagesel )
+WRITE8_MEMBER(radio86_state::radio86_pagesel)
 {
-	radio86_state *state = space->machine().driver_data<radio86_state>();
-	state->m_disk_sel = data;
+	m_disk_sel = data;
 }
 
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )

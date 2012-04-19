@@ -225,322 +225,288 @@ MACHINE_START( ti86 )
 
 /* I/O ports handlers */
 
-READ8_HANDLER ( ti85_port_0000_r )
+READ8_MEMBER(ti85_state::ti85_port_0000_r)
 {
 	return 0xff;
 }
 
-READ8_HANDLER ( ti8x_keypad_r )
+READ8_MEMBER(ti85_state::ti8x_keypad_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0xff;
 	int port;
 	int bit;
 	static const char *const bitnames[] = { "BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7" };
 
-	if (state->m_keypad_mask == 0x7f) return data;
+	if (m_keypad_mask == 0x7f) return data;
 
 	for (bit = 0; bit < 7; bit++)
 	{
-		if (~state->m_keypad_mask&(0x01<<bit))
+		if (~m_keypad_mask&(0x01<<bit))
 		{
 			for (port = 0; port < 8; port++)
 			{
-				data ^= input_port_read(space->machine(), bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
+				data ^= input_port_read(machine(), bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
 			}
 		}
 	}
 	return data;
 }
 
- READ8_HANDLER ( ti85_port_0002_r )
+ READ8_MEMBER(ti85_state::ti85_port_0002_r )
 {
 	return 0xff;
 }
 
- READ8_HANDLER ( ti85_port_0003_r )
+ READ8_MEMBER(ti85_state::ti85_port_0003_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0;
 
-	if (state->m_LCD_status)
-		data |= state->m_LCD_mask;
-	if (state->m_ON_interrupt_status)
+	if (m_LCD_status)
+		data |= m_LCD_mask;
+	if (m_ON_interrupt_status)
 		data |= 0x01;
-	if (state->m_timer_interrupt_status)
+	if (m_timer_interrupt_status)
 		data |= 0x04;
-	if (!state->m_ON_pressed)
+	if (!m_ON_pressed)
 		data |= 0x08;
-	state->m_ON_interrupt_status = 0;
-	state->m_timer_interrupt_status = 0;
+	m_ON_interrupt_status = 0;
+	m_timer_interrupt_status = 0;
 	return data;
 }
 
- READ8_HANDLER ( ti85_port_0004_r )
+ READ8_MEMBER(ti85_state::ti85_port_0004_r )
 {
 	return 0xff;
 }
 
- READ8_HANDLER ( ti85_port_0005_r )
+ READ8_MEMBER(ti85_state::ti85_port_0005_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_memory_page_1;
+	return m_ti8x_memory_page_1;
 }
 
-READ8_HANDLER ( ti85_port_0006_r )
+READ8_MEMBER(ti85_state::ti85_port_0006_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_power_mode;
+	return m_power_mode;
 }
 
-READ8_HANDLER ( ti8x_serial_r )
+READ8_MEMBER(ti85_state::ti8x_serial_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	//ti85_update_serial(state->m_serial);
-	return (state->m_white_out<<3)
-		| (state->m_red_out<<2)
-		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
-		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+	//ti85_update_serial(m_serial);
+	return (m_white_out<<3)
+		| (m_red_out<<2)
+		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
+		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
 		| 0x03	// no link cable
-		| state->m_PCR;
+		| m_PCR;
 }
 
- READ8_HANDLER ( ti82_port_0002_r )
+READ8_MEMBER(ti85_state::ti82_port_0002_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_port2;
+	return m_ti8x_port2;
 }
 
-READ8_HANDLER ( ti86_port_0005_r )
+READ8_MEMBER(ti85_state::ti86_port_0005_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_memory_page_1;
+	return m_ti8x_memory_page_1;
 }
 
- READ8_HANDLER ( ti86_port_0006_r )
+READ8_MEMBER(ti85_state::ti86_port_0006_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_memory_page_2;
+	return m_ti8x_memory_page_2;
 }
 
-READ8_HANDLER ( ti83_port_0000_r )
+READ8_MEMBER(ti85_state::ti83_port_0000_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return ((state->m_ti8x_memory_page_1 & 0x08) << 1) | 0x0C;
+	return ((m_ti8x_memory_page_1 & 0x08) << 1) | 0x0C;
 }
 
- READ8_HANDLER ( ti83_port_0002_r )
+READ8_MEMBER(ti85_state::ti83_port_0002_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_port2;
+	return m_ti8x_port2;
 }
 
- READ8_HANDLER ( ti83_port_0003_r )
+READ8_MEMBER(ti85_state::ti83_port_0003_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 	int data = 0;
 
-	data |= state->m_LCD_mask;
+	data |= m_LCD_mask;
 
-	if (state->m_ON_interrupt_status)
+	if (m_ON_interrupt_status)
 		data |= 0x01;
-	if (!state->m_ON_pressed)
+	if (!m_ON_pressed)
 		data |= 0x08;
-	state->m_ON_interrupt_status = 0;
-	state->m_timer_interrupt_status = 0;
+	m_ON_interrupt_status = 0;
+	m_timer_interrupt_status = 0;
 	return data;
 }
 
-READ8_HANDLER ( ti8x_plus_serial_r )
+READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	//ti85_update_serial(state->m_serial);
-	return (state->m_white_out<<3)
-		| (state->m_red_out<<2)
-		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
-		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+	//ti85_update_serial(m_serial);
+	return (m_white_out<<3)
+		| (m_red_out<<2)
+		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
+		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
 		| 0x03	// no link cable
-		| state->m_PCR;
+		| m_PCR;
 }
 
- READ8_HANDLER ( ti83p_port_0002_r )
+READ8_MEMBER(ti85_state::ti83p_port_0002_r )
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	return state->m_ti8x_port2|3;
+	return m_ti8x_port2|3;
 }
 
-WRITE8_HANDLER ( ti81_port_0007_w )
+WRITE8_MEMBER(ti85_state::ti81_port_0007_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti81_port_7_data = data;
+	m_ti81_port_7_data = data;
 }
 
-WRITE8_HANDLER ( ti85_port_0000_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0000_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_LCD_memory_base = data;
+	m_LCD_memory_base = data;
 }
 
-WRITE8_HANDLER ( ti8x_keypad_w )
+WRITE8_MEMBER(ti85_state::ti8x_keypad_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_keypad_mask = data&0x7f;
+	m_keypad_mask = data&0x7f;
 }
 
-WRITE8_HANDLER ( ti85_port_0002_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0002_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_LCD_contrast = data&0x1f;
+	m_LCD_contrast = data&0x1f;
 }
 
-WRITE8_HANDLER ( ti85_port_0003_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0003_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	if (state->m_LCD_status && !(data&0x08))	state->m_timer_interrupt_mask = 0;
-	state->m_ON_interrupt_mask = data&0x01;
-//  state->m_timer_interrupt_mask = data&0x04;
-	state->m_LCD_mask = data&0x02;
-	state->m_LCD_status = data&0x08;
+	if (m_LCD_status && !(data&0x08))	m_timer_interrupt_mask = 0;
+	m_ON_interrupt_mask = data&0x01;
+//  m_timer_interrupt_mask = data&0x04;
+	m_LCD_mask = data&0x02;
+	m_LCD_status = data&0x08;
 }
 
-WRITE8_HANDLER ( ti85_port_0004_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0004_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_video_buffer_width = (data>>3)&0x03;
-	state->m_interrupt_speed = (data>>1)&0x03;
-	state->m_port4_bit0 = data&0x01;
+	m_video_buffer_width = (data>>3)&0x03;
+	m_interrupt_speed = (data>>1)&0x03;
+	m_port4_bit0 = data&0x01;
 }
 
-WRITE8_HANDLER ( ti85_port_0005_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0005_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = data;
-	update_ti85_memory(space->machine());
+	m_ti8x_memory_page_1 = data;
+	update_ti85_memory(machine());
 }
 
-WRITE8_HANDLER ( ti85_port_0006_w )
+WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_power_mode = data;
+	m_power_mode = data;
 }
 
-WRITE8_HANDLER ( ti8x_serial_w )
+WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	speaker_level_w(state->m_speaker, ( (data>>2)|(data>>3) ) & 0x01);
-	state->m_red_out=(data>>2)&0x01;
-	state->m_white_out=(data>>3)&0x01;
-	//ti85serial_red_out( state->m_serial, 0, state->m_red_out );
-	//ti85serial_white_out( state->m_serial, 0, state->m_white_out );
-	//ti85_update_serial(state->m_serial);
-	state->m_PCR = data&0xf0;
+	speaker_level_w(m_speaker, ( (data>>2)|(data>>3) ) & 0x01);
+	m_red_out=(data>>2)&0x01;
+	m_white_out=(data>>3)&0x01;
+	//ti85serial_red_out( m_serial, 0, m_red_out );
+	//ti85serial_white_out( m_serial, 0, m_white_out );
+	//ti85_update_serial(m_serial);
+	m_PCR = data&0xf0;
 }
 
-WRITE8_HANDLER ( ti86_port_0005_w )
+WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(space->machine());
+	m_ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
+	update_ti86_memory(machine());
 }
 
-WRITE8_HANDLER ( ti86_port_0006_w )
+WRITE8_MEMBER(ti85_state::ti86_port_0006_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(space->machine());
+	m_ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
+	update_ti86_memory(machine());
 }
 
-WRITE8_HANDLER ( ti82_port_0002_w )
+WRITE8_MEMBER(ti85_state::ti82_port_0002_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = (data & 0x07);
-	update_ti85_memory(space->machine());
-	state->m_ti8x_port2 = data;
+	m_ti8x_memory_page_1 = (data & 0x07);
+	update_ti85_memory(machine());
+	m_ti8x_port2 = data;
 }
 
-WRITE8_HANDLER ( ti83_port_0000_w )
+WRITE8_MEMBER(ti85_state::ti83_port_0000_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = (state->m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
-	update_ti85_memory(space->machine());
+	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
+	update_ti85_memory(machine());
 }
 
-WRITE8_HANDLER ( ti83_port_0002_w )
+WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = (state->m_ti8x_memory_page_1 & 8) | (data & 7);
-	update_ti85_memory(space->machine());
-	state->m_ti8x_port2 = data;
+	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 8) | (data & 7);
+	update_ti85_memory(machine());
+	m_ti8x_port2 = data;
 }
 
-WRITE8_HANDLER ( ti83_port_0003_w )
+WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-		if (state->m_LCD_status && !(data&0x08))	state->m_timer_interrupt_mask = 0;
-		state->m_ON_interrupt_mask = data&0x01;
-		//state->m_timer_interrupt_mask = data&0x04;
-		state->m_LCD_mask = data&0x02;
-		state->m_LCD_status = data&0x08;
+		if (m_LCD_status && !(data&0x08))	m_timer_interrupt_mask = 0;
+		m_ON_interrupt_mask = data&0x01;
+		//m_timer_interrupt_mask = data&0x04;
+		m_LCD_mask = data&0x02;
+		m_LCD_status = data&0x08;
 }
 
-WRITE8_HANDLER ( ti8x_plus_serial_w )
+WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	speaker_level_w(state->m_speaker,( (data>>0)|(data>>1) )&0x01 );
-	state->m_red_out=(data>>0)&0x01;
-	state->m_white_out=(data>>1)&0x01;
-	//ti85serial_red_out( state->m_serial, 0, state->m_red_out );
-	//ti85serial_white_out( state->m_serial, 0, state->m_white_out );
-	//ti85_update_serial(state->m_serial);
-	state->m_PCR = data&0xf0;
+	speaker_level_w(m_speaker,( (data>>0)|(data>>1) )&0x01 );
+	m_red_out=(data>>0)&0x01;
+	m_white_out=(data>>1)&0x01;
+	//ti85serial_red_out( m_serial, 0, m_red_out );
+	//ti85serial_white_out( m_serial, 0, m_white_out );
+	//ti85_update_serial(m_serial);
+	m_PCR = data&0xf0;
 }
 
-WRITE8_HANDLER ( ti83p_port_0002_w )
+WRITE8_MEMBER(ti85_state::ti83p_port_0002_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_port2 = data;
+	m_ti8x_port2 = data;
 }
 
-WRITE8_HANDLER ( ti83p_port_0003_w )
+WRITE8_MEMBER(ti85_state::ti83p_port_0003_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_LCD_mask = (data&0x08) >> 2;
-	state->m_ON_interrupt_mask = data & 0x01;
+	m_LCD_mask = (data&0x08) >> 2;
+	m_ON_interrupt_mask = data & 0x01;
 }
 
-WRITE8_HANDLER ( ti83p_port_0004_w )
+WRITE8_MEMBER(ti85_state::ti83p_port_0004_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	if ((data & 1) && !(state->m_ti83p_port4 & 1))
+	if ((data & 1) && !(m_ti83p_port4 & 1))
 	{
-		state->m_ti8x_memory_page_1 = 0x1f;
-		state->m_ti8x_memory_page_2 = 0x1f;
+		m_ti8x_memory_page_1 = 0x1f;
+		m_ti8x_memory_page_2 = 0x1f;
 	}
-	else if (!(data & 1) && (state->m_ti83p_port4 & 1))
+	else if (!(data & 1) && (m_ti83p_port4 & 1))
 	{
-		state->m_ti8x_memory_page_1 = 0x1f;
-		state->m_ti8x_memory_page_2 = 0x40;
+		m_ti8x_memory_page_1 = 0x1f;
+		m_ti8x_memory_page_2 = 0x40;
 	}
-	update_ti83p_memory(space->machine());
-	state->m_ti83p_port4 = data;
+	update_ti83p_memory(machine());
+	m_ti83p_port4 = data;
 }
 
-WRITE8_HANDLER ( ti83p_port_0006_w )
+WRITE8_MEMBER(ti85_state::ti83p_port_0006_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(space->machine());
+	m_ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
+	update_ti83p_memory(machine());
 }
 
-WRITE8_HANDLER ( ti83p_port_0007_w )
+WRITE8_MEMBER(ti85_state::ti83p_port_0007_w)
 {
-	ti85_state *state = space->machine().driver_data<ti85_state>();
-	state->m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(space->machine());
+	m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
+	update_ti83p_memory(machine());
 }
 
 /* NVRAM functions */

@@ -223,6 +223,19 @@ public:
 	int m_flash_battery_load;
 	
 	DIRECT_UPDATE_MEMBER(gba_direct);
+	DECLARE_READ32_MEMBER(gba_io_r);
+	DECLARE_WRITE32_MEMBER(gba_io_w);
+	DECLARE_WRITE32_MEMBER(gba_pram_w);
+	DECLARE_WRITE32_MEMBER(gba_vram_w);
+	DECLARE_WRITE32_MEMBER(gba_oam_w);
+	DECLARE_READ32_MEMBER(gba_bios_r);
+	DECLARE_READ32_MEMBER(gba_10000000_r);
+	DECLARE_READ32_MEMBER(sram_r);
+	DECLARE_WRITE32_MEMBER(sram_w);
+	DECLARE_READ32_MEMBER(flash_r);
+	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 };
 
 /*----------- defined in video/gba.c -----------*/

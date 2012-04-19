@@ -270,10 +270,9 @@ const mos6526_interface cbmb_cia =
 	DEVCB_NULL
 };
 
-WRITE8_HANDLER( cbmb_colorram_w )
+WRITE8_MEMBER(cbmb_state::cbmb_colorram_w)
 {
-	cbmb_state *state = space->machine().driver_data<cbmb_state>();
-	state->m_colorram[offset] = data | 0xf0;
+	m_colorram[offset] = data | 0xf0;
 }
 
 WRITE_LINE_DEVICE_HANDLER( cbmb_change_font )

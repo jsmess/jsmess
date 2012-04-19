@@ -18,6 +18,7 @@ public:
 	int m_keyboard_mask;
 	UINT8 m_keypressed;
 	UINT8 m_keyboard_cnt;
+	DECLARE_READ8_MEMBER(irisha_keyboard_r);
 };
 
 
@@ -30,7 +31,6 @@ extern const i8255_interface irisha_ppi8255_interface;
 extern const struct pit8253_config irisha_pit8253_intf;
 extern const struct pic8259_interface irisha_pic8259_config;
 
-extern READ8_HANDLER (irisha_keyboard_r);
 
 
 /*----------- defined in video/irisha.c -----------*/

@@ -60,12 +60,12 @@
     I/O PORTS
 ***************************************************************************/
 
-static READ8_HANDLER( samcoupe_disk_r )
+READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 {
-	wd1772_t *fdc = space->machine().device<wd1772_t>("wd1772");
+	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = space->machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
@@ -84,12 +84,12 @@ static READ8_HANDLER( samcoupe_disk_r )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( samcoupe_disk_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 {
-	wd1772_t *fdc = space->machine().device<wd1772_t>("wd1772");
+	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = space->machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
@@ -106,9 +106,9 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 	}
 }
 
-static READ8_HANDLER( samcoupe_pen_r )
+READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
-	screen_device *scr = space->machine().primary_screen;
+	screen_device *scr = machine().primary_screen;
 	UINT8 data;
 
 	if (offset & 0x100)
@@ -130,117 +130,108 @@ static READ8_HANDLER( samcoupe_pen_r )
 	return data;
 }
 
-static WRITE8_HANDLER( samcoupe_clut_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_clut_w)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	state->m_clut[(offset >> 8) & 0x0f] = data & 0x7f;
+	m_clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
-static READ8_HANDLER( samcoupe_status_r )
+READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(space->machine(), "keyboard_row_fe") & 0xe0;
-	if (!BIT(offset,  9)) data &= input_port_read(space->machine(), "keyboard_row_fd") & 0xe0;
-	if (!BIT(offset, 10)) data &= input_port_read(space->machine(), "keyboard_row_fb") & 0xe0;
-	if (!BIT(offset, 11)) data &= input_port_read(space->machine(), "keyboard_row_f7") & 0xe0;
-	if (!BIT(offset, 12)) data &= input_port_read(space->machine(), "keyboard_row_ef") & 0xe0;
-	if (!BIT(offset, 13)) data &= input_port_read(space->machine(), "keyboard_row_df") & 0xe0;
-	if (!BIT(offset, 14)) data &= input_port_read(space->machine(), "keyboard_row_bf") & 0xe0;
-	if (!BIT(offset, 15)) data &= input_port_read(space->machine(), "keyboard_row_7f") & 0xe0;
+	if (!BIT(offset,  8)) data &= input_port_read(machine(), "keyboard_row_fe") & 0xe0;
+	if (!BIT(offset,  9)) data &= input_port_read(machine(), "keyboard_row_fd") & 0xe0;
+	if (!BIT(offset, 10)) data &= input_port_read(machine(), "keyboard_row_fb") & 0xe0;
+	if (!BIT(offset, 11)) data &= input_port_read(machine(), "keyboard_row_f7") & 0xe0;
+	if (!BIT(offset, 12)) data &= input_port_read(machine(), "keyboard_row_ef") & 0xe0;
+	if (!BIT(offset, 13)) data &= input_port_read(machine(), "keyboard_row_df") & 0xe0;
+	if (!BIT(offset, 14)) data &= input_port_read(machine(), "keyboard_row_bf") & 0xe0;
+	if (!BIT(offset, 15)) data &= input_port_read(machine(), "keyboard_row_7f") & 0xe0;
 
 	/* bit 0-4, interrupt source */
-	data |= state->m_status;
+	data |= m_status;
 
 	return data;
 }
 
-static WRITE8_HANDLER( samcoupe_line_int_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_line_int_w)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	state->m_line_int = data;
+	m_line_int = data;
 }
 
-static READ8_HANDLER( samcoupe_lmpr_r )
+READ8_MEMBER(samcoupe_state::samcoupe_lmpr_r)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->m_lmpr;
+	return m_lmpr;
 }
 
-static WRITE8_HANDLER( samcoupe_lmpr_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_lmpr_w)
 {
-	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_lmpr = data;
+	m_lmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
-static READ8_HANDLER( samcoupe_hmpr_r )
+READ8_MEMBER(samcoupe_state::samcoupe_hmpr_r)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->m_hmpr;
+	return m_hmpr;
 }
 
-static WRITE8_HANDLER( samcoupe_hmpr_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_hmpr_w)
 {
-	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_hmpr = data;
+	m_hmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
-static READ8_HANDLER( samcoupe_vmpr_r )
+READ8_MEMBER(samcoupe_state::samcoupe_vmpr_r)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->m_vmpr;
+	return m_vmpr;
 }
 
-static WRITE8_HANDLER( samcoupe_vmpr_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_vmpr_w)
 {
-	address_space *space_program = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	address_space *space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_vmpr = data;
+	m_vmpr = data;
 	samcoupe_update_memory(space_program);
 }
 
-static READ8_HANDLER( samcoupe_midi_r )
+READ8_MEMBER(samcoupe_state::samcoupe_midi_r)
 {
-	logerror("%s: read from midi port\n", space->machine().describe_context());
+	logerror("%s: read from midi port\n", machine().describe_context());
 	return 0xff;
 }
 
-static WRITE8_HANDLER( samcoupe_midi_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_midi_w)
 {
-	logerror("%s: write to midi port: 0x%02x\n", space->machine().describe_context(), data);
+	logerror("%s: write to midi port: 0x%02x\n", machine().describe_context(), data);
 }
 
-static READ8_HANDLER( samcoupe_keyboard_r )
+READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 {
-	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
+	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(space->machine(), "keyboard_row_fe") & 0x1f;
-	if (!BIT(offset,  9)) data &= input_port_read(space->machine(), "keyboard_row_fd") & 0x1f;
-	if (!BIT(offset, 10)) data &= input_port_read(space->machine(), "keyboard_row_fb") & 0x1f;
-	if (!BIT(offset, 11)) data &= input_port_read(space->machine(), "keyboard_row_f7") & 0x1f;
-	if (!BIT(offset, 12)) data &= input_port_read(space->machine(), "keyboard_row_ef") & 0x1f;
-	if (!BIT(offset, 13)) data &= input_port_read(space->machine(), "keyboard_row_df") & 0x1f;
-	if (!BIT(offset, 14)) data &= input_port_read(space->machine(), "keyboard_row_bf") & 0x1f;
-	if (!BIT(offset, 15)) data &= input_port_read(space->machine(), "keyboard_row_7f") & 0x1f;
+	if (!BIT(offset,  8)) data &= input_port_read(machine(), "keyboard_row_fe") & 0x1f;
+	if (!BIT(offset,  9)) data &= input_port_read(machine(), "keyboard_row_fd") & 0x1f;
+	if (!BIT(offset, 10)) data &= input_port_read(machine(), "keyboard_row_fb") & 0x1f;
+	if (!BIT(offset, 11)) data &= input_port_read(machine(), "keyboard_row_f7") & 0x1f;
+	if (!BIT(offset, 12)) data &= input_port_read(machine(), "keyboard_row_ef") & 0x1f;
+	if (!BIT(offset, 13)) data &= input_port_read(machine(), "keyboard_row_df") & 0x1f;
+	if (!BIT(offset, 14)) data &= input_port_read(machine(), "keyboard_row_bf") & 0x1f;
+	if (!BIT(offset, 15)) data &= input_port_read(machine(), "keyboard_row_7f") & 0x1f;
 
 	if (offset == 0xff00)
 	{
-		data &= input_port_read(space->machine(), "keyboard_row_ff") & 0x1f;
+		data &= input_port_read(machine(), "keyboard_row_ff") & 0x1f;
 
 		/* if no key has been pressed, return the mouse state */
 		if (data == 0x1f)
-			data = samcoupe_mouse_r(space->machine());
+			data = samcoupe_mouse_r(machine());
 	}
 
 	/* bit 5, lightpen strobe */
@@ -255,13 +246,12 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 	return data;
 }
 
-static WRITE8_HANDLER( samcoupe_border_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
 {
-	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
+	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 
-	state->m_border = data;
+	m_border = data;
 
 	/* bit 3, cassette output */
 	cassette->output( BIT(data, 3) ? -1.0 : +1.0);
@@ -270,10 +260,9 @@ static WRITE8_HANDLER( samcoupe_border_w )
 	speaker_level_w(speaker, BIT(data, 4));
 }
 
-static READ8_HANDLER( samcoupe_attributes_r )
+READ8_MEMBER(samcoupe_state::samcoupe_attributes_r)
 {
-	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
-	return state->m_attribute;
+	return m_attribute;
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
@@ -313,20 +302,20 @@ static ADDRESS_MAP_START( samcoupe_mem, AS_PROGRAM, 8, samcoupe_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( samcoupe_io, AS_IO, 8, samcoupe_state )
-	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE_LEGACY(samcoupe_ext_mem_w)
-	AM_RANGE(0x00e0, 0x00e7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_disk_r, samcoupe_disk_w)
+	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
+	AM_RANGE(0x00e0, 0x00e7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
 	AM_RANGE(0x00e8, 0x00e8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt1", centronics_device, write)
 	AM_RANGE(0x00e9, 0x00e9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVREADWRITE_LEGACY("lpt1", samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
 	AM_RANGE(0x00ea, 0x00ea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt2", centronics_device, write)
 	AM_RANGE(0x00eb, 0x00eb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVREADWRITE_LEGACY("lpt2", samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
-	AM_RANGE(0x00f8, 0x00f8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_pen_r, samcoupe_clut_w)
-	AM_RANGE(0x00f9, 0x00f9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_status_r, samcoupe_line_int_w)
-	AM_RANGE(0x00fa, 0x00fa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_lmpr_r, samcoupe_lmpr_w)
-	AM_RANGE(0x00fb, 0x00fb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_hmpr_r, samcoupe_hmpr_w)
-	AM_RANGE(0x00fc, 0x00fc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_vmpr_r, samcoupe_vmpr_w)
-	AM_RANGE(0x00fd, 0x00fd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_midi_r, samcoupe_midi_w)
-	AM_RANGE(0x00fe, 0x00fe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(samcoupe_keyboard_r, samcoupe_border_w)
-	AM_RANGE(0x00ff, 0x00ff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ_LEGACY(samcoupe_attributes_r)
+	AM_RANGE(0x00f8, 0x00f8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
+	AM_RANGE(0x00f9, 0x00f9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
+	AM_RANGE(0x00fa, 0x00fa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
+	AM_RANGE(0x00fb, 0x00fb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_hmpr_r, samcoupe_hmpr_w)
+	AM_RANGE(0x00fc, 0x00fc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
+	AM_RANGE(0x00fd, 0x00fd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
+	AM_RANGE(0x00fe, 0x00fe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
+	AM_RANGE(0x00ff, 0x00ff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
 	AM_RANGE(0x00ff, 0x00ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE_LEGACY("saa1099", saa1099_data_w)
 	AM_RANGE(0x01ff, 0x01ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE_LEGACY("saa1099", saa1099_control_w)
 ADDRESS_MAP_END

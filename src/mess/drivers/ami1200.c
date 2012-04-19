@@ -36,6 +36,7 @@ public:
 	UINT16 m_potgo_value;
 	int m_cd32_shifter[2];
 	int m_oldstate[2];
+	DECLARE_WRITE32_MEMBER(aga_overlay_w);
 };
 
 
@@ -47,22 +48,22 @@ public:
 
 static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra);
 
-static WRITE32_HANDLER( aga_overlay_w )
+WRITE32_MEMBER(ami1200_state::aga_overlay_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine(), "bank1", data & 1);
+		memory_set_bank(machine(), "bank1", data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, 0x1fffff, "bank1");
+			space.install_write_bank(0x000000, 0x1fffff, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			space->unmap_write(0x000000, 0x1fffff);
+			space.unmap_write(0x000000, 0x1fffff);
 	}
 }
 
@@ -122,7 +123,7 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE_LEGACY(aga_overlay_w)
+	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)

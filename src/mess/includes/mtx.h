@@ -45,6 +45,16 @@ public:
 
 	/* timers */
 	device_t *m_cassette_timer;
+	DECLARE_WRITE8_MEMBER(mtx_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mtx_sound_latch_w);
+	DECLARE_WRITE8_MEMBER(mtx_sense_w);
+	DECLARE_READ8_MEMBER(mtx_key_lo_r);
+	DECLARE_READ8_MEMBER(mtx_key_hi_r);
+	DECLARE_WRITE8_MEMBER(hrx_address_w);
+	DECLARE_READ8_MEMBER(hrx_data_r);
+	DECLARE_WRITE8_MEMBER(hrx_data_w);
+	DECLARE_READ8_MEMBER(hrx_attr_r);
+	DECLARE_WRITE8_MEMBER(hrx_attr_w);
 };
 
 /*----------- defined in machine/mtx.c -----------*/
@@ -53,11 +63,9 @@ MACHINE_START( mtx512 );
 MACHINE_RESET( mtx512 );
 SNAPSHOT_LOAD( mtx );
 
-WRITE8_HANDLER( mtx_bankswitch_w );
 
 /* Sound */
 READ8_DEVICE_HANDLER( mtx_sound_strobe_r );
-WRITE8_HANDLER( mtx_sound_latch_w );
 
 /* Cassette */
 WRITE8_DEVICE_HANDLER( mtx_cst_w );
@@ -67,15 +75,7 @@ READ8_DEVICE_HANDLER( mtx_strobe_r );
 READ8_DEVICE_HANDLER( mtx_prt_r );
 
 /* Keyboard */
-WRITE8_HANDLER( mtx_sense_w );
-READ8_HANDLER( mtx_key_lo_r );
-READ8_HANDLER( mtx_key_hi_r );
 
 /* HRX */
-WRITE8_HANDLER( hrx_address_w );
-READ8_HANDLER( hrx_data_r );
-WRITE8_HANDLER( hrx_data_w );
-READ8_HANDLER( hrx_attr_r );
-WRITE8_HANDLER( hrx_attr_w );
 
 #endif /* __MTX_H__ */

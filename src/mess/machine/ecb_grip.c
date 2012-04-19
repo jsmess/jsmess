@@ -749,8 +749,8 @@ void grip_device::device_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	// setup GRIP memory banking
-	memory_configure_bank(*this, "videoram", 0, 2, m_video_ram, 0x8000);
-	memory_set_bank(*this, "videoram", 0);
+	memory_configure_bank(machine(), "videoram", 0, 2, m_video_ram, 0x8000);
+	memory_set_bank(machine(), "videoram", 0);
 
 	// allocate keyboard scan timer
 	m_kb_timer = timer_alloc();
@@ -842,7 +842,7 @@ WRITE8_MEMBER( grip_device::page_w )
 {
 	m_page = BIT(data, 7);
 
-	memory_set_bank(*this, "videoram", m_page);
+	memory_set_bank(machine(), "videoram", m_page);
 }
 
 

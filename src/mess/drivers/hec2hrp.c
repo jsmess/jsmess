@@ -120,13 +120,13 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE_LEGACY(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE_LEGACY(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE_LEGACY(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE_LEGACY(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE_LEGACY(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE_LEGACY(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE_LEGACY(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM
@@ -144,13 +144,13 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE_LEGACY(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE_LEGACY(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE_LEGACY(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE_LEGACY(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE_LEGACY(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE_LEGACY(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE_LEGACY(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
@@ -166,13 +166,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ff) AM_READWRITE_LEGACY(hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE_LEGACY(hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
@@ -180,22 +180,22 @@ static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x000,0x0EF) AM_READWRITE_LEGACY(hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE_LEGACY(hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0EF) AM_READWRITE(hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
+	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE_LEGACY(hector_mx40_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE_LEGACY(hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx40_io_port_w )
+	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE_LEGACY(hector_mx80_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE_LEGACY(hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx80_io_port_w )
+	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 
 
 ADDRESS_MAP_END

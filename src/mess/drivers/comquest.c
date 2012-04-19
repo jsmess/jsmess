@@ -45,14 +45,14 @@ icq3250a-d
 #include "imagedev/cartslot.h"
 
 #ifdef UNUSED_FUNCTION
-static  READ8_HANDLER(comquest_read)
+READ8_MEMBER(comquest_state::comquest_read)
 {
 	UINT8 data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
 
-static WRITE8_HANDLER(comquest_write)
+WRITE8_MEMBER(comquest_state::comquest_write)
 {
 	logerror("comquest read %.4x %.2x\n",offset,data);
 }

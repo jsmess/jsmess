@@ -90,16 +90,14 @@ const floppy_format_type einstein_state::floppy_formats[] = {
  * upper 8 bits define the offset in the row,
  * data bits define data to write
  */
-static WRITE8_HANDLER( einstein_80col_ram_w )
+WRITE8_MEMBER(einstein_state::einstein_80col_ram_w)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
-	einstein->m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
+	m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
 }
 
-static READ8_HANDLER( einstein_80col_ram_r )
+READ8_MEMBER(einstein_state::einstein_80col_ram_r)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
-	return einstein->m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
+	return m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
 }
 
 /* TODO: Verify implementation */
@@ -145,13 +143,12 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_6845_de_changed )
  * bit 2 - Jumper M002 0 = 50Hz, 1 = 60Hz
  * bit 3 - Jumper M001 0 = ???, 1=??? perminently wired high on both the boards I have seen - PHS.
  */
-static READ8_HANDLER( einstein_80col_state_r )
+READ8_MEMBER(einstein_state::einstein_80col_state_r)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	UINT8 result = 0;
 
-	result |= einstein->m_de;
-	result |= input_port_read(space->machine(), "80column_dips") & 0x06;
+	result |= m_de;
+	result |= input_port_read(machine(), "80column_dips") & 0x06;
 
 	return result;
 }
@@ -212,30 +209,28 @@ static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
 	}
 }
 
-static WRITE8_HANDLER( einstein_keyboard_line_write )
+WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
 
-	einstein->m_keyboard_line = data;
+	m_keyboard_line = data;
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(space->machine());
+	einstein_scan_keyboard(machine());
 }
 
-static READ8_HANDLER( einstein_keyboard_data_read )
+READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(space->machine());
+	einstein_scan_keyboard(machine());
 
 	if (VERBOSE_KEYBOARD)
-		logerror("einstein_keyboard_data_read: %02x\n", einstein->m_keyboard_data);
+		logerror("einstein_keyboard_data_read: %02x\n", m_keyboard_data);
 
-	return einstein->m_keyboard_data;
+	return m_keyboard_data;
 }
 
 
@@ -316,11 +311,10 @@ static void einstein_page_rom(running_machine &machine)
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
-static WRITE8_HANDLER( einstein_rom_w )
+WRITE8_MEMBER(einstein_state::einstein_rom_w)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
-	einstein->m_rom_enabled ^= 1;
-	einstein_page_rom(space->machine());
+	m_rom_enabled ^= 1;
+	einstein_page_rom(machine());
 }
 
 
@@ -328,17 +322,16 @@ static WRITE8_HANDLER( einstein_rom_w )
     INTERRUPTS
 ***************************************************************************/
 
-static READ8_HANDLER( einstein_kybintmsk_r )
+READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 {
-	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	UINT8 data = 0;
 
 	/* clear key int. a read of this I/O port will do this or a reset */
-	einstein->m_interrupt &= ~EINSTEIN_KEY_INT;
+	m_interrupt &= ~EINSTEIN_KEY_INT;
 
 	/* bit 0 and 1: fire buttons on the joysticks */
-	data |= input_port_read(space->machine(), "BUTTONS");
+	data |= input_port_read(machine(), "BUTTONS");
 
 	/* bit 2 to 4: printer status */
 	data |= centronics->busy_r() << 2;
@@ -346,70 +339,67 @@ static READ8_HANDLER( einstein_kybintmsk_r )
 	data |= centronics->fault_r() << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
-	data |= input_port_read(space->machine(), "EXTRA");
+	data |= input_port_read(machine(), "EXTRA");
 
 	if(VERBOSE_KEYBOARD)
-		logerror("%s: einstein_kybintmsk_r %02x\n", space->machine().describe_context(), data);
+		logerror("%s: einstein_kybintmsk_r %02x\n", machine().describe_context(), data);
 
 	return data;
 }
 
-static WRITE8_HANDLER( einstein_kybintmsk_w )
+WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_kybintmsk_w %02x\n", space->machine().describe_context(), data);
+	logerror("%s: einstein_kybintmsk_w %02x\n", machine().describe_context(), data);
 
 	/* set mask from bit 0 */
 	if (data & 0x01)
 	{
 		logerror("key int is disabled\n");
-		einstein->m_interrupt_mask &= ~EINSTEIN_KEY_INT;
+		m_interrupt_mask &= ~EINSTEIN_KEY_INT;
 	}
 	else
 	{
 		logerror("key int is enabled\n");
-		einstein->m_interrupt_mask |= EINSTEIN_KEY_INT;
+		m_interrupt_mask |= EINSTEIN_KEY_INT;
 	}
 }
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /ADC interrupt */
-static WRITE8_HANDLER( einstein_adcintmsk_w )
+WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_adcintmsk_w %02x\n", space->machine().describe_context(), data);
+	logerror("%s: einstein_adcintmsk_w %02x\n", machine().describe_context(), data);
 
 	if (data & 0x01)
 	{
 		logerror("adc int is disabled\n");
-		einstein->m_interrupt_mask &= ~EINSTEIN_ADC_INT;
+		m_interrupt_mask &= ~EINSTEIN_ADC_INT;
 	}
 	else
 	{
 		logerror("adc int is enabled\n");
-		einstein->m_interrupt_mask |= EINSTEIN_ADC_INT;
+		m_interrupt_mask |= EINSTEIN_ADC_INT;
 	}
 }
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /FIRE interrupt */
-static WRITE8_HANDLER( einstein_fire_int_w )
+WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
 {
-	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 
-	logerror("%s: einstein_fire_int_w %02x\n", space->machine().describe_context(), data);
+	logerror("%s: einstein_fire_int_w %02x\n", machine().describe_context(), data);
 
 	if (data & 0x01)
 	{
 		logerror("fire int is disabled\n");
-		einstein->m_interrupt_mask &= ~EINSTEIN_FIRE_INT;
+		m_interrupt_mask &= ~EINSTEIN_FIRE_INT;
 	}
 	else
 	{
 		logerror("fire int is enabled\n");
-		einstein->m_interrupt_mask |= EINSTEIN_FIRE_INT;
+		m_interrupt_mask |= EINSTEIN_FIRE_INT;
 	}
 }
 
@@ -538,11 +528,11 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	/* block 3, wd1770 floppy controller */
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd177x_t, read, write)
 	/* block 4, internal controls */
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(einstein_kybintmsk_r, einstein_kybintmsk_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_adcintmsk_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
 	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(IC_I042, einstein_drsel_w)
-	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_rom_w)
-	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_fire_int_w)
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE(einstein_rom_w)
+	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE(einstein_fire_int_w)
 	/* block 5, z80ctc */
 	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I058, z80ctc_r, z80ctc_w)
 	/* block 6, z80pio */
@@ -555,10 +545,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( einstein2_io, AS_IO, 8, einstein_state )
 	AM_IMPORT_FROM(einstein_io)
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(einstein_80col_ram_r, einstein_80col_ram_w)
+	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
 	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ_LEGACY(einstein_80col_state_r)
+	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ(einstein_80col_state_r)
 ADDRESS_MAP_END
 
 
@@ -734,8 +724,8 @@ static const ay8910_interface einstein_ay_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER(IC_I001, PROGRAM, einstein_keyboard_data_read),
-	DEVCB_MEMORY_HANDLER(IC_I001, PROGRAM, einstein_keyboard_line_write),
+	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_data_read),
+	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_line_write),
 	DEVCB_NULL
 };
 

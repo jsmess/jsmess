@@ -552,17 +552,16 @@ INTERRUPT_GEN( msx_interrupt )
 */
 
 
-READ8_HANDLER ( msx_psg_port_a_r )
+READ8_MEMBER(msx_state::msx_psg_port_a_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
 	UINT8 data;
 
-	data = (state->m_cass->input() > 0.0038 ? 0x80 : 0);
+	data = (m_cass->input() > 0.0038 ? 0x80 : 0);
 
-	if ( (state->m_psg_b ^ input_port_read(space->machine(), "DSW") ) & 0x40)
+	if ( (m_psg_b ^ input_port_read(machine(), "DSW") ) & 0x40)
 	{
 		/* game port 2 */
-		UINT8 inp = input_port_read(space->machine(), "JOY1");
+		UINT8 inp = input_port_read(machine(), "JOY1");
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -572,16 +571,16 @@ READ8_HANDLER ( msx_psg_port_a_r )
 		{
 			/* mouse */
 			data |= ( inp & 0x70 );
-			if (state->m_mouse_stat[1] < 0)
+			if (m_mouse_stat[1] < 0)
 				data |= 0xf;
 			else
-				data |= ~(state->m_mouse[1] >> (4*state->m_mouse_stat[1]) ) & 15;
+				data |= ~(m_mouse[1] >> (4*m_mouse_stat[1]) ) & 15;
 		}
 	}
 	else
 	{
 		/* game port 1 */
-		UINT8 inp = input_port_read(space->machine(), "JOY0");
+		UINT8 inp = input_port_read(machine(), "JOY0");
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -591,43 +590,41 @@ READ8_HANDLER ( msx_psg_port_a_r )
 		{
 			/* mouse */
 			data |= ( inp & 0x70 );
-			if (state->m_mouse_stat[0] < 0)
+			if (m_mouse_stat[0] < 0)
 				data |= 0xf;
 			else
-				data |= ~(state->m_mouse[0] >> (4*state->m_mouse_stat[0]) ) & 15;
+				data |= ~(m_mouse[0] >> (4*m_mouse_stat[0]) ) & 15;
 		}
 	}
 
 	return data;
 }
 
-READ8_HANDLER ( msx_psg_port_b_r )
+READ8_MEMBER(msx_state::msx_psg_port_b_r)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
-	return state->m_psg_b;
+	return m_psg_b;
 }
 
-WRITE8_HANDLER ( msx_psg_port_a_w )
+WRITE8_MEMBER(msx_state::msx_psg_port_a_w)
 {
 }
 
-WRITE8_HANDLER ( msx_psg_port_b_w )
+WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 {
-	msx_state *state = space->machine().driver_data<msx_state>();
 	/* Arabic or kana mode led */
-	if ( (data ^ state->m_psg_b) & 0x80)
-		set_led_status (space->machine(), 2, !(data & 0x80) );
+	if ( (data ^ m_psg_b) & 0x80)
+		set_led_status (machine(), 2, !(data & 0x80) );
 
-	if ( (state->m_psg_b ^ data) & 0x10)
+	if ( (m_psg_b ^ data) & 0x10)
 	{
-		if (++state->m_mouse_stat[0] > 3) state->m_mouse_stat[0] = -1;
+		if (++m_mouse_stat[0] > 3) m_mouse_stat[0] = -1;
 	}
-	if ( (state->m_psg_b ^ data) & 0x20)
+	if ( (m_psg_b ^ data) & 0x20)
 	{
-		if (++state->m_mouse_stat[1] > 3) state->m_mouse_stat[1] = -1;
+		if (++m_mouse_stat[1] > 3) m_mouse_stat[1] = -1;
 	}
 
-	state->m_psg_b = data;
+	m_psg_b = data;
 }
 
 WRITE8_DEVICE_HANDLER( msx_printer_strobe_w )

@@ -294,7 +294,7 @@ Timings:
 /* I/O ports */
 
 static ADDRESS_MAP_START(io_map, AS_IO, 8, lviv_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(lviv_io_r,lviv_io_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(lviv_io_r,lviv_io_w)
 ADDRESS_MAP_END
 
 /* memory w/r functions */

@@ -20,6 +20,8 @@ public:
 	int m_dma_activ;
 	int m_state;
 	int m_count;
+	DECLARE_READ8_MEMBER(comquest_read);
+	DECLARE_WRITE8_MEMBER(comquest_write);
 };
 
 

@@ -105,9 +105,9 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	}
 }
 
-WRITE8_HANDLER( mtx_bankswitch_w )
+WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
 {
-	bankswitch(space->machine(), data);
+	bankswitch(machine(), data);
 }
 
 /*-------------------------------------------------
@@ -127,11 +127,10 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
     mtx_sound_latch_w - sound latch write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( mtx_sound_latch_w )
+WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	state->m_sound_latch = data;
+	m_sound_latch = data;
 }
 
 /*-------------------------------------------------
@@ -190,31 +189,29 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
     mtx_sense_w - keyboard sense write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( mtx_sense_w )
+WRITE8_MEMBER(mtx_state::mtx_sense_w)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	state->m_key_sense = data;
+	m_key_sense = data;
 }
 
 /*-------------------------------------------------
     mtx_key_lo_r - keyboard low read
 -------------------------------------------------*/
 
-READ8_HANDLER( mtx_key_lo_r )
+READ8_MEMBER(mtx_state::mtx_key_lo_r)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
 	UINT8 data = 0xff;
 
-	if (!(state->m_key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0");
-	if (!(state->m_key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1");
-	if (!(state->m_key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2");
-	if (!(state->m_key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3");
-	if (!(state->m_key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4");
-	if (!(state->m_key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5");
-	if (!(state->m_key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6");
-	if (!(state->m_key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7");
+	if (!(m_key_sense & 0x01)) data &= input_port_read(machine(), "ROW0");
+	if (!(m_key_sense & 0x02)) data &= input_port_read(machine(), "ROW1");
+	if (!(m_key_sense & 0x04)) data &= input_port_read(machine(), "ROW2");
+	if (!(m_key_sense & 0x08)) data &= input_port_read(machine(), "ROW3");
+	if (!(m_key_sense & 0x10)) data &= input_port_read(machine(), "ROW4");
+	if (!(m_key_sense & 0x20)) data &= input_port_read(machine(), "ROW5");
+	if (!(m_key_sense & 0x40)) data &= input_port_read(machine(), "ROW6");
+	if (!(m_key_sense & 0x80)) data &= input_port_read(machine(), "ROW7");
 
 	return data;
 }
@@ -223,20 +220,19 @@ READ8_HANDLER( mtx_key_lo_r )
     mtx_key_lo_r - keyboard high read
 -------------------------------------------------*/
 
-READ8_HANDLER( mtx_key_hi_r )
+READ8_MEMBER(mtx_state::mtx_key_hi_r)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	UINT8 data = input_port_read(space->machine(), "country_code");
+	UINT8 data = input_port_read(machine(), "country_code");
 
-	if (!(state->m_key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0") >> 8;
-	if (!(state->m_key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1") >> 8;
-	if (!(state->m_key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2") >> 8;
-	if (!(state->m_key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3") >> 8;
-	if (!(state->m_key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4") >> 8;
-	if (!(state->m_key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5") >> 8;
-	if (!(state->m_key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6") >> 8;
-	if (!(state->m_key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7") >> 8;
+	if (!(m_key_sense & 0x01)) data &= input_port_read(machine(), "ROW0") >> 8;
+	if (!(m_key_sense & 0x02)) data &= input_port_read(machine(), "ROW1") >> 8;
+	if (!(m_key_sense & 0x04)) data &= input_port_read(machine(), "ROW2") >> 8;
+	if (!(m_key_sense & 0x08)) data &= input_port_read(machine(), "ROW3") >> 8;
+	if (!(m_key_sense & 0x10)) data &= input_port_read(machine(), "ROW4") >> 8;
+	if (!(m_key_sense & 0x20)) data &= input_port_read(machine(), "ROW5") >> 8;
+	if (!(m_key_sense & 0x40)) data &= input_port_read(machine(), "ROW6") >> 8;
+	if (!(m_key_sense & 0x80)) data &= input_port_read(machine(), "ROW7") >> 8;
 
 	return data;
 }
@@ -245,7 +241,7 @@ READ8_HANDLER( mtx_key_hi_r )
     hrx_address_w - HRX video RAM address
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_address_w )
+WRITE8_MEMBER(mtx_state::hrx_address_w)
 {
 	if (offset)
 	{
@@ -287,7 +283,7 @@ WRITE8_HANDLER( hrx_address_w )
     hrx_data_r - HRX data read
 -------------------------------------------------*/
 
-READ8_HANDLER( hrx_data_r )
+READ8_MEMBER(mtx_state::hrx_data_r)
 {
 	return 0;
 }
@@ -296,7 +292,7 @@ READ8_HANDLER( hrx_data_r )
     hrx_data_w - HRX data write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_data_w )
+WRITE8_MEMBER(mtx_state::hrx_data_w)
 {
 }
 
@@ -304,7 +300,7 @@ WRITE8_HANDLER( hrx_data_w )
     hrx_attr_r - HRX attribute read
 -------------------------------------------------*/
 
-READ8_HANDLER( hrx_attr_r )
+READ8_MEMBER(mtx_state::hrx_attr_r)
 {
 	return 0;
 }
@@ -313,7 +309,7 @@ READ8_HANDLER( hrx_attr_r )
     hrx_attr_r - HRX attribute write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_attr_w )
+WRITE8_MEMBER(mtx_state::hrx_attr_w)
 {
 	/*
 

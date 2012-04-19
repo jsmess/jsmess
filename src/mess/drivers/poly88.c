@@ -28,9 +28,9 @@ static ADDRESS_MAP_START( poly88_io, AS_IO, 8, poly88_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(poly88_baud_rate_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(poly88_intr_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ_LEGACY(poly88_keyboard_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(poly88_intr_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8, poly88_state )

@@ -69,6 +69,8 @@ public:
 	emu_timer* m_timer2_timer;
 	UINT8 m_timer2_top;
 	INT32 m_timer2_increment;
+	DECLARE_READ8_MEMBER(avr8_read);
+	DECLARE_WRITE8_MEMBER(avr8_write);
 };
 
 void craft_state::machine_start()
@@ -200,13 +202,12 @@ static TIMER_CALLBACK( avr8_timer1_tick )
     */
 }
 
-static READ8_HANDLER( avr8_read )
+READ8_MEMBER(craft_state::avr8_read)
 {
-    craft_state *state = space->machine().driver_data<craft_state>();
 
 	if(offset <= Avr8::REGIDX_R31)
 	{
-		return state->m_regs[offset];
+		return m_regs[offset];
 	}
 
     switch( offset )
@@ -214,10 +215,10 @@ static READ8_HANDLER( avr8_read )
 		case Avr8::REGIDX_SPL:
 		case Avr8::REGIDX_SPH:
 		case Avr8::REGIDX_SREG:
-			return state->m_regs[offset];
+			return m_regs[offset];
 
         default:
-            verboselog(space->machine(), 0, "AVR8: Unrecognized register read: %02x\n", offset );
+            verboselog(machine(), 0, "AVR8: Unrecognized register read: %02x\n", offset );
     }
 
     return 0;
@@ -831,95 +832,94 @@ static void avr8_update_ocr1(running_machine &machine, UINT16 newval, UINT8 reg)
 	verboselog(machine, 0, "avr8_update_ocr1: TODO: new OCR1%c = %04x\n", avr8_reg_name[reg], newval);
 }
 
-static WRITE8_HANDLER( avr8_write )
+WRITE8_MEMBER(craft_state::avr8_write)
 {
-    craft_state *state = space->machine().driver_data<craft_state>();
-
+	craft_state *state = machine().driver_data<craft_state>();
 	if(offset <= Avr8::REGIDX_R31)
 	{
-		state->m_regs[offset] = data;
+		m_regs[offset] = data;
 		return;
 	}
 
     switch( offset )
     {
 		case Avr8::REGIDX_OCR1BH:
-			verboselog(space->machine(), 0, "AVR8: OCR1BH = %02x\n", data );
-			avr8_update_ocr1(space->machine(), (AVR8_OCR1B & 0x00ff) | (data << 8), AVR8_REG_B);
+			verboselog(machine(), 0, "AVR8: OCR1BH = %02x\n", data );
+			avr8_update_ocr1(machine(), (AVR8_OCR1B & 0x00ff) | (data << 8), AVR8_REG_B);
 			break;
 
 		case Avr8::REGIDX_OCR1BL:
-			verboselog(space->machine(), 0, "AVR8: OCR1BL = %02x\n", data );
-			avr8_update_ocr1(space->machine(), (AVR8_OCR1B & 0xff00) | data, AVR8_REG_B);
+			verboselog(machine(), 0, "AVR8: OCR1BL = %02x\n", data );
+			avr8_update_ocr1(machine(), (AVR8_OCR1B & 0xff00) | data, AVR8_REG_B);
 			break;
 
 		case Avr8::REGIDX_OCR1AH:
-			verboselog(space->machine(), 0, "AVR8: OCR1AH = %02x\n", data );
-			avr8_update_ocr1(space->machine(), (AVR8_OCR1A & 0x00ff) | (data << 8), AVR8_REG_A);
+			verboselog(machine(), 0, "AVR8: OCR1AH = %02x\n", data );
+			avr8_update_ocr1(machine(), (AVR8_OCR1A & 0x00ff) | (data << 8), AVR8_REG_A);
 			break;
 
 		case Avr8::REGIDX_OCR1AL:
-			verboselog(space->machine(), 0, "AVR8: OCR1AL = %02x\n", data );
-			avr8_update_ocr1(space->machine(), (AVR8_OCR1A & 0xff00) | data, AVR8_REG_A);
+			verboselog(machine(), 0, "AVR8: OCR1AL = %02x\n", data );
+			avr8_update_ocr1(machine(), (AVR8_OCR1A & 0xff00) | data, AVR8_REG_A);
 			break;
 
 		case Avr8::REGIDX_TCCR1B:
-			verboselog(space->machine(), 0, "AVR8: TCCR1B = %02x\n", data );
-			avr8_changed_tccr1b(space->machine(), data);
+			verboselog(machine(), 0, "AVR8: TCCR1B = %02x\n", data );
+			avr8_changed_tccr1b(machine(), data);
 			break;
 
 		case Avr8::REGIDX_TCCR1A:
-			verboselog(space->machine(), 0, "AVR8: TCCR1A = %02x\n", data );
-			avr8_changed_tccr1a(space->machine(), data);
+			verboselog(machine(), 0, "AVR8: TCCR1A = %02x\n", data );
+			avr8_changed_tccr1a(machine(), data);
 			break;
 
 		case Avr8::REGIDX_TIMSK1:
-			verboselog(space->machine(), 0, "AVR8: TIMSK1 = %02x\n", data );
-			avr8_change_timsk1(space->machine(), data);
+			verboselog(machine(), 0, "AVR8: TIMSK1 = %02x\n", data );
+			avr8_change_timsk1(machine(), data);
 			break;
 
 		case Avr8::REGIDX_TCCR2B:
-			verboselog(space->machine(), 0, "AVR8: TCCR2B = %02x\n", data );
-			avr8_changed_tccr2b(space->machine(), data);
+			verboselog(machine(), 0, "AVR8: TCCR2B = %02x\n", data );
+			avr8_changed_tccr2b(machine(), data);
 			break;
 
 		case Avr8::REGIDX_TCCR2A:
-			verboselog(space->machine(), 0, "AVR8: TCCR2A = %02x\n", data );
-			avr8_changed_tccr2a(space->machine(), data);
+			verboselog(machine(), 0, "AVR8: TCCR2A = %02x\n", data );
+			avr8_changed_tccr2a(machine(), data);
 			break;
 
 		case Avr8::REGIDX_SPL:
 		case Avr8::REGIDX_SPH:
 		case Avr8::REGIDX_SREG:
-			state->m_regs[offset] = data;
+			m_regs[offset] = data;
 			break;
 
 		case Avr8::REGIDX_SPSR:
-			avr8_change_spsr(space->machine(), data);
+			avr8_change_spsr(machine(), data);
 			break;
 
 		case Avr8::REGIDX_SPCR:
-			avr8_change_spcr(space->machine(), data);
+			avr8_change_spcr(machine(), data);
 			break;
 
 		case Avr8::REGIDX_DDRD:
-			avr8_change_ddr(space->machine(), AVR8_REG_D, data);
+			avr8_change_ddr(machine(), AVR8_REG_D, data);
 			break;
 
 		case Avr8::REGIDX_DDRC:
-			avr8_change_ddr(space->machine(), AVR8_REG_C, data);
+			avr8_change_ddr(machine(), AVR8_REG_C, data);
 			break;
 
 		case Avr8::REGIDX_PORTB:
-			avr8_change_port(space->machine(), AVR8_REG_B, data);
+			avr8_change_port(machine(), AVR8_REG_B, data);
 			break;
 
 		case Avr8::REGIDX_DDRB:
-			avr8_change_ddr(space->machine(), AVR8_REG_B, data);
+			avr8_change_ddr(machine(), AVR8_REG_B, data);
 			break;
 
         default:
-            verboselog(space->machine(), 0, "AVR8: Unrecognized register write: %02x = %02x\n", offset, data );
+            verboselog(machine(), 0, "AVR8: Unrecognized register write: %02x = %02x\n", offset, data );
     }
 }
 
@@ -932,7 +932,7 @@ static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8, craft_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
-    AM_RANGE(0x0000, 0x00ff) AM_READWRITE_LEGACY(avr8_read, avr8_write)
+    AM_RANGE(0x0000, 0x00ff) AM_READWRITE(avr8_read, avr8_write)
     AM_RANGE(0x0100, 0x04ff) AM_RAM
 ADDRESS_MAP_END
 

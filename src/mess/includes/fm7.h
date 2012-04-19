@@ -142,78 +142,110 @@ public:
 	fm7_video_t m_video;
 	fm7_alu_t m_alu;
 	int m_sb_prev;
+	DECLARE_READ8_MEMBER(fm7_subintf_r);
+	DECLARE_WRITE8_MEMBER(fm7_subintf_w);
+	DECLARE_READ8_MEMBER(fm7_sub_busyflag_r);
+	DECLARE_WRITE8_MEMBER(fm7_sub_busyflag_w);
+	DECLARE_READ8_MEMBER(fm7_cancel_ack);
+	DECLARE_READ8_MEMBER(fm7_attn_irq_r);
+	DECLARE_READ8_MEMBER(fm7_vram_access_r);
+	DECLARE_WRITE8_MEMBER(fm7_vram_access_w);
+	DECLARE_READ8_MEMBER(fm7_vram_r);
+	DECLARE_WRITE8_MEMBER(fm7_vram_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram_banked_w);
+	DECLARE_READ8_MEMBER(fm7_vram0_r);
+	DECLARE_READ8_MEMBER(fm7_vram1_r);
+	DECLARE_READ8_MEMBER(fm7_vram2_r);
+	DECLARE_READ8_MEMBER(fm7_vram3_r);
+	DECLARE_READ8_MEMBER(fm7_vram4_r);
+	DECLARE_READ8_MEMBER(fm7_vram5_r);
+	DECLARE_READ8_MEMBER(fm7_vram6_r);
+	DECLARE_READ8_MEMBER(fm7_vram7_r);
+	DECLARE_READ8_MEMBER(fm7_vram8_r);
+	DECLARE_READ8_MEMBER(fm7_vram9_r);
+	DECLARE_READ8_MEMBER(fm7_vramA_r);
+	DECLARE_READ8_MEMBER(fm7_vramB_r);
+	DECLARE_WRITE8_MEMBER(fm7_vram0_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram1_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram2_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram3_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram4_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram5_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram6_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram7_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram8_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram9_w);
+	DECLARE_WRITE8_MEMBER(fm7_vramA_w);
+	DECLARE_WRITE8_MEMBER(fm7_vramB_w);
+	DECLARE_READ8_MEMBER(fm7_crt_r);
+	DECLARE_WRITE8_MEMBER(fm7_crt_w);
+	DECLARE_WRITE8_MEMBER(fm7_vram_offset_w);
+	DECLARE_WRITE8_MEMBER(fm7_multipage_w);
+	DECLARE_READ8_MEMBER(fm7_palette_r);
+	DECLARE_WRITE8_MEMBER(fm7_palette_w);
+	DECLARE_WRITE8_MEMBER(fm77av_analog_palette_w);
+	DECLARE_READ8_MEMBER(fm77av_video_flags_r);
+	DECLARE_WRITE8_MEMBER(fm77av_video_flags_w);
+	DECLARE_READ8_MEMBER(fm77av_sub_modestatus_r);
+	DECLARE_WRITE8_MEMBER(fm77av_sub_modestatus_w);
+	DECLARE_WRITE8_MEMBER(fm77av_sub_bank_w);
+	DECLARE_READ8_MEMBER(fm77av_alu_r);
+	DECLARE_WRITE8_MEMBER(fm77av_alu_w);
+	DECLARE_READ8_MEMBER(fm7_sub_ram_ports_banked_r);
+	DECLARE_WRITE8_MEMBER(fm7_sub_ram_ports_banked_w);
+	DECLARE_READ8_MEMBER(fm7_console_ram_banked_r);
+	DECLARE_WRITE8_MEMBER(fm7_console_ram_banked_w);
+	DECLARE_WRITE8_MEMBER(fm7_irq_mask_w);
+	DECLARE_READ8_MEMBER(fm7_irq_cause_r);
+	DECLARE_WRITE8_MEMBER(fm7_beeper_w);
+	DECLARE_READ8_MEMBER(fm7_sub_beeper_r);
+	DECLARE_READ8_MEMBER(vector_r);
+	DECLARE_WRITE8_MEMBER(vector_w);
+	DECLARE_READ8_MEMBER(fm7_fd04_r);
+	DECLARE_READ8_MEMBER(fm7_rom_en_r);
+	DECLARE_WRITE8_MEMBER(fm7_rom_en_w);
+	DECLARE_WRITE8_MEMBER(fm7_init_en_w);
+	DECLARE_READ8_MEMBER(fm7_fdc_r);
+	DECLARE_WRITE8_MEMBER(fm7_fdc_w);
+	DECLARE_READ8_MEMBER(fm7_keyboard_r);
+	DECLARE_READ8_MEMBER(fm7_sub_keyboard_r);
+	DECLARE_READ8_MEMBER(fm77av_key_encoder_r);
+	DECLARE_WRITE8_MEMBER(fm77av_key_encoder_w);
+	DECLARE_READ8_MEMBER(fm7_cassette_printer_r);
+	DECLARE_WRITE8_MEMBER(fm7_cassette_printer_w);
+	DECLARE_READ8_MEMBER(fm77av_boot_mode_r);
+	DECLARE_READ8_MEMBER(fm7_psg_select_r);
+	DECLARE_WRITE8_MEMBER(fm7_psg_select_w);
+	DECLARE_WRITE8_MEMBER(fm77av_ym_select_w);
+	DECLARE_READ8_MEMBER(fm7_psg_data_r);
+	DECLARE_WRITE8_MEMBER(fm7_psg_data_w);
+	DECLARE_WRITE8_MEMBER(fm77av_bootram_w);
+	DECLARE_READ8_MEMBER(fm7_main_shared_r);
+	DECLARE_WRITE8_MEMBER(fm7_main_shared_w);
+	DECLARE_READ8_MEMBER(fm7_fmirq_r);
+	DECLARE_READ8_MEMBER(fm7_unknown_r);
+	DECLARE_READ8_MEMBER(fm7_mmr_r);
+	DECLARE_WRITE8_MEMBER(fm7_mmr_w);
+	DECLARE_READ8_MEMBER(fm7_kanji_r);
+	DECLARE_WRITE8_MEMBER(fm7_kanji_w);
+	void fm77av_encoder_setup_command();
+	void fm77av_encoder_handle_command();
 };
 
 
 /*----------- defined in drivers/fm7.c -----------*/
 
-READ8_HANDLER( fm7_sub_keyboard_r );
-READ8_HANDLER( fm77av_key_encoder_r );
-WRITE8_HANDLER( fm77av_key_encoder_w );
-READ8_HANDLER( fm7_sub_beeper_r );
 
 
 /*----------- defined in video/fm7.c -----------*/
 
 TIMER_CALLBACK( fm77av_vsync );
 
-READ8_HANDLER( fm7_subintf_r );
-WRITE8_HANDLER( fm7_subintf_w );
-READ8_HANDLER( fm7_sub_busyflag_r );
-WRITE8_HANDLER( fm7_sub_busyflag_w );
-READ8_HANDLER( fm77av_sub_modestatus_r );
-WRITE8_HANDLER( fm77av_sub_modestatus_w );
-WRITE8_HANDLER( fm77av_sub_bank_w );
 
-READ8_HANDLER( fm7_cancel_ack );
-READ8_HANDLER( fm7_attn_irq_r );
 
-READ8_HANDLER( fm7_vram_access_r );
-WRITE8_HANDLER( fm7_vram_access_w );
-READ8_HANDLER( fm7_vram_r );
-WRITE8_HANDLER( fm7_vram_w );
-READ8_HANDLER( fm7_crt_r );
-WRITE8_HANDLER( fm7_crt_w );
-WRITE8_HANDLER( fm7_vram_offset_w );
-READ8_HANDLER( fm77av_video_flags_r );
-WRITE8_HANDLER( fm77av_video_flags_w );
-READ8_HANDLER( fm77av_alu_r );
-WRITE8_HANDLER( fm77av_alu_w );
 
-WRITE8_HANDLER( fm77av_analog_palette_w );
-WRITE8_HANDLER( fm7_multipage_w );
-READ8_HANDLER( fm7_palette_r );
-WRITE8_HANDLER( fm7_palette_w );
 
-READ8_HANDLER( fm7_vram0_r );
-READ8_HANDLER( fm7_vram1_r );
-READ8_HANDLER( fm7_vram2_r );
-READ8_HANDLER( fm7_vram3_r );
-READ8_HANDLER( fm7_vram4_r );
-READ8_HANDLER( fm7_vram5_r );
-READ8_HANDLER( fm7_vram6_r );
-READ8_HANDLER( fm7_vram7_r );
-READ8_HANDLER( fm7_vram8_r );
-READ8_HANDLER( fm7_vram9_r );
-READ8_HANDLER( fm7_vramA_r );
-READ8_HANDLER( fm7_vramB_r );
-WRITE8_HANDLER( fm7_vram0_w );
-WRITE8_HANDLER( fm7_vram1_w );
-WRITE8_HANDLER( fm7_vram2_w );
-WRITE8_HANDLER( fm7_vram3_w );
-WRITE8_HANDLER( fm7_vram4_w );
-WRITE8_HANDLER( fm7_vram5_w );
-WRITE8_HANDLER( fm7_vram6_w );
-WRITE8_HANDLER( fm7_vram7_w );
-WRITE8_HANDLER( fm7_vram8_w );
-WRITE8_HANDLER( fm7_vram9_w );
-WRITE8_HANDLER( fm7_vramA_w );
-WRITE8_HANDLER( fm7_vramB_w );
 
-READ8_HANDLER( fm7_sub_ram_ports_banked_r );
-WRITE8_HANDLER( fm7_sub_ram_ports_banked_w );
-READ8_HANDLER( fm7_console_ram_banked_r );
-WRITE8_HANDLER( fm7_console_ram_banked_w );
 
 VIDEO_START( fm7 );
 SCREEN_UPDATE_IND16( fm7 );

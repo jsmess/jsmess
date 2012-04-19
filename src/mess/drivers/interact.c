@@ -77,12 +77,12 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
 /*  AM_RANGE(0x0800,0x0808) AM_WRITE_LEGACY(hector_switch_bank_w)// Bank management not udsed in BR machine*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE_LEGACY(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE_LEGACY(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE_LEGACY(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE_LEGACY(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE_LEGACY(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE_LEGACY(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/

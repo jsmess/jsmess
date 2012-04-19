@@ -20,6 +20,15 @@ public:
 	UINT8 m_memory_block[16];
 	UINT8 m_video_write_mode;
 	UINT8 m_key_line;
+	DECLARE_WRITE8_MEMBER(pp01_video_write_mode_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_r_1_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_g_1_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_b_1_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_r_2_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_g_2_w);
+	DECLARE_WRITE8_MEMBER(pp01_video_b_2_w);
+	DECLARE_WRITE8_MEMBER(pp01_mem_block_w);
+	DECLARE_READ8_MEMBER(pp01_mem_block_r);
 };
 
 
@@ -28,9 +37,6 @@ extern const struct pit8253_config pp01_pit8253_intf;
 extern const i8255_interface pp01_ppi8255_interface;
 extern MACHINE_START( pp01 );
 extern MACHINE_RESET( pp01 );
-extern WRITE8_HANDLER (pp01_mem_block_w);
-extern READ8_HANDLER  (pp01_mem_block_r);
-extern WRITE8_HANDLER (pp01_video_write_mode_w);
 /*----------- defined in video/pp01.c -----------*/
 
 extern VIDEO_START( pp01 );

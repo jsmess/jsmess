@@ -17,27 +17,26 @@
   I/O devices
 ***************************************************************************/
 
-READ8_HANDLER( galaxy_keyboard_r )
+READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	if (offset == 0)
 	{
-		double level = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
 	{
-		return input_port_read(space->machine(), keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return input_port_read(machine(), keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
-WRITE8_HANDLER( galaxy_latch_w )
+WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
 {
-	galaxy_state *state = space->machine().driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
-	state->m_latch_value = data;
-	space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(val);
+	m_latch_value = data;
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(val);
 }
 
 

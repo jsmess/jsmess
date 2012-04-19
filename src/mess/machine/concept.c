@@ -255,9 +255,8 @@ static void via_irq_func(device_t *device, int state)
 	concept_set_interrupt(device->machine(), TIMINT_level, state);
 }
 
-READ16_HANDLER(concept_io_r)
+READ16_MEMBER(concept_state::concept_io_r)
 {
-	concept_state *state = space->machine().driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return 0;
 
@@ -277,8 +276,8 @@ READ16_HANDLER(concept_io_r)
 			/* IO4 registers */
 			{
 				int slot = ((offset >> 4) & 7) - 1;
-				if (state->m_expansion_slots[slot].reg_read)
-					return state->m_expansion_slots[slot].reg_read(space, offset & 0xf);
+				if (m_expansion_slots[slot].reg_read)
+					return m_expansion_slots[slot].reg_read(&space, offset & 0xf);
 			}
 			break;
 
@@ -300,8 +299,8 @@ READ16_HANDLER(concept_io_r)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
-			if (state->m_expansion_slots[slot].rom_read)
-				return state->m_expansion_slots[slot].rom_read(space, offset & 0xff);
+			if (m_expansion_slots[slot].rom_read)
+				return m_expansion_slots[slot].rom_read(&space, offset & 0xff);
 		}
 		break;
 
@@ -313,8 +312,8 @@ READ16_HANDLER(concept_io_r)
 	case 6:
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
-		if (!state->m_clock_enable)
-			return mm58274c_r(space->machine().device("mm58274c"), state->m_clock_address);
+		if (!m_clock_enable)
+			return mm58274c_r(machine().device("mm58274c"), m_clock_address);
 		break;
 
 	case 7:
@@ -331,21 +330,21 @@ READ16_HANDLER(concept_io_r)
 				/* data */
 				reply = 0;
 
-				if (state->m_KeyQueueLen)
+				if (m_KeyQueueLen)
 				{
-					reply = state->m_KeyQueue[state->m_KeyQueueHead];
-					state->m_KeyQueueHead = (state->m_KeyQueueHead + 1) % KeyQueueSize;
-					state->m_KeyQueueLen--;
+					reply = m_KeyQueue[m_KeyQueueHead];
+					m_KeyQueueHead = (m_KeyQueueHead + 1) % KeyQueueSize;
+					m_KeyQueueLen--;
 				}
 
-				if (!state->m_KeyQueueLen)
-					concept_set_interrupt(space->machine(), KEYINT_level, 0);
+				if (!m_KeyQueueLen)
+					concept_set_interrupt(machine(), KEYINT_level, 0);
 
 				return reply;
 
 			case 1:
 				/* always tell transmit is empty */
-				reply = state->m_KeyQueueLen ? 0x98 : 0x10;
+				reply = m_KeyQueueLen ? 0x98 : 0x10;
 				break;
 			}
 			break;
@@ -362,8 +361,8 @@ READ16_HANDLER(concept_io_r)
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-				return via_0->read(*space, offset & 0xf);
+				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+				return via_0->read(space, offset & 0xf);
 			}
 			break;
 
@@ -394,9 +393,8 @@ READ16_HANDLER(concept_io_r)
 	return 0;
 }
 
-WRITE16_HANDLER(concept_io_w)
+WRITE16_MEMBER(concept_state::concept_io_w)
 {
-	concept_state *state = space->machine().driver_data<concept_state>();
 	if (! ACCESSING_BITS_0_7)
 		return;
 
@@ -420,8 +418,8 @@ WRITE16_HANDLER(concept_io_w)
 				int slot = ((offset >> 4) & 7) - 1;
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
-				if (state->m_expansion_slots[slot].reg_write)
-					state->m_expansion_slots[slot].reg_write(space, offset & 0xf, data);
+				if (m_expansion_slots[slot].reg_write)
+					m_expansion_slots[slot].reg_write(&space, offset & 0xf, data);
 			}
 			break;
 
@@ -443,8 +441,8 @@ WRITE16_HANDLER(concept_io_w)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
-			if (state->m_expansion_slots[slot].rom_write)
-				state->m_expansion_slots[slot].rom_write(space, offset & 0xff, data);
+			if (m_expansion_slots[slot].rom_write)
+				m_expansion_slots[slot].rom_write(&space, offset & 0xff, data);
 		}
 		break;
 
@@ -456,8 +454,8 @@ WRITE16_HANDLER(concept_io_w)
 	case 6:
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
-		if (!state->m_clock_enable)
-			mm58274c_w(space->machine().device("mm58274c"), state->m_clock_address, data & 0xf);
+		if (!m_clock_enable)
+			mm58274c_w(machine().device("mm58274c"), m_clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -476,19 +474,19 @@ WRITE16_HANDLER(concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-				via_0->write(*space, offset & 0xf, data);
+				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+				via_0->write(space, offset & 0xf, data);
 			}
 			break;
 
 		case 4:
 			/* NCALM clock calendar address and strobe register */
-			if (state->m_clock_enable != ((data & 0x10) != 0))
+			if (m_clock_enable != ((data & 0x10) != 0))
 			{
-				state->m_clock_enable = (data & 0x10) != 0;
-				if (! state->m_clock_enable)
+				m_clock_enable = (data & 0x10) != 0;
+				if (! m_clock_enable)
 					/* latch address when enable goes low */
-					state->m_clock_address = data & 0x0f;
+					m_clock_address = data & 0x0f;
 			}
 			/*volume_control = (data & 0x20) != 0;*/
 			/*alt_map = (data & 0x40) != 0;*/

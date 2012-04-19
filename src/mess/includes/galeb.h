@@ -16,6 +16,7 @@ public:
 		m_video_ram(*this, "video_ram"){ }
 
 	required_shared_ptr<UINT8> m_video_ram;
+	DECLARE_READ8_MEMBER(galeb_keyboard_r);
 };
 
 /*----------- defined in video/galeb.c -----------*/

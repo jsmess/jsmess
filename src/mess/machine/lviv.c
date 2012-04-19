@@ -145,10 +145,9 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 
 
 /* I/O */
- READ8_HANDLER ( lviv_io_r )
+READ8_MEMBER(lviv_state::lviv_io_r)
 {
-	lviv_state *state = space->machine().driver_data<lviv_state>();
-	if (state->m_startup_mem_map)
+	if (m_startup_mem_map)
 	{
 		return 0;	/* ??? */
 	}
@@ -157,10 +156,10 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 3);
+			return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 3);
 
 		case 1:
-			return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 3);
+			return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 3);
 
 		case 2:
 		case 3:
@@ -171,36 +170,35 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 	}
 }
 
-WRITE8_HANDLER ( lviv_io_w )
+WRITE8_MEMBER(lviv_state::lviv_io_w)
 {
-	lviv_state *state = space->machine().driver_data<lviv_state>();
-	address_space *cpuspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	if (state->m_startup_mem_map)
+	address_space *cpuspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	if (m_startup_mem_map)
 	{
-		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
+		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-		state->m_startup_mem_map = 0;
+		m_startup_mem_map = 0;
 
 		cpuspace->install_write_bank(0x0000, 0x3fff, "bank1");
 		cpuspace->install_write_bank(0x4000, 0x7fff, "bank2");
 		cpuspace->install_write_bank(0x8000, 0xbfff, "bank3");
 		cpuspace->unmap_write(0xC000, 0xffff);
 
-		memory_set_bankptr(space->machine(),"bank1", ram);
-		memory_set_bankptr(space->machine(),"bank2", ram + 0x4000);
-		memory_set_bankptr(space->machine(),"bank3", ram + 0x8000);
-		memory_set_bankptr(space->machine(),"bank4", space->machine().region("maincpu")->base() + 0x010000);
+		memory_set_bankptr(machine(),"bank1", ram);
+		memory_set_bankptr(machine(),"bank2", ram + 0x4000);
+		memory_set_bankptr(machine(),"bank3", ram + 0x8000);
+		memory_set_bankptr(machine(),"bank4", machine().region("maincpu")->base() + 0x010000);
 	}
 	else
 	{
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 3, data);
+			machine().device<i8255_device>("ppi8255_0")->write(space, offset & 3, data);
 			break;
 
 		case 1:
-			space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 3, data);
+			machine().device<i8255_device>("ppi8255_1")->write(space, offset & 3, data);
 			break;
 
 		case 2:

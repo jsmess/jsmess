@@ -25,8 +25,8 @@
 
 static void init_nes_core(running_machine &machine);
 static void nes_machine_stop(running_machine &machine);
-static READ8_HANDLER(nes_fds_r);
-static WRITE8_HANDLER(nes_fds_w);
+
+
 static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
 
 /***************************************************************************
@@ -68,11 +68,11 @@ static void init_nes_core( running_machine &machine )
 		if (state->m_fds_ram == NULL)
 			state->m_fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
 
-		space->install_legacy_read_handler(0x4030, 0x403f, FUNC(nes_fds_r));
+		space->install_read_handler(0x4030, 0x403f, read8_delegate(FUNC(nes_state::nes_fds_r),state));
 		space->install_read_bank(0x6000, 0xdfff, "bank2");
 		space->install_read_bank(0xe000, 0xffff, "bank1");
 
-		space->install_legacy_write_handler(0x4020, 0x402f, FUNC(nes_fds_w));
+		space->install_write_handler(0x4020, 0x402f, write8_delegate(FUNC(nes_state::nes_fds_w),state));
 		space->install_write_bank(0x6000, 0xdfff, "bank2");
 
 		memory_set_bankptr(machine, "bank1", &state->m_rom[0xe000]);
@@ -331,10 +331,9 @@ static void nes_machine_stop( running_machine &machine )
 
 
 
-READ8_HANDLER( nes_IN0_r )
+READ8_MEMBER(nes_state::nes_IN0_r)
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
-	int cfg = input_port_read(space->machine(), "CTRLSEL");
+	int cfg = input_port_read(machine(), "CTRLSEL");
 	int ret;
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
@@ -348,20 +347,20 @@ READ8_HANDLER( nes_IN0_r )
 		/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
 		ret = 0x40;
 
-		ret |= ((state->m_in_0.i0 >> state->m_in_0.shift) & 0x01);
+		ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
 
 		/* zapper */
 		if ((cfg & 0x000f) == 0x0002)
 		{
-			int x = state->m_in_0.i1;	/* read Zapper x-position */
-			int y = state->m_in_0.i2;	/* read Zapper y-position */
+			int x = m_in_0.i1;	/* read Zapper x-position */
+			int y = m_in_0.i2;	/* read Zapper y-position */
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
-			pix = state->m_ppu->get_pixel(x, y);
+			pix = m_ppu->get_pixel(x, y);
 
 			/* get the color base from the ppu */
-			color_base = state->m_ppu->get_colorbase();
+			color_base = m_ppu->get_colorbase();
 
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
@@ -373,13 +372,13 @@ READ8_HANDLER( nes_IN0_r )
 				ret |= 0x08;  /* no sprite hit */
 
 			/* If button 1 is pressed, indicate the light gun trigger is pressed */
-			ret |= ((state->m_in_0.i0 & 0x01) << 4);
+			ret |= ((m_in_0.i0 & 0x01) << 4);
 		}
 
 		if (LOG_JOY)
-			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space->device()), state->m_in_0.shift, state->m_in_0.i0);
+			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space.device()), m_in_0.shift, m_in_0.i0);
 
-		state->m_in_0.shift++;
+		m_in_0.shift++;
 	}
 
 	return ret;
@@ -399,23 +398,22 @@ static UINT8 nes_read_subor_keyboard_line( running_machine &machine, UINT8 scan,
 	return ((input_port_read(machine, sub_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
 }
 
-READ8_HANDLER( nes_IN1_r )
+READ8_MEMBER(nes_state::nes_IN1_r)
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
-	int cfg = input_port_read(space->machine(), "CTRLSEL");
+	int cfg = input_port_read(machine(), "CTRLSEL");
 	int ret;
 
 	if ((cfg & 0x000f) == 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
-		if (state->m_fck_scan < 9)
-			ret = ~nes_read_fc_keyboard_line(space->machine(), state->m_fck_scan, state->m_fck_mode) & 0x1e;
+		if (m_fck_scan < 9)
+			ret = ~nes_read_fc_keyboard_line(machine(), m_fck_scan, m_fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
 	else if ((cfg & 0x000f) == 0x08)	// for now we treat the Subor keyboard separately from other inputs!
 	{
-		if (state->m_fck_scan < 12)
-			ret = ~nes_read_subor_keyboard_line(space->machine(), state->m_fck_scan, state->m_fck_mode) & 0x1e;
+		if (m_fck_scan < 12)
+			ret = ~nes_read_subor_keyboard_line(machine(), m_fck_scan, m_fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
@@ -426,20 +424,20 @@ READ8_HANDLER( nes_IN1_r )
 		ret = 0x40;
 
 		/* Handle data line 0's serial output */
-		ret |= ((state->m_in_1.i0 >> state->m_in_1.shift) & 0x01);
+		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
 
 		/* zapper */
 		if ((cfg & 0x00f0) == 0x0030)
 		{
-			int x = state->m_in_1.i1;	/* read Zapper x-position */
-			int y = state->m_in_1.i2;	/* read Zapper y-position */
+			int x = m_in_1.i1;	/* read Zapper x-position */
+			int y = m_in_1.i2;	/* read Zapper y-position */
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
-			pix = state->m_ppu->get_pixel(x, y);
+			pix = m_ppu->get_pixel(x, y);
 
 			/* get the color base from the ppu */
-			color_base = state->m_ppu->get_colorbase();
+			color_base = m_ppu->get_colorbase();
 
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
@@ -451,25 +449,25 @@ READ8_HANDLER( nes_IN1_r )
 				ret |= 0x08;  /* no sprite hit */
 
 			/* If button 1 is pressed, indicate the light gun trigger is pressed */
-			ret |= ((state->m_in_1.i0 & 0x01) << 4);
+			ret |= ((m_in_1.i0 & 0x01) << 4);
 		}
 
 		/* arkanoid dial */
 		else if ((cfg & 0x00f0) == 0x0040)
 		{
 			/* Handle data line 2's serial output */
-			ret |= ((state->m_in_1.i2 >> state->m_in_1.shift) & 0x01) << 3;
+			ret |= ((m_in_1.i2 >> m_in_1.shift) & 0x01) << 3;
 
 			/* Handle data line 3's serial output - bits are reversed */
 			/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-			/* ret |= ((state->m_in_1[3] >> state->m_in_1.shift) & 0x01) << 4; */
-			/* ret |= ((state->m_in_1[3] << state->m_in_1.shift) & 0x80) >> 3; */
+			/* ret |= ((m_in_1[3] >> m_in_1.shift) & 0x01) << 4; */
+			/* ret |= ((m_in_1[3] << m_in_1.shift) & 0x80) >> 3; */
 		}
 
 		if (LOG_JOY)
-			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space->device()), state->m_in_1.shift, state->m_in_1.i0);
+			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space.device()), m_in_1.shift, m_in_1.i0);
 
-		state->m_in_1.shift++;
+		m_in_1.shift++;
 	}
 
 	return ret;
@@ -553,13 +551,12 @@ static TIMER_CALLBACK( lightgun_tick )
 	}
 }
 
-WRITE8_HANDLER( nes_IN0_w )
+WRITE8_MEMBER(nes_state::nes_IN0_w)
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
-	int cfg = input_port_read(space->machine(), "CTRLSEL");
+	int cfg = input_port_read(machine(), "CTRLSEL");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	space->machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
@@ -570,13 +567,13 @@ WRITE8_HANDLER( nes_IN0_w )
 			int lines = ((cfg & 0x000f) == 0x04) ? 9 : 12;
 			UINT8 out = BIT(data, 1);	// scan
 
-			if (state->m_fck_mode && !out && ++state->m_fck_scan > lines)
-				state->m_fck_scan = 0;
+			if (m_fck_mode && !out && ++m_fck_scan > lines)
+				m_fck_scan = 0;
 
-			state->m_fck_mode = out;	// access lower or upper 4 bits
+			m_fck_mode = out;	// access lower or upper 4 bits
 
 			if (BIT(data, 0))	// reset
-				state->m_fck_scan = 0;
+				m_fck_scan = 0;
 		}
 	}
 	else
@@ -585,38 +582,38 @@ WRITE8_HANDLER( nes_IN0_w )
 			return;
 
 		if (LOG_JOY)
-			logerror("joy 0 bits read: %d\n", state->m_in_0.shift);
+			logerror("joy 0 bits read: %d\n", m_in_0.shift);
 
 		/* Toggling bit 0 high then low resets both controllers */
-		state->m_in_0.shift = 0;
-		state->m_in_1.shift = 0;
+		m_in_0.shift = 0;
+		m_in_1.shift = 0;
 
 		/* Read the input devices */
 		if ((cfg & 0x000f) != 0x06)
 		{
-			nes_read_input_device(space->machine(), cfg >>  0, &state->m_in_0, 0,  TRUE);
-			nes_read_input_device(space->machine(), cfg >>  4, &state->m_in_1, 1,  TRUE);
-			nes_read_input_device(space->machine(), cfg >>  8, &state->m_in_2, 2, FALSE);
-			nes_read_input_device(space->machine(), cfg >> 12, &state->m_in_3, 3, FALSE);
+			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE);
+			nes_read_input_device(machine(), cfg >>  4, &m_in_1, 1,  TRUE);
+			nes_read_input_device(machine(), cfg >>  8, &m_in_2, 2, FALSE);
+			nes_read_input_device(machine(), cfg >> 12, &m_in_3, 3, FALSE);
 		}
 		else // crazy climber pad
 		{
-			nes_read_input_device(space->machine(), 0, &state->m_in_1, 1,  TRUE);
-			nes_read_input_device(space->machine(), 0, &state->m_in_2, 2, FALSE);
-			nes_read_input_device(space->machine(), 0, &state->m_in_3, 3, FALSE);
-			nes_read_input_device(space->machine(), cfg >>  0, &state->m_in_0, 0,  TRUE);
+			nes_read_input_device(machine(), 0, &m_in_1, 1,  TRUE);
+			nes_read_input_device(machine(), 0, &m_in_2, 2, FALSE);
+			nes_read_input_device(machine(), 0, &m_in_3, 3, FALSE);
+			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE);
 		}
 
 		if (cfg & 0x0f00)
-			state->m_in_0.i0 |= (state->m_in_2.i0 << 8) | (0x08 << 16);
+			m_in_0.i0 |= (m_in_2.i0 << 8) | (0x08 << 16);
 
 		if (cfg & 0xf000)
-			state->m_in_1.i0 |= (state->m_in_3.i0 << 8) | (0x04 << 16);
+			m_in_1.i0 |= (m_in_3.i0 << 8) | (0x04 << 16);
 	}
 }
 
 
-WRITE8_HANDLER( nes_IN1_w )
+WRITE8_MEMBER(nes_state::nes_IN1_w)
 {
 }
 
@@ -1552,50 +1549,49 @@ static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 }
 
-static READ8_HANDLER( nes_fds_r )
+READ8_MEMBER(nes_state::nes_fds_r)
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
 	UINT8 ret = 0x00;
 
 	switch (offset)
 	{
 		case 0x00: /* $4030 - disk status 0 */
-			ret = state->m_fds_status0;
+			ret = m_fds_status0;
 			/* clear the disk IRQ detect flag */
-			state->m_fds_status0 &= ~0x01;
+			m_fds_status0 &= ~0x01;
 			break;
 		case 0x01: /* $4031 - data latch */
 			/* don't read data if disk is unloaded */
-			if (state->m_fds_data == NULL)
+			if (m_fds_data == NULL)
 				ret = 0;
-			else if (state->m_fds_current_side)
+			else if (m_fds_current_side)
 			{
 				// a bunch of games (e.g. bshashsc and fairypin) keep reading beyond the last track
 				// what is the expected behavior?
-				if (state->m_fds_head_position > 65500)
-					state->m_fds_head_position = 0;
-				ret = state->m_fds_data[(state->m_fds_current_side - 1) * 65500 + state->m_fds_head_position++];
+				if (m_fds_head_position > 65500)
+					m_fds_head_position = 0;
+				ret = m_fds_data[(m_fds_current_side - 1) * 65500 + m_fds_head_position++];
 			}
 			else
 				ret = 0;
 			break;
 		case 0x02: /* $4032 - disk status 1 */
 			/* return "no disk" status if disk is unloaded */
-			if (state->m_fds_data == NULL)
+			if (m_fds_data == NULL)
 				ret = 1;
-			else if (state->m_fds_last_side != state->m_fds_current_side)
+			else if (m_fds_last_side != m_fds_current_side)
 			{
 				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
-				state->m_fds_count++;
-				if (state->m_fds_count == 50)
+				m_fds_count++;
+				if (m_fds_count == 50)
 				{
-					state->m_fds_last_side = state->m_fds_current_side;
-					state->m_fds_count = 0;
+					m_fds_last_side = m_fds_current_side;
+					m_fds_count = 0;
 				}
 			}
 			else
-				ret = (state->m_fds_current_side == 0); /* 0 if a disk is inserted */
+				ret = (m_fds_current_side == 0); /* 0 if a disk is inserted */
 			break;
 		case 0x03: /* $4033 */
 			ret = 0x80;
@@ -1608,21 +1604,20 @@ static READ8_HANDLER( nes_fds_r )
 	return ret;
 }
 
-static WRITE8_HANDLER( nes_fds_w )
+WRITE8_MEMBER(nes_state::nes_fds_w)
 {
-	nes_state *state = space->machine().driver_data<nes_state>();
 
 	switch (offset)
 	{
 		case 0x00:
-			state->m_IRQ_count_latch = (state->m_IRQ_count_latch & 0xff00) | data;
+			m_IRQ_count_latch = (m_IRQ_count_latch & 0xff00) | data;
 			break;
 		case 0x01:
-			state->m_IRQ_count_latch = (state->m_IRQ_count_latch & 0x00ff) | (data << 8);
+			m_IRQ_count_latch = (m_IRQ_count_latch & 0x00ff) | (data << 8);
 			break;
 		case 0x02:
-			state->m_IRQ_count = state->m_IRQ_count_latch;
-			state->m_IRQ_enable = data;
+			m_IRQ_count = m_IRQ_count_latch;
+			m_IRQ_enable = data;
 			break;
 		case 0x03:
 			// d0 = sound io (1 = enable)
@@ -1632,19 +1627,19 @@ static WRITE8_HANDLER( nes_fds_w )
 			/* write data out to disk */
 			break;
 		case 0x05:
-			state->m_fds_motor_on = BIT(data, 0);
+			m_fds_motor_on = BIT(data, 0);
 
 			if (BIT(data, 1))
-				state->m_fds_head_position = 0;
+				m_fds_head_position = 0;
 
-			state->m_fds_read_mode = BIT(data, 2);
-			set_nt_mirroring(space->machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			m_fds_read_mode = BIT(data, 2);
+			set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-			if ((!(data & 0x40)) && (state->m_fds_write_reg & 0x40))
-				state->m_fds_head_position -= 2; // ???
+			if ((!(data & 0x40)) && (m_fds_write_reg & 0x40))
+				m_fds_head_position -= 2; // ???
 
-			state->m_IRQ_enable_latch = BIT(data, 7);
-			state->m_fds_write_reg = data;
+			m_IRQ_enable_latch = BIT(data, 7);
+			m_fds_write_reg = data;
 			break;
 	}
 }

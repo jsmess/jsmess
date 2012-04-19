@@ -41,6 +41,20 @@ public:
 	UINT8					m_ppi_data_signal;
 	UINT8					m_ppi_shift_register;
 	UINT8					m_ppi_shift_enable;
+	DECLARE_READ8_MEMBER(pc_page_r);
+	DECLARE_WRITE8_MEMBER(pc_page_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
+	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
+	DECLARE_WRITE8_MEMBER(ibm5150_kb_set_clock_signal);
+	DECLARE_WRITE8_MEMBER(ibm5150_kb_set_data_signal);
+	DECLARE_READ8_MEMBER(input_port_0_r);
+	DECLARE_READ8_MEMBER(pc_rtc_r);
+	DECLARE_WRITE8_MEMBER(pc_rtc_w);
+	DECLARE_WRITE8_MEMBER(pc_EXP_w);
+	DECLARE_READ8_MEMBER(pc_EXP_r);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -63,14 +77,8 @@ void pc_speaker_set_input(running_machine &machine, UINT8 data);
 
 void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
 
-WRITE8_HANDLER( pc_nmi_enable_w );
-READ8_HANDLER( pcjr_nmi_enable_r );
 
-READ8_HANDLER( pc_page_r );
-WRITE8_HANDLER( pc_page_w );
 
-WRITE8_HANDLER( ibm5150_kb_set_clock_signal );
-WRITE8_HANDLER( ibm5150_kb_set_data_signal );
 
 DRIVER_INIT( ibm5150 );
 DRIVER_INIT( pccga );
@@ -97,15 +105,9 @@ TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt );
 TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt );
 
 
-READ8_HANDLER( pc_rtc_r );
-WRITE8_HANDLER( pc_rtc_w );
 
-READ16_HANDLER( pc16le_rtc_r );
-WRITE16_HANDLER( pc16le_rtc_w );
 
 void pc_rtc_init(running_machine &machine);
 
-READ8_HANDLER ( pc_EXP_r );
-WRITE8_HANDLER ( pc_EXP_w );
 
 #endif /* PC_H_ */

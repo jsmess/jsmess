@@ -339,7 +339,7 @@ static MACHINE_RESET(z80ne_base)
 	ay31015_set_transmitter_clock( state->m_ay31015, state->m_cass_data.speed * 16.0);
 
 	state->m_nmi_delay_counter = 0;
-	lx385_ctrl_w(space, 0, 0);
+	state->lx385_ctrl_w(*space, 0, 0);
 
 }
 
@@ -431,9 +431,8 @@ MACHINE_START( z80netf )
 ******************************************************************************/
 
 /* LX.383 - LX.384 HEX keyboard and display */
-READ8_HANDLER( lx383_r )
+READ8_MEMBER(z80ne_state::lx383_r)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
 	/*
      * Keyboard scanning
      *
@@ -451,12 +450,11 @@ READ8_HANDLER( lx383_r )
      *      D6 - 0
      *      D7 - ~KEY Pressed
      */
-    return state->m_lx383_key[state->m_lx383_scan_counter];
+    return m_lx383_key[m_lx383_scan_counter];
 }
 
-WRITE8_HANDLER( lx383_w )
+WRITE8_MEMBER(z80ne_state::lx383_w)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
 	/*
      * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
      * The 1KHz NE-555 astable oscillator circuit drive
@@ -486,8 +484,8 @@ WRITE8_HANDLER( lx383_w )
     	output_set_digit_value( offset, data ^ 0xff );
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
-    	state->m_nmi_delay_counter = 1;
-		space->machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_nmi_delay_count), &space->machine()));
+    	m_nmi_delay_counter = 1;
+		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_nmi_delay_count), &machine()));
 }
 
 
@@ -534,41 +532,37 @@ WRITE8_HANDLER( lx383_w )
     data on the positive-edge of the clock pulse.
  *
  */
-READ8_HANDLER(lx385_data_r)
+READ8_MEMBER(z80ne_state::lx385_data_r)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
-	return ay31015_get_received_data( state->m_ay31015 );
+	return ay31015_get_received_data( m_ay31015 );
 }
 
-READ8_HANDLER(lx385_ctrl_r)
+READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
 	/* set unused bits high */
 	UINT8 data = 0xc0;
 
-	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 0 );
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_OR   ) ? 0x01 : 0);
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_FE   ) ? 0x02 : 0);
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_PE   ) ? 0x04 : 0);
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_TBMT ) ? 0x08 : 0);
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_DAV  ) ? 0x10 : 0);
-	data |= (ay31015_get_output_pin( state->m_ay31015, AY31015_EOC  ) ? 0x20 : 0);
-	ay31015_set_input_pin( state->m_ay31015, AY31015_SWE, 1 );
+	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 0 );
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_OR   ) ? 0x01 : 0);
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_FE   ) ? 0x02 : 0);
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_PE   ) ? 0x04 : 0);
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_TBMT ) ? 0x08 : 0);
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_DAV  ) ? 0x10 : 0);
+	data |= (ay31015_get_output_pin( m_ay31015, AY31015_EOC  ) ? 0x20 : 0);
+	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 1 );
 
 	return data;
 }
 
-WRITE8_HANDLER(lx385_data_w)
+WRITE8_MEMBER(z80ne_state::lx385_data_w)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
-	ay31015_set_transmit_data( state->m_ay31015, data );
+	ay31015_set_transmit_data( m_ay31015, data );
 }
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
 
-WRITE8_HANDLER(lx385_ctrl_w)
+WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
 	/* Translate data to control signals
      *     0 bit1=0, bit0=0   UART Reset pulse
      *     1 bit1=0, bit0=1   UART RDAV (Reset Data Available) pulse
@@ -578,8 +572,8 @@ WRITE8_HANDLER(lx385_ctrl_w)
      */
 	UINT8 uart_reset, uart_rdav, uart_tx_clock;
 	UINT8 motor_a, motor_b;
-	UINT8 changed_bits = (state->m_lx385_ctrl ^ data) & 0x1C;
-	state->m_lx385_ctrl = data;
+	UINT8 changed_bits = (m_lx385_ctrl ^ data) & 0x1C;
+	m_lx385_ctrl = data;
 
 	uart_reset = ((data & 0x03) == 0x00);
 	uart_rdav  = ((data & 0x03) == 0x01);
@@ -590,35 +584,35 @@ WRITE8_HANDLER(lx385_ctrl_w)
 	/* UART Reset and RDAV */
 	if(uart_reset)
 	{
-		ay31015_set_input_pin( state->m_ay31015, AY31015_XR, 1 );
-		ay31015_set_input_pin( state->m_ay31015, AY31015_XR, 0 );
+		ay31015_set_input_pin( m_ay31015, AY31015_XR, 1 );
+		ay31015_set_input_pin( m_ay31015, AY31015_XR, 0 );
 	}
 
 	if(uart_rdav)
 	{
-		ay31015_set_input_pin( state->m_ay31015, AY31015_RDAV, 1 );
-		ay31015_set_input_pin( state->m_ay31015, AY31015_RDAV, 0 );
+		ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 1 );
+		ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 0 );
 	}
 
 	if (!changed_bits) return;
 
 	/* UART Tx Clock enable/disable */
 	if(changed_bits & 0x04)
-		ay31015_set_transmitter_clock( state->m_ay31015, uart_tx_clock ? state->m_cass_data.speed * 16.0 : 0.0);
+		ay31015_set_transmitter_clock( m_ay31015, uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
 
 	/* motors */
 	if(changed_bits & 0x18)
 	{
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
+		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 			(motor_a) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
-		space->machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(
+		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(
 			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
-			state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));
+			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));
 		else
-			state->m_cassette_timer->adjust(attotime::zero);
+			m_cassette_timer->adjust(attotime::zero);
 	}
 }
 
@@ -638,20 +632,18 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 	return videoram[offset];
 }
 
-READ8_HANDLER(lx388_data_r)
+READ8_MEMBER(z80ne_state::lx388_data_r)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
 	UINT8 data;
 
-	data = kr2376_data_r(state->m_lx388_kr2376, 0) & 0x7f;
-	data |= kr2376_get_output_pin(state->m_lx388_kr2376, KR2376_SO) << 7;
+	data = kr2376_data_r(m_lx388_kr2376, 0) & 0x7f;
+	data |= kr2376_get_output_pin(m_lx388_kr2376, KR2376_SO) << 7;
 	return data;
 }
 
-READ8_HANDLER( lx388_read_field_sync )
+READ8_MEMBER(z80ne_state::lx388_read_field_sync)
 {
-	z80ne_state *state = space->machine().driver_data<z80ne_state>();
-	return state->m_vdg->fs_r() << 7;
+	return m_vdg->fs_r() << 7;
 }
 
 /*

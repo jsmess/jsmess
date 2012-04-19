@@ -38,6 +38,14 @@ public:
 	int m_tape_index;
 	nascom1_portstat_t m_portstat;
 	nascom2_fdc_t m_nascom2_fdc;
+	DECLARE_READ8_MEMBER(nascom2_fdc_select_r);
+	DECLARE_WRITE8_MEMBER(nascom2_fdc_select_w);
+	DECLARE_READ8_MEMBER(nascom2_fdc_status_r);
+	DECLARE_READ8_MEMBER(nascom1_port_00_r);
+	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
+	DECLARE_READ8_MEMBER(nascom1_port_01_r);
+	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
+	DECLARE_READ8_MEMBER(nascom1_port_02_r);
 };
 
 
@@ -50,15 +58,7 @@ DEVICE_IMAGE_LOAD( nascom1_cassette );
 DEVICE_IMAGE_UNLOAD( nascom1_cassette );
 SNAPSHOT_LOAD( nascom1 );
 
-READ8_HANDLER( nascom2_fdc_select_r );
-WRITE8_HANDLER( nascom2_fdc_select_w );
-READ8_HANDLER( nascom2_fdc_status_r );
 
-READ8_HANDLER( nascom1_port_00_r );
-READ8_HANDLER( nascom1_port_01_r );
-READ8_HANDLER( nascom1_port_02_r );
-WRITE8_HANDLER( nascom1_port_00_w );
-WRITE8_HANDLER( nascom1_port_01_w );
 
 READ8_DEVICE_HANDLER( nascom1_hd6402_si );
 WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );

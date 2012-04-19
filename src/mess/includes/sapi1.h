@@ -18,6 +18,11 @@ public:
 	UINT8 m_keyboard_mask;
 	UINT8 m_refresh_counter;
 	UINT8 m_zps3_25;
+	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
+	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
+	DECLARE_WRITE8_MEMBER(sapizps3_00_w);
+	DECLARE_READ8_MEMBER(sapizps3_25_r);
+	DECLARE_WRITE8_MEMBER(sapizps3_25_w);
 };
 
 
@@ -29,8 +34,6 @@ extern MACHINE_START( sapi1 );
 extern MACHINE_RESET( sapi1 );
 extern MACHINE_RESET( sapizps3 );
 
-extern READ8_HANDLER (sapi1_keyboard_r );
-extern WRITE8_HANDLER(sapi1_keyboard_w );
 
 /*----------- defined in video/sapi1.c -----------*/
 

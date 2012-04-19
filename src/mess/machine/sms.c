@@ -233,51 +233,50 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 }
 
 
-static WRITE8_HANDLER( sms_input_write )
+WRITE8_MEMBER(sms_state::sms_input_write)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
 	switch (offset)
 	{
 	case 0:
-		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) & 0x0f)
+		switch (input_port_read_safe(machine(), "CTRLSEL", 0x00) & 0x0f)
 		{
 		case 0x04:	/* Sports Pad */
-			if (data != state->m_sports_pad_last_data_1)
+			if (data != m_sports_pad_last_data_1)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
+				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
 
-				state->m_sports_pad_last_data_1 = data;
-				if (cpu_cycles - state->m_last_sports_pad_time_1 > 512)
+				m_sports_pad_last_data_1 = data;
+				if (cpu_cycles - m_last_sports_pad_time_1 > 512)
 				{
-					state->m_sports_pad_state_1 = 3;
-					state->m_sports_pad_1_x = input_port_read(space->machine(), "SPORT0");
-					state->m_sports_pad_1_y = input_port_read(space->machine(), "SPORT1");
+					m_sports_pad_state_1 = 3;
+					m_sports_pad_1_x = input_port_read(machine(), "SPORT0");
+					m_sports_pad_1_y = input_port_read(machine(), "SPORT1");
 				}
-				state->m_last_sports_pad_time_1 = cpu_cycles;
-				state->m_sports_pad_state_1 = (state->m_sports_pad_state_1 + 1) & 3;
+				m_last_sports_pad_time_1 = cpu_cycles;
+				m_sports_pad_state_1 = (m_sports_pad_state_1 + 1) & 3;
 			}
 			break;
 		}
 		break;
 
 	case 1:
-		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) & 0xf0)
+		switch (input_port_read_safe(machine(), "CTRLSEL", 0x00) & 0xf0)
 		{
 		case 0x40:	/* Sports Pad */
-			if (data != state->m_sports_pad_last_data_2)
+			if (data != m_sports_pad_last_data_2)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
+				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
 
-				state->m_sports_pad_last_data_2 = data;
-				if (cpu_cycles - state->m_last_sports_pad_time_2 > 2048)
+				m_sports_pad_last_data_2 = data;
+				if (cpu_cycles - m_last_sports_pad_time_2 > 2048)
 				{
-					state->m_sports_pad_state_2 = 3;
-					state->m_sports_pad_2_x = input_port_read(space->machine(), "SPORT2");
-					state->m_sports_pad_2_y = input_port_read(space->machine(), "SPORT3");
+					m_sports_pad_state_2 = 3;
+					m_sports_pad_2_x = input_port_read(machine(), "SPORT2");
+					m_sports_pad_2_y = input_port_read(machine(), "SPORT3");
 				}
-				state->m_last_sports_pad_time_2 = cpu_cycles;
-				state->m_sports_pad_state_2 = (state->m_sports_pad_state_2 + 1) & 3;
+				m_last_sports_pad_time_2 = cpu_cycles;
+				m_sports_pad_state_2 = (m_sports_pad_state_2 + 1) & 3;
 			}
 			break;
 		}
@@ -700,46 +699,43 @@ static void sms_get_inputs( address_space *space )
 }
 
 
-WRITE8_HANDLER( sms_fm_detect_w )
+WRITE8_MEMBER(sms_state::sms_fm_detect_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_has_fm)
-		state->m_fm_detect = (data & 0x01);
+	if (m_has_fm)
+		m_fm_detect = (data & 0x01);
 }
 
 
-READ8_HANDLER( sms_fm_detect_r )
+READ8_MEMBER(sms_state::sms_fm_detect_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_has_fm)
+	if (m_has_fm)
 	{
-		return state->m_fm_detect;
+		return m_fm_detect;
 	}
 	else
 	{
-		if (state->m_bios_port & IO_CHIP)
+		if (m_bios_port & IO_CHIP)
 		{
 			return 0xff;
 		}
 		else
 		{
-			sms_get_inputs(space);
-			return state->m_input_port0;
+			sms_get_inputs(&space);
+			return m_input_port0;
 		}
 	}
 }
 
-WRITE8_HANDLER( sms_io_control_w )
+WRITE8_MEMBER(sms_state::sms_io_control_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	bool hcount_latch = false;
 
 	if (data & 0x08)
 	{
 		/* check if TH pin level is high (1) and was low last time */
-		if (data & 0x80 && !(state->m_ctrl_reg & 0x80))
+		if (data & 0x80 && !(m_ctrl_reg & 0x80))
 		{
 			hcount_latch = true;
 		}
@@ -748,7 +744,7 @@ WRITE8_HANDLER( sms_io_control_w )
 
 	if (data & 0x02)
 	{
-		if (data & 0x20 && !(state->m_ctrl_reg & 0x20))
+		if (data & 0x20 && !(m_ctrl_reg & 0x20))
 		{
 			hcount_latch = true;
 		}
@@ -757,21 +753,20 @@ WRITE8_HANDLER( sms_io_control_w )
 
 	if (hcount_latch)
 	{
-		sms_vdp_hcount_latch(space);
+		sms_vdp_hcount_latch(&space);
 	}
 
-	state->m_ctrl_reg = data;
+	m_ctrl_reg = data;
 }
 
 
-READ8_HANDLER( sms_count_r )
+READ8_MEMBER(sms_state::sms_count_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
 	if (offset & 0x01)
-		return state->m_vdp->hcount_latch_read(*state->m_space, offset);
+		return m_vdp->hcount_latch_read(*m_space, offset);
 	else
-		return state->m_vdp->vcount_read(*state->m_space, offset);
+		return m_vdp->vcount_read(*m_space, offset);
 }
 
 
@@ -804,194 +799,181 @@ WRITE_LINE_DEVICE_HANDLER( sms_pause_callback )
 	driver_state->m_lphaser_2_latch = 0;
 }
 
-READ8_HANDLER( sms_input_port_0_r )
+READ8_MEMBER(sms_state::sms_input_port_0_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_bios_port & IO_CHIP)
+	if (m_bios_port & IO_CHIP)
 	{
 		return 0xff;
 	}
 	else
 	{
-		sms_get_inputs(space);
-		return state->m_input_port0;
+		sms_get_inputs(&space);
+		return m_input_port0;
 	}
 }
 
 
-READ8_HANDLER( sms_input_port_1_r )
+READ8_MEMBER(sms_state::sms_input_port_1_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_bios_port & IO_CHIP)
+	if (m_bios_port & IO_CHIP)
 		return 0xff;
 
-	sms_get_inputs(space);
+	sms_get_inputs(&space);
 
 	/* Reset Button */
-	state->m_input_port1 = (state->m_input_port1 & 0xef) | (input_port_read_safe(space->machine(), "RESET", 0x01) & 0x01) << 4;
+	m_input_port1 = (m_input_port1 & 0xef) | (input_port_read_safe(machine(), "RESET", 0x01) & 0x01) << 4;
 
 	/* Do region detection if TH of ports A and B are set to output (0) */
-	if (!(state->m_ctrl_reg & 0x0a))
+	if (!(m_ctrl_reg & 0x0a))
 	{
 		/* Move bits 7,5 of IO control port into bits 7, 6 */
-		state->m_input_port1 = (state->m_input_port1 & 0x3f) | (state->m_ctrl_reg & 0x80) | (state->m_ctrl_reg & 0x20) << 1;
+		m_input_port1 = (m_input_port1 & 0x3f) | (m_ctrl_reg & 0x80) | (m_ctrl_reg & 0x20) << 1;
 
 		/* Inverse region detect value for Japanese machines */
-		if (state->m_is_region_japan)
-			state->m_input_port1 ^= 0xc0;
+		if (m_is_region_japan)
+			m_input_port1 ^= 0xc0;
 	}
 	else
 	{
-		if (state->m_ctrl_reg & 0x02 && state->m_lphaser_1_latch)
+		if (m_ctrl_reg & 0x02 && m_lphaser_1_latch)
 		{
-			state->m_input_port1 &= ~0x40;
-			state->m_lphaser_1_latch = 0;
+			m_input_port1 &= ~0x40;
+			m_lphaser_1_latch = 0;
 		}
 
-		if (state->m_ctrl_reg & 0x08 && state->m_lphaser_2_latch)
+		if (m_ctrl_reg & 0x08 && m_lphaser_2_latch)
 		{
-			state->m_input_port1 &= ~0x80;
-			state->m_lphaser_2_latch = 0;
+			m_input_port1 &= ~0x80;
+			m_lphaser_2_latch = 0;
 		}
 	}
 
-	return state->m_input_port1;
+	return m_input_port1;
 }
 
 
 
-WRITE8_HANDLER( sms_ym2413_register_port_0_w )
+WRITE8_MEMBER(sms_state::sms_ym2413_register_port_0_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_has_fm)
-		ym2413_w(state->m_ym, 0, (data & 0x3f));
+	if (m_has_fm)
+		ym2413_w(m_ym, 0, (data & 0x3f));
 }
 
 
-WRITE8_HANDLER( sms_ym2413_data_port_0_w )
+WRITE8_MEMBER(sms_state::sms_ym2413_data_port_0_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_has_fm)
+	if (m_has_fm)
 	{
 		logerror("data_port_0_w %x %x\n", offset, data);
-		ym2413_w(state->m_ym, 1, data);
+		ym2413_w(m_ym, 1, data);
 	}
 }
 
 
-READ8_HANDLER( gg_input_port_2_r )
+READ8_MEMBER(sms_state::gg_input_port_2_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((state->m_is_region_japan ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
-	return ((state->m_is_region_japan ? 0x00 : 0x40) | (input_port_read(space->machine(), "START") & 0x80));
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((m_is_region_japan ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
+	return ((m_is_region_japan ? 0x00 : 0x40) | (input_port_read(machine(), "START") & 0x80));
 }
 
 
-READ8_HANDLER( sms_sscope_r )
+READ8_MEMBER(sms_state::sms_sscope_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	return state->m_sscope_state;
+	return m_sscope_state;
 }
 
 
-WRITE8_HANDLER( sms_sscope_w )
+WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	state->m_sscope_state = data;
+	m_sscope_state = data;
 }
 
 
-READ8_HANDLER( sms_mapper_r )
+READ8_MEMBER(sms_state::sms_mapper_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	return state->m_mapper[offset];
+	return m_mapper[offset];
 }
 
 /* Terebi Oekaki */
 /* The following code comes from sg1000.c. We should eventually merge these TV Draw implementations */
-static WRITE8_HANDLER( sms_tvdraw_axis_w )
+WRITE8_MEMBER(sms_state::sms_tvdraw_axis_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	UINT8 tvboard_on = input_port_read_safe(space->machine(), "TVDRAW", 0x00);
+	UINT8 tvboard_on = input_port_read_safe(machine(), "TVDRAW", 0x00);
 
 	if (data & 0x01)
 	{
-		state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(space->machine(), "TVDRAW_X") : 0x80;
+		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(machine(), "TVDRAW_X") : 0x80;
 
-		if (state->m_cartridge[state->m_current_cartridge].m_tvdraw_data < 4) state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = 4;
-		if (state->m_cartridge[state->m_current_cartridge].m_tvdraw_data > 251) state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = 251;
+		if (m_cartridge[m_current_cartridge].m_tvdraw_data < 4) m_cartridge[m_current_cartridge].m_tvdraw_data = 4;
+		if (m_cartridge[m_current_cartridge].m_tvdraw_data > 251) m_cartridge[m_current_cartridge].m_tvdraw_data = 251;
 	}
 	else
 	{
-		state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(space->machine(), "TVDRAW_Y") + 0x20 : 0x80;
+		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(machine(), "TVDRAW_Y") + 0x20 : 0x80;
 	}
 }
 
-static READ8_HANDLER( sms_tvdraw_status_r )
+READ8_MEMBER(sms_state::sms_tvdraw_status_r)
 {
-	UINT8 tvboard_on = input_port_read_safe(space->machine(), "TVDRAW", 0x00);
-	return tvboard_on ? input_port_read(space->machine(), "TVDRAW_PEN") : 0x01;
+	UINT8 tvboard_on = input_port_read_safe(machine(), "TVDRAW", 0x00);
+	return tvboard_on ? input_port_read(machine(), "TVDRAW_PEN") : 0x01;
 }
 
-static READ8_HANDLER( sms_tvdraw_data_r )
+READ8_MEMBER(sms_state::sms_tvdraw_data_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	return state->m_cartridge[state->m_current_cartridge].m_tvdraw_data;
+	return m_cartridge[m_current_cartridge].m_tvdraw_data;
 }
 
 
-static WRITE8_HANDLER( sms_93c46_w )
+WRITE8_MEMBER(sms_state::sms_93c46_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if ( state->m_cartridge[state->m_current_cartridge].m_93c46_enabled )
+	if ( m_cartridge[m_current_cartridge].m_93c46_enabled )
 	{
-		state->m_cartridge[state->m_current_cartridge].m_93c46_lines = data;
+		m_cartridge[m_current_cartridge].m_93c46_lines = data;
 
 		logerror( "sms_93c46_w: setting eeprom lines: DI=%s CLK=%s CS=%s\n", data & 0x01 ? "1" : "0", data & 0x02 ? "1" : "0", data & 0x04 ? "1" : "0" );
-		state->m_eeprom->write_bit( ( data & 0x01 ) ? ASSERT_LINE : CLEAR_LINE );
-		state->m_eeprom->set_cs_line( !( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
-		state->m_eeprom->set_clock_line( ( data & 0x02 ) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->write_bit( ( data & 0x01 ) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_cs_line( !( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line( ( data & 0x02 ) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
 
-static READ8_HANDLER( sms_93c46_r )
+READ8_MEMBER(sms_state::sms_93c46_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	UINT8 data = state->m_banking_cart[5][0];
+	UINT8 data = m_banking_cart[5][0];
 
-	if ( state->m_cartridge[state->m_current_cartridge].m_93c46_enabled )
+	if ( m_cartridge[m_current_cartridge].m_93c46_enabled )
 	{
-		data = ( state->m_cartridge[state->m_current_cartridge].m_93c46_lines & 0xFC ) | 0x02;
-		data |= state->m_eeprom->read_bit() ? 1 : 0;
+		data = ( m_cartridge[m_current_cartridge].m_93c46_lines & 0xFC ) | 0x02;
+		data |= m_eeprom->read_bit() ? 1 : 0;
 	}
 
 	return data;
 }
 
 
-WRITE8_HANDLER( sms_mapper_w )
+WRITE8_MEMBER(sms_state::sms_mapper_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	bool bios_selected = false;
 	bool cartridge_selected = false;
 
 	offset &= 3;
 
-	state->m_mapper[offset] = data;
-	state->m_mapper_ram[offset] = data;
+	m_mapper[offset] = data;
+	m_mapper_ram[offset] = data;
 
-	if (state->m_bios_port & IO_BIOS_ROM || (state->m_is_gamegear && state->m_BIOS == NULL))
+	if (m_bios_port & IO_BIOS_ROM || (m_is_gamegear && m_BIOS == NULL))
 	{
-		if (!(state->m_bios_port & IO_CARTRIDGE) || (state->m_is_gamegear && state->m_BIOS == NULL))
+		if (!(m_bios_port & IO_CARTRIDGE) || (m_is_gamegear && m_BIOS == NULL))
 		{
-			if (!state->m_cartridge[state->m_current_cartridge].ROM)
+			if (!m_cartridge[m_current_cartridge].ROM)
 				return;
 			cartridge_selected = true;
 		}
@@ -1003,7 +985,7 @@ WRITE8_HANDLER( sms_mapper_w )
 	}
 	else
 	{
-		if (!state->m_BIOS)
+		if (!m_BIOS)
 			return;
 		bios_selected = true;
 	}
@@ -1014,315 +996,302 @@ WRITE8_HANDLER( sms_mapper_w )
 		/* Is it ram or rom? */
 		if (data & 0x08) /* it's ram */
 		{
-			if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
+			if ( m_cartridge[m_current_cartridge].features & CF_93C46_EEPROM )
 			{
 				if ( data & 0x80 )
 				{
-					state->m_eeprom->reset();
+					m_eeprom->reset();
 					logerror("sms_mapper_w: eeprom CS=1\n");
-					state->m_eeprom->set_cs_line( ASSERT_LINE );
+					m_eeprom->set_cs_line( ASSERT_LINE );
 				}
 				logerror("sms_mapper_w: eeprom enabled\n");
-				state->m_cartridge[state->m_current_cartridge].m_93c46_enabled = true;
+				m_cartridge[m_current_cartridge].m_93c46_enabled = true;
 			}
 			else
 			{
 				UINT8 *sram = NULL;
-				state->m_cartridge[state->m_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
+				m_cartridge[m_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
 				if (data & 0x04)
 				{
-					sram = state->m_cartridge[state->m_current_cartridge].cartSRAM + 0x4000;
+					sram = m_cartridge[m_current_cartridge].cartSRAM + 0x4000;
 				}
 				else
 				{
-					sram = state->m_cartridge[state->m_current_cartridge].cartSRAM;
+					sram = m_cartridge[m_current_cartridge].cartSRAM;
 				}
-				memory_set_bankptr(space->machine(),  "bank5", sram);
-				memory_set_bankptr(space->machine(),  "bank6", sram + 0x2000);
+				memory_set_bankptr(machine(),  "bank5", sram);
+				memory_set_bankptr(machine(),  "bank6", sram + 0x2000);
 			}
 		}
 		else /* it's rom */
 		{
-			if (state->m_bios_port & IO_BIOS_ROM || ! state->m_has_bios)
+			if (m_bios_port & IO_BIOS_ROM || ! m_has_bios)
 			{
-				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
+				if ( ! ( m_cartridge[m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 				{
-					if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
+					if ( m_cartridge[m_current_cartridge].features & CF_93C46_EEPROM )
 					{
 						if ( data & 0x80 )
 						{
-							state->m_eeprom->reset();
+							m_eeprom->reset();
 							logerror("sms_mapper_w: eeprom CS=1\n");
-							state->m_eeprom->set_cs_line( ASSERT_LINE );
+							m_eeprom->set_cs_line( ASSERT_LINE );
 						}
 						logerror("sms_mapper_w: eeprom disabled\n");
-						state->m_cartridge[state->m_current_cartridge].m_93c46_enabled = false;
+						m_cartridge[m_current_cartridge].m_93c46_enabled = false;
 					}
 					else
 					{
-						state->map_cart_16k( 0x8000, state->m_mapper[3] );
+						map_cart_16k( 0x8000, m_mapper[3] );
 					}
 				}
 			}
 			else
 			{
-				state->map_bios_16k( 0x8000, state->m_mapper[3] );
+				map_bios_16k( 0x8000, m_mapper[3] );
 			}
 		}
 		break;
 
 	case 1: /* Select 16k ROM bank for 0400-3FFF */
-		if ( cartridge_selected || state->m_is_gamegear )
+		if ( cartridge_selected || m_is_gamegear )
 		{
-			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
+			if ( ! ( m_cartridge[m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 			{
-				state->map_cart_16k( 0x400, data );
+				map_cart_16k( 0x400, data );
 			}
 		}
 		if ( bios_selected )
 		{
-			state->map_bios_16k( 0x400, data );
+			map_bios_16k( 0x400, data );
 		}
 		break;
 
 	case 2: /* Select 16k ROM bank for 4000-7FFF */
-		if ( cartridge_selected || state->m_is_gamegear )
+		if ( cartridge_selected || m_is_gamegear )
 		{
-			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
+			if ( ! ( m_cartridge[m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 			{
-				state->map_cart_16k( 0x4000, data );
+				map_cart_16k( 0x4000, data );
 			}
 		}
 		if ( bios_selected )
 		{
-			state->map_bios_16k( 0x4000, data );
+			map_bios_16k( 0x4000, data );
 		}
 		break;
 
 	case 3: /* Select 16k ROM bank for 8000-BFFF */
-		if ( cartridge_selected || state->m_is_gamegear )
+		if ( cartridge_selected || m_is_gamegear )
 		{
-			if ( state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
+			if ( m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
 			{
 				return;
 			}
 
-			if ( ! ( state->m_mapper[0] & 0x08 ) )		// Is RAM disabled
+			if ( ! ( m_mapper[0] & 0x08 ) )		// Is RAM disabled
 			{
-				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
+				if ( ! ( m_cartridge[m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 				{
-					state->map_cart_16k( 0x8000, data );
+					map_cart_16k( 0x8000, data );
 				}
 			}
 		}
 
 		if ( bios_selected )
 		{
-			if ( ! ( state->m_mapper[0] & 0x08 ) )		// Is RAM disabled
+			if ( ! ( m_mapper[0] & 0x08 ) )		// Is RAM disabled
 			{
-				state->map_bios_16k( 0x8000, data );
+				map_bios_16k( 0x8000, data );
 			}
 		}
 		break;
 	}
 }
 
-static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
+WRITE8_MEMBER(sms_state::sms_korean_zemina_banksw_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER)
+	if (m_cartridge[m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER)
 	{
-		if (!state->m_cartridge[state->m_current_cartridge].ROM)
+		if (!m_cartridge[m_current_cartridge].ROM)
 			return;
 
 		switch (offset & 3)
 		{
 			case 0:
-				state->map_cart_8k( 0x8000, data );
+				map_cart_8k( 0x8000, data );
 				break;
 			case 1:
-				state->map_cart_8k( 0xA000, data );
+				map_cart_8k( 0xA000, data );
 				break;
 			case 2:
-				state->map_cart_8k( 0x4000, data );
+				map_cart_8k( 0x4000, data );
 				break;
 			case 3:
-				state->map_cart_8k( 0x6000, data );
+				map_cart_8k( 0x6000, data );
 				break;
 		}
 		LOG(("Zemina mapper write: offset %x data %x.\n", offset, data));
 	}
 }
 
-static WRITE8_HANDLER( sms_codemasters_page0_w )
+WRITE8_MEMBER(sms_state::sms_codemasters_page0_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_cartridge[state->m_current_cartridge].ROM && state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
+	if (m_cartridge[m_current_cartridge].ROM && m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
-		state->map_cart_16k( 0x0000, data );
+		map_cart_16k( 0x0000, data );
 	}
 }
 
 
-static WRITE8_HANDLER( sms_codemasters_page1_w )
+WRITE8_MEMBER(sms_state::sms_codemasters_page1_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_cartridge[state->m_current_cartridge].ROM && state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
+	if (m_cartridge[m_current_cartridge].ROM && m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
 		/* Check if we need to switch in some RAM */
 		if (data & 0x80)
 		{
-			state->m_cartridge[state->m_current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr(space->machine(), "bank6", state->m_cartridge[state->m_current_cartridge].cartRAM + state->m_cartridge[state->m_current_cartridge].ram_page * 0x2000);
+			m_cartridge[m_current_cartridge].ram_page = data & 0x07;
+			memory_set_bankptr(machine(), "bank6", m_cartridge[m_current_cartridge].cartRAM + m_cartridge[m_current_cartridge].ram_page * 0x2000);
 		}
 		else
 		{
-			state->map_cart_16k( 0x4000, data );
-			memory_set_bankptr(space->machine(), "bank6", state->m_banking_cart[5] + 0x2000);
+			map_cart_16k( 0x4000, data );
+			memory_set_bankptr(machine(), "bank6", m_banking_cart[5] + 0x2000);
 		}
 	}
 }
 
 
-WRITE8_HANDLER( sms_4pak_page0_w )
+WRITE8_MEMBER(sms_state::sms_4pak_page0_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->m_cartridge[state->m_current_cartridge].m_4pak_page0 = data;
+	m_cartridge[m_current_cartridge].m_4pak_page0 = data;
 
-	state->map_cart_16k( 0x0000, data );
-	state->map_cart_16k( 0x8000, ( state->m_cartridge[state->m_current_cartridge].m_4pak_page0 & 0x30 ) + state->m_cartridge[state->m_current_cartridge].m_4pak_page2 );
+	map_cart_16k( 0x0000, data );
+	map_cart_16k( 0x8000, ( m_cartridge[m_current_cartridge].m_4pak_page0 & 0x30 ) + m_cartridge[m_current_cartridge].m_4pak_page2 );
 }
 
 
-WRITE8_HANDLER( sms_4pak_page1_w )
+WRITE8_MEMBER(sms_state::sms_4pak_page1_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->m_cartridge[state->m_current_cartridge].m_4pak_page1 = data;
+	m_cartridge[m_current_cartridge].m_4pak_page1 = data;
 
-	state->map_cart_16k( 0x4000, data );
+	map_cart_16k( 0x4000, data );
 }
 
 
-WRITE8_HANDLER( sms_4pak_page2_w )
+WRITE8_MEMBER(sms_state::sms_4pak_page2_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->m_cartridge[state->m_current_cartridge].m_4pak_page2 = data;
+	m_cartridge[m_current_cartridge].m_4pak_page2 = data;
 
-	state->map_cart_16k( 0x8000, ( state->m_cartridge[state->m_current_cartridge].m_4pak_page0 & 0x30 ) + state->m_cartridge[state->m_current_cartridge].m_4pak_page2 );
+	map_cart_16k( 0x8000, ( m_cartridge[m_current_cartridge].m_4pak_page0 & 0x30 ) + m_cartridge[m_current_cartridge].m_4pak_page2 );
 }
 
 
-WRITE8_HANDLER( sms_janggun_bank0_w )
+WRITE8_MEMBER(sms_state::sms_janggun_bank0_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->map_cart_8k( 0x4000, data );
+	map_cart_8k( 0x4000, data );
 }
 
 
-WRITE8_HANDLER( sms_janggun_bank1_w )
+WRITE8_MEMBER(sms_state::sms_janggun_bank1_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->map_cart_8k( 0x6000, data );
+	map_cart_8k( 0x6000, data );
 }
 
 
-WRITE8_HANDLER( sms_janggun_bank2_w )
+WRITE8_MEMBER(sms_state::sms_janggun_bank2_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->map_cart_8k( 0x8000, data );
+	map_cart_8k( 0x8000, data );
 }
 
 
-WRITE8_HANDLER( sms_janggun_bank3_w )
+WRITE8_MEMBER(sms_state::sms_janggun_bank3_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	state->map_cart_8k( 0xA000, data );
+	map_cart_8k( 0xA000, data );
 }
 
 
-WRITE8_HANDLER( sms_bios_w )
+WRITE8_MEMBER(sms_state::sms_bios_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	state->m_bios_port = data;
+	m_bios_port = data;
 
-	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(&space->device()));
+	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(&space.device()));
 
-	setup_rom(space);
+	setup_rom(&space);
 }
 
 
-WRITE8_HANDLER( sms_cartram2_w )
+WRITE8_MEMBER(sms_state::sms_cartram2_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 
-	if (state->m_mapper[0] & 0x08)
+	if (m_mapper[0] & 0x08)
 	{
 		logerror("write %02X to cartram at offset #%04X\n", data, offset + 0x2000);
-		if (state->m_mapper[0] & 0x04)
+		if (m_mapper[0] & 0x04)
 		{
-			state->m_cartridge[state->m_current_cartridge].cartSRAM[offset + 0x6000] = data;
+			m_cartridge[m_current_cartridge].cartSRAM[offset + 0x6000] = data;
 		}
 		else
 		{
-			state->m_cartridge[state->m_current_cartridge].cartSRAM[offset + 0x2000] = data;
+			m_cartridge[m_current_cartridge].cartSRAM[offset + 0x2000] = data;
 		}
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
+	if (m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
 	{
-		state->m_cartridge[state->m_current_cartridge].cartRAM[state->m_cartridge[state->m_current_cartridge].ram_page * 0x2000 + offset] = data;
+		m_cartridge[m_current_cartridge].cartRAM[m_cartridge[m_current_cartridge].ram_page * 0x2000 + offset] = data;
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_MAPPER && offset == 0) /* Dodgeball King mapper */
+	if (m_cartridge[m_current_cartridge].features & CF_KOREAN_MAPPER && offset == 0) /* Dodgeball King mapper */
 	{
-		state->map_cart_16k( 0x8000, data );
+		map_cart_16k( 0x8000, data );
 	}
 }
 
 
-WRITE8_HANDLER( sms_cartram_w )
+WRITE8_MEMBER(sms_state::sms_cartram_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	int page;
 
-	if (state->m_mapper[0] & 0x08)
+	if (m_mapper[0] & 0x08)
 	{
 		logerror("write %02X to cartram at offset #%04X\n", data, offset);
-		if (state->m_mapper[0] & 0x04)
+		if (m_mapper[0] & 0x04)
 		{
-			state->m_cartridge[state->m_current_cartridge].cartSRAM[offset + 0x4000] = data;
+			m_cartridge[m_current_cartridge].cartSRAM[offset + 0x4000] = data;
 		}
 		else
 		{
-			state->m_cartridge[state->m_current_cartridge].cartSRAM[offset] = data;
+			m_cartridge[m_current_cartridge].cartSRAM[offset] = data;
 		}
 	}
 	else
 	{
-		if (state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER && offset == 0) /* Codemasters mapper */
+		if (m_cartridge[m_current_cartridge].features & CF_CODEMASTERS_MAPPER && offset == 0) /* Codemasters mapper */
 		{
-			UINT8 rom_page_count = state->m_cartridge[state->m_current_cartridge].size / 0x4000;
+			UINT8 rom_page_count = m_cartridge[m_current_cartridge].size / 0x4000;
 			page = (rom_page_count > 0) ? data % rom_page_count : 0;
-			if (!state->m_cartridge[state->m_current_cartridge].ROM)
+			if (!m_cartridge[m_current_cartridge].ROM)
 				return;
-			state->m_banking_cart[5] = state->m_cartridge[state->m_current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr(space->machine(), "bank5", state->m_banking_cart[5]);
-			memory_set_bankptr(space->machine(), "bank6", state->m_banking_cart[5] + 0x2000);
+			m_banking_cart[5] = m_cartridge[m_current_cartridge].ROM + page * 0x4000;
+			memory_set_bankptr(machine(), "bank5", m_banking_cart[5]);
+			memory_set_bankptr(machine(), "bank6", m_banking_cart[5] + 0x2000);
 			LOG(("rom 2 paged in %x (Codemasters mapper).\n", page));
 		}
-		else if (state->m_cartridge[state->m_current_cartridge].features & CF_ONCART_RAM)
+		else if (m_cartridge[m_current_cartridge].features & CF_ONCART_RAM)
 		{
-			state->m_cartridge[state->m_current_cartridge].cartRAM[offset & (state->m_cartridge[state->m_current_cartridge].ram_size - 1)] = data;
+			m_cartridge[m_current_cartridge].cartRAM[offset & (m_cartridge[m_current_cartridge].ram_size - 1)] = data;
 		}
 		else
 		{
@@ -1332,12 +1301,11 @@ WRITE8_HANDLER( sms_cartram_w )
 }
 
 
-WRITE8_HANDLER( gg_sio_w )
+WRITE8_MEMBER(sms_state::gg_sio_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
 
-	state->m_gg_sio[offset & 0x07] = data;
+	m_gg_sio[offset & 0x07] = data;
 	switch (offset & 7)
 	{
 		case 0x00: /* Parallel Data */
@@ -1358,9 +1326,8 @@ WRITE8_HANDLER( gg_sio_w )
 }
 
 
-READ8_HANDLER( gg_sio_r )
+READ8_MEMBER(sms_state::gg_sio_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	logerror("*** read SIO register #%d\n", offset);
 
 	switch (offset & 7)
@@ -1381,7 +1348,7 @@ READ8_HANDLER( gg_sio_r )
 			break;
 	}
 
-	return state->m_gg_sio[offset];
+	return m_gg_sio[offset];
 }
 
 static void sms_machine_stop( running_machine &machine )
@@ -1999,43 +1966,43 @@ MACHINE_RESET( sms )
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Install special memory handlers */
-		space->install_legacy_write_handler(0x0000, 0x0000, FUNC(sms_codemasters_page0_w));
-		space->install_legacy_write_handler(0x4000, 0x4000, FUNC(sms_codemasters_page1_w));
+		space->install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(sms_state::sms_codemasters_page0_w),state));
+		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_codemasters_page1_w),state));
 	}
 
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER )
 	{
-		space->install_legacy_write_handler(0x0000, 0x0003, FUNC(sms_korean_zemina_banksw_w));
+		space->install_write_handler(0x0000, 0x0003, write8_delegate(FUNC(sms_state::sms_korean_zemina_banksw_w),state));
 	}
 
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_JANGGUN_MAPPER )
 	{
-		space->install_legacy_write_handler(0x4000, 0x4000, FUNC(sms_janggun_bank0_w));
-		space->install_legacy_write_handler(0x6000, 0x6000, FUNC(sms_janggun_bank1_w));
-		space->install_legacy_write_handler(0x8000, 0x8000, FUNC(sms_janggun_bank2_w));
-		space->install_legacy_write_handler(0xA000, 0xA000, FUNC(sms_janggun_bank3_w));
+		space->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(sms_state::sms_janggun_bank0_w),state));
+		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_janggun_bank1_w),state));
+		space->install_write_handler(0x8000, 0x8000, write8_delegate(FUNC(sms_state::sms_janggun_bank2_w),state));
+		space->install_write_handler(0xA000, 0xA000,write8_delegate(FUNC(sms_state::sms_janggun_bank3_w),state));
 	}
 
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_4PAK_MAPPER )
 	{
-		space->install_legacy_write_handler(0x3ffe, 0x3ffe, FUNC(sms_4pak_page0_w));
-		space->install_legacy_write_handler(0x7fff, 0x7fff, FUNC(sms_4pak_page1_w));
-		space->install_legacy_write_handler(0xbfff, 0xbfff, FUNC(sms_4pak_page2_w));
+		space->install_write_handler(0x3ffe, 0x3ffe, write8_delegate(FUNC(sms_state::sms_4pak_page0_w),state));
+		space->install_write_handler(0x7fff, 0x7fff, write8_delegate(FUNC(sms_state::sms_4pak_page1_w),state));
+		space->install_write_handler(0xbfff, 0xbfff, write8_delegate(FUNC(sms_state::sms_4pak_page2_w),state));
 	}
 
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_TVDRAW )
 	{
-		space->install_legacy_write_handler(0x6000, 0x6000, FUNC(sms_tvdraw_axis_w));
-		space->install_legacy_read_handler(0x8000, 0x8000, FUNC(sms_tvdraw_status_r));
-		space->install_legacy_read_handler(0xa000, 0xa000, FUNC(sms_tvdraw_data_r));
+		space->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(sms_state::sms_tvdraw_axis_w),state));
+		space->install_read_handler(0x8000, 0x8000, read8_delegate(FUNC(sms_state::sms_tvdraw_status_r),state));
+		space->install_read_handler(0xa000, 0xa000, read8_delegate(FUNC(sms_state::sms_tvdraw_data_r),state));
 		space->nop_write(0xa000, 0xa000);
 		state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = 0;
 	}
 
 	if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
 	{
-		space->install_legacy_write_handler(0x8000,0x8000, FUNC(sms_93c46_w));
-		space->install_legacy_read_handler(0x8000,0x8000, FUNC(sms_93c46_r));
+		space->install_write_handler(0x8000,0x8000, write8_delegate(FUNC(sms_state::sms_93c46_w),state));
+		space->install_read_handler(0x8000,0x8000, read8_delegate(FUNC(sms_state::sms_93c46_r),state));
 	}
 
 	if (state->m_cartridge[state->m_current_cartridge].features & CF_GG_SMS_MODE)
@@ -2079,63 +2046,60 @@ MACHINE_RESET( sms )
 	state->m_sscope_state = 0;
 }
 
-READ8_HANDLER( sms_store_cart_select_r )
+READ8_MEMBER(sms_state::sms_store_cart_select_r)
 {
 	return 0xff;
 }
 
 
-WRITE8_HANDLER( sms_store_cart_select_w )
+WRITE8_MEMBER(sms_state::sms_store_cart_select_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
 	UINT8 slot = data >> 4;
 	UINT8 slottype = data & 0x08;
 
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot );
 	/* cartridge? slot #0 */
 	if (slottype == 0)
-		state->m_current_cartridge = slot;
+		m_current_cartridge = slot;
 
-	setup_cart_banks(space->machine());
-	memory_set_bankptr(space->machine(), "bank10", state->m_banking_cart[3] + 0x2000);
-	setup_rom(space);
+	setup_cart_banks(machine());
+	memory_set_bankptr(machine(), "bank10", m_banking_cart[3] + 0x2000);
+	setup_rom(&space);
 }
 
 
-READ8_HANDLER( sms_store_select1 )
+READ8_MEMBER(sms_state::sms_store_select1)
 {
 	return 0xff;
 }
 
 
-READ8_HANDLER( sms_store_select2 )
+READ8_MEMBER(sms_state::sms_store_select2)
 {
 	return 0xff;
 }
 
 
-READ8_HANDLER( sms_store_control_r )
+READ8_MEMBER(sms_state::sms_store_control_r)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	return state->m_store_control;
+	return m_store_control;
 }
 
 
-WRITE8_HANDLER( sms_store_control_w )
+WRITE8_MEMBER(sms_state::sms_store_control_w)
 {
-	sms_state *state = space->machine().driver_data<sms_state>();
-	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(&space->device()), data);
+	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(&space.device()), data);
 	if (data & 0x02)
 	{
-		space->machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
+		machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
 	}
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		space->machine().device("maincpu")->reset();
-		space->machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		machine().device("maincpu")->reset();
+		machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 	}
-	state->m_store_control = data;
+	m_store_control = data;
 }
 
 WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback )

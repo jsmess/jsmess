@@ -48,44 +48,39 @@ MACHINE_RESET( pecom )
 	state->m_reset_timer->adjust(attotime::from_msec(5));
 }
 
-static READ8_HANDLER( pecom_cdp1869_charram_r )
+READ8_MEMBER(pecom_state::pecom_cdp1869_charram_r)
 {
-	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->m_cdp1869->char_ram_r(*space, offset);
+	return m_cdp1869->char_ram_r(space, offset);
 }
 
-static WRITE8_HANDLER( pecom_cdp1869_charram_w )
+WRITE8_MEMBER(pecom_state::pecom_cdp1869_charram_w)
 {
-	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->m_cdp1869->char_ram_w(*space, offset, data);
+	return m_cdp1869->char_ram_w(space, offset, data);
 }
 
-static READ8_HANDLER( pecom_cdp1869_pageram_r )
+READ8_MEMBER(pecom_state::pecom_cdp1869_pageram_r)
 {
-	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->m_cdp1869->page_ram_r(*space, offset);
+	return m_cdp1869->page_ram_r(space, offset);
 }
 
-static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
+WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 {
-	pecom_state *state = space->machine().driver_data<pecom_state>();
-	return state->m_cdp1869->page_ram_w(*space, offset, data);
+	return m_cdp1869->page_ram_w(space, offset, data);
 }
 
-WRITE8_HANDLER( pecom_bank_w )
+WRITE8_MEMBER(pecom_state::pecom_bank_w)
 {
-//  pecom_state *state = space->machine().driver_data<pecom_state>();
-	address_space *space2 = space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *rom = space->machine().region(CDP1802_TAG)->base();
-	space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	address_space *space2 = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
+	memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 
 	if (data==2)
 	{
-		space2->install_legacy_read_handler (0xf000, 0xf7ff, FUNC(pecom_cdp1869_charram_r));
-		space2->install_legacy_write_handler(0xf000, 0xf7ff, FUNC(pecom_cdp1869_charram_w));
-		space2->install_legacy_read_handler (0xf800, 0xffff, FUNC(pecom_cdp1869_pageram_r));
-		space2->install_legacy_write_handler(0xf800, 0xffff, FUNC(pecom_cdp1869_pageram_w));
+		space2->install_read_handler (0xf000, 0xf7ff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_r),this));
+		space2->install_write_handler(0xf000, 0xf7ff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_w),this));
+		space2->install_read_handler (0xf800, 0xffff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_r),this));
+		space2->install_write_handler(0xf800, 0xffff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_w),this));
 	}
 	else
 	{
@@ -93,12 +88,12 @@ WRITE8_HANDLER( pecom_bank_w )
 		space2->unmap_write(0xf800, 0xffff);
 		space2->install_read_bank (0xf000, 0xf7ff, "bank3");
 		space2->install_read_bank (0xf800, 0xffff, "bank4");
-		memory_set_bankptr(space->machine(), "bank3", rom + 0xf000);
-		memory_set_bankptr(space->machine(), "bank4", rom + 0xf800);
+		memory_set_bankptr(machine(), "bank3", rom + 0xf000);
+		memory_set_bankptr(machine(), "bank4", rom + 0xf800);
 	}
 }
 
-READ8_HANDLER (pecom_keyboard_r)
+READ8_MEMBER(pecom_state::pecom_keyboard_r)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
@@ -111,10 +106,10 @@ READ8_HANDLER (pecom_keyboard_r)
        Address is available on address bus during reading of value from port, and that is
        used to determine keyboard line reading
     */
-	UINT16 addr = cpu_get_reg(space->machine().device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(space->machine().device(CDP1802_TAG), COSMAC_X));
+	UINT16 addr = cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
-	return input_port_read(space->machine(), keynames[addr - 0x7cca]) & 0x03;
+	return input_port_read(machine(), keynames[addr - 0x7cca]) & 0x03;
 }
 
 /* CDP1802 Interface */
