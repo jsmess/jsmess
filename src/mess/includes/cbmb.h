@@ -31,7 +31,7 @@ public:
 	required_shared_ptr<UINT8> m_basic;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_kernal;
-	required_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_colorram;
 
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
