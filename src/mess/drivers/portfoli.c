@@ -791,7 +791,7 @@ void portfolio_state::machine_start()
 	save_item(NAME(m_sivr));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_keylatch));
-	save_item(NAME(m_contrast));
+	save_pointer(NAME(m_contrast.target()), m_contrast.bytes());
 	save_item(NAME(m_pid));
 }
 

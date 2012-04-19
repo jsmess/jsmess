@@ -61,7 +61,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_ram(*this, "ram") { }
 
-	required_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<UINT8> m_ram;
 	int m_is_telestrat;
 	unsigned char m_irqs;
 	char *m_ram_0x0c000;
