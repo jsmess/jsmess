@@ -26,8 +26,7 @@ public:
 		  m_maincpu(*this, UB8830D_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_centronics(*this, CENTRONICS_TAG)
-	,
+		  m_centronics(*this, CENTRONICS_TAG),
 		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -44,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 
-	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_video_ram;
 };
 
 class jtces88_state : public jtc_state
