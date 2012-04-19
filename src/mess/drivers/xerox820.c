@@ -274,6 +274,14 @@ static ADDRESS_MAP_START( xerox168_mem, AS_PROGRAM, 16, xerox820ii_state )
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mk83_mem, AS_PROGRAM, 8, xerox820_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x3000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
 /* Input Ports */
 
 static INPUT_PORTS_START( xerox820 )
@@ -884,6 +892,11 @@ static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
 	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mk83, xerox820 )
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_PROGRAM_MAP(mk83_mem)
+MACHINE_CONFIG_END
+
 /* ROMs */
 
 ROM_START( xerox820 )
@@ -953,8 +966,8 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820",	GAME_NO_SOUND)
+COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND)
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, mk83,   	0,          0,      xerox820,   xerox820,   0,      "<unknown>",					"MK-83",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, mk83,       0,          0,      mk83,       xerox820,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND)
