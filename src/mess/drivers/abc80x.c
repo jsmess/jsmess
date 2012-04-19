@@ -995,13 +995,12 @@ void abc802_state::machine_reset()
 void abc806_state::machine_start()
 {
 	UINT8 *mem = machine().region(Z80_TAG)->base();
-	//UINT32 videoram_size = m_ram->size() - (32 * 1024);
+	UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
 	// setup memory banking
-	//FIXME
-	//m_video_ram = auto_alloc_array(machine(), UINT8, videoram_size);
+	m_video_ram.allocate(videoram_size);
 
 	for (bank = 1; bank <= 16; bank++)
 	{

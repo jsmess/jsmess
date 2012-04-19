@@ -480,7 +480,7 @@ void abc806_state::video_start()
 	m_hru2_prom = machine().region("hru2")->base();
 
 	// allocate memory
-	//m_char_ram = auto_alloc_array(machine(), UINT8, ABC806_CHAR_RAM_SIZE);
+	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
 	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving

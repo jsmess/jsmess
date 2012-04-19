@@ -113,8 +113,8 @@ public:
 	int m_fetch_charram;			// opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// video state
-	required_shared_ptr<UINT8> m_video_ram; 				// HR video RAM
-	required_shared_ptr<UINT8> m_char_ram; 				// character RAM
+	optional_shared_ptr<UINT8> m_video_ram; 				// HR video RAM
+	optional_shared_ptr<UINT8> m_char_ram; 				// character RAM
 	const UINT8 *m_char_rom;		// character generator ROM
 	const UINT8 *m_fgctl_prom;		// foreground control PROM
 	UINT8 m_hrs;					// HR picture start scanline
