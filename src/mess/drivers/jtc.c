@@ -542,7 +542,7 @@ static PALETTE_INIT( jtc_es40 )
 void jtces40_state::video_start()
 {
 	/* allocate memory */
-	//m_video_ram = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
+	m_video_ram.allocate(JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_r = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_g = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_b = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
