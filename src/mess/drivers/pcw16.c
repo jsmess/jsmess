@@ -1402,7 +1402,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_INTEL_E28F008SA_ADD("flash1")
 
 	/* video ints */
-	MCFG_TIMER_ADD_PERIODIC("video_timer", pcw16_timer_callback, attotime::from_hz(5830))
+	MCFG_TIMER_ADD_PERIODIC("video_timer", pcw16_timer_callback, attotime::from_usec(5830))
 	/* rtc timer */
 	MCFG_TIMER_ADD_PERIODIC("rtc_timer", rtc_timer_callback, attotime::from_hz(256))
 	/* keyboard timer */
