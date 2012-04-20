@@ -235,7 +235,7 @@ void ts2068_update_memory(running_machine &machine)
 	UINT8 timex_cart_chunks = timex_cart->chunks;
 	UINT8 *DOCK = timex_cart->data;
 
-	ExROM = machine.region("maincpu")->base() + 0x014000;
+	ExROM = state->memregion("maincpu")->base() + 0x014000;
 
 	if (state->m_port_f4_data & 0x01)
 	{
@@ -243,14 +243,14 @@ void ts2068_update_memory(running_machine &machine)
 		{
 				space->install_read_bank(0x0000, 0x1fff, "bank1");
 				space->unmap_write(0x0000, 0x1fff);
-				memory_set_bankptr(machine, "bank1", ExROM);
+				state->membank("bank1")->set_base(ExROM);
 				logerror("0000-1fff EXROM\n");
 		}
 		else
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank1", DOCK);
+				state->membank("bank1")->set_base(DOCK);
 				space->install_read_bank(0x0000, 0x1fff, "bank1");
 				if (timex_cart_chunks&0x01)
 					space->install_write_bank(0x0000, 0x1fff, "bank9");
@@ -269,8 +269,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		ChosenROM = machine.region("maincpu")->base() + 0x010000;
-		memory_set_bankptr(machine, "bank1", ChosenROM);
+		ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000;
+		state->membank("bank1")->set_base(ChosenROM);
 		space->install_read_bank(0x0000, 0x1fff, "bank1");
 		space->unmap_write(0x0000, 0x1fff);
 		logerror("0000-1fff HOME\n");
@@ -280,7 +280,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank2", ExROM);
+			state->membank("bank2")->set_base(ExROM);
 			space->install_read_bank(0x2000, 0x3fff, "bank2");
 			space->unmap_write(0x2000, 0x3fff);
 			logerror("2000-3fff EXROM\n");
@@ -289,7 +289,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank2", DOCK+0x2000);
+				state->membank("bank2")->set_base(DOCK+0x2000);
 				space->install_read_bank(0x2000, 0x3fff, "bank2");
 				if (timex_cart_chunks&0x02)
 					space->install_write_bank(0x2000, 0x3fff, "bank10");
@@ -307,8 +307,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		ChosenROM = machine.region("maincpu")->base() + 0x012000;
-		memory_set_bankptr(machine, "bank2", ChosenROM);
+		ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x012000;
+		state->membank("bank2")->set_base(ChosenROM);
 		space->install_read_bank(0x2000, 0x3fff, "bank2");
 		space->unmap_write(0x2000, 0x3fff);
 		logerror("2000-3fff HOME\n");
@@ -318,7 +318,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank3", ExROM);
+			state->membank("bank3")->set_base(ExROM);
 			space->install_read_bank(0x4000, 0x5fff, "bank3");
 			space->unmap_write(0x4000, 0x5fff);
 			logerror("4000-5fff EXROM\n");
@@ -327,7 +327,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank3", DOCK+0x4000);
+				state->membank("bank3")->set_base(DOCK+0x4000);
 				space->install_read_bank(0x4000, 0x5fff, "bank3");
 				if (timex_cart_chunks&0x04)
 					space->install_write_bank(0x4000, 0x5fff, "bank11");
@@ -344,8 +344,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", messram);
-		memory_set_bankptr(machine, "bank11", messram);
+		state->membank("bank3")->set_base(messram);
+		state->membank("bank11")->set_base(messram);
 		space->install_read_bank(0x4000, 0x5fff, "bank3");
 		space->install_write_bank(0x4000, 0x5fff, "bank11");
 		logerror("4000-5fff RAM\n");
@@ -355,7 +355,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank4", ExROM);
+			state->membank("bank4")->set_base(ExROM);
 			space->install_read_bank(0x6000, 0x7fff, "bank4");
 			space->unmap_write(0x6000, 0x7fff);
 			logerror("6000-7fff EXROM\n");
@@ -364,7 +364,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 				if (timex_cart_type == TIMEX_CART_DOCK)
 				{
-					memory_set_bankptr(machine, "bank4", DOCK+0x6000);
+					state->membank("bank4")->set_base(DOCK+0x6000);
 					space->install_read_bank(0x6000, 0x7fff, "bank4");
 					if (timex_cart_chunks&0x08)
 						space->install_write_bank(0x6000, 0x7fff, "bank12");
@@ -381,8 +381,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank4", messram + 0x2000);
-		memory_set_bankptr(machine, "bank12", messram + 0x2000);
+		state->membank("bank4")->set_base(messram + 0x2000);
+		state->membank("bank12")->set_base(messram + 0x2000);
 		space->install_read_bank(0x6000, 0x7fff, "bank4");
 		space->install_write_bank(0x6000, 0x7fff, "bank12");
 		logerror("6000-7fff RAM\n");
@@ -392,7 +392,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank5", ExROM);
+			state->membank("bank5")->set_base(ExROM);
 			space->install_read_bank(0x8000, 0x9fff, "bank5");
 			space->unmap_write(0x8000, 0x9fff);
 			logerror("8000-9fff EXROM\n");
@@ -401,7 +401,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank5", DOCK+0x8000);
+				state->membank("bank5")->set_base(DOCK+0x8000);
 				space->install_read_bank(0x8000, 0x9fff,"bank5");
 				if (timex_cart_chunks&0x10)
 					space->install_write_bank(0x8000, 0x9fff,"bank13");
@@ -418,8 +418,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank5", messram + 0x4000);
-		memory_set_bankptr(machine, "bank13", messram + 0x4000);
+		state->membank("bank5")->set_base(messram + 0x4000);
+		state->membank("bank13")->set_base(messram + 0x4000);
 		space->install_read_bank(0x8000, 0x9fff,"bank5");
 		space->install_write_bank(0x8000, 0x9fff,"bank13");
 		logerror("8000-9fff RAM\n");
@@ -429,7 +429,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank6", ExROM);
+			state->membank("bank6")->set_base(ExROM);
 			space->install_read_bank(0xa000, 0xbfff, "bank6");
 			space->unmap_write(0xa000, 0xbfff);
 			logerror("a000-bfff EXROM\n");
@@ -438,7 +438,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank6", DOCK+0xa000);
+				state->membank("bank6")->set_base(DOCK+0xa000);
 				space->install_read_bank(0xa000, 0xbfff, "bank6");
 				if (timex_cart_chunks&0x20)
 					space->install_write_bank(0xa000, 0xbfff, "bank14");
@@ -456,8 +456,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank6", messram + 0x6000);
-		memory_set_bankptr(machine, "bank14", messram + 0x6000);
+		state->membank("bank6")->set_base(messram + 0x6000);
+		state->membank("bank14")->set_base(messram + 0x6000);
 		space->install_read_bank(0xa000, 0xbfff, "bank6");
 		space->install_write_bank(0xa000, 0xbfff, "bank14");
 		logerror("a000-bfff RAM\n");
@@ -467,7 +467,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank7", ExROM);
+			state->membank("bank7")->set_base(ExROM);
 			space->install_read_bank(0xc000, 0xdfff, "bank7");
 			space->unmap_write(0xc000, 0xdfff);
 			logerror("c000-dfff EXROM\n");
@@ -476,7 +476,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank7", DOCK+0xc000);
+				state->membank("bank7")->set_base(DOCK+0xc000);
 				space->install_read_bank(0xc000, 0xdfff, "bank7");
 				if (timex_cart_chunks&0x40)
 					space->install_write_bank(0xc000, 0xdfff, "bank15");
@@ -493,8 +493,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank7", messram + 0x8000);
-		memory_set_bankptr(machine, "bank15", messram + 0x8000);
+		state->membank("bank7")->set_base(messram + 0x8000);
+		state->membank("bank15")->set_base(messram + 0x8000);
 		space->install_read_bank(0xc000, 0xdfff, "bank7");
 		space->install_write_bank(0xc000, 0xdfff, "bank15");
 		logerror("c000-dfff RAM\n");
@@ -504,7 +504,7 @@ void ts2068_update_memory(running_machine &machine)
 	{
 		if (state->m_port_ff_data & 0x80)
 		{
-			memory_set_bankptr(machine, "bank8", ExROM);
+			state->membank("bank8")->set_base(ExROM);
 			space->install_read_bank(0xe000, 0xffff, "bank8");
 			space->unmap_write(0xe000, 0xffff);
 			logerror("e000-ffff EXROM\n");
@@ -513,7 +513,7 @@ void ts2068_update_memory(running_machine &machine)
 		{
 			if (timex_cart_type == TIMEX_CART_DOCK)
 			{
-				memory_set_bankptr(machine, "bank8", DOCK+0xe000);
+				state->membank("bank8")->set_base(DOCK+0xe000);
 				space->install_read_bank(0xe000, 0xffff, "bank8");
 				if (timex_cart_chunks&0x80)
 					space->install_write_bank(0xe000, 0xffff, "bank16");
@@ -530,8 +530,8 @@ void ts2068_update_memory(running_machine &machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank8", messram + 0xa000);
-		memory_set_bankptr(machine, "bank16", messram + 0xa000);
+		state->membank("bank8")->set_base(messram + 0xa000);
+		state->membank("bank16")->set_base(messram + 0xa000);
 		space->install_read_bank(0xe000, 0xffff, "bank8");
 		space->install_write_bank(0xe000, 0xffff, "bank16");
 		logerror("e000-ffff RAM\n");
@@ -603,8 +603,8 @@ static MACHINE_RESET( tc2048 )
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
-	memory_set_bankptr(machine, "bank1", messram);
-	memory_set_bankptr(machine, "bank2", messram);
+	state->membank("bank1")->set_base(messram);
+	state->membank("bank2")->set_base(messram);
 	state->m_port_ff_data = 0;
 	state->m_port_f4_data = -1;
 	MACHINE_RESET_CALL(spectrum);

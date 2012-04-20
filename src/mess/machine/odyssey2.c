@@ -19,17 +19,17 @@ static void odyssey2_switch_banks(running_machine &machine)
 	switch ( state->m_cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
-		memory_set_bankptr( machine, "bank1", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0xC00 );
-		memory_set_bankptr( machine, "bank2", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0xC00 + 0x800 );
+		state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 );
+		state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 + 0x800 );
 		break;
 	case 16384:
 		/* 16KB cart support (for instance, full sized version KTAA) */
-		memory_set_bankptr( machine, "bank1", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0x400 );
-		memory_set_bankptr( machine, "bank2", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0xC00 );
+		state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0x400 );
+		state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0xC00 );
 		break;
 	default:
-		memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0x800);
-		memory_set_bankptr(machine, "bank2", machine.region("user1")->base() + (state->m_p1 & 0x03) * 0x800 );
+		state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800);
+		state->membank("bank2")->set_base(state->memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800 );
 		break;
 	}
 }
@@ -48,7 +48,7 @@ DRIVER_INIT( odyssey2 )
 	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	int i;
 	int size = 0;
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 
 	state->m_ram        = auto_alloc_array(machine, UINT8, 256);

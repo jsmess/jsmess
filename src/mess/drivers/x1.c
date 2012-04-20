@@ -343,7 +343,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 			int width = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
 			int height = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
 			int pcg_bank = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = machine.region(pcg_bank ? "pcg" : "cgrom")->base();
+			UINT8 *gfx_data = machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int	knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
@@ -357,7 +357,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 				knj_bank = state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
 				if(knj_enable)
 				{
-					gfx_data = machine.region("kanji")->base();
+					gfx_data = state->memregion("kanji")->base();
 					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
 				}
 			}
@@ -965,7 +965,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 
 READ8_MEMBER( x1_state::x1_rom_r )
 {
-	UINT8 *rom = machine().region("cart_img")->base();
+	UINT8 *rom = memregion("cart_img")->base();
 
 //  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 
@@ -1123,7 +1123,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 
 	if(addr == 0 && m_scrn_reg.pcg_mode) // Kanji ROM read, X1Turbo only
 	{
-		gfx_data = machine().region("kanji")->base();
+		gfx_data = memregion("kanji")->base();
 		pcg_offset = (m_tvram[check_chr_addr()]+(m_kvram[check_chr_addr()]<<8)) & 0xfff;
 		pcg_offset*=0x20;
 		pcg_offset+=(offset & 0x0f);
@@ -1136,7 +1136,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		UINT8 y_char_size;
 
 		/* addr == 0 reads from the ANK rom */
-		gfx_data = machine().region((addr == 0) ? "cgrom" : "pcg")->base();
+		gfx_data = memregion((addr == 0) ? "cgrom" : "pcg")->base();
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
@@ -1151,7 +1151,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 WRITE8_MEMBER( x1_state::x1_pcg_w )
 {
 	int addr,pcg_offset;
-	UINT8 *PCG_RAM = machine().region("pcg")->base();
+	UINT8 *PCG_RAM = memregion("pcg")->base();
 
 	addr = (offset & 0x300) >> 8;
 
@@ -1446,7 +1446,7 @@ static UINT16 jis_convert(int kanji_addr)
 
 READ8_MEMBER( x1_state::x1_kanji_r )
 {
-	UINT8 *kanji_rom = machine().region("kanji")->base();
+	UINT8 *kanji_rom = memregion("kanji")->base();
 	UINT8 res;
 
 	res = kanji_rom[jis_convert(m_kanji_addr & 0xfff0)+(offset*0x10)+(m_kanji_addr & 0xf)];
@@ -1489,7 +1489,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 
 READ8_MEMBER( x1_state::x1_emm_r )
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 res;
 
 	if(offset & ~3)
@@ -1514,7 +1514,7 @@ READ8_MEMBER( x1_state::x1_emm_r )
 
 WRITE8_MEMBER( x1_state::x1_emm_w )
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 
 	if(offset & ~3)
 	{
@@ -1545,7 +1545,7 @@ READ8_MEMBER( x1_state::x1turbo_bank_r )
 
 WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 {
-	//UINT8 *RAM = machine().region("x1_cpu")->base();
+	//UINT8 *RAM = memregion("x1_cpu")->base();
 	/*
     --x- ---- BML5: latch bit (doesn't have any real function)
     ---x ---- BMCS: select bank RAM, active low
@@ -1559,11 +1559,11 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 /* TODO: waitstate penalties */
 READ8_MEMBER( x1_state::x1_mem_r )
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
-		UINT8 *ipl = machine().region("ipl")->base();
+		UINT8 *ipl = memregion("ipl")->base();
 		return ipl[offset]; //ROM
 	}
 
@@ -1572,7 +1572,7 @@ READ8_MEMBER( x1_state::x1_mem_r )
 
 WRITE8_MEMBER( x1_state::x1_mem_w )
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	wram[offset] = data; //RAM
 }
@@ -1581,7 +1581,7 @@ READ8_MEMBER( x1_state::x1turbo_mem_r )
 {
 	if((m_ex_bank & 0x10) == 0)
 	{
-		UINT8 *wram = machine().region("wram")->base();
+		UINT8 *wram = memregion("wram")->base();
 
 		return wram[offset+((m_ex_bank & 0xf)*0x10000)];
 	}
@@ -1593,7 +1593,7 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
 {
 	if((m_ex_bank & 0x10) == 0)
 	{
-		UINT8 *wram = machine().region("wram")->base();
+		UINT8 *wram = memregion("wram")->base();
 
 		wram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
 	}
@@ -2468,8 +2468,8 @@ TIMER_CALLBACK(x1_rtc_increment)
 MACHINE_RESET( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
-	//UINT8 *ROM = machine.region("x1_cpu")->base();
-	UINT8 *PCG_RAM = machine.region("pcg")->base();
+	//UINT8 *ROM = machine.root_device().memregion("x1_cpu")->base();
+	UINT8 *PCG_RAM = state->memregion("pcg")->base();
 	int i;
 
 	memset(state->m_gfx_bitmap_ram,0x00,0xc000*2);
@@ -2764,8 +2764,8 @@ ROM_END
 DRIVER_INIT( x1_kanji )
 {
 	UINT32 i,j,k,l;
-	UINT8 *kanji = machine.region("kanji")->base();
-	UINT8 *raw_kanji = machine.region("raw_kanji")->base();
+	UINT8 *kanji = machine.root_device().memregion("kanji")->base();
+	UINT8 *raw_kanji = machine.root_device().memregion("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)

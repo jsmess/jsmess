@@ -155,7 +155,7 @@ static MACHINE_RESET(ec65)
 static VIDEO_START( ec65 )
 {
 	ec65_state *state = machine.driver_data<ec65_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( ec65_update_row )

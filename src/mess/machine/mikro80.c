@@ -18,10 +18,10 @@ DRIVER_INIT(mikro80)
 {
 	mikro80_state *state = machine.driver_data<mikro80_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
+	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
 	state->m_key_mask = 0x7f;
 }
 
@@ -73,14 +73,15 @@ I8255_INTERFACE( mikro80_ppi8255_interface )
 
 static TIMER_CALLBACK( mikro80_reset )
 {
-	memory_set_bank(machine,"bank1", 0);
+	mikro80_state *state = machine.driver_data<mikro80_state>();
+	state->membank("bank1")->set_entry(0);
 }
 
 MACHINE_RESET( mikro80 )
 {
 	mikro80_state *state = machine.driver_data<mikro80_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(mikro80_reset));
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 	state->m_keyboard_mask = 0;
 }
 

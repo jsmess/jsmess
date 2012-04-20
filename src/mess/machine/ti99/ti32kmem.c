@@ -92,7 +92,7 @@ void ti_32k_expcard_device::cruwrite(offs_t offset, UINT8 value)
 
 void ti_32k_expcard_device::device_start(void)
 {
-	m_ram_ptr = subregion(RAMREGION)->base();
+	m_ram_ptr = memregion(RAMREGION)->base();
 	m_cru_base = 0;
 }
 

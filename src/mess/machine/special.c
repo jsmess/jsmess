@@ -15,11 +15,12 @@
 /* Driver initialization */
 DRIVER_INIT(special)
 {
+	special_state *state = machine.driver_data<special_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	memset(RAM,0x0000,0x3000); // make first page empty by default
-	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xc000);
+	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	state->membank("bank1")->configure_entries(0, 2, RAM, 0xc000);
 }
 
 READ8_MEMBER( special_state::specialist_8255_porta_r )
@@ -103,14 +104,16 @@ I8255_INTERFACE( specialist_ppi8255_interface )
 
 static TIMER_CALLBACK( special_reset )
 {
-	memory_set_bank(machine, "bank1", 0);
+	special_state *state = machine.driver_data<special_state>();
+	state->membank("bank1")->set_entry(0);
 }
 
 
 MACHINE_RESET( special )
 {
+	special_state *state = machine.driver_data<special_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(special_reset));
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 }
 
 
@@ -140,36 +143,36 @@ void special_state::specimx_set_bank(offs_t i, UINT8 data)
 
 	space->install_write_bank(0xc000, 0xffbf, "bank3");
 	space->install_write_bank(0xffc0, 0xffdf, "bank4");
-	memory_set_bankptr(machine(), "bank4", ram + 0xffc0);
+	membank("bank4")->set_base(ram + 0xffc0);
 	switch(i)
 	{
 		case 0 :
 			space->install_write_bank(0x0000, 0x8fff, "bank1");
 			space->install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(special_state::video_memory_w), this));
 
-			memory_set_bankptr(machine(), "bank1", ram);
-			memory_set_bankptr(machine(), "bank2", ram + 0x9000);
-			memory_set_bankptr(machine(), "bank3", ram + 0xc000);
+			membank("bank1")->set_base(ram);
+			membank("bank2")->set_base(ram + 0x9000);
+			membank("bank3")->set_base(ram + 0xc000);
 			break;
 		case 1 :
 			space->install_write_bank(0x0000, 0x8fff, "bank1");
 			space->install_write_bank(0x9000, 0xbfff, "bank2");
 
-			memory_set_bankptr(machine(), "bank1", ram + 0x10000);
-			memory_set_bankptr(machine(), "bank2", ram + 0x19000);
-			memory_set_bankptr(machine(), "bank3", ram + 0x1c000);
+			membank("bank1")->set_base(ram + 0x10000);
+			membank("bank2")->set_base(ram + 0x19000);
+			membank("bank3")->set_base(ram + 0x1c000);
 			break;
 		case 2 :
 			space->unmap_write(0x0000, 0x8fff);
 			space->unmap_write(0x9000, 0xbfff);
 
-			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x10000);
-			memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base() + 0x19000);
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
+			membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x19000);
 
 			if (data & 0x80)
-				memory_set_bankptr(machine(), "bank3", ram + 0x1c000);
+				membank("bank3")->set_base(ram + 0x1c000);
 			else
-				memory_set_bankptr(machine(), "bank3", ram + 0xc000);
+				membank("bank3")->set_base(ram + 0xc000);
 
 			break;
 	}
@@ -272,7 +275,7 @@ void special_state::erik_set_bank()
 	UINT8 bank2 = (m_RR_register >> 2) & 3;
 	UINT8 bank3 = (m_RR_register >> 4) & 3;
 	UINT8 bank4 = (m_RR_register >> 6) & 3;
-	UINT8 *mem = machine().region("maincpu")->base();
+	UINT8 *mem = memregion("maincpu")->base();
 	UINT8 *ram = m_ram->pointer();
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 
@@ -288,11 +291,11 @@ void special_state::erik_set_bank()
 		case	1:
 		case	2:
 		case	3:
-			memory_set_bankptr(machine(), "bank1", ram + 0x10000*(bank1-1));
+			membank("bank1")->set_base(ram + 0x10000*(bank1-1));
 			break;
 		case	0:
 			space->unmap_write(0x0000, 0x3fff);
-			memory_set_bankptr(machine(), "bank1", mem + 0x10000);
+			membank("bank1")->set_base(mem + 0x10000);
 			break;
 	}
 	switch(bank2)
@@ -300,11 +303,11 @@ void special_state::erik_set_bank()
 		case	1:
 		case	2:
 		case	3:
-			memory_set_bankptr(machine(), "bank2", ram + 0x10000*(bank2-1) + 0x4000);
+			membank("bank2")->set_base(ram + 0x10000*(bank2-1) + 0x4000);
 			break;
 		case	0:
 			space->unmap_write(0x4000, 0x8fff);
-			memory_set_bankptr(machine(), "bank2", mem + 0x14000);
+			membank("bank2")->set_base(mem + 0x14000);
 			break;
 	}
 	switch(bank3)
@@ -312,11 +315,11 @@ void special_state::erik_set_bank()
 		case	1:
 		case	2:
 		case	3:
-			memory_set_bankptr(machine(), "bank3", ram + 0x10000*(bank3-1) + 0x9000);
+			membank("bank3")->set_base(ram + 0x10000*(bank3-1) + 0x9000);
 			break;
 		case	0:
 			space->unmap_write(0x9000, 0xbfff);
-			memory_set_bankptr(machine(), "bank3", mem + 0x19000);
+			membank("bank3")->set_base(mem + 0x19000);
 			break;
 	}
 	switch(bank4)
@@ -324,13 +327,13 @@ void special_state::erik_set_bank()
 		case	1:
 		case	2:
 		case	3:
-			memory_set_bankptr(machine(), "bank4", ram + 0x10000*(bank4-1) + 0x0c000);
-			memory_set_bankptr(machine(), "bank5", ram + 0x10000*(bank4-1) + 0x0f000);
-			memory_set_bankptr(machine(), "bank6", ram + 0x10000*(bank4-1) + 0x0f800);
+			membank("bank4")->set_base(ram + 0x10000*(bank4-1) + 0x0c000);
+			membank("bank5")->set_base(ram + 0x10000*(bank4-1) + 0x0f000);
+			membank("bank6")->set_base(ram + 0x10000*(bank4-1) + 0x0f800);
 			break;
 		case	0:
 			space->unmap_write(0xc000, 0xefff);
-			memory_set_bankptr(machine(), "bank4", mem + 0x1c000);
+			membank("bank4")->set_base(mem + 0x1c000);
 			space->unmap_write(0xf000, 0xf7ff);
 			space->nop_read(0xf000, 0xf7ff);
 			space->install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));

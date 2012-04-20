@@ -216,10 +216,10 @@ WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 {
-	unsigned char *ROM = machine().region("master")->base();
+	unsigned char *ROM = memregion("master")->base();
 	int bank = data & 7;
 	ROM = &ROM[0x4000 * bank];
-	memory_set_bankptr(machine(), "bank1", ROM);
+	membank("bank1")->set_base(ROM);
 }
 
 WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
@@ -275,12 +275,12 @@ WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 {
 
-	unsigned char *ROM = machine().region("slave")->base();
+	unsigned char *ROM = memregion("slave")->base();
 	int bank = (data & 0x03);
 	m_port0_data = data;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(machine(), "bank2", ROM);
+	membank("bank2")->set_base(ROM);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_scrollx_w)
@@ -308,11 +308,11 @@ WRITE8_MEMBER(hvyunit_state::coin_count_w)
 
 WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
 {
-	unsigned char *ROM = machine().region("soundcpu")->base();
+	unsigned char *ROM = memregion("soundcpu")->base();
 	int bank = data & 0x3;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(machine(), "bank3", ROM);
+	membank("bank3")->set_base(ROM);
 }
 
 

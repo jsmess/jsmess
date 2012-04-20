@@ -150,7 +150,7 @@ static MACHINE_START( ddragon )
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_sub_cpu = machine.device("sub");
@@ -203,7 +203,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 	else if (m_dd_sub_cpu_busy == 0)
 		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(machine(), "bank1", (data & 0xe0) >> 5);
+	membank("bank1")->set_entry((data & 0xe0) >> 5);
 }
 
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(machine(), "bank1", (data & 0x20) >> 5);
+	membank("bank1")->set_entry((data & 0x20) >> 5);
 }
 
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 
 WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 {
-	int oldbank = machine().memory().bank("bank1")->entry();
+	int oldbank = membank("bank1")->entry();
 	int newbank = (data & 0xe0) >> 5;
 
 	m_scrollx_hi = (data & 0x01);
@@ -278,7 +278,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 	else if (m_dd_sub_cpu_busy == 0)
 		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(machine(), "bank1", newbank);
+	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
 		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_w),this));
 	else if (newbank != 4 && oldbank == 4)
@@ -465,7 +465,7 @@ static void dd_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
 
 		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
 		msm5205_data_w(device, state->m_adpcm_data[chip] >> 4);
@@ -2023,26 +2023,26 @@ static DRIVER_INIT( toffy )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),state));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = machine.region("maincpu")->base();
-	length = machine.region("maincpu")->bytes();
+	rom = machine.root_device().memregion("maincpu")->base();
+	length = machine.root_device().memregion("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	rom = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = machine.region("gfx2")->base();
-	length = machine.region("gfx2")->bytes();
+	rom = machine.root_device().memregion("gfx2")->base();
+	length = machine.root_device().memregion("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = machine.region("gfx3")->base();
-	length = machine.region("gfx3")->bytes();
+	rom = machine.root_device().memregion("gfx3")->base();
+	length = state->memregion("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
@@ -2058,8 +2058,8 @@ static DRIVER_INIT( ddragon6809 )
 	int i;
 	UINT8 *dst,*src;
 
-	src = machine.region("chars")->base();
-	dst = machine.region("gfx1")->base();
+	src = machine.root_device().memregion("chars")->base();
+	dst = state->memregion("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)
 	{

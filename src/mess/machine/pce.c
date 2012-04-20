@@ -111,9 +111,9 @@ static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback );
 
 WRITE8_MEMBER(pce_state::pce_sf2_banking_w)
 {
-	memory_set_bankptr( machine(), "bank2", machine().region("user1")->base() + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( machine(), "bank3", machine().region("user1")->base() + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( machine(), "bank4", machine().region("user1")->base() + offset * 0x080000 + 0x0D0000 );
+	membank( "bank2" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x080000 );
+	membank( "bank3" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x088000 );
+	membank( "bank4" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x0D0000 );
 }
 
 WRITE8_MEMBER(pce_state::pce_cartridge_ram_w)
@@ -131,7 +131,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
 
 	/* open file to get size */
-	ROM = image.device().machine().region("user1")->base();
+	ROM = state->memregion("user1")->base();
 
 	if (image.software_entry() == NULL)
 		size = image.length();
@@ -212,10 +212,10 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			memcpy(ROM + 0x080000, ROM, 0x080000);
 	}
 
-	memory_set_bankptr(image.device().machine(), "bank1", ROM);
-	memory_set_bankptr(image.device().machine(), "bank2", ROM + 0x080000);
-	memory_set_bankptr(image.device().machine(), "bank3", ROM + 0x088000);
-	memory_set_bankptr(image.device().machine(), "bank4", ROM + 0x0d0000);
+	state->membank("bank1")->set_base(ROM);
+	state->membank("bank2")->set_base(ROM + 0x080000);
+	state->membank("bank3")->set_base(ROM + 0x088000);
+	state->membank("bank4")->set_base(ROM + 0x0d0000);
 
 	/* Check for Street fighter 2 */
 	if (size == PCE_ROM_MAXSIZE)
@@ -227,7 +227,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	if (!memcmp(ROM + 0x1F26, "POPULOUS", 8))
 	{
 		state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x8000);
-		memory_set_bankptr(image.device().machine(), "bank2", state->m_cartridge_ram);
+		state->membank("bank2")->set_base(state->m_cartridge_ram);
 		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
 	}
 
@@ -242,7 +242,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		if(state->m_sys3_card)
 		{
 			state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x30000);
-			memory_set_bankptr(image.device().machine(), "bank4", state->m_cartridge_ram);
+			state->membank("bank4")->set_base(state->m_cartridge_ram);
 			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
 			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),state),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),state));
 		}
@@ -380,7 +380,7 @@ static void pce_set_cd_bram( running_machine &machine )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
-	memory_set_bankptr( machine, "bank10", pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
+	state->membank( "bank10" )->set_base( pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
 static void adpcm_stop(running_machine &machine, UINT8 irq_flag)

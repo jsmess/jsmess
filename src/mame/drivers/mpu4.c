@@ -464,11 +464,11 @@ static MACHINE_RESET( mpu4 )
 
 	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = state->memregion("maincpu")->base();
 
-		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
+		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(machine, "bank1", 0);
+		state->membank("bank1")->set_entry(0);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -522,20 +522,20 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 //  printf("bank %02x\n", data);
 
 	m_pageval = (data & 0x03);
-	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
 READ8_MEMBER(mpu4_state::bankswitch_r)
 {
-	return machine().memory().bank("bank1")->entry();
+	return membank("bank1")->entry();
 }
 
 
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -1560,7 +1560,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	if (mstate->m_bwb_bank)
 	{
 		mstate->m_pageval = state;
-		memory_set_bank(device->machine(), "bank1", (mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
+		mstate->membank("bank1")->set_entry((mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
 	}
 }
 
@@ -15233,13 +15233,13 @@ void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 DRIVER_INIT( crystal )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
 DRIVER_INIT( crystali )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
 

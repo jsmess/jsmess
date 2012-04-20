@@ -152,18 +152,18 @@ WRITE8_MEMBER( osborne1_state::osborne1_bankswitch_w )
 	}
 	if ( m_bank2_enabled )
 	{
-		memory_set_bankptr(machine(),"bank1", machine().region("maincpu")->base() );
-		memory_set_bankptr(machine(),"bank2", m_empty_4K );
-		memory_set_bankptr(machine(),"bank3", m_empty_4K );
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+		membank("bank2")->set_base(m_empty_4K );
+		membank("bank3")->set_base(m_empty_4K );
 	}
 	else
 	{
-		memory_set_bankptr(machine(),"bank1", machine().device<ram_device>(RAM_TAG)->pointer() );
-		memory_set_bankptr(machine(),"bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000 );
-		memory_set_bankptr(machine(),"bank3", machine().device<ram_device>(RAM_TAG)->pointer() + 0x3000 );
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() );
+		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000 );
+		membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x3000 );
 	}
 	m_bank4_ptr = machine().device<ram_device>(RAM_TAG)->pointer() + ( ( m_bank3_enabled ) ? 0x10000 : 0xF000 );
-	memory_set_bankptr(machine(),"bank4", m_bank4_ptr );
+	membank("bank4")->set_base(m_bank4_ptr );
 	m_bankswitch = offset;
 	m_in_irq_handler = 0;
 }
@@ -383,7 +383,7 @@ MACHINE_RESET( osborne1 )
 	state->m_pia_1_irq_state = FALSE;
 	state->m_in_irq_handler = 0;
 
-	state->m_p_chargen = machine.region( "chargen" )->base();
+	state->m_p_chargen = state->memregion( "chargen" )->base();
 
 	memset( machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000, 0xFF, 0x1000 );
 

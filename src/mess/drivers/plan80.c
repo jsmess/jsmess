@@ -144,24 +144,26 @@ INPUT_PORTS_END
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( plan80_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	plan80_state *state = machine.driver_data<plan80_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER( plan80_state )
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
 }
 
 DRIVER_INIT( plan80 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
+	plan80_state *state = machine.driver_data<plan80_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 VIDEO_START_MEMBER( plan80_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( plan80_state )

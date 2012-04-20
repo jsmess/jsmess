@@ -77,7 +77,7 @@ static SCREEN_UPDATE_IND16( fp6000 )
 	fp6000_state *state = screen.machine().driver_data<fp6000_state>();
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = screen.machine().region("pcg")->base();
+	UINT8 *gfx_rom = state->memregion("pcg")->base();
 	UINT32 count;
 
 	count = 0;
@@ -277,7 +277,7 @@ static MACHINE_START(fp6000)
 {
 	fp6000_state *state = machine.driver_data<fp6000_state>();
 
-	state->m_char_rom = machine.region("pcg")->base();
+	state->m_char_rom = state->memregion("pcg")->base();
 	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 

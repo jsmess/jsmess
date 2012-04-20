@@ -37,51 +37,52 @@ public:
 
 static void tvc_set_mem_page(running_machine &machine, UINT8 data)
 {
+	tvc_state *state = machine.driver_data<tvc_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(data & 0x18) {
 		case 0x00 : // system ROM selected
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				memory_set_bankptr(space->machine(), "bank1", machine.region("sys")->base());
+				state->membank("bank1")->set_base(machine.root_device().memregion("sys")->base());
 				break;
 		case 0x08 : // Cart ROM selected
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				memory_set_bankptr(space->machine(), "bank1", machine.region("cart")->base());
+				state->membank("bank1")->set_base(machine.root_device().memregion("cart")->base());
 				break;
 		case 0x10 : // RAM selected
 				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-				memory_set_bankptr(space->machine(), "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+				state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine(), "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine(), "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000);
+		state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine(), "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+		state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine(), "bank4", machine.region("cart")->base());
+				state->membank("bank4")->set_base(machine.root_device().memregion("cart")->base());
 				break;
 		case 0x40 : // System ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine(), "bank4", machine.region("sys")->base());
+				state->membank("bank4")->set_base(machine.root_device().memregion("sys")->base());
 				break;
 		case 0x80 : // RAM selected
 				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
-				memory_set_bankptr(space->machine(), "bank4", machine.device<ram_device>(RAM_TAG)->pointer()+0xc000);
+				state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer()+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				memory_set_bankptr(space->machine(), "bank4", machine.region("ext")->base());
+				state->membank("bank4")->set_base(machine.root_device().memregion("ext")->base());
 				break;
 
 	}

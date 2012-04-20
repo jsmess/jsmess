@@ -294,7 +294,7 @@ static DRIVER_INIT( ti990_10 )
 	/* load specific ti990/12 rom page */
 	const int page = 3;
 
-	memmove(machine.region("maincpu")->base()+0x1FFC00, machine.region("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
+	memmove(machine.root_device().memregion("maincpu")->base()+0x1FFC00, machine.root_device().memregion("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
 #endif
 	vdt911_init(machine);
 }

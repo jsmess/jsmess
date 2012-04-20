@@ -490,7 +490,7 @@ WRITE8_HANDLER( cbm8096_w )
 		if (data & 0x20)
 		{
 			state->m_pet80_bank1_base = state->m_memory + 0x8000;
-			memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
+			state->membank("bank1")->set_base(state->m_pet80_bank1_base);
 			space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 		}
 		else
@@ -516,70 +516,70 @@ WRITE8_HANDLER( cbm8096_w )
 			if (!(data & 0x20))
 			{
 				state->m_pet80_bank1_base = state->m_memory + 0x14000;
-				memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
+				state->membank("bank1")->set_base(state->m_pet80_bank1_base);
 			}
-			memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x15000);
-			memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0x16000);
-			memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0x17000);
+			state->membank("bank2")->set_base(state->m_memory + 0x15000);
+			state->membank("bank3")->set_base(state->m_memory + 0x16000);
+			state->membank("bank4")->set_base(state->m_memory + 0x17000);
 		}
 		else
 		{
 			if (!(data & 0x20))
 			{
 				state->m_pet80_bank1_base = state->m_memory + 0x10000;
-				memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base);
+				state->membank("bank1")->set_base(state->m_pet80_bank1_base);
 			}
-			memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x11000);
-			memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0x12000);
-			memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0x13000);
+			state->membank("bank2")->set_base(state->m_memory + 0x11000);
+			state->membank("bank3")->set_base(state->m_memory + 0x12000);
+			state->membank("bank4")->set_base(state->m_memory + 0x13000);
 		}
 
 		if (data & 8)
 		{
 			if (!(data & 0x40))
 			{
-				memory_set_bankptr(space->machine(), "bank7", state->m_memory + 0x1e800);
+				state->membank("bank7")->set_base(state->m_memory + 0x1e800);
 			}
-			memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0x1c000);
-			memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0x1f000);
-			memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0x1fff1);
+			state->membank("bank6")->set_base(state->m_memory + 0x1c000);
+			state->membank("bank8")->set_base(state->m_memory + 0x1f000);
+			state->membank("bank9")->set_base(state->m_memory + 0x1fff1);
 		}
 		else
 		{
 			if (!(data & 0x40))
 			{
-				memory_set_bankptr(space->machine(), "bank7", state->m_memory+ 0x1a800);
+				state->membank("bank7")->set_base(state->m_memory+ 0x1a800);
 			}
-			memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0x18000);
-			memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0x1b000);
-			memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0x1bff1);
+			state->membank("bank6")->set_base(state->m_memory + 0x18000);
+			state->membank("bank8")->set_base(state->m_memory + 0x1b000);
+			state->membank("bank9")->set_base(state->m_memory + 0x1bff1);
 		}
 	}
 	else
 	{
 		state->m_pet80_bank1_base = state->m_memory + 0x8000;
-		memory_set_bankptr(space->machine(), "bank1", state->m_pet80_bank1_base );
+		state->membank("bank1")->set_base(state->m_pet80_bank1_base );
 		space->install_legacy_write_handler(0x8000, 0x8fff, FUNC(pet80_bank1_w));
 
-		memory_set_bankptr(space->machine(), "bank2", state->m_memory + 0x9000);
+		state->membank("bank2")->set_base(state->m_memory + 0x9000);
 		space->unmap_write(0x9000, 0x9fff);
 
-		memory_set_bankptr(space->machine(), "bank3", state->m_memory + 0xa000);
+		state->membank("bank3")->set_base(state->m_memory + 0xa000);
 		space->unmap_write(0xa000, 0xafff);
 
-		memory_set_bankptr(space->machine(), "bank4", state->m_memory + 0xb000);
+		state->membank("bank4")->set_base(state->m_memory + 0xb000);
 		space->unmap_write(0xb000, 0xbfff);
 
-		memory_set_bankptr(space->machine(), "bank6", state->m_memory + 0xc000);
+		state->membank("bank6")->set_base(state->m_memory + 0xc000);
 		space->unmap_write(0xc000, 0xe7ff);
 
 		space->install_legacy_read_handler(0xe800, 0xefff, FUNC(cbm8096_io_r));
 		space->install_legacy_write_handler(0xe800, 0xefff, FUNC(cbm8096_io_w));
 
-		memory_set_bankptr(space->machine(), "bank8", state->m_memory + 0xf000);
+		state->membank("bank8")->set_base(state->m_memory + 0xf000);
 		space->unmap_write(0xf000, 0xffef);
 
-		memory_set_bankptr(space->machine(), "bank9", state->m_memory + 0xfff1);
+		state->membank("bank9")->set_base(state->m_memory + 0xfff1);
 		space->unmap_write(0xfff1, 0xffff);
 	}
 }
@@ -606,8 +606,8 @@ WRITE8_HANDLER( superpet_w )
 		case 4:
 		case 5:
 			state->m_spet.bank = data & 0xf;
-			memory_configure_bank(space->machine(), "bank1", 0, 16, state->m_supermemory, 0x1000);
-			memory_set_bank(space->machine(), "bank1", state->m_spet.bank);
+			state->membank("bank1")->configure_entries(0, 16, state->m_supermemory, 0x1000);
+			state->membank("bank1")->set_entry(state->m_spet.bank);
 			/* 7 low writeprotects systemlatch */
 			break;
 
@@ -657,7 +657,7 @@ static void pet_common_driver_init( running_machine &machine )
 	state->m_cbm8096 = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, machine.device<ram_device>(RAM_TAG)->size() - 1, "bank10");
-	memory_set_bankptr(machine, "bank10", state->m_memory);
+	state->membank("bank10")->set_base(state->m_memory);
 
 	if (machine.device<ram_device>(RAM_TAG)->size() < 0x8000)
 	{
@@ -699,7 +699,7 @@ DRIVER_INIT( pet )
 DRIVER_INIT( pet80 )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory.set_target(machine.region("maincpu")->base(),state->m_memory.bytes());
+	state->m_memory.set_target(state->memregion("maincpu")->base(),state->m_memory.bytes());
 
 	pet_common_driver_init(machine);
 	state->m_cbm8096 = 1;
@@ -717,8 +717,8 @@ DRIVER_INIT( superpet )
 
 	state->m_supermemory = auto_alloc_array(machine, UINT8, 0x10000);
 
-	memory_configure_bank(machine, "bank1", 0, 16, state->m_supermemory, 0x1000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 16, state->m_supermemory, 0x1000);
+	state->membank("bank1")->set_entry(0);
 
 	superpet_vh_init(machine);
 }

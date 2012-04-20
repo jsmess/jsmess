@@ -49,7 +49,7 @@ static MACHINE_RESET(m79152pc)
 static VIDEO_START( m79152pc )
 {
 	m79152pc_state *state = machine.driver_data<m79152pc_state>();
-	state->m_p_chargen = machine.region("chargen")->base()+4;
+	state->m_p_chargen = state->memregion("chargen")->base()+4;
 }
 
 static SCREEN_UPDATE_IND16( m79152pc )

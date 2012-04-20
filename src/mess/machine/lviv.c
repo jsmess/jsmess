@@ -31,13 +31,13 @@ static void lviv_update_memory (running_machine &machine)
 
 	if (state->m_ppi_port_outputs[0][2] & 0x02)
 	{
-		memory_set_bankptr(machine,"bank1", ram);
-		memory_set_bankptr(machine,"bank2", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,"bank1", ram + 0x8000);
-		memory_set_bankptr(machine,"bank2", ram + 0xc000);
+		state->membank("bank1")->set_base(ram + 0x8000);
+		state->membank("bank2")->set_base(ram + 0xc000);
 	}
 }
 
@@ -184,10 +184,10 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 		cpuspace->install_write_bank(0x8000, 0xbfff, "bank3");
 		cpuspace->unmap_write(0xC000, 0xffff);
 
-		memory_set_bankptr(machine(),"bank1", ram);
-		memory_set_bankptr(machine(),"bank2", ram + 0x4000);
-		memory_set_bankptr(machine(),"bank3", ram + 0x8000);
-		memory_set_bankptr(machine(),"bank4", machine().region("maincpu")->base() + 0x010000);
+		membank("bank1")->set_base(ram);
+		membank("bank2")->set_base(ram + 0x4000);
+		membank("bank3")->set_base(ram + 0x8000);
+		membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000);
 	}
 	else
 	{
@@ -247,11 +247,11 @@ MACHINE_RESET( lviv )
 	space->unmap_write(0x8000, 0xbfff);
 	space->unmap_write(0xC000, 0xffff);
 
-	mem = machine.region("maincpu")->base();
-	memory_set_bankptr(machine,"bank1", mem + 0x010000);
-	memory_set_bankptr(machine,"bank2", mem + 0x010000);
-	memory_set_bankptr(machine,"bank3", mem + 0x010000);
-	memory_set_bankptr(machine,"bank4", mem + 0x010000);
+	mem = state->memregion("maincpu")->base();
+	state->membank("bank1")->set_base(mem + 0x010000);
+	state->membank("bank2")->set_base(mem + 0x010000);
+	state->membank("bank3")->set_base(mem + 0x010000);
+	state->membank("bank4")->set_base(mem + 0x010000);
 
 	/*machine.scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 

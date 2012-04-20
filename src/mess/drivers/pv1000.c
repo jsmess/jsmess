@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 {
-	UINT8 *gfxram = machine().region( "gfxram" )->base();
+	UINT8 *gfxram = memregion( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
 	gfx_element_mark_dirty(machine().gfx[1], offset/32);
@@ -170,7 +170,7 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = image.device().machine().region("cart")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

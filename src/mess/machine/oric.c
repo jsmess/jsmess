@@ -478,7 +478,7 @@ static void oric_install_apple2_interface(running_machine &machine)
 
 	space->install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
 	space->install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
-	memory_set_bankptr(machine, "bank4",	machine.region("maincpu")->base() + 0x014000 + 0x020);
+	state->membank("bank4")->set_base(	state->memregion("maincpu")->base() + 0x014000 + 0x020);
 }
 
 
@@ -551,7 +551,7 @@ WRITE8_MEMBER(oric_state::apple2_v2_interface_w)
 /*  logerror("apple 2 interface v2 rom page: %01x\n",(offset & 0x02)>>1); */
 
 	/* bit 0 is 0 for page 0, 1 for page 1 */
-	memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
+	membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
 
 	oric_enable_memory(machine(), 1, 3, TRUE, TRUE);
 
@@ -563,25 +563,25 @@ WRITE8_MEMBER(oric_state::apple2_v2_interface_w)
 		/* logerror("apple 2 interface v2: rom enabled\n"); */
 
 		/* enable rom */
-		rom_ptr = machine().region("maincpu")->base() + 0x010000;
-		memory_set_bankptr(machine(), "bank1", rom_ptr);
-		memory_set_bankptr(machine(), "bank2", rom_ptr+0x02000);
-		memory_set_bankptr(machine(), "bank3", rom_ptr+0x03800);
-		memory_set_bankptr(machine(), "bank5", m_ram_0x0c000);
-		memory_set_bankptr(machine(), "bank6", m_ram_0x0c000+0x02000);
-		memory_set_bankptr(machine(), "bank7", m_ram_0x0c000+0x03800);
+		rom_ptr = memregion("maincpu")->base() + 0x010000;
+		membank("bank1")->set_base(rom_ptr);
+		membank("bank2")->set_base(rom_ptr+0x02000);
+		membank("bank3")->set_base(rom_ptr+0x03800);
+		membank("bank5")->set_base(m_ram_0x0c000);
+		membank("bank6")->set_base(m_ram_0x0c000+0x02000);
+		membank("bank7")->set_base(m_ram_0x0c000+0x03800);
 	}
 	else
 	{
 		/*logerror("apple 2 interface v2: ram enabled\n"); */
 
 		/* enable ram */
-		memory_set_bankptr(machine(), "bank1", m_ram_0x0c000);
-		memory_set_bankptr(machine(), "bank2", m_ram_0x0c000+0x02000);
-		memory_set_bankptr(machine(), "bank3", m_ram_0x0c000+0x03800);
-		memory_set_bankptr(machine(), "bank5", m_ram_0x0c000);
-		memory_set_bankptr(machine(), "bank6", m_ram_0x0c000+0x02000);
-		memory_set_bankptr(machine(), "bank7", m_ram_0x0c000+0x03800);
+		membank("bank1")->set_base(m_ram_0x0c000);
+		membank("bank2")->set_base(m_ram_0x0c000+0x02000);
+		membank("bank3")->set_base(m_ram_0x0c000+0x03800);
+		membank("bank5")->set_base(m_ram_0x0c000);
+		membank("bank6")->set_base(m_ram_0x0c000+0x02000);
+		membank("bank7")->set_base(m_ram_0x0c000+0x03800);
 	}
 }
 
@@ -642,10 +642,10 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
 
-			rom_ptr = machine.region("maincpu")->base() + 0x010000;
-			memory_set_bankptr(machine, "bank1", rom_ptr);
-			memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
-			memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
+			rom_ptr = state->memregion("maincpu")->base() + 0x010000;
+			state->membank("bank1")->set_base(rom_ptr);
+			state->membank("bank2")->set_base(rom_ptr+0x02000);
+			state->membank("bank3")->set_base(rom_ptr+0x03800);
 		}
 		else
 		{
@@ -653,12 +653,12 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 
 			oric_enable_memory(machine, 1, 3, TRUE, TRUE);
 
-			memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
-			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank3", state->m_ram_0x0c000+0x03800);
-			memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
-			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank7", state->m_ram_0x0c000+0x03800);
+			state->membank("bank1")->set_base(state->m_ram_0x0c000);
+			state->membank("bank2")->set_base(state->m_ram_0x0c000+0x02000);
+			state->membank("bank3")->set_base(state->m_ram_0x0c000+0x03800);
+			state->membank("bank5")->set_base(state->m_ram_0x0c000);
+			state->membank("bank6")->set_base(state->m_ram_0x0c000+0x02000);
+			state->membank("bank7")->set_base(state->m_ram_0x0c000+0x03800);
 		}
 	}
 	else
@@ -677,10 +677,10 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 			/*logerror("&c000-&f8ff is ram!\n"); */
 			oric_enable_memory(machine, 1, 2, TRUE, TRUE);
 
-			memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
-			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
-			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
+			state->membank("bank1")->set_base(state->m_ram_0x0c000);
+			state->membank("bank2")->set_base(state->m_ram_0x0c000+0x02000);
+			state->membank("bank5")->set_base(state->m_ram_0x0c000);
+			state->membank("bank6")->set_base(state->m_ram_0x0c000+0x02000);
 		}
 
 		{
@@ -690,9 +690,9 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 			/*logerror("&f800-&ffff is jasmin rom\n"); */
 			/* jasmin rom enabled */
 			oric_enable_memory(machine, 3, 3, TRUE, TRUE);
-			rom_ptr = machine.region("maincpu")->base() + 0x010000+0x04000+0x02000;
-			memory_set_bankptr(machine, "bank3", rom_ptr);
-			memory_set_bankptr(machine, "bank7", rom_ptr);
+			rom_ptr = machine.root_device().memregion("maincpu")->base() + 0x010000+0x04000+0x02000;
+			state->membank("bank3")->set_base(rom_ptr);
+			state->membank("bank7")->set_base(rom_ptr);
 		}
 	}
 }
@@ -871,8 +871,8 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 		/*logerror("&c000-&dfff is ram\n"); */
 		/* rom disabled enable ram */
 		oric_enable_memory(machine, 1, 1, TRUE, TRUE);
-		memory_set_bankptr(machine, "bank1", state->m_ram_0x0c000);
-		memory_set_bankptr(machine, "bank5", state->m_ram_0x0c000);
+		state->membank("bank1")->set_base(state->m_ram_0x0c000);
+		state->membank("bank5")->set_base(state->m_ram_0x0c000);
 	}
 	else
 	{
@@ -880,9 +880,9 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 		/*logerror("&c000-&dfff is os rom\n"); */
 		/* basic rom */
 		oric_enable_memory(machine, 1, 1, TRUE, FALSE);
-		rom_ptr = machine.region("maincpu")->base() + 0x010000;
-		memory_set_bankptr(machine, "bank1", rom_ptr);
-		memory_set_bankptr(machine, "bank5", rom_ptr);
+		rom_ptr = machine.root_device().memregion("maincpu")->base() + 0x010000;
+		state->membank("bank1")->set_base(rom_ptr);
+		state->membank("bank5")->set_base(rom_ptr);
 	}
 
 	/* for 0x0e000-0x0ffff */
@@ -893,11 +893,11 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 		/*logerror("&e000-&ffff is os rom\n"); */
 		/* basic rom */
 		oric_enable_memory(machine, 2, 3, TRUE, FALSE);
-		rom_ptr = machine.region("maincpu")->base() + 0x010000;
-		memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
-		memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
-		memory_set_bankptr(machine, "bank6", rom_ptr+0x02000);
-		memory_set_bankptr(machine, "bank7", rom_ptr+0x03800);
+		rom_ptr = machine.root_device().memregion("maincpu")->base() + 0x010000;
+		state->membank("bank2")->set_base(rom_ptr+0x02000);
+		state->membank("bank3")->set_base(rom_ptr+0x03800);
+		state->membank("bank6")->set_base(rom_ptr+0x02000);
+		state->membank("bank7")->set_base(rom_ptr+0x03800);
 
 	}
 	else
@@ -909,19 +909,19 @@ static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
 			/*logerror("&e000-&ffff is disk rom\n"); */
 			oric_enable_memory(machine, 2, 3, TRUE, FALSE);
 			/* enable rom of microdisc interface */
-			rom_ptr = machine.region("maincpu")->base() + 0x014000;
-			memory_set_bankptr(machine, "bank2", rom_ptr);
-			memory_set_bankptr(machine, "bank3", rom_ptr+0x01800);
+			rom_ptr = machine.root_device().memregion("maincpu")->base() + 0x014000;
+			state->membank("bank2")->set_base(rom_ptr);
+			state->membank("bank3")->set_base(rom_ptr+0x01800);
 		}
 		else
 		{
 			/*logerror("&e000-&ffff is ram\n"); */
 			/* rom disabled enable ram */
 			oric_enable_memory(machine, 2, 3, TRUE, TRUE);
-			memory_set_bankptr(machine, "bank2", state->m_ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank3", state->m_ram_0x0c000+0x03800);
-			memory_set_bankptr(machine, "bank6", state->m_ram_0x0c000+0x02000);
-			memory_set_bankptr(machine, "bank7", state->m_ram_0x0c000+0x03800);
+			state->membank("bank2")->set_base(state->m_ram_0x0c000+0x02000);
+			state->membank("bank3")->set_base(state->m_ram_0x0c000+0x03800);
+			state->membank("bank6")->set_base(state->m_ram_0x0c000+0x02000);
+			state->membank("bank7")->set_base(state->m_ram_0x0c000+0x03800);
 		}
 	}
 }
@@ -1111,13 +1111,13 @@ MACHINE_RESET( oric )
 
 			/* os rom */
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
-			rom_ptr = machine.region("maincpu")->base() + 0x010000;
-			memory_set_bankptr(machine, "bank1", rom_ptr);
-			memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
-			memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
-			memory_set_bankptr(machine, "bank5", rom_ptr);
-			memory_set_bankptr(machine, "bank6", rom_ptr+0x02000);
-			memory_set_bankptr(machine, "bank7", rom_ptr+0x03800);
+			rom_ptr = state->memregion("maincpu")->base() + 0x010000;
+			state->membank("bank1")->set_base(rom_ptr);
+			state->membank("bank2")->set_base(rom_ptr+0x02000);
+			state->membank("bank3")->set_base(rom_ptr+0x03800);
+			state->membank("bank5")->set_base(rom_ptr);
+			state->membank("bank6")->set_base(rom_ptr+0x02000);
+			state->membank("bank7")->set_base(rom_ptr+0x03800);
 
 
 			if (disc_interface_id==ORIC_FLOPPY_INTERFACE_APPLE2)
@@ -1295,8 +1295,8 @@ static void telestrat_refresh_mem(running_machine &machine)
 	{
 		case TELESTRAT_MEM_BLOCK_RAM:
 		{
-			memory_set_bankptr(machine, "bank1", mem_block->ptr);
-			memory_set_bankptr(machine, "bank2", mem_block->ptr);
+			state->membank("bank1")->set_base(mem_block->ptr);
+			state->membank("bank2")->set_base(mem_block->ptr);
 			space->install_read_bank(0xc000, 0xffff, "bank1");
 			space->install_write_bank(0xc000, 0xffff, "bank2");
 		}
@@ -1304,7 +1304,7 @@ static void telestrat_refresh_mem(running_machine &machine)
 
 		case TELESTRAT_MEM_BLOCK_ROM:
 		{
-			memory_set_bankptr(machine, "bank1", mem_block->ptr);
+			state->membank("bank1")->set_base(mem_block->ptr);
 			space->install_read_bank(0xc000, 0xffff, "bank1");
 			space->nop_write(0xc000, 0xffff);
 		}
@@ -1422,7 +1422,7 @@ static void telestrat_acia_callback(running_machine &machine, int irq_state)
 MACHINE_START( telestrat )
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 
 	oric_common_init_machine(machine);
 

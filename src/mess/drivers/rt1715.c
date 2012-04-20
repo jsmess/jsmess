@@ -109,14 +109,16 @@ WRITE8_MEMBER(rt1715_state::k7658_data_w)
 
 static MACHINE_START( rt1715 )
 {
-	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
-	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer());
+	rt1715_state *state = machine.driver_data<rt1715_state>();
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
+	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 static MACHINE_RESET( rt1715 )
 {
+	rt1715_state *state = machine.driver_data<rt1715_state>();
 	/* on reset, enable ROM */
-	memory_set_bankptr(machine, "bank1", machine.region("ipl")->base());
+	state->membank("bank1")->set_base(state->memregion("ipl")->base());
 }
 
 WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
@@ -124,7 +126,7 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 	logerror("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
-	memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************

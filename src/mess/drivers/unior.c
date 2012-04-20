@@ -244,8 +244,8 @@ static MACHINE_RESET(unior)
 static VIDEO_START( unior )
 {
 	unior_state *state = machine.driver_data<unior_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_vram = machine.region("vram")->base();
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_vram = state->memregion("vram")->base();
 }
 
 static SCREEN_UPDATE_IND16( unior )

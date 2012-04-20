@@ -266,13 +266,13 @@ WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
 
-	memory_set_bank(machine(), "bank2", data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 
 	flip_screen_set(data & 0x10);
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank3", data & 0x07);
+	membank("bank3")->set_entry(data & 0x07);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
@@ -571,16 +571,16 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_START( airbustr )
 {
 	airbustr_state *state = machine.driver_data<airbustr_state>();
-	UINT8 *MASTER = machine.region("master")->base();
-	UINT8 *SLAVE = machine.region("slave")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *MASTER = machine.root_device().memregion("master")->base();
+	UINT8 *SLAVE = machine.root_device().memregion("slave")->base();
+	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 3, &MASTER[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 3, 5, &MASTER[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 3, &SLAVE[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 3, 5, &SLAVE[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank3", 0, 3, &AUDIO[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank3", 3, 5, &AUDIO[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 3, &SLAVE[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
+	state->membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
+	state->membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
 	state->m_master = machine.device("master");
 	state->m_slave = machine.device("slave");
@@ -607,9 +607,9 @@ static MACHINE_RESET( airbustr )
 	state->m_fg_scrolly = 0;
 	state->m_highbits = 0;
 
-	memory_set_bank(machine, "bank1", 0x02);
-	memory_set_bank(machine, "bank2", 0x02);
-	memory_set_bank(machine, "bank3", 0x02);
+	state->membank("bank1")->set_entry(0x02);
+	state->membank("bank2")->set_entry(0x02);
+	state->membank("bank3")->set_entry(0x02);
 }
 
 /* Machine Driver */

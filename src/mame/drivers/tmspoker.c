@@ -293,8 +293,8 @@ static INTERRUPT_GEN( tmspoker_interrupt )
 
 static MACHINE_START( tmspoker )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0], 0x1000);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
 }
 
 
@@ -304,7 +304,7 @@ static MACHINE_RESET( tmspoker )
 
 	popmessage("ROM Bank: %02X", seldsw);
 
-	memory_set_bank(machine, "bank1", seldsw);
+	machine.root_device().membank("bank1")->set_entry(seldsw);
 }
 
 
@@ -615,8 +615,8 @@ static DRIVER_INIT( bus )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.region("maincpu")->base();
-	const size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	const size_t len = machine.root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

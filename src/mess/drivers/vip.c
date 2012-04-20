@@ -659,7 +659,7 @@ void vip_state::machine_reset()
 	}
 
 	/* enable ROM all through address space */
-	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, machine().region(CDP1802_TAG)->base());
+	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, memregion(CDP1802_TAG)->base());
 }
 
 /* Machine Drivers */
@@ -740,7 +740,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( vip )
 {
-	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
 	UINT8 *chip8_ptr = NULL;
 	int chip8_size = 0;
 	int size = image.length();
@@ -748,14 +748,14 @@ static QUICKLOAD_LOAD( vip )
 	if (strcmp(image.filetype(), "c8") == 0)
 	{
 		/* CHIP-8 program */
-		chip8_ptr = image.device().machine().region("chip8")->base();
-		chip8_size = image.device().machine().region("chip8")->bytes();
+		chip8_ptr = image.device().machine().root_device().memregion("chip8")->base();
+		chip8_size = image.device().machine().root_device().memregion("chip8")->bytes();
 	}
 	else if (strcmp(image.filename(), "c8x") == 0)
 	{
 		/* CHIP-8X program */
-		chip8_ptr = image.device().machine().region("chip8x")->base();
-		chip8_size = image.device().machine().region("chip8x")->bytes();
+		chip8_ptr = image.device().machine().root_device().memregion("chip8x")->base();
+		chip8_size = image.device().machine().root_device().memregion("chip8x")->bytes();
 	}
 
 	if ((size + chip8_size) > image.device().machine().device<ram_device>(RAM_TAG)->size())

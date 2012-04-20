@@ -798,7 +798,7 @@ MACHINE_CONFIG_END
 static MACHINE_START( pc1260 )
 {
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x4000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);

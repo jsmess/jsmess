@@ -105,7 +105,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(applix)
 {
 	applix_state *state = machine.driver_data<applix_state>();
-	UINT8* RAM = machine.region("maincpu")->base();
+	UINT8* RAM = state->memregion("maincpu")->base();
 	memcpy(state->m_base, RAM+0x500000, 16);
 	machine.device("maincpu")->reset();
 }

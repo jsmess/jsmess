@@ -112,7 +112,7 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine().driver_data<einstein_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *data = device->machine().region("gfx1")->base();
+	UINT8 *data = device->machine().root_device().memregion("gfx1")->base();
 	UINT8 char_code, data_byte;
 	int i, x;
 
@@ -306,8 +306,8 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 
 static void einstein_page_rom(running_machine &machine)
 {
-	einstein_state *einstein = machine.driver_data<einstein_state>();
-	memory_set_bankptr(machine, "bank1", einstein->m_rom_enabled ? machine.region("bios")->base() : machine.device<ram_device>(RAM_TAG)->pointer());
+	einstein_state *state = machine.driver_data<einstein_state>();
+	state->membank("bank1")->set_base(state->m_rom_enabled ? machine.root_device().memregion("bios")->base() : machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -421,26 +421,26 @@ static MACHINE_START( einstein )
 
 static MACHINE_RESET( einstein )
 {
-	einstein_state *einstein = machine.driver_data<einstein_state>();
+	einstein_state *state = machine.driver_data<einstein_state>();
 	//device_t *floppy;
 	//UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */
-	einstein->m_color_screen = machine.device("screen");
-	einstein->m_ctc = machine.device(IC_I058);
+	state->m_color_screen = machine.device("screen");
+	state->m_ctc = machine.device(IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer());
-	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
-	einstein->m_rom_enabled = 1;
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	state->m_rom_enabled = 1;
 	einstein_page_rom(machine);
 
 	/* a reset causes the fire int, adc int, keyboard int mask
     to be set to 1, which causes all these to be DISABLED */
-	einstein->m_interrupt = 0;
-	einstein->m_interrupt_mask = 0;
+	state->m_interrupt = 0;
+	state->m_interrupt_mask = 0;
 
-	einstein->m_ctc_trigger = 0;
+	state->m_ctc_trigger = 0;
 
 	/* configure floppy drives */
 /*  floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;

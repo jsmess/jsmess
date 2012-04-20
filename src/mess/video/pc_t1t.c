@@ -703,7 +703,7 @@ static void pc_t1t_bank_w(running_machine &machine, int data)
 {
 	if (pcjr.bank != data)
 	{
-		UINT8 *ram = machine.region("maincpu")->base();
+		UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 		int dram, vram;
 		pcjr.bank = data;
 	/* it seems the video ram is mapped to the last 128K of main memory */
@@ -746,7 +746,7 @@ static void pc_pcjr_bank_w(running_machine &machine, int data)
 			dram = ((data & 0x07) << 14);
 			vram = ((data & 0x38) << (14-3));
 		}
-		memory_set_bankptr( machine, "bank14", machine.device<ram_device>(RAM_TAG)->pointer() + vram );
+		machine.root_device().membank( "bank14" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer() + vram );
 		pcjr.displayram = machine.device<ram_device>(RAM_TAG)->pointer() + dram;
 		pc_pcjr_mode_switch(machine);
 	}
@@ -932,7 +932,7 @@ static VIDEO_START( pc_t1t )
 	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
 
-	pcjr.chr_gen = machine.region("gfx1")->base();
+	pcjr.chr_gen = machine.root_device().memregion("gfx1")->base();
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
@@ -962,7 +962,7 @@ static VIDEO_START( pc_pcjr )
 	int buswidth;
 	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
 
-	pcjr.chr_gen = machine.region("gfx1")->base();
+	pcjr.chr_gen = machine.root_device().memregion("gfx1")->base();
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.mode_control = 0x08;

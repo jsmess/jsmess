@@ -37,7 +37,8 @@ WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 
 static void dai_update_memory(running_machine &machine, int dai_rom_bank)
 {
-	memory_set_bank(machine, "bank2", dai_rom_bank);
+	dai_state *state = machine.driver_data<dai_state>();
+	state->membank("bank2")->set_entry(dai_rom_bank);
 }
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
@@ -147,14 +148,15 @@ MACHINE_START( dai )
 	state->m_sound = machine.device("custom");
 	state->m_tms5501 = machine.device("tms5501");
 
-	memory_configure_bank(machine, "bank2", 0, 4, machine.region("maincpu")->base() + 0x010000, 0x1000);
+	state->membank("bank2")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x010000, 0x1000);
 	machine.scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
 	machine.scheduler().timer_pulse(attotime::from_hz(100), FUNC(dai_timer));	/* timer for tms5501 */
 }
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	dai_state *state = machine.driver_data<dai_state>();
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************

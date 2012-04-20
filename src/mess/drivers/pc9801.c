@@ -392,7 +392,7 @@ void pc9801_state::video_start()
 	m_tvram = auto_alloc_array(machine(), UINT8, 0x4000);
 
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -914,7 +914,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		{
 			case 0x09://cg window font read
 			{
-				UINT8 *pcg = machine().region("pcg")->base();
+				UINT8 *pcg = memregion("pcg")->base();
 
 				return pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | (m_font_line & 0x0f)];
 			}
@@ -980,7 +980,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				return;
 			case 0x09: //cg window font write
 			{
-				UINT8 *pcg = machine().region("pcg")->base();
+				UINT8 *pcg = memregion("pcg")->base();
 
 				pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | m_font_line] = data;
 				return;
@@ -1198,35 +1198,35 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(pc9801_state::pc9801rs_wram_r)
 {
-	UINT8 *WRAM = machine().region("wram")->base();
+	UINT8 *WRAM = memregion("wram")->base();
 
 	return WRAM[offset];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_wram_w)
 {
-	UINT8 *WRAM = machine().region("wram")->base();
+	UINT8 *WRAM = memregion("wram")->base();
 
 	WRAM[offset] = data;
 }
 
 READ8_MEMBER(pc9801_state::pc9801rs_ex_wram_r)
 {
-	UINT8 *EX_WRAM = machine().region("ex_wram")->base();
+	UINT8 *EX_WRAM = memregion("ex_wram")->base();
 
 	return EX_WRAM[offset];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_ex_wram_w)
 {
-	UINT8 *EX_WRAM = machine().region("ex_wram")->base();
+	UINT8 *EX_WRAM = memregion("ex_wram")->base();
 
 	EX_WRAM[offset] = data;
 }
 
 READ8_MEMBER(pc9801_state::pc9801rs_ipl_r)
 {
-	UINT8 *ROM = machine().region("ipl")->base();
+	UINT8 *ROM = memregion("ipl")->base();
 
 	return ROM[(offset & 0x1ffff)+(m_rom_bank*0x20000)];
 }
@@ -1234,14 +1234,14 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r)
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
 
-	UINT8 *KNJRAM = machine().region("kanji")->base();
+	UINT8 *KNJRAM = memregion("kanji")->base();
 
 	return KNJRAM[offset];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
-	UINT8 *KNJRAM = machine().region("kanji")->base();
+	UINT8 *KNJRAM = memregion("kanji")->base();
 
 	KNJRAM[offset] = data;
 }
@@ -2436,16 +2436,16 @@ static MACHINE_RESET(pc9801f)
 	{
 		UINT8 op_mode;
 		UINT8 *ROM;
-		UINT8 *PRG = machine.region("fdc_data")->base();
+		UINT8 *PRG = machine.root_device().memregion("fdc_data")->base();
 		int i;
 
-		ROM = machine.region("fdc_bios_2dd")->base();
+		ROM = machine.root_device().memregion("fdc_bios_2dd")->base();
 		op_mode = (input_port_read(machine, "ROM_LOAD") & 2) >> 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000];
 
-		ROM = machine.region("fdc_bios_2hd")->base();
+		ROM = machine.root_device().memregion("fdc_bios_2hd")->base();
 		op_mode = input_port_read(machine, "ROM_LOAD") & 1;
 
 		for(i=0;i<0x1000;i++)

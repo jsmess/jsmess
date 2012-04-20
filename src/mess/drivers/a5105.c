@@ -229,12 +229,12 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		switch (m_memsel[0])
 		{
 		case 0:
-			memory_set_bankptr(machine(), "bank1", m_rom_base);
+			membank("bank1")->set_base(m_rom_base);
 			prog->install_read_bank(0x0000, 0x3fff, "bank1");
 			prog->unmap_write(0x0000, 0x3fff);
 			break;
 		case 2:
-			memory_set_bankptr(machine(), "bank1", m_ram_base);
+			membank("bank1")->set_base(m_ram_base);
 			prog->install_readwrite_bank(0x0000, 0x3fff, "bank1");
 			break;
 		default:
@@ -250,17 +250,17 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		switch (m_memsel[1])
 		{
 		case 0:
-			memory_set_bankptr(machine(), "bank2", m_rom_base + 0x4000);
+			membank("bank2")->set_base(m_rom_base + 0x4000);
 			prog->install_read_bank(0x4000, 0x7fff, "bank2");
 			prog->unmap_write(0x4000, 0x4000);
 			break;
 		case 1:
-			memory_set_bankptr(machine(), "bank2", machine().region("k5651")->base());
+			membank("bank2")->set_base(machine().root_device().memregion("k5651")->base());
 			prog->install_read_bank(0x4000, 0x7fff, "bank2");
 			prog->unmap_write(0x4000, 0x4000);
 			break;
 		case 2:
-			memory_set_bankptr(machine(), "bank2", m_ram_base + 0x4000);
+			membank("bank2")->set_base(m_ram_base + 0x4000);
 			prog->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			break;
 		default:
@@ -276,12 +276,12 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		switch (m_memsel[2])
 		{
 		case 0:
-			memory_set_bankptr(machine(), "bank3", m_rom_base + 0x8000);
+			membank("bank3")->set_base(m_rom_base + 0x8000);
 			prog->install_read_bank(0x8000, 0xbfff, "bank3");
 			prog->unmap_write(0x8000, 0xbfff);
 			break;
 		case 2:
-			memory_set_bankptr(machine(), "bank3", m_ram_base + 0x8000);
+			membank("bank3")->set_base(m_ram_base + 0x8000);
 			prog->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			break;
 		default:
@@ -297,7 +297,7 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		switch (m_memsel[3])
 		{
 		case 2:
-			memory_set_bankptr(machine(), "bank4", m_ram_base + 0xc000);
+			membank("bank4")->set_base(m_ram_base + 0xc000);
 			prog->install_readwrite_bank(0xc000, 0xffff, "bank4");
 			break;
 		default:
@@ -460,12 +460,12 @@ MACHINE_RESET_MEMBER(a5105_state)
 	beep_set_frequency(m_beep, 500);
 
 	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
-	m_rom_base = (UINT8*)machine().region("maincpu")->base();
+	m_rom_base = (UINT8*)machine().root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine(), "bank1", m_rom_base);
-	memory_set_bankptr(machine(), "bank2", m_rom_base + 0x4000);
-	memory_set_bankptr(machine(), "bank3", m_ram_base);
-	memory_set_bankptr(machine(), "bank4", m_ram_base + 0x4000);
+	membank("bank1")->set_base(m_rom_base);
+	membank("bank2")->set_base(m_rom_base + 0x4000);
+	membank("bank3")->set_base(m_ram_base);
+	membank("bank4")->set_base(m_ram_base + 0x4000);
 }
 
 
@@ -503,7 +503,7 @@ static PALETTE_INIT( gdc )
 VIDEO_START_MEMBER( a5105_state )
 {
 	// find memory regions
-	m_char_rom = machine().region("pcg")->base();
+	m_char_rom = memregion("pcg")->base();
 }
 
 static UPD7220_INTERFACE( hgdc_intf )

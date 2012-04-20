@@ -173,7 +173,7 @@ static void render_sprites(running_machine &machine)
 	INT32 xInc;
 	INT32 i, j, k;
 
-	UINT8* memory = machine.region("maincpu")->base();
+	UINT8* memory = state->memregion("maincpu")->base();
 
 	for (i = 0; i < STIC_MOBS; i++)
 	{
@@ -240,7 +240,7 @@ static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitm
 	INT16 w, h, nextx, nexty;
 	UINT8 csPtr = 0;
 	UINT16 nextCard;
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = state->memregion("maincpu")->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
 		 h < STIC_BACKTAB_HEIGHT;
@@ -311,7 +311,7 @@ static void render_fg_bg_mode(running_machine &machine, bitmap_ind16 &bitmap)
 	UINT8 j, isGrom, fgcolor, bgcolor;
 	UINT16 nextCard, memoryLocation;
 	UINT8* memory;
-	UINT8* ram = machine.region("maincpu")->base();
+	UINT8* ram = state->memregion("maincpu")->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
 		 h < STIC_BACKTAB_HEIGHT;

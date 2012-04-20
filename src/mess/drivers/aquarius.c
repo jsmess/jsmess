@@ -185,7 +185,7 @@ WRITE8_MEMBER(aquarius_state::scrambler_w)
 
 READ8_MEMBER(aquarius_state::cartridge_r)
 {
-	UINT8 *rom = machine().region("maincpu")->base() + 0xc000;
+	UINT8 *rom = memregion("maincpu")->base() + 0xc000;
 	return rom[offset] ^ m_scrambler;
 }
 
@@ -213,13 +213,14 @@ WRITE8_MEMBER(aquarius_state::floppy_w)
 
 static DRIVER_INIT( aquarius )
 {
+	aquarius_state *state = machine.driver_data<aquarius_state>();
 	/* install expansion memory if available */
 	if (machine.device<ram_device>(RAM_TAG)->size() > 0x1000)
 	{
 		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 		space->install_readwrite_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
-		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 

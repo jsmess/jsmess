@@ -498,8 +498,8 @@ void myarc_hfdc_device::device_start()
 	if (VERBOSE>5) LOG("hfdc: start\n");
 	m_hdc9234 = static_cast<smc92x4_device *>(subdevice(FDC_TAG));
 	m_clock = subdevice(CLOCK_TAG);
-	m_dsrrom = subregion(DSRROM)->base();
-	m_buffer_ram = subregion(BUFFER)->base();
+	m_dsrrom = memregion(DSRROM)->base();
+	m_buffer_ram = memregion(BUFFER)->base();
 
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 

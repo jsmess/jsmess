@@ -175,7 +175,7 @@ static SCREEN_UPDATE_IND16( jr100 )
 	jr100_state *state = screen.machine().driver_data<jr100_state>();
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = screen.machine().region("maincpu")->base() + 0xe000;
+	UINT8 *rom_pcg = state->memregion("maincpu")->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)

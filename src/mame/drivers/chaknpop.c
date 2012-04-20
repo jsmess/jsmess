@@ -346,9 +346,9 @@ GFXDECODE_END
 static MACHINE_START( chaknpop )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_gfxmode));
 	state->save_item(NAME(state->m_flip_x));

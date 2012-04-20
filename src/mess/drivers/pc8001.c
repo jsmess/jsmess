@@ -315,7 +315,7 @@ static PALETTE_INIT( pc8001 )
 void pc8001_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 /* uPD3301 Interface */
@@ -463,38 +463,38 @@ void pc8001_state::machine_start()
 	/* setup memory banking */
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("n80")->base(), 0);
+	membank("bank1")->configure_entry(1, memregion("n80")->base());
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);
 
 	switch (m_ram->size())
 	{
 	case 16*1024:
-		memory_configure_bank(machine(), "bank3", 0, 1, ram, 0);
+		membank("bank3")->configure_entry(0, ram);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->unmap_readwrite(0x8000, 0xbfff);
 		program->install_readwrite_bank(0xc000, 0xffff, "bank3");
 		break;
 
 	case 32*1024:
-		memory_configure_bank(machine(), "bank3", 0, 1, ram, 0);
+		membank("bank3")->configure_entry(0, ram);
 		program->unmap_readwrite(0x6000, 0xbfff);
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 		break;
 
 	case 64*1024:
-		memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
-		memory_configure_bank(machine(), "bank2", 0, 1, ram + 0x6000, 0);
-		memory_configure_bank(machine(), "bank3", 0, 1, ram + 0x8000, 0);
+		membank("bank1")->configure_entry(0, ram);
+		membank("bank2")->configure_entry(0, ram + 0x6000);
+		membank("bank3")->configure_entry(0, ram + 0x8000);
 		program->install_readwrite_bank(0x0000, 0x5fff, "bank1");
 		program->install_readwrite_bank(0x6000, 0xbfff, "bank2");
 		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
-		memory_set_bank(machine(), "bank2", 0);
+		membank("bank2")->set_entry(0);
 		break;
 	}
 
-	memory_set_bank(machine(), "bank1", 1);
-	memory_set_bank(machine(), "bank3", 0);
+	membank("bank1")->set_entry(1);
+	membank("bank3")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_width80));

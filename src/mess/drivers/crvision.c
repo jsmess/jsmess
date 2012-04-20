@@ -847,7 +847,8 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	UINT32 size;
 	UINT8 *temp_copy;
 	running_machine &machine = image.device().machine();
-	UINT8 *mem = machine.region(M6502_TAG)->base();
+	crvision_state *state = machine.driver_data<crvision_state>();
+	UINT8 *mem = state->memregion(M6502_TAG)->base();
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	if (image.software_entry() == NULL)
@@ -940,11 +941,11 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 1, mem + 0x8000, 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, mem + 0x8000);
+	state->membank("bank1")->set_entry(0);
 
-	memory_configure_bank(machine, "bank2", 0, 1, mem + 0x4000, 0);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->configure_entry(0, mem + 0x4000);
+	state->membank("bank2")->set_entry(0);
 
 	auto_free(machine, temp_copy);
 

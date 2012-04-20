@@ -101,19 +101,19 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 
 WRITE8_MEMBER(irobot_state::irobot_out0_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	m_out0 = data;
 	switch (data & 0x60)
 	{
 		case 0:
-			memory_set_bankptr(machine(), "bank2", &RAM[0x1C000]);
+			membank("bank2")->set_base(&RAM[0x1C000]);
 			break;
 		case 0x20:
-			memory_set_bankptr(machine(), "bank2", &RAM[0x1C800]);
+			membank("bank2")->set_base(&RAM[0x1C800]);
 			break;
 		case 0x40:
-			memory_set_bankptr(machine(), "bank2", &RAM[0x1D000]);
+			membank("bank2")->set_base(&RAM[0x1D000]);
 			break;
 	}
 	m_outx = (data & 0x18) >> 3;
@@ -123,27 +123,27 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 
 WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	switch ((data & 0x0E) >> 1)
 	{
 		case 0:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x10000]);
+			membank("bank1")->set_base(&RAM[0x10000]);
 			break;
 		case 1:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x12000]);
+			membank("bank1")->set_base(&RAM[0x12000]);
 			break;
 		case 2:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x14000]);
+			membank("bank1")->set_base(&RAM[0x14000]);
 			break;
 		case 3:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x16000]);
+			membank("bank1")->set_base(&RAM[0x16000]);
 			break;
 		case 4:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x18000]);
+			membank("bank1")->set_base(&RAM[0x18000]);
 			break;
 		case 5:
-			memory_set_bankptr(machine(), "bank1", &RAM[0x1A000]);
+			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
 	set_led_status(machine(), 0,data & 0x10);
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( scanline_callback )
 MACHINE_RESET( irobot )
 {
 	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *MB = machine.region("mathbox")->base();
+	UINT8 *MB = state->memregion("mathbox")->base();
 
 	/* initialize the memory regions */
 	state->m_mbROM		= MB + 0x00000;
@@ -332,7 +332,7 @@ static void irmb_dout(irobot_state *state, const irmb_ops *curop, UINT32 d)
 static void load_oproms(running_machine &machine)
 {
 	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *MB = machine.region("proms")->base() + 0x20;
+	UINT8 *MB = state->memregion("proms")->base() + 0x20;
 	int i;
 
 	/* allocate RAM */

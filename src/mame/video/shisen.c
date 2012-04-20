@@ -12,13 +12,13 @@ WRITE8_MEMBER(shisen_state::sichuan2_bankswitch_w)
 {
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
 	/* bits 0-2 select ROM bank */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 
 	/* bits 3-5 select gfx bank */
 	bank = (data & 0x38) >> 3;

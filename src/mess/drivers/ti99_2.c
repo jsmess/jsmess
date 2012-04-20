@@ -115,17 +115,17 @@ static DRIVER_INIT( ti99_2_32 )
 	state->m_ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (machine().region("maincpu")->base()+0x4000)
-#define TI99_2_32_ROMPAGE1 (machine().region("maincpu")->base()+0x10000)
+#define TI99_2_32_ROMPAGE0 (machine().root_device().memregion("maincpu")->base()+0x4000)
+#define TI99_2_32_ROMPAGE1 (machine().root_device().memregion("maincpu")->base()+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
 	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	state->m_irq_state = ASSERT_LINE;
 	if (! state->m_ROM_paged)
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()+0x4000);
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x4000);
 	else
-		memory_set_bankptr(machine, "bank1", (machine.region("maincpu")->base()+0x4000));
+		state->membank("bank1")->set_base((state->memregion("maincpu")->base()+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
@@ -237,7 +237,7 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	/* now, we handle ROM paging */
 	if (m_ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(machine(), "bank1", (m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		membank("bank1")->set_base((m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 

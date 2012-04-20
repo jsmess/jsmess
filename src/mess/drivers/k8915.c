@@ -57,9 +57,9 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 {
 // seems to switch ram and rom around.
 	if (data == 0x87)
-		memory_set_bank(machine(), "boot", 0); // ram at 0000
+		membank("boot")->set_entry(0); // ram at 0000
 	else
-		memory_set_bank(machine(), "boot", 1); // rom at 0000
+		membank("boot")->set_entry(1); // rom at 0000
 }
 
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
@@ -82,18 +82,19 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(k8915_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 }
 
 static DRIVER_INIT(k8915)
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
+	k8915_state *state = machine.driver_data<k8915_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 VIDEO_START_MEMBER( k8915_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( k8915_state )

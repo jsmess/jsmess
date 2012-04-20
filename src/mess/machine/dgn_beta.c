@@ -315,11 +315,11 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 		}
 
 		state->m_PageRegs[state->m_TaskReg][Page].memory=readbank;
-		memory_set_bankptr(machine, page_num,readbank);
+		state->membank(page_num)->set_base(readbank);
 
 		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
 		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",state->m_TaskReg,Page));
-		LOG_BANK_UPDATE(("memory_set_bankptr(%X)\n",Page+1));
+		//LOG_BANK_UPDATE(("%X)\n",state->membank(Page+1)));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=1\n"));
 	}
@@ -333,7 +333,7 @@ static void SetDefaultTask(running_machine &machine)
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
-	if (VERBOSE) debug_console_printf(machine, "Set Default task\n");
+	//if (VERBOSE) debug_console_printf(machine)->set_base("Set Default task\n");
 
 	state->m_TaskReg=NoPagingTask;
 
@@ -1063,7 +1063,7 @@ static void dgnbeta_reset(running_machine &machine)
 
     logerror("MACHINE_RESET( dgnbeta )\n");
 
-	state->m_system_rom = machine.region(MAINCPU_TAG)->base();
+	state->m_system_rom = state->memregion(MAINCPU_TAG)->base();
 
 	/* Make sure CPU 1 is started out halted ! */
 	cputag_set_input_line(machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);

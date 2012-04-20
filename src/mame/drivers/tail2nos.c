@@ -29,7 +29,7 @@ WRITE16_MEMBER(tail2nos_state::sound_command_w)
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(device->machine(), "bank3", data & 0x01);
+	device->machine().root_device().membank("bank3")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
@@ -208,10 +208,10 @@ static const k051316_interface tail2nos_k051316_intf =
 static MACHINE_START( tail2nos )
 {
 	tail2nos_state *state = machine.driver_data<tail2nos_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
-	memory_set_bank(machine, "bank3", 0);
+	state->membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	state->membank("bank3")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -227,8 +227,8 @@ static MACHINE_RESET( tail2nos )
 	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
-	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
+	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
+	state->membank("bank2")->set_base(state->memregion("user2")->base());
 
 	state->m_charbank = 0;
 	state->m_charpalette = 0;

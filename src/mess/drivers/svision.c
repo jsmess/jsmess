@@ -129,7 +129,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(),offset,data);
-			memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + ((m_reg[0x26] & 0xe0) << 9));
+			membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + ((m_reg[0x26] & 0xe0) << 9));
 			svision_irq(machine());
 			break;
 		case 0x23: /* delta hero irq routine write */
@@ -430,7 +430,7 @@ static DRIVER_INIT( svision )
 	state->m_sound = machine.device("custom");
 	state->m_dma_finished = svision_dma_finished(state->m_sound);
 	state->m_pet.on = FALSE;
-	memory_set_bankptr(machine, "bank2", machine.region("user1")->base() + 0x1c000);
+	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x1c000);
 }
 
 static DRIVER_INIT( svisions )
@@ -439,7 +439,7 @@ static DRIVER_INIT( svisions )
 	state->m_svision.timer1 = machine.scheduler().timer_alloc(FUNC(svision_timer));
 	state->m_sound = machine.device("custom");
 	state->m_dma_finished = svision_dma_finished(state->m_sound);
-	memory_set_bankptr(machine, "bank2", machine.region("user1")->base() + 0x1c000);
+	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x1c000);
 	state->m_svision.timer1 = machine.scheduler().timer_alloc(FUNC(svision_timer));
 	state->m_pet.on = TRUE;
 	state->m_pet.timer = machine.scheduler().timer_alloc(FUNC(svision_pet_timer));
@@ -456,7 +456,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		size = image.length();
 		temp_copy = auto_alloc_array(image.device().machine(), UINT8, size);
 
-		if (size > image.device().machine().region("user1")->bytes())
+		if (size > image.device().machine().root_device().memregion("user1")->bytes())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			auto_free(image.device().machine(), temp_copy);
@@ -477,11 +477,11 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
-	mirror = image.device().machine().region("user1")->bytes() / size;
+	mirror = image.device().machine().root_device().memregion("user1")->bytes() / size;
 
 	/* With the following, we mirror the cart in the whole "user1" memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(image.device().machine().region("user1")->base() + i * size, temp_copy, size);
+		memcpy(image.device().machine().root_device().memregion("user1")->base() + i * size, temp_copy, size);
 
 	auto_free(image.device().machine(), temp_copy);
 
@@ -493,7 +493,7 @@ static MACHINE_RESET( svision )
 	svision_state *state = machine.driver_data<svision_state>();
 	state->m_svision.timer_shot = FALSE;
 	*state->m_dma_finished = FALSE;
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 }
 
 
@@ -502,7 +502,7 @@ static MACHINE_RESET( tvlink )
 	svision_state *state = machine.driver_data<svision_state>();
 	state->m_svision.timer_shot = FALSE;
 	*state->m_dma_finished = FALSE;
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 	state->m_tvlink.palette_on = FALSE;
 
 	memset(state->m_reg + 0x800, 0xff, 0x40); // normally done from state->m_tvlink microcontroller

@@ -73,22 +73,22 @@ static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 {
 	a7800_state *state = machine.driver_data<a7800_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->m_ROM = machine.region("maincpu")->base();
+	state->m_ROM = state->memregion("maincpu")->base();
 	state->m_ispal = ispal;
 	state->m_lines = lines;
 	state->m_p1_one_button = 1;
 	state->m_p2_one_button = 1;
 
 	/* standard banks */
-	memory_set_bankptr(machine, "bank5", &state->m_ROM[0x2040]);		/* RAM0 */
-	memory_set_bankptr(machine, "bank6", &state->m_ROM[0x2140]);		/* RAM1 */
-	memory_set_bankptr(machine, "bank7", &state->m_ROM[0x2000]);		/* MAINRAM */
+	state->membank("bank5")->set_base(&state->m_ROM[0x2040]);		/* RAM0 */
+	state->membank("bank6")->set_base(&state->m_ROM[0x2140]);		/* RAM1 */
+	state->membank("bank7")->set_base(&state->m_ROM[0x2000]);		/* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	space->install_readwrite_bank(0x0480, 0x04FF,"bank10");
-	memory_set_bankptr(machine, "bank10", state->m_ROM + 0x0480);
+	state->membank("bank10")->set_base(state->m_ROM + 0x0480);
 	space->install_readwrite_bank(0x1800, 0x27FF, "bank11");
-	memory_set_bankptr(machine, "bank11", state->m_ROM + 0x1800);
+	state->membank("bank11")->set_base(state->m_ROM + 0x1800);
 }
 
 
@@ -115,11 +115,11 @@ MACHINE_RESET( a7800 )
 	state->m_maria_flag = 0;
 
 	/* set banks to default states */
-	memory = machine.region("maincpu")->base();
-	memory_set_bankptr(machine,  "bank1", memory + 0x4000 );
-	memory_set_bankptr(machine,  "bank2", memory + 0x8000 );
-	memory_set_bankptr(machine,  "bank3", memory + 0xA000 );
-	memory_set_bankptr(machine,  "bank4", memory + 0xC000 );
+	memory = state->memregion("maincpu")->base();
+	state->membank("bank1")->set_base(memory + 0x4000 );
+	state->membank("bank2")->set_base(memory + 0x8000 );
+	state->membank("bank3")->set_base(memory + 0xA000 );
+	state->membank("bank4")->set_base(memory + 0xC000 );
 
 	/* pokey cartridge */
 	if (state->m_cart_type & 0x01)
@@ -197,7 +197,7 @@ static int a7800_verify_cart(char header[128])
 DEVICE_START( a7800_cart )
 {
 	a7800_state *state = device->machine().driver_data<a7800_state>();
-	UINT8 *memory = device->machine().region("maincpu")->base();
+	UINT8 *memory = state->memregion("maincpu")->base();
 
 	state->m_bios_bkup = NULL;
 	state->m_cart_bkup = NULL;
@@ -257,7 +257,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	a7800_state *state = image.device().machine().driver_data<a7800_state>();
 	UINT32 len = 0, start = 0;
 	unsigned char header[128];
-	UINT8 *memory = image.device().machine().region("maincpu")->base();
+	UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 	const char	*pcb_name;
 
 	// detect cart type either from xml or from header
@@ -402,7 +402,7 @@ WRITE8_MEMBER(a7800_state::a7800_RAM0_w)
 
 WRITE8_MEMBER(a7800_state::a7800_cart_w)
 {
-	UINT8 *memory = machine().region("maincpu")->base();
+	UINT8 *memory = memregion("maincpu")->base();
 
 	if(offset < 0x4000)
 	{
@@ -432,8 +432,8 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(machine(), "bank2",memory + 0x10000 + (data << 14));
-		memory_set_bankptr(machine(), "bank3",memory + 0x12000 + (data << 14));
+		membank("bank2")->set_base(memory + 0x10000 + (data << 14));
+		membank("bank3")->set_base(memory + 0x12000 + (data << 14));
 	/*  logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( m_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -442,11 +442,11 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(machine(), "bank1",memory + 0x10000 );
+			membank("bank1")->set_base(memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(machine(), "bank1",memory + 0x14000 );
+			membank("bank1")->set_base(memory + 0x14000 );
 		}
 	}
 	else if(( m_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -456,8 +456,8 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr(machine(),  "bank3", memory + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr(machine(),  "bank4", memory + 0x12000 + ( data << 14 ) );
+		membank("bank3")->set_base(memory + 0x10000 + ( data << 14 ) );
+		membank("bank4")->set_base(memory + 0x12000 + ( data << 14 ) );
 	}
 }
 

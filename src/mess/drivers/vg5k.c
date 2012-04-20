@@ -324,7 +324,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( vg5k )
 {
-	UINT8 *FNT = machine.region("ef9345")->base();
+	UINT8 *FNT = machine.root_device().memregion("ef9345")->base();
 	UINT16 a,b,c,d,dest=0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */

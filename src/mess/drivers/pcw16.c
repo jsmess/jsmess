@@ -423,7 +423,7 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 		{
 			/* lower 4 banks are write protected. Use the rom
             loaded */
-			mem_ptr = &machine.region("maincpu")->base()[0x010000];
+			mem_ptr = &state->memregion("maincpu")->base()[0x010000];
 		}
 		else
 		{
@@ -454,8 +454,8 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 	state->m_mem_ptr[bank] = (char*)mem_ptr;
 	sprintf(bank1,"bank%d",(bank+1));
 	sprintf(bank2,"bank%d",(bank+5));
-	memory_set_bankptr(machine, bank1, mem_ptr);
-	memory_set_bankptr(machine, bank2, mem_ptr);
+	state->membank(bank1)->set_base(mem_ptr);
+	state->membank(bank2)->set_base(mem_ptr);
 
 	if ((bank_id & 0x080)==0)
 	{

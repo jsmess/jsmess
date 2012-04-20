@@ -73,7 +73,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
         7       RELCPMH
 
     */
-
+	mtx_state *state = machine.driver_data<mtx_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
@@ -82,7 +82,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	memory_set_bank(machine, "bank2", rom_page);
+	state->membank("bank2")->set_entry(rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= messram->size()/0x8000)
@@ -94,14 +94,14 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	{
 		program->nop_readwrite(0x4000, 0x7fff);
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine, "bank4", ram_page);
+		state->membank("bank4")->set_entry(ram_page);
 	}
 	else
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine, "bank3", ram_page);
-		memory_set_bank(machine, "bank4", ram_page);
+		state->membank("bank3")->set_entry(ram_page);
+		state->membank("bank4")->set_entry(ram_page);
 	}
 }
 
@@ -383,10 +383,10 @@ MACHINE_START( mtx512 )
 	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
-	memory_configure_bank(machine, "bank2", 0, 8, machine.region("user2")->base(), 0x2000);
-	memory_configure_bank(machine, "bank3", 0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
-	memory_configure_bank(machine, "bank4", 0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
+	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
+	state->membank("bank2")->configure_entries(0, 8, state->memregion("user2")->base(), 0x2000);
+	state->membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
+	state->membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
 /*-------------------------------------------------

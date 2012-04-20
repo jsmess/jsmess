@@ -1946,7 +1946,7 @@ WRITE32_MEMBER(gba_state::gba_oam_w)
 
 READ32_MEMBER(gba_state::gba_bios_r)
 {
-	UINT32 *rom = (UINT32 *)(*machine().region("maincpu"));
+	UINT32 *rom = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 	if (m_bios_protected != 0)
 	{
 		offset = (m_bios_last_address + 8) / 4;
@@ -2930,7 +2930,7 @@ static int gba_chip_has_conflict( UINT32 chip)
 static UINT32 gba_fix_wrong_chip(running_machine &machine, UINT32 cart_size, UINT32 chip)
 {
 	char game_code[5] = { 0 };
-	UINT8 *ROM = machine.region("cartridge")->base();
+	UINT8 *ROM = machine.root_device().memregion("cartridge")->base();
 
 	if (cart_size >= 0xAC + 4)
 	{
@@ -3012,7 +3012,7 @@ static int gba_get_pcb_id(const char *pcb)
 
 static DEVICE_IMAGE_LOAD( gba_cart )
 {
-	UINT8 *ROM = image.device().machine().region("cartridge")->base();
+	UINT8 *ROM = image.device().machine().root_device().memregion("cartridge")->base();
 	UINT32 cart_size;
 	UINT32 chip = 0;
 	gba_state *state = image.device().machine().driver_data<gba_state>();

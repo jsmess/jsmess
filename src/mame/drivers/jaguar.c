@@ -491,7 +491,7 @@ static IRQ_CALLBACK(jaguar_irq_callback)
 static MACHINE_RESET( cojag )
 {
 	cojag_state *state = machine.driver_data<cojag_state>();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = state->memregion("user2")->base();
 
 	/* 68020 only: copy the interrupt vectors into RAM */
 	if (!cojag_is_r3000)
@@ -503,17 +503,17 @@ static MACHINE_RESET( cojag )
 		/* graphics banks */
 		if (cojag_is_r3000)
 		{
-			memory_configure_bank(machine, "bank1", 0, 2, rom + 0x800000, 0x400000);
-			memory_set_bank(machine, "bank1", 0);
+			state->membank("bank1")->configure_entries(0, 2, rom + 0x800000, 0x400000);
+			state->membank("bank1")->set_entry(0);
 		}
-		memory_configure_bank(machine, "bank8", 0, 2, rom + 0x800000, 0x400000);
-		memory_set_bank(machine, "bank8", 0);
+		state->membank("bank8")->configure_entries(0, 2, rom + 0x800000, 0x400000);
+		state->membank("bank8")->set_entry(0);
 
 		/* sound banks */
-		memory_configure_bank(machine, "bank2", 0, 8, rom + 0x000000, 0x200000);
-		memory_configure_bank(machine, "bank9", 0, 8, rom + 0x000000, 0x200000);
-		memory_set_bank(machine, "bank2", 0);
-		memory_set_bank(machine, "bank9", 0);
+		state->membank("bank2")->configure_entries(0, 8, rom + 0x000000, 0x200000);
+		state->membank("bank9")->configure_entries(0, 8, rom + 0x000000, 0x200000);
+		state->membank("bank2")->set_entry(0);
+		state->membank("bank9")->set_entry(0);
 	}
 
 	/* clear any spinuntil stuff */
@@ -719,10 +719,10 @@ WRITE32_MEMBER(cojag_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (machine().region("user2")->base())
+	if (machine().root_device().memregion("user2")->base())
 	{
-		memory_set_bank(machine(), "bank2", (data >> 1) & 7);
-		memory_set_bank(machine(), "bank9", (data >> 1) & 7);
+		membank("bank2")->set_entry((data >> 1) & 7);
+		membank("bank9")->set_entry((data >> 1) & 7);
 	}
 
 	COMBINE_DATA(&m_misc_control_data);
@@ -899,11 +899,11 @@ WRITE32_MEMBER(cojag_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space.device()), data);
 
 	/* adjust banking */
-	if (machine().region("user2")->base())
+	if (machine().root_device().memregion("user2")->base())
 	{
 		if (cojag_is_r3000)
-			memory_set_bank(machine(), "bank1", data & 1);
-		memory_set_bank(machine(), "bank8", data & 1);
+			membank("bank1")->set_entry(data & 1);
+		membank("bank8")->set_entry(data & 1);
 	}
 }
 
@@ -1831,7 +1831,7 @@ MACHINE_CONFIG_END
 
 static void jaguar_fix_endian( running_machine &machine, UINT32 addr, UINT32 size )
 {
-	UINT8 j[4], *RAM = machine.region("maincpu")->base();
+	UINT8 j[4], *RAM = machine.root_device().memregion("maincpu")->base();
 	UINT32 i;
 	size += addr;
 	logerror("File Loaded to address range %X to %X\n",addr,size-1);
@@ -1871,7 +1871,7 @@ static QUICKLOAD_LOAD( jaguar )
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 
-	image.fread( &image.device().machine().region("maincpu")->base()[quickload_begin], quickload_size);
+	image.fread( &image.device().machine().root_device().memregion("maincpu")->base()[quickload_begin], quickload_size);
 
 	jaguar_fix_endian(image.device().machine(), quickload_begin, quickload_size);
 
@@ -1916,7 +1916,7 @@ static QUICKLOAD_LOAD( jaguar )
 	{
 		memset(jaguar_shared_ram, 0, 0x200000);
 		image.fseek(0, SEEK_SET);
-		image.fread( &image.device().machine().region("maincpu")->base()[start-skip], quickload_size);
+		image.fread( &image.device().machine().root_device().memregion("maincpu")->base()[start-skip], quickload_size);
 		quickload_begin = start;
 		jaguar_fix_endian(image.device().machine(), (start-skip)&0xfffffc, quickload_size);
 	}
@@ -1955,7 +1955,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		}
 
 		/* Load cart into memory */
-		image.fread( &image.device().machine().region("maincpu")->base()[0x800000+load_offset], size);
+		image.fread( &image.device().machine().root_device().memregion("maincpu")->base()[0x800000+load_offset], size);
 	}
 	else
 	{

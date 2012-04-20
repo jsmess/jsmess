@@ -344,9 +344,9 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 
 			mem_bank = mem_bank & state->m_membank_rom_mask;
 
-			addr = (machine.region("maincpu")->base()+0x010000) + (mem_bank<<14);
+			addr = (state->memregion("maincpu")->base()+0x010000) + (mem_bank<<14);
 
-			memory_set_bankptr(machine, bank1, addr);
+			state->membank(bank1)->set_base(addr);
 
 			space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
@@ -362,8 +362,8 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 
 			addr = machine.device<ram_device>(RAM_TAG)->pointer() + (mem_bank<<14);
 
-			memory_set_bankptr(machine, bank1, addr);
-			memory_set_bankptr(machine, bank5, addr);
+			state->membank(bank1)->set_base(addr);
+			state->membank(bank5)->set_base(addr);
 
 			space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 			LOG(("BANK %d: RAM\n",bank));
@@ -381,13 +381,13 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 				mem_bank = mem_bank & state->m_membank_card_ram_mask;
 				addr = state->m_card_ram + (mem_bank<<14);
 
-				memory_set_bankptr(machine, bank1, addr);
+				state->membank(bank1)->set_base(addr);
 
 				/* write enabled? */
 				if (input_port_read(machine, "EXTRA") & 0x02)
 				{
 					/* yes */
-					memory_set_bankptr(machine, bank5, addr);
+					state->membank(bank5)->set_base(addr);
 
 					space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
 				}

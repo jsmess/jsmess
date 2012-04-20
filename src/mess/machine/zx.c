@@ -20,7 +20,7 @@
 
 WRITE8_MEMBER(zx_state::zx_ram_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
@@ -38,7 +38,7 @@ WRITE8_MEMBER(zx_state::zx_ram_w)
 /* I know this looks really pointless... but it has to be here */
 READ8_MEMBER( zx_state::zx_ram_r )
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	return RAM[offset | 0xc000];
 }
 
@@ -49,7 +49,7 @@ DRIVER_INIT( zx )
 
 	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	space->install_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),state));
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x4000);
 }
 
 DIRECT_UPDATE_HANDLER( zx_setdirect )

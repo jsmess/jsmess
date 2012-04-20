@@ -211,7 +211,7 @@ void abc800_state::bankswitch()
 	else
 	{
 		// BASIC ROM selected
-		program->install_rom(0x0000, 0x3fff, machine().region(Z80_TAG)->base());
+		program->install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
 	}
 }
 
@@ -227,7 +227,7 @@ void abc802_state::bankswitch()
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		program->install_rom(0x0000, 0x77ff, machine().region(Z80_TAG)->base());
+		program->install_rom(0x0000, 0x77ff, memregion(Z80_TAG)->base());
 		program->install_ram(0x7800, 0x7fff, m_char_ram);
 	}
 	else
@@ -266,8 +266,8 @@ void abc806_state::bankswitch()
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
 			program->install_readwrite_bank(start_addr, end_addr, bank_name);
-			memory_configure_bank(machine(), bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-			memory_set_bank(machine(), bank_name, 1);
+			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
+			membank(bank_name)->set_entry(1);
 		}
 
 		for (bank = 9; bank <= 16; bank++)
@@ -280,7 +280,7 @@ void abc806_state::bankswitch()
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
 			program->install_readwrite_bank(start_addr, end_addr, bank_name);
-			memory_set_bank(machine(), bank_name, 0);
+			membank(bank_name)->set_entry(0);
 		}
 	}
 	else
@@ -300,8 +300,8 @@ void abc806_state::bankswitch()
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
 				program->install_readwrite_bank(start_addr, end_addr, bank_name);
-				memory_configure_bank(machine(), bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-				memory_set_bank(machine(), bank_name, 1);
+				membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
+				membank(bank_name)->set_entry(1);
 			}
 			else
 			{
@@ -315,7 +315,7 @@ void abc806_state::bankswitch()
 
 					program->install_read_bank(start_addr, end_addr, bank_name);
 					program->unmap_write(start_addr, end_addr);
-					memory_set_bank(machine(), bank_name, 0);
+					membank(bank_name)->set_entry(0);
 					break;
 
 				case 8:
@@ -325,7 +325,7 @@ void abc806_state::bankswitch()
 					program->install_read_bank(0x7000, 0x77ff, bank_name);
 					program->unmap_write(0x7000, 0x77ff);
 					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r),this), write8_delegate(FUNC(abc806_state::charram_w),this));
-					memory_set_bank(machine(), bank_name, 0);
+					membank(bank_name)->set_entry(0);
 					break;
 
 				default:
@@ -333,7 +333,7 @@ void abc806_state::bankswitch()
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
 					program->install_readwrite_bank(start_addr, end_addr, bank_name);
-					memory_set_bank(machine(), bank_name, 0);
+					membank(bank_name)->set_entry(0);
 					break;
 				}
 			}
@@ -366,8 +366,8 @@ void abc806_state::bankswitch()
 				program->install_readwrite_bank(start_addr, end_addr, bank_name);
 			}
 
-			memory_configure_bank(machine(), bank_name, 1, 1, m_video_ram + videoram_offset, 0);
-			memory_set_bank(machine(), bank_name, 1);
+			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
+			membank(bank_name)->set_entry(1);
 		}
 	}
 }
@@ -994,7 +994,7 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
-	UINT8 *mem = machine().region(Z80_TAG)->base();
+	UINT8 *mem = memregion(Z80_TAG)->base();
 	UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
@@ -1005,9 +1005,9 @@ void abc806_state::machine_start()
 	for (bank = 1; bank <= 16; bank++)
 	{
 		sprintf(bank_name,"bank%d",bank);
-		memory_configure_bank(machine(), bank_name, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(machine(), bank_name, 1, 1, m_video_ram, 0);
-		memory_set_bank(machine(), bank_name, 0);
+		membank(bank_name)->configure_entry(0, mem + (0x1000 * (bank - 1)));
+		membank(bank_name)->configure_entry(1, m_video_ram);
+		membank(bank_name)->set_entry(0);
 	}
 
 	// register for state saving
@@ -1034,7 +1034,7 @@ void abc806_state::machine_reset()
 	for (bank = 1; bank <= 16; bank++)
 	{
 		sprintf(bank_name,"bank%d",bank);
-		memory_set_bank(machine(), bank_name, 0);
+		membank(bank_name)->set_entry(0);
 	}
 
 	bankswitch();
@@ -1415,7 +1415,7 @@ DIRECT_UPDATE_MEMBER(abc800c_state::abc800c_direct_update_handler)
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, machine().region(Z80_TAG)->base() + 0x7c00);
+		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, memregion(Z80_TAG)->base() + 0x7c00);
 
 		if (!m_fetch_charram)
 		{
@@ -1451,7 +1451,7 @@ DIRECT_UPDATE_MEMBER(abc800m_state::abc800m_direct_update_handler)
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine().region(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
 
 		if (!m_fetch_charram)
 		{
@@ -1489,7 +1489,7 @@ DIRECT_UPDATE_MEMBER(abc802_state::abc802_direct_update_handler)
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine().region(Z80_TAG)->base() + 0x7800);
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
 			return ~0;
 		}
 	}
@@ -1513,7 +1513,7 @@ DIRECT_UPDATE_MEMBER(abc806_state::abc806_direct_update_handler)
 {	
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine().region(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
 
 		if (!m_fetch_charram)
 		{

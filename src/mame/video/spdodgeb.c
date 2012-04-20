@@ -5,7 +5,7 @@
 
 PALETTE_INIT( spdodgeb )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -108,13 +108,13 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_scrollx_lo_w)
 
 WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
 
 	/* bit 1 = ROM bank switch */
-	memory_set_bankptr(machine(), "bank1",rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
+	membank("bank1")->set_base(rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
 
 	/* bit 2 = scroll high bit */
 	m_lastscroll = (m_lastscroll & 0x0ff) | ((data & 0x04) << 6);

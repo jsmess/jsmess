@@ -190,7 +190,7 @@ MACHINE_RESET_MEMBER( zrt80_state )
 
 VIDEO_START_MEMBER( zrt80_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( zrt80_update_row )

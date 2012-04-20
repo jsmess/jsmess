@@ -177,7 +177,7 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER( homelab_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static SCREEN_UPDATE_IND16( homelab )

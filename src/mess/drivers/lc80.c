@@ -300,20 +300,20 @@ void lc80_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0); // TODO
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_set_bank(machine(), "bank1", 1);
+	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base()); // TODO
+	membank("bank1")->configure_entry(1, memregion(Z80_TAG)->base());
+	membank("bank1")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank2", 0, 1, machine().region(Z80_TAG)->base() + 0x800, 0); // TODO
-	memory_configure_bank(machine(), "bank2", 1, 1, machine().region(Z80_TAG)->base() + 0x800, 0);
-	memory_set_bank(machine(), "bank2", 1);
+	membank("bank2")->configure_entry(0, memregion(Z80_TAG)->base() + 0x800); // TODO
+	membank("bank2")->configure_entry(1, memregion(Z80_TAG)->base() + 0x800);
+	membank("bank2")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank3", 0, 1, machine().region(Z80_TAG)->base() + 0x1000, 0); // TODO
-	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z80_TAG)->base() + 0x1000, 0);
-	memory_set_bank(machine(), "bank3", 1);
+	membank("bank3")->configure_entry(0, memregion(Z80_TAG)->base() + 0x1000); // TODO
+	membank("bank3")->configure_entry(1, memregion(Z80_TAG)->base() + 0x1000);
+	membank("bank3")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank4", 0, 1, machine().region(Z80_TAG)->base() + 0x2000, 0);
-	memory_set_bank(machine(), "bank4", 0);
+	membank("bank4")->configure_entry(0, memregion(Z80_TAG)->base() + 0x2000);
+	membank("bank4")->set_entry(0);
 
 	program->install_readwrite_bank(0x0000, 0x07ff, "bank1");
 	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");

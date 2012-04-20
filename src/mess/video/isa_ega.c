@@ -598,8 +598,8 @@ void isa8_ega_device::device_start()
 		palette_set_color_rgb( machine(), i, r, g, b );
 	}
 	astring tempstring;
-	UINT8	*dst = machine().region(subtag(tempstring, "user2" ))->base() + 0x0000;
-	UINT8	*src = machine().region(subtag(tempstring, "user1" ))->base() + 0x3fff;
+	UINT8	*dst = memregion(subtag(tempstring, "user2" ))->base() + 0x0000;
+	UINT8	*src = memregion(subtag(tempstring, "user1" ))->base() + 0x3fff;
 	int		i;
 
 	/* Perform the EGA bios address line swaps */

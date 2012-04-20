@@ -235,7 +235,7 @@ void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mi
 	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
-	memory_set_bankptr(machine(), tag, data);
+	membank(tag)->set_base(data);
 }
 
 void nubus_device::set_irq_line(int slot, int state)
@@ -336,8 +336,8 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	UINT8 *newrom = NULL;
 
 	astring tempstring;
-	UINT8 *rom = device().machine().region(dev->subtag(tempstring, romregion))->base();
-	UINT32 romlen = device().machine().region(dev->subtag(tempstring, romregion))->bytes();
+	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(tempstring, romregion))->base();
+	UINT32 romlen = device().machine().root_device().memregion(dev->subtag(tempstring, romregion))->bytes();
 
 //  printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 

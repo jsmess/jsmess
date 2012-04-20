@@ -133,7 +133,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = machine.region("jsa")->base();
+	rgn = machine.root_device().memregion("jsa")->base();
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -161,14 +161,14 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 		/* the upper 128k is fixed, the lower 128k is bankswitched */
 		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
 		{
-			UINT8 *base = machine.region(regions[rgn])->base();
-			if (base != NULL && machine.region(regions[rgn])->bytes() >= 0x80000)
+			UINT8 *base = machine.root_device().memregion(regions[rgn])->base();
+			if (base != NULL && machine.root_device().memregion(regions[rgn])->bytes() >= 0x80000)
 			{
 				const char *bank = (rgn != 2) ? "bank12" : "bank14";
 				const char *bank_plus_1 = (rgn != 2) ? "bank13" : "bank15";
-				memory_configure_bank(machine, bank, 0, 2, base + 0x00000, 0x00000);
-				memory_configure_bank(machine, bank, 2, 2, base + 0x20000, 0x20000);
-				memory_set_bankptr(machine, bank_plus_1, base + 0x60000);
+				machine.root_device().membank(bank)->configure_entries(0, 2, base + 0x00000, 0x00000);
+				machine.root_device().membank(bank)->configure_entries(2, 2, base + 0x20000, 0x20000);
+				machine.root_device().membank(bank_plus_1)->set_base(base + 0x60000);
 			}
 		}
 	}
@@ -548,7 +548,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine(), "bank12", (space->machine().memory().bank("bank12")->entry() & 2) | ((data >> 1) & 1));
+				space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -572,7 +572,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine(), "bank12", (space->machine().memory().bank("bank12")->entry() & 1) | ((data >> 3) & 2));
+				space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 1) | ((data >> 3) & 2));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -681,7 +681,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine(), "bank12", (space->machine().memory().bank("bank12")->entry() & 2) | ((data >> 1) & 1));
+			space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -705,8 +705,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine(), "bank12", (space->machine().memory().bank("bank12")->entry() & 1) | ((data >> 3) & 2));
-			memory_set_bank(space->machine(), "bank14", data >> 6);
+			space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 1) | ((data >> 3) & 2));
+			space->machine().root_device().membank("bank14")->set_entry(data >> 6);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;

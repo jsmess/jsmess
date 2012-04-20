@@ -514,7 +514,7 @@ INTERRUPT_GEN( microtan_interrupt )
 DRIVER_INIT( microtan )
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
-    UINT8 *dst = machine.region("gfx2")->base();
+    UINT8 *dst = state->memregion("gfx2")->base();
     int i;
     address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 

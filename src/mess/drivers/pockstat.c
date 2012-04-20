@@ -789,11 +789,11 @@ READ32_MEMBER(pockstat_state::ps_rombank_r)
 			if(m_ftlb_regs.entry[index] == bank)
 			{
 				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
-				return machine().region("flash")->u32(index * (0x2000/4) + (offset & (0x1fff/4)));
+				return memregion("flash")->u32(index * (0x2000/4) + (offset & (0x1fff/4)));
 			}
 		}
 	}
-	return machine().region("flash")->u32(offset & 0x7fff);
+	return memregion("flash")->u32(offset & 0x7fff);
 }
 
 
@@ -819,7 +819,7 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 	if(m_ps_flash_write_count)
 	{
 		m_ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)(*machine().region("flash")))[offset]);
+		COMBINE_DATA(&((UINT32*)(*machine().root_device().memregion("flash")))[offset]);
 	}
 }
 
@@ -958,7 +958,7 @@ static SCREEN_UPDATE_RGB32( pockstat )
 static DEVICE_IMAGE_LOAD( pockstat_flash )
 {
 	int i, length;
-	UINT8 *cart = image.device().machine().region("flash")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("flash")->base();
 	static const char *gme_id = "123-456-STD";
 
 	length = image.fread( cart, 0x20f40);

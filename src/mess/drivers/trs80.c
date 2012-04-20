@@ -892,7 +892,7 @@ static DRIVER_INIT( trs80m4 )
 	trs80_state *state = machine.driver_data<trs80_state>();
 	state->m_mode = 0;
 	state->m_model4 = 2;
-	state->m_p_videoram.set_target(machine.region("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
 }
 
 static DRIVER_INIT( trs80m4p )
@@ -900,7 +900,7 @@ static DRIVER_INIT( trs80m4p )
 	trs80_state *state = machine.driver_data<trs80_state>();
 	state->m_mode = 0;
 	state->m_model4 = 4;
-	state->m_p_videoram.set_target(machine.region("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
 }
 
 static DRIVER_INIT( lnw80 )
@@ -908,8 +908,8 @@ static DRIVER_INIT( lnw80 )
 	trs80_state *state = machine.driver_data<trs80_state>();
 	state->m_mode = 0;
 	state->m_model4 = 0;
-	state->m_p_gfxram = machine.region("gfx2")->base();
-	state->m_p_videoram.set_target(machine.region("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	state->m_p_gfxram = machine.root_device().memregion("gfx2")->base();
+	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
 }
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT         COMPANY           FULLNAME */

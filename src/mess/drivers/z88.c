@@ -68,7 +68,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
 		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
 
-		memory_set_bank(machine(), bank_tag, page);
+		membank(bank_tag)->set_entry(page);
 	}
 	else if (page < 0x40)	// internal RAM
 	{
@@ -78,7 +78,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
 
 			// set the bank
-			memory_set_bank(machine(), bank_tag, page);
+			membank(bank_tag)->set_entry(page);
 		}
 		else
 		{
@@ -119,7 +119,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		else
 			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0, 0x1fff);
 
-		memory_set_bank(machine(), "bank1", rams & 1);
+		membank("bank1")->set_entry(rams & 1);
 	}
 }
 
@@ -245,20 +245,20 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)machine().region("bios")->base();
+	m_bios = (UINT8*)machine().root_device().memregion("bios")->base();
 	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// configure the memory banks
-	memory_configure_bank(machine(), "bank1", 0, 1, m_bios, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, m_ram_base,  0);
-	memory_configure_bank(machine(), "bank2", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank3", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank4", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank5", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank2", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank3", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank4", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank5", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank1")->configure_entry(0, m_bios);
+	membank("bank1")->configure_entry(1, m_ram_base);
+	membank("bank2")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank3")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank4")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank5")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank2")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank3")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank4")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank5")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
 
 	m_carts[1] = machine().device<z88cart_slot_device>("slot1");
 	m_carts[2] = machine().device<z88cart_slot_device>("slot2");

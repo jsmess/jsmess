@@ -225,16 +225,17 @@ static DRIVER_INIT(tutor)
 	tutor_state *state = machine.driver_data<tutor_state>();
 	state->m_tape_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tape_interrupt_handler));
 
-	memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + basic_base, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("maincpu")->base() + cartridge_base, 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + basic_base);
+	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + cartridge_base);
+	state->membank("bank1")->set_entry(0);
 }
 
 
 static DRIVER_INIT(pyuuta)
 {
 	DRIVER_INIT_CALL(tutor);
-	memory_set_bank(machine, "bank1", 1);
+	tutor_state *state = machine.driver_data<tutor_state>();
+	state->membank("bank1")->set_entry(1);
 }
 
 
@@ -296,7 +297,7 @@ READ8_MEMBER( tutor_state::key_r )
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = image.device().machine().region("maincpu")->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -315,7 +316,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(image.device().machine().region("maincpu")->base() + cartridge_base, 0, 0x6000);
+	memset(image.device().machine().root_device().memregion("maincpu")->base() + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -363,13 +364,13 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
 		m_cartridge_enable = 0;
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->set_entry(0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
 		m_cartridge_enable = 1;
-		memory_set_bank(machine(), "bank1", 1);
+		membank("bank1")->set_entry(1);
 		break;
 
 	default:

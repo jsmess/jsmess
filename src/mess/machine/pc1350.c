@@ -105,12 +105,12 @@ MACHINE_START( pc1350 )
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1350_power_up));
 
 	space->install_readwrite_bank(0x6000, 0x6fff, "bank1");
-	memory_set_bankptr(machine, "bank1", &machine.device<ram_device>(RAM_TAG)->pointer()[0x0000]);
+	state->membank("bank1")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x0000]);
 
 	if (machine.device<ram_device>(RAM_TAG)->size() >= 0x3000)
 	{
 		space->install_readwrite_bank(0x4000, 0x5fff, "bank2");
-		memory_set_bankptr(machine, "bank2", &machine.device<ram_device>(RAM_TAG)->pointer()[0x1000]);
+		state->membank("bank2")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x1000]);
 	}
 	else
 	{
@@ -120,7 +120,7 @@ MACHINE_START( pc1350 )
 	if (machine.device<ram_device>(RAM_TAG)->size() >= 0x5000)
 	{
 		space->install_readwrite_bank(0x2000, 0x3fff, "bank3");
-		memory_set_bankptr(machine, "bank3", &machine.device<ram_device>(RAM_TAG)->pointer()[0x3000]);
+		state->membank("bank3")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x3000]);
 	}
 	else
 	{
@@ -128,7 +128,7 @@ MACHINE_START( pc1350 )
 	}
 
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x2000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);

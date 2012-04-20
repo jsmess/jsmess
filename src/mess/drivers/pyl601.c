@@ -60,11 +60,11 @@ WRITE8_MEMBER(pyl601_state::rom_page_w)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
-		memory_set_bankptr(machine(), "bank2", machine().region("romdisk")->base() + chip*0x10000 + page * 0x2000);
+		membank("bank2")->set_base(machine().root_device().memregion("romdisk")->base() + chip*0x10000 + page * 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
+		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 	}
 }
 
@@ -120,7 +120,7 @@ READ8_MEMBER(pyl601_state::keyboard_r)
 READ8_MEMBER(pyl601_state::keycheck_r)
 {
 	UINT8 retVal = 0x3f;
-	UINT8 *keyboard = machine().region("keyboard")->base();
+	UINT8 *keyboard = memregion("keyboard")->base();
 	UINT16 row1 = input_port_read(machine(), "ROW1");
 	UINT16 row2 = input_port_read(machine(), "ROW2");
 	UINT16 row3 = input_port_read(machine(), "ROW3");
@@ -347,12 +347,12 @@ static MACHINE_RESET(pyl601)
 	pyl601_state *state = machine.driver_data<pyl601_state>();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	state->m_key_code = 0xff;
-	memory_set_bankptr(machine, "bank1", ram + 0x0000);
-	memory_set_bankptr(machine, "bank2", ram + 0xc000);
-	memory_set_bankptr(machine, "bank3", ram + 0xe000);
-	memory_set_bankptr(machine, "bank4", ram + 0xe700);
-	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0xf000);
-	memory_set_bankptr(machine, "bank6", ram + 0xf000);
+	state->membank("bank1")->set_base(ram + 0x0000);
+	state->membank("bank2")->set_base(ram + 0xc000);
+	state->membank("bank3")->set_base(ram + 0xe000);
+	state->membank("bank4")->set_base(ram + 0xe700);
+	state->membank("bank5")->set_base(state->memregion("maincpu")->base() + 0xf000);
+	state->membank("bank6")->set_base(ram + 0xf000);
 
 	machine.device("maincpu")->reset();
 }
@@ -365,7 +365,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *charrom = device->machine().region("gfx1")->base();
+	UINT8 *charrom = state->memregion("gfx1")->base();
 
 	int column, bit, i;
 	UINT8 data;
@@ -412,7 +412,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *charrom = device->machine().region("gfx1")->base();
+	UINT8 *charrom = state->memregion("gfx1")->base();
 
 	int column, bit, i;
 	UINT8 data;

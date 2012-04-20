@@ -248,7 +248,7 @@ void ti_pcode_card_device::device_start()
 	m_grom[5] = static_cast<ti99_grom_device*>(subdevice(PGROM5_TAG));
 	m_grom[6] = static_cast<ti99_grom_device*>(subdevice(PGROM6_TAG));
 	m_grom[7] = static_cast<ti99_grom_device*>(subdevice(PGROM7_TAG));
-	m_rom = subregion(PCODE_ROM_TAG)->base();
+	m_rom = memregion(PCODE_ROM_TAG)->base();
 }
 
 void ti_pcode_card_device::device_reset()

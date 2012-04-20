@@ -258,11 +258,11 @@ void adam_state::bankswitch()
 		if (BIT(m_adamnet, 1))
 		{
 			program->unmap_readwrite(0x0000, 0x5fff);
-			program->install_rom(0x6000, 0x7fff, machine().region("wp")->base() + 0x8000);
+			program->install_rom(0x6000, 0x7fff, memregion("wp")->base() + 0x8000);
 		}
 		else
 		{
-			program->install_rom(0x0000, 0x7fff, machine().region("wp")->base());
+			program->install_rom(0x0000, 0x7fff, memregion("wp")->base());
 		}
 		break;
 
@@ -278,7 +278,7 @@ void adam_state::bankswitch()
 		break;
 
 	case LO_OS7_ROM_INTERNAL_RAM:
-		program->install_rom(0x0000, 0x1fff, machine().region("os7")->base());
+		program->install_rom(0x0000, 0x1fff, memregion("os7")->base());
 		program->install_ram(0x2000, 0x7fff, ram + 0x2000);
 		break;
 	}
@@ -290,13 +290,13 @@ void adam_state::bankswitch()
 		break;
 
 	case HI_ROM_EXPANSION:
-		program->install_rom(0x8000, 0xffff, machine().region("xrom")->base());
+		program->install_rom(0x8000, 0xffff, memregion("xrom")->base());
 		break;
 
 	case HI_RAM_EXPANSION:
 		if (m_game)
 		{
-			program->install_rom(0x8000, 0xffff, machine().region("cart")->base());
+			program->install_rom(0x8000, 0xffff, memregion("cart")->base());
 		}
 		else
 		{
@@ -308,7 +308,7 @@ void adam_state::bankswitch()
 		break;
 
 	case HI_CARTRIDGE_ROM:
-		program->install_rom(0x8000, 0xffff, machine().region("cart")->base());
+		program->install_rom(0x8000, 0xffff, memregion("cart")->base());
 		break;
 	}
 }

@@ -20,7 +20,7 @@ SCREEN_UPDATE_IND16( llc1 )
 	llc_state *state = screen.machine().driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c,inv;
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{
@@ -52,7 +52,7 @@ SCREEN_UPDATE_IND16( llc2 )
 	llc_state *state = screen.machine().driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c;
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{

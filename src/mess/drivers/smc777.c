@@ -95,9 +95,9 @@ static SCREEN_UPDATE_IND16( smc777 )
 	smc777_state *state = screen.machine().driver_data<smc777_state>();
 	int x,y,yi;
 	UINT16 count;
-	UINT8 *vram = screen.machine().region("vram")->base();
-	UINT8 *attr = screen.machine().region("attr")->base();
-	UINT8 *gram = screen.machine().region("fbuf")->base();
+	UINT8 *vram = screen.machine().root_device().memregion("vram")->base();
+	UINT8 *attr = screen.machine().root_device().memregion("attr")->base();
+	UINT8 *gram = state->memregion("fbuf")->base();
 	int x_width;
 
 	bitmap.fill(screen.machine().pens[state->m_backdrop_pen], cliprect);
@@ -181,7 +181,7 @@ static SCREEN_UPDATE_IND16( smc777 )
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data = screen.machine().region("pcg")->base();
+					UINT8 *gfx_data = screen.machine().root_device().memregion("pcg")->base();
 					int pen;
 
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->m_pal_mode) : bk_pen;
@@ -246,7 +246,7 @@ WRITE8_MEMBER(smc777_state::smc777_6845_w)
 
 READ8_MEMBER(smc777_state::smc777_vram_r)
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -257,7 +257,7 @@ READ8_MEMBER(smc777_state::smc777_vram_r)
 
 READ8_MEMBER(smc777_state::smc777_attr_r)
 {
-	UINT8 *attr = machine().region("attr")->base();
+	UINT8 *attr = memregion("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -268,7 +268,7 @@ READ8_MEMBER(smc777_state::smc777_attr_r)
 
 READ8_MEMBER(smc777_state::smc777_pcg_r)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -279,7 +279,7 @@ READ8_MEMBER(smc777_state::smc777_pcg_r)
 
 WRITE8_MEMBER(smc777_state::smc777_vram_w)
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -290,7 +290,7 @@ WRITE8_MEMBER(smc777_state::smc777_vram_w)
 
 WRITE8_MEMBER(smc777_state::smc777_attr_w)
 {
-	UINT8 *attr = machine().region("attr")->base();
+	UINT8 *attr = memregion("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -301,7 +301,7 @@ WRITE8_MEMBER(smc777_state::smc777_attr_w)
 
 WRITE8_MEMBER(smc777_state::smc777_pcg_w)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -314,7 +314,7 @@ WRITE8_MEMBER(smc777_state::smc777_pcg_w)
 
 READ8_MEMBER(smc777_state::smc777_fbuf_r)
 {
-	UINT8 *fbuf = machine().region("fbuf")->base();
+	UINT8 *fbuf = memregion("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x007f) << 8);
@@ -325,7 +325,7 @@ READ8_MEMBER(smc777_state::smc777_fbuf_r)
 
 WRITE8_MEMBER(smc777_state::smc777_fbuf_w)
 {
-	UINT8 *fbuf = machine().region("fbuf")->base();
+	UINT8 *fbuf = memregion("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x00ff) << 8);
@@ -570,8 +570,8 @@ WRITE8_MEMBER(smc777_state::display_reg_w)
 
 READ8_MEMBER(smc777_state::smc777_mem_r)
 {
-	UINT8 *wram = machine().region("wram")->base();
-	UINT8 *bios = machine().region("bios")->base();
+	UINT8 *wram = memregion("wram")->base();
+	UINT8 *bios = memregion("bios")->base();
 	UINT8 z80_r;
 
 	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
@@ -593,7 +593,7 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 
 WRITE8_MEMBER(smc777_state::smc777_mem_w)
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	wram[offset] = data;
 }

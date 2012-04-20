@@ -219,8 +219,8 @@ INPUT_PORTS_END
 static MACHINE_RESET(pdp11)
 {
 	// Load M9301-YA
-	UINT8* user1 = machine.region("user1")->base();
-	UINT8* maincpu = machine.region("maincpu")->base();
+	UINT8* user1 = machine.root_device().memregion("user1")->base();
+	UINT8* maincpu = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for(i=0;i<0x100;i++) {
@@ -263,8 +263,8 @@ static void load9312prom(UINT8 *desc, UINT8 *src, int size)
 static MACHINE_RESET(pdp11ub2)
 {
 	// Load M9312
-	UINT8* user1 = machine.region("consproms")->base() + input_port_read(machine,"CONSPROM") * 0x0400;
-	UINT8* maincpu = machine.region("maincpu")->base();
+	UINT8* user1 = machine.root_device().memregion("consproms")->base() + input_port_read(machine,"CONSPROM") * 0x0400;
+	UINT8* maincpu = machine.root_device().memregion("maincpu")->base();
 
 	//0165000
 	load9312prom(maincpu + 0165000,user1,0x100);
@@ -281,13 +281,13 @@ static MACHINE_RESET(pdp11ub2)
 	}
 
 	//0173000
-	load9312prom(maincpu + 0173000,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM1") * 0x0200,0x080);
+	load9312prom(maincpu + 0173000,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM1") * 0x0200,0x080);
 	//0173200
-	load9312prom(maincpu + 0173200,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM2") * 0x0200,0x080);
+	load9312prom(maincpu + 0173200,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM2") * 0x0200,0x080);
 	//0173400
-	load9312prom(maincpu + 0173400,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM3") * 0x0200,0x080);
+	load9312prom(maincpu + 0173400,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM3") * 0x0200,0x080);
 	//0173600
-	load9312prom(maincpu + 0173600,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM4") * 0x0200,0x080);
+	load9312prom(maincpu + 0173600,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM4") * 0x0200,0x080);
 
 }
 

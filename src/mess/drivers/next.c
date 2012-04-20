@@ -1151,14 +1151,14 @@ COMP( ????, nextctc, nextst, 0,       nextctc,   next,    nextctc, "Next Softwar
 
 		/*
 
-    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
     rom[0x3f48/4] = 0x2f017000; // memory test funcall
     rom[0x3f4c/4] = 0x4e712400;
     rom[0x00b8/4] = 0x001a4e71; // rom checksum
     rom[0x00bc/4] = 0x4e714e71;
 
 v74
-    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
     rom[0x329c/4] = 0x70004e71; // memory test funcall
     rom[0x32a0/4] = 0x4e712400;
     rom[0x03f8/4] = 0x001a4e71; // rom checksum

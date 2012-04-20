@@ -293,7 +293,7 @@ static DEVICE_START( i82439tx )
 	i82439tx->space = cpu->memory().space(AS_PROGRAM);
 
 	/* get rom region */
-	i82439tx->rom = device->machine().region(config->rom_region)->base();
+	i82439tx->rom = device->machine().root_device().memregion(config->rom_region)->base();
 
 	/* setup save states */
 	device->save_item(NAME(i82439tx->regs));

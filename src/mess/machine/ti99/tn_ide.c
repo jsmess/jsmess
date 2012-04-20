@@ -301,7 +301,7 @@ void nouspikel_ide_interface_device::device_start()
 	m_rtc = subdevice<rtc65271_device>("ide_rtc");
 	m_ide = subdevice("ide");
 
-	m_ram = subregion(BUFFER_TAG)->base();
+	m_ram = memregion(BUFFER_TAG)->base();
 	m_sram_enable_dip = false; // TODO: what is this?
 }
 

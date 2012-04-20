@@ -503,9 +503,9 @@ static PALETTE_INIT( exelv )
 
 void exelv_state::machine_start()
 {
-	UINT8 *rom = machine().region("user1")->base() + 0x0200;
-	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0x8000 - 0x200);
-	memory_set_bank(machine(), "bank1", 0);
+	UINT8 *rom = memregion("user1")->base() + 0x0200;
+	membank("bank1")->configure_entry(0, rom);
+	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_tms7020_porta));

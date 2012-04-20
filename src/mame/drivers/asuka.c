@@ -249,12 +249,12 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 {
-	memory_set_bank(device->machine(),  "bank1", data & 0x03);
+	device->machine().root_device().membank("bank1")->set_entry(data & 0x03);
 }
 
 
@@ -270,7 +270,7 @@ static void asuka_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("ymsnd")->base()[state->m_adpcm_pos];
+		state->m_adpcm_data = device->machine().root_device().memregion("ymsnd")->base()[state->m_adpcm_pos];
 		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
@@ -842,8 +842,8 @@ static MACHINE_START( asuka )
 	state->m_tc0100scn = machine.device("tc0100scn");
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 3, machine.region("audiocpu")->base() + 0x10000, 0x04000);
+	state->membank("bank1")->configure_entry(0, machine.root_device().memregion("audiocpu")->base());
+	state->membank("bank1")->configure_entries(1, 3, state->memregion("audiocpu")->base() + 0x10000, 0x04000);
 
 	state->save_item(NAME(state->m_adpcm_pos));
 	state->save_item(NAME(state->m_adpcm_data));

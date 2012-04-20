@@ -178,7 +178,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	if( state->m_bank != new_bank)
 	{
 		state->m_bank = new_bank;
-		memory_set_bank(device->machine(), "bank1", state->m_bank);
+		state->membank("bank1")->set_entry(state->m_bank);
 	}
 
 	state->m_mux_data = data & ~0xc0;
@@ -357,9 +357,9 @@ INPUT_PORTS_END
 static MACHINE_START( yumefuda )
 {
 	albazg_state *state = machine.driver_data<albazg_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->save_item(NAME(state->m_mux_data));
 	state->save_item(NAME(state->m_bank));

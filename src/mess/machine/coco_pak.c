@@ -113,7 +113,7 @@ void coco_pak_device::device_reset()
 
 UINT8* coco_pak_device::get_cart_base()
 {
-	return subregion(CARTSLOT_TAG)->base();
+	return memregion(CARTSLOT_TAG)->base();
 }
 
 /***************************************************************************
@@ -169,8 +169,8 @@ void coco_pak_banked_device::banked_pak_set_bank(UINT32 bank)
 {
 	UINT64 pos;
 	UINT32 i;
-	UINT8 *rom = subregion(CARTSLOT_TAG)->base();
-	UINT32 rom_length = subregion(CARTSLOT_TAG)->bytes();
+	UINT8 *rom = memregion(CARTSLOT_TAG)->base();
+	UINT32 rom_length = memregion(CARTSLOT_TAG)->bytes();
 
 	pos = (bank * 0x4000) % m_cart->length();
 

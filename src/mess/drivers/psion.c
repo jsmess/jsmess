@@ -57,11 +57,12 @@ UINT8 psion_state::kb_read(running_machine &machine)
 
 void psion_state::update_banks(running_machine &machine)
 {
+	psion_state *state = machine.driver_data<psion_state>();
 	if (m_ram_bank < m_ram_bank_count && m_ram_bank_count)
-		memory_set_bank(machine, "rambank", m_ram_bank);
+		state->membank("rambank")->set_entry(m_ram_bank);
 
 	if (m_rom_bank < m_rom_bank_count && m_rom_bank_count)
-		memory_set_bank(machine, "rombank", m_rom_bank);
+		state->membank("rombank")->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
@@ -402,18 +403,18 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)machine().region("maincpu")->base();
+		UINT8* rom_base = (UINT8 *)machine().root_device().memregion("maincpu")->base();
 
-		memory_configure_bank(machine(), "rombank", 0, 1, rom_base + 0x8000, 0x4000);
-		memory_configure_bank(machine(), "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
-		memory_set_bank(machine(), "rombank", 0);
+		membank("rombank")->configure_entry(0, rom_base + 0x8000);
+		membank("rombank")->configure_entries(1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
+		membank("rombank")->set_entry(0);
 	}
 
 	if (m_ram_bank_count)
 	{
 		m_paged_ram = auto_alloc_array(machine(), UINT8, m_ram_bank_count * 0x4000);
-		memory_configure_bank(machine(), "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
-		memory_set_bank(machine(), "rambank", 0);
+		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram, 0x4000);
+		membank("rambank")->set_entry(0);
 	}
 
 	save_item(NAME(m_kb_counter));

@@ -115,7 +115,7 @@ void tmc600_state::video_start()
 	m_color_ram = auto_alloc_array(machine(), UINT8, TMC600_PAGE_RAM_SIZE);
 
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
 	save_pointer(NAME(m_color_ram), TMC600_PAGE_RAM_SIZE);

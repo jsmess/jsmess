@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
-	memory_set_bank(device->machine(), "bank1", data & 0x01);
+	device->machine().root_device().membank("bank1")->set_entry(data & 0x01);
 
 	msm5205_reset_w(device, data & 0x08);
 }
@@ -291,9 +291,9 @@ GFXDECODE_END
 static MACHINE_START( goal92 )
 {
 	goal92_state *state = machine.driver_data<goal92_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 

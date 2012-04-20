@@ -91,7 +91,7 @@ WRITE8_MEMBER( vixen_state::ctl_w )
 {
 	logerror("CTL %u\n", data);
 
-	memory_set_bank(machine(), "bank3", BIT(data, 0));
+	membank("bank3")->set_entry(BIT(data, 0));
 }
 
 
@@ -412,8 +412,8 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 void vixen_state::video_start()
 {
 	// find memory regions
-	m_sync_rom = machine().region("video")->base();
-	m_char_rom = machine().region("chargen")->base();
+	m_sync_rom = memregion("video")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
 	save_item(NAME(m_alt));
@@ -783,16 +783,16 @@ void vixen_state::machine_start()
 	// configure memory banking
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
+	membank("bank1")->configure_entry(0, ram);
+	membank("bank1")->configure_entry(1, memregion(Z8400A_TAG)->base());
 
-	memory_configure_bank(machine(), "bank2", 0, 1, ram, 0);
-	memory_configure_bank(machine(), "bank2", 1, 1, m_video_ram, 0);
+	membank("bank2")->configure_entry(0, ram);
+	membank("bank2")->configure_entry(1, m_video_ram);
 
-	memory_configure_bank(machine(), "bank3", 0, 1, m_video_ram, 0);
-	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
+	membank("bank3")->configure_entry(0, m_video_ram);
+	membank("bank3")->configure_entry(1, memregion(Z8400A_TAG)->base());
 
-	memory_configure_bank(machine(), "bank4", 0, 1, m_video_ram, 0);
+	membank("bank4")->configure_entry(0, m_video_ram);
 
 	// register for state saving
 	save_item(NAME(m_reset));
@@ -814,9 +814,9 @@ void vixen_state::machine_reset()
 	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
 	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
 
-	memory_set_bank(machine(), "bank1", 1);
-	memory_set_bank(machine(), "bank2", 1);
-	memory_set_bank(machine(), "bank3", 1);
+	membank("bank1")->set_entry(1);
+	membank("bank2")->set_entry(1);
+	membank("bank3")->set_entry(1);
 
 	m_reset = 1;
 
@@ -917,13 +917,13 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 			program->install_read_bank(0x0000, 0xefff, "bank1");
 			program->install_write_bank(0x0000, 0xefff, "bank2");
 
-			memory_set_bank(machine, "bank1", 0);
-			memory_set_bank(machine, "bank2", 0);
+			state->membank("bank1")->set_entry(0);
+			state->membank("bank2")->set_entry(0);
 
 			state->m_reset = 0;
 		}
 
-		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine.region(Z8400A_TAG)->base());
+		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine.root_device().memregion(Z8400A_TAG)->base());
 
 		return ~0;
 	}

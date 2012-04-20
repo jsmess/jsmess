@@ -191,7 +191,7 @@ static PALETTE_INIT( cgc7900 )
 void cgc7900_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("gfx1")->base();
+	m_char_rom = memregion("gfx1")->base();
 }
 
 /*-------------------------------------------------

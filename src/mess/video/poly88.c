@@ -24,7 +24,7 @@ static const UINT8 mcm6571a_shift[] =
 VIDEO_START( poly88 )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	state->m_FNT = machine.region("chargen")->base();
+	state->m_FNT = state->memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( poly88 )

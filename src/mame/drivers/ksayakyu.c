@@ -81,7 +81,7 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
         xxxxxxx  - unused ?
 
     */
-	memory_set_bank(machine(), "bank1", data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 }
 
 WRITE8_MEMBER(ksayakyu_state::latch_w)
@@ -250,9 +250,9 @@ GFXDECODE_END
 static MACHINE_START( ksayakyu )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_sound_status));
 	state->save_item(NAME(state->m_video_ctrl));

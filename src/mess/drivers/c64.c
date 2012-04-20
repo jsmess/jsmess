@@ -1022,9 +1022,9 @@ void c64_state::machine_start()
 	cbm_common_init();
 
 	// find memory regions
-	m_basic = machine().region("basic")->base();
-	m_kernal = machine().region("kernal")->base();
-	m_charom = machine().region("charom")->base();
+	m_basic = memregion("basic")->base();
+	m_kernal = memregion("kernal")->base();
+	m_charom = memregion("charom")->base();
 
 	// allocate memory
 	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
@@ -1055,8 +1055,8 @@ void c64c_state::machine_start()
 	c64_state::machine_start();
 
 	// find memory regions
-	m_basic = machine().region(M6510_TAG)->base();
-	m_kernal = machine().region(M6510_TAG)->base() + 0x2000;
+	m_basic = memregion(M6510_TAG)->base();
+	m_kernal = memregion(M6510_TAG)->base() + 0x2000;
 }
 
 

@@ -69,7 +69,7 @@ void avigo_state::video_start()
 	m_screen_column = 0;
 
 	/* allocate video memory */
-	m_video_memory = machine().region_alloc( "videoram", (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1, 1, ENDIANNESS_LITTLE )->base();
+	m_video_memory = machine().memory().region_alloc( "videoram", (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1, 1, ENDIANNESS_LITTLE )->base();
 	memset(m_video_memory, 0, (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
 
 	save_pointer(NAME(m_video_memory), (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);

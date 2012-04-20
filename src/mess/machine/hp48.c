@@ -797,7 +797,7 @@ static void hp48_apply_modules(hp48_state *state)
 
 		if ( state->m_modules[i].data )
 		{
-			memory_set_bankptr( space->machine(), bank, state->m_modules[i].data );
+			state->membank( bank )->set_base( state->m_modules[i].data );
 		}
 
 		if ( i == 0 )
@@ -1134,7 +1134,7 @@ static void hp48_machine_start( running_machine &machine, hp48_models model )
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
 	rom = auto_alloc_array(machine, UINT8, 2 * rom_size);
-	hp48_decode_nibble( rom, machine.region( "maincpu" )->base(), rom_size );
+	hp48_decode_nibble( rom, state->memregion( "maincpu" )->base(), rom_size );
 
 	/* init state */
 	memset( ram, 0, 2 * ram_size );

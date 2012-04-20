@@ -109,7 +109,7 @@ void a2bus_cffa2000_device::device_start()
 	set_a2bus_device();
 
 	astring tempstring;
-	m_rom = device().machine().region(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
 
 	// patch default setting so slave device is enabled
 	m_rom[0x801] = 4;

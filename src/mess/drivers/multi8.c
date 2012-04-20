@@ -94,7 +94,7 @@ static VIDEO_START( multi8 )
 
 	state->m_vram_bank = 8;
 	state->m_bw_mode = 0;
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
@@ -644,9 +644,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START(multi8)
 {
 	multi8_state *state = machine.driver_data<multi8_state>();
-	state->m_p_vram = machine.region("vram")->base();
-	state->m_p_wram = machine.region("wram")->base();
-	state->m_p_kanji = machine.region("kanji")->base();
+	state->m_p_vram = machine.root_device().memregion("vram")->base();
+	state->m_p_wram = machine.root_device().memregion("wram")->base();
+	state->m_p_kanji = state->memregion("kanji")->base();
 }
 
 static MACHINE_RESET(multi8)

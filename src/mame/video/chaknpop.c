@@ -24,7 +24,7 @@
 
 PALETTE_INIT( chaknpop )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; i++)
@@ -81,7 +81,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 		int all_dirty = 0;
 
 		m_gfxmode = data;
-		memory_set_bank(machine(), "bank1", (m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
+		membank("bank1")->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
 
 		if (m_flip_x != (m_gfxmode & GFX_FLIP_X))
 		{
@@ -154,7 +154,7 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 VIDEO_START( chaknpop )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
 	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
@@ -169,7 +169,7 @@ VIDEO_START( chaknpop )
 	state->save_pointer(NAME(state->m_vram3), 0x2000);
 	state->save_pointer(NAME(state->m_vram4), 0x2000);
 
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->set_entry(0);
 	tx_tilemap_mark_all_dirty(machine);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine));

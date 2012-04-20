@@ -131,11 +131,11 @@ READ8_MEMBER( mm1_state::mmu_r )
 		}
 		else if (!(mmu & MMU_CE0))
 		{
-			data = machine().region(I8085A_TAG)->base()[offset & 0x1fff];
+			data = memregion(I8085A_TAG)->base()[offset & 0x1fff];
 		}
 		else if (!(mmu & MMU_CE1))
 		{
-			data = machine().region(I8085A_TAG)->base()[0x2000 + (offset & 0x1fff)];
+			data = memregion(I8085A_TAG)->base()[0x2000 + (offset & 0x1fff)];
 		}
 	}
 
@@ -735,8 +735,8 @@ static const upd765_interface fdc_intf =
 void mm1_state::machine_start()
 {
 	// find memory regions
-	m_mmu_rom = machine().region("address")->base();
-	m_key_rom = machine().region("keyboard")->base();
+	m_mmu_rom = memregion("address")->base();
+	m_key_rom = memregion("keyboard")->base();
 
 	// register for state saving
 	save_item(NAME(m_sense));

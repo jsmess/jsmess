@@ -400,9 +400,9 @@ static VIDEO_START( supracan )
 	supracan_state *state = machine.driver_data<supracan_state>();
 	state->m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
-	state->m_vram = (UINT16*)(*machine.region("ram_gfx"));
-	state->m_vram_swapped = (UINT16*)(*machine.region("ram_gfx2"));
-	state->m_vram_addr_swapped = (UINT8*)(*machine.region("ram_gfx3")); // hack for 1bpp layer at startup
+	state->m_vram = (UINT16*)(*machine.root_device().memregion("ram_gfx"));
+	state->m_vram_swapped = (UINT16*)(*machine.root_device().memregion("ram_gfx2"));
+	state->m_vram_addr_swapped = (UINT8*)(*state->memregion("ram_gfx3")); // hack for 1bpp layer at startup
 
 	state->m_tilemap_sizes[0][0] = tilemap_create(machine, get_supracan_tilemap0_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_tilemap_sizes[0][1] = tilemap_create(machine, get_supracan_tilemap0_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -1735,7 +1735,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 
 static DEVICE_IMAGE_LOAD( supracan_cart )
 {
-	UINT8 *cart = image.device().machine().region("cart")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
 	UINT32 size = 0;
 
 	if (image.software_entry() == NULL)

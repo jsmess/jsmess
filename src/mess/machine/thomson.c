@@ -401,7 +401,7 @@ static UINT8 thom_cart_bank;     /* current bank */
 DEVICE_IMAGE_LOAD( to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = image.device().machine().region("maincpu" )->base() + 0x10000;
+	UINT8* pos = image.device().machine().root_device().memregion("maincpu" )->base() + 0x10000;
 	offs_t size = image.length();
 	char name[129];
 
@@ -457,7 +457,7 @@ static void to7_update_cart_bank(running_machine &machine)
 	if ( bank != old_cart_bank )
 		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
 
-	memory_set_bank( machine, THOM_CART_BANK, bank );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 	old_cart_bank = bank;
 }
 
@@ -485,7 +485,7 @@ WRITE8_HANDLER ( to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to7_cartridge_r )
 {
-	UINT8* pos = space->machine().region( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to7_update_cart_bank(space->machine());
@@ -1473,7 +1473,7 @@ MACHINE_RESET ( to7 )
 MACHINE_START ( to7 )
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to7: machine start called\n" ));
@@ -1488,12 +1488,12 @@ MACHINE_START ( to7 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x2000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_set_bank( machine, THOM_BASE_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	machine.root_device().membank( THOM_BASE_BANK )->configure_entry( 0, ram + 0x4000);
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0, 2, thom_vram, 0x2000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_BASE_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
 
 	if ( machine.device<ram_device>(RAM_TAG)->size() > 24*1024 )
 	{
@@ -1502,8 +1502,8 @@ MACHINE_START ( to7 )
 		int extram = machine.device<ram_device>(RAM_TAG)->size() - 24*1024;
 		space->install_write_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK);
 		space->install_read_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK );
-		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, ram + 0x6000, extram );
-		memory_set_bank( machine, THOM_RAM_BANK, 0 );
+		machine.root_device().membank( THOM_RAM_BANK )->configure_entry( 0, ram + 0x6000);
+		machine.root_device().membank( THOM_RAM_BANK )->set_entry( 0 );
 	}
 
 	/* force 2 topmost color bits to 1 */
@@ -1582,7 +1582,7 @@ static void to770_update_ram_bank(running_machine &machine)
 
 	if ( machine.device<ram_device>(RAM_TAG)->size() == 128*1024 || bank < 2 )
 	{
-		memory_set_bank( machine, THOM_RAM_BANK, bank );
+		machine.root_device().membank( THOM_RAM_BANK )->set_entry( bank );
 		space->install_write_bank(0xa000, 0xdfff, THOM_RAM_BANK);
 	}
 	else
@@ -1729,7 +1729,7 @@ MACHINE_RESET( to770 )
 
 MACHINE_START ( to770 )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to770: machine start called\n" ));
@@ -1744,14 +1744,14 @@ MACHINE_START ( to770 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, ram + 0x8000, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_set_bank( machine, THOM_BASE_BANK, 0 );
-	memory_set_bank( machine, THOM_RAM_BANK,  0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	machine.root_device().membank( THOM_BASE_BANK )->configure_entry( 0, ram + 0x4000);
+	machine.root_device().membank( THOM_RAM_BANK )->configure_entries( 0, 6, ram + 0x8000, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0, 2, thom_vram, 0x2000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_BASE_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_RAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -1930,7 +1930,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 DEVICE_IMAGE_LOAD( mo5_cartridge )
 {
-	UINT8* pos = image.device().machine().region("maincpu")->base() + 0x10000;
+	UINT8* pos = image.device().machine().root_device().memregion("maincpu")->base() + 0x10000;
 	UINT64 size = image.length();
 	int i,j;
 	char name[129];
@@ -2015,7 +2015,7 @@ static void mo5_update_cart_bank(running_machine &machine)
 		if ( bank != old_cart_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is internal / cartridge bank %i\n", thom_cart_bank ));
 	}
-	memory_set_bank( machine, THOM_CART_BANK, bank );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 	old_cart_bank = bank;
 }
 
@@ -2043,7 +2043,7 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_HANDLER ( mo5_cartridge_r )
 {
-	UINT8* pos = space->machine().region( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo5_update_cart_bank(space->machine());
@@ -2101,7 +2101,7 @@ MACHINE_RESET( mo5 )
 
 MACHINE_START ( mo5 )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo5: machine start called\n" ));
@@ -2118,13 +2118,13 @@ MACHINE_START ( mo5 )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x8000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, ram + 0xc000, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_set_bank( machine, THOM_BASE_BANK, 0 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	machine.root_device().membank( THOM_BASE_BANK )->configure_entry( 0, ram + 0x4000);
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 4, 4, ram + 0xc000, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0, 2, thom_vram, 0x2000 );
+	machine.root_device().membank( THOM_BASE_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -2379,7 +2379,7 @@ static void to9_update_cart_bank(running_machine &machine)
 		break;
 	}
 
-	memory_set_bank( machine, THOM_CART_BANK, bank );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 	old_cart_bank = bank;
 }
 
@@ -2412,7 +2412,7 @@ WRITE8_HANDLER ( to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to9_cartridge_r )
 {
-	UINT8* pos = space->machine().region( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to9_update_cart_bank(space->machine());
@@ -2456,7 +2456,7 @@ static void to9_update_ram_bank (running_machine &machine)
 
 	if ( machine.device<ram_device>(RAM_TAG)->size() == 192*1024 || bank < 6 )
 	{
-		memory_set_bank( machine, THOM_RAM_BANK, bank );
+		machine.root_device().membank( THOM_RAM_BANK )->set_entry( bank );
 		space->install_write_bank( 0xa000, 0xdfff, THOM_RAM_BANK);
 	}
 	else
@@ -3065,7 +3065,7 @@ MACHINE_RESET ( to9 )
 
 MACHINE_START ( to9 )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to9: machine start called\n" ));
@@ -3082,14 +3082,14 @@ MACHINE_START ( to9 )
 	/* memory */
 	thom_vram = ram;
 	thom_cart_bank = 0;
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, thom_vram, 0x2000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, ram + 0x8000, 0x4000 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_BASE_BANK, 0 );
-	memory_set_bank( machine, THOM_RAM_BANK,  0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0,  2, thom_vram, 0x2000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 12, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_BASE_BANK )->configure_entry( 0,  ram + 0x4000);
+	machine.root_device().membank( THOM_RAM_BANK )->configure_entries( 0, 10, ram + 0x8000, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_BASE_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_RAM_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -3467,7 +3467,7 @@ static void to8_update_floppy_bank( running_machine &machine )
 		LOG_BANK(( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
 			  (to8_reg_sys1 & 0x80) ? "external" : "internal",
 			  bank % TO7_NB_FLOP_BANK ));
-	memory_set_bank( machine, THOM_FLOP_BANK, bank );
+	machine.root_device().membank( THOM_FLOP_BANK )->set_entry( bank );
 	old_floppy_bank = bank;
 }
 
@@ -3524,8 +3524,8 @@ static void to8_update_ram_bank (running_machine &machine)
 	to8_data_vpage = bank;
 	if ( machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || to8_data_vpage < 16 )
 	{
-		memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
-		memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
+		machine.root_device().membank( TO8_DATA_LO )->set_entry( to8_data_vpage );
+		machine.root_device().membank( TO8_DATA_HI )->set_entry( to8_data_vpage );
 
 		if (to8_data_vpage <= 4) {
 			space->install_legacy_write_handler( 0xa000, 0xbfff, FUNC(to8_data_lo_w));
@@ -3604,7 +3604,7 @@ static void to8_update_cart_bank (running_machine &machine)
 
 	if ( machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || bank < 16 )
 	{
-		memory_set_bank( machine, THOM_CART_BANK, bank );
+		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 	}
 
 	old_cart_bank = bank;
@@ -3638,7 +3638,7 @@ WRITE8_HANDLER ( to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to8_cartridge_r )
 {
-	UINT8* pos = space->machine().region( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to8_update_cart_bank(space->machine());
@@ -3652,7 +3652,7 @@ READ8_HANDLER ( to8_cartridge_r )
 
 static void to8_floppy_init( running_machine &machine )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	to7_floppy_init( machine, mem + 0x34000 );
 }
 
@@ -3660,11 +3660,11 @@ static void to8_floppy_init( running_machine &machine )
 
 static void to8_floppy_reset( running_machine &machine )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_INT )
 		thmfc_floppy_reset(machine);
-	memory_configure_bank( machine, THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
+	machine.root_device().membank( THOM_FLOP_BANK )->configure_entries( TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
 }
 
 
@@ -3962,7 +3962,7 @@ static WRITE8_DEVICE_HANDLER ( to8_timer_port_out )
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
 	thom_set_mode_point( device->machine(), data & 1 );       /* bit 0: video bank switch */
-	memory_set_bank( device->machine(), TO8_BIOS_BANK, to8_bios_bank );
+	device->machine().root_device().membank( TO8_BIOS_BANK )->set_entry( to8_bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
 	to8_update_floppy_bank(device->machine());
 	to8_update_cart_bank(device->machine());
@@ -4051,7 +4051,7 @@ MACHINE_RESET ( to8 )
 	to8_update_ram_bank(machine);
 	to8_update_cart_bank(machine);
 	to8_update_floppy_bank(machine);
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 	/* thom_cart_bank not reset */
 }
 
@@ -4059,7 +4059,7 @@ MACHINE_RESET ( to8 )
 
 MACHINE_START ( to8 )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to8: machine start called\n" ));
@@ -4076,21 +4076,21 @@ MACHINE_START ( to8 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram, 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram + 0x0000, 0x4000 );
-	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, TO8_SYS_LO,  0 );
-	memory_set_bank( machine, TO8_SYS_HI,  0 );
-	memory_set_bank( machine, TO8_DATA_LO, 0 );
-	memory_set_bank( machine, TO8_DATA_HI, 0 );
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0,  8, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 8, 32, ram, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0,  2, ram, 0x2000 );
+	machine.root_device().membank( TO8_SYS_LO )->configure_entry( 0,  ram + 0x6000);
+	machine.root_device().membank( TO8_SYS_HI )->configure_entry( 0,  ram + 0x4000);
+	machine.root_device().membank( TO8_DATA_LO )->configure_entries( 0, 32, ram + 0x2000, 0x4000 );
+	machine.root_device().membank( TO8_DATA_HI )->configure_entries( 0, 32, ram + 0x0000, 0x4000 );
+	machine.root_device().membank( TO8_BIOS_BANK )->configure_entries( 0,  2, mem + 0x30800, 0x2000 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -4160,7 +4160,7 @@ static WRITE8_DEVICE_HANDLER ( to9p_timer_port_out )
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
 	thom_set_mode_point( device->machine(), data & 1 );       /* bit 0: video bank switch */
-	memory_set_bank( device->machine(), TO8_BIOS_BANK, bios_bank );
+	device->machine().root_device().membank( TO8_BIOS_BANK )->set_entry( bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
 	to8_update_floppy_bank(device->machine());
 	to8_update_cart_bank(device->machine());
@@ -4222,7 +4222,7 @@ MACHINE_RESET ( to9p )
 	to8_update_ram_bank(machine);
 	to8_update_cart_bank(machine);
 	to8_update_floppy_bank(machine);
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 	/* thom_cart_bank not reset */
 }
 
@@ -4230,7 +4230,7 @@ MACHINE_RESET ( to9p )
 
 MACHINE_START ( to9p )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to9p: machine start called\n" ));
@@ -4247,21 +4247,21 @@ MACHINE_START ( to9p )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram, 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram + 0x0000, 0x4000 );
-	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, TO8_SYS_LO,  0 );
-	memory_set_bank( machine, TO8_SYS_HI,  0 );
-	memory_set_bank( machine, TO8_DATA_LO, 0 );
-	memory_set_bank( machine, TO8_DATA_HI, 0 );
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0,  8, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 8, 32, ram, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0,  2, ram, 0x2000 );
+	machine.root_device().membank( TO8_SYS_LO )->configure_entry( 0,  ram + 0x6000);
+	machine.root_device().membank( TO8_SYS_HI )->configure_entry( 0,  ram + 0x4000);
+	machine.root_device().membank( TO8_DATA_LO )->configure_entries( 0, 32, ram + 0x2000, 0x4000 );
+	machine.root_device().membank( TO8_DATA_HI )->configure_entries( 0, 32, ram + 0x0000, 0x4000 );
+	machine.root_device().membank( TO8_BIOS_BANK )->configure_entries( 0,  2, mem + 0x30800, 0x2000 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -4305,8 +4305,8 @@ static void mo6_update_ram_bank ( running_machine &machine )
 			LOG_BANK(( "mo6_update_ram_bank: select bank %i (new style)\n", bank ));
 	}
 	to8_data_vpage = bank;
-	memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
-	memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
+	machine.root_device().membank( TO8_DATA_LO )->set_entry( to8_data_vpage );
+	machine.root_device().membank( TO8_DATA_HI )->set_entry( to8_data_vpage );
 }
 
 
@@ -4399,8 +4399,8 @@ static void mo6_update_cart_bank (running_machine &machine)
 	}
 
 	old_cart_bank = bank;
-	memory_set_bank( machine, THOM_CART_BANK, bank );
-	memory_set_bank( machine, TO8_BIOS_BANK, b );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( b );
 }
 
 
@@ -4427,7 +4427,7 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_HANDLER ( mo6_cartridge_r )
 {
-	UINT8* pos = space->machine().region( "maincpu" )->base() + 0x10000;
+	UINT8* pos = space->machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo6_update_cart_bank(space->machine());
@@ -4853,7 +4853,7 @@ MACHINE_RESET ( mo6 )
 
 MACHINE_START ( mo6 )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo6: machine start called\n" ));
@@ -4871,23 +4871,23 @@ MACHINE_START ( mo6 )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram, 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram + 0x0000, 0x4000 );
-	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, TO8_SYS_LO,  0 );
-	memory_set_bank( machine, TO8_SYS_HI,  0 );
-	memory_set_bank( machine, TO8_DATA_LO, 0 );
-	memory_set_bank( machine, TO8_DATA_HI, 0 );
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 8, 8, ram, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0, 2, ram, 0x2000 );
+	machine.root_device().membank( TO8_SYS_LO )->configure_entry( 0, ram + 0x6000);
+	machine.root_device().membank( TO8_SYS_HI )->configure_entry( 0, ram + 0x4000);
+	machine.root_device().membank( TO8_DATA_LO )->configure_entries( 0, 8, ram + 0x2000, 0x4000 );
+	machine.root_device().membank( TO8_DATA_HI )->configure_entries( 0, 8, ram + 0x0000, 0x4000 );
+	machine.root_device().membank( TO8_BIOS_BANK )->configure_entries( 0, 2, mem + 0x23000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );
@@ -5114,7 +5114,7 @@ MACHINE_RESET ( mo5nr )
 
 MACHINE_START ( mo5nr )
 {
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo5nr: machine start called\n" ));
@@ -5132,23 +5132,23 @@ MACHINE_START ( mo5nr )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = ram;
-	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram, 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram, 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram + 0x0000, 0x4000 );
-	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( machine, THOM_CART_BANK, 0 );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
-	memory_set_bank( machine, TO8_SYS_LO,  0 );
-	memory_set_bank( machine, TO8_SYS_HI,  0 );
-	memory_set_bank( machine, TO8_DATA_LO, 0 );
-	memory_set_bank( machine, TO8_DATA_HI, 0 );
-	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->configure_entries( 8, 8, ram, 0x4000 );
+	machine.root_device().membank( THOM_VRAM_BANK )->configure_entries( 0, 2, ram, 0x2000 );
+	machine.root_device().membank( TO8_SYS_LO )->configure_entry( 0, ram + 0x6000);
+	machine.root_device().membank( TO8_SYS_HI )->configure_entry( 0, ram + 0x4000);
+	machine.root_device().membank( TO8_DATA_LO )->configure_entries( 0, 8, ram + 0x2000, 0x4000 );
+	machine.root_device().membank( TO8_DATA_HI )->configure_entries( 0, 8, ram + 0x0000, 0x4000 );
+	machine.root_device().membank( TO8_BIOS_BANK )->configure_entries( 0, 2, mem + 0x23000, 0x4000 );
+	machine.root_device().membank( THOM_CART_BANK )->set_entry( 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_SYS_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_LO )->set_entry( 0 );
+	machine.root_device().membank( TO8_DATA_HI )->set_entry( 0 );
+	machine.root_device().membank( TO8_BIOS_BANK )->set_entry( 0 );
 
 	/* save-state */
 	state_save_register_global( machine, thom_cart_nb_banks );

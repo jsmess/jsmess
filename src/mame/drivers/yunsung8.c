@@ -49,7 +49,7 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_bankswitch_w)
 
 	m_layers_ctrl = data & 0x30;	// Layers enable
 
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 
 	if (data & ~0x37)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
 	msm5205_reset_w(device, data & 0x20);
 
-	memory_set_bank(device->machine(), "bank2", data & 0x07);
+	device->machine().root_device().membank("bank2")->set_entry(data & 0x07);
 
 	if (data != (data & (~0x27)))
 		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
@@ -466,16 +466,16 @@ static const msm5205_interface yunsung8_msm5205_interface =
 static MACHINE_START( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *AUDIO = machine.root_device().memregion("audiocpu")->base();
 
 	state->m_videoram_0 = state->m_videoram + 0x0000;	// Ram is banked
 	state->m_videoram_1 = state->m_videoram + 0x2000;
 
-	memory_configure_bank(machine, "bank1", 0, 3, &MAIN[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 3, 5, &MAIN[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 3, &AUDIO[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 3, 5, &AUDIO[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &MAIN[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, 5, &MAIN[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 

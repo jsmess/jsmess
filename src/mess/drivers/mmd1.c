@@ -360,14 +360,14 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 READ8_MEMBER( mmd1_state::mmd2_bank_r )
 {
-	memory_set_bank(machine(), "bank1", offset);
-	memory_set_bank(machine(), "bank2", offset);
-	memory_set_bank(machine(), "bank3", offset);
-	memory_set_bank(machine(), "bank4", offset);
-	memory_set_bank(machine(), "bank5", offset);
-	memory_set_bank(machine(), "bank6", offset);
-	memory_set_bank(machine(), "bank7", offset);
-	memory_set_bank(machine(), "bank8", offset);
+	membank("bank1")->set_entry(offset);
+	membank("bank2")->set_entry(offset);
+	membank("bank3")->set_entry(offset);
+	membank("bank4")->set_entry(offset);
+	membank("bank5")->set_entry(offset);
+	membank("bank6")->set_entry(offset);
+	membank("bank7")->set_entry(offset);
+	membank("bank8")->set_entry(offset);
 	return 0xff;
 }
 
@@ -446,14 +446,15 @@ static MACHINE_RESET( mmd1 )
 
 static MACHINE_RESET( mmd2 )
 {
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
-	memory_set_bank(machine, "bank3", 0);
-	memory_set_bank(machine, "bank4", 0);
-	memory_set_bank(machine, "bank5", 0);
-	memory_set_bank(machine, "bank6", 0);
-	memory_set_bank(machine, "bank7", 0);
-	memory_set_bank(machine, "bank8", 0);
+	mmd1_state *state = machine.driver_data<mmd1_state>();
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->set_entry(0);
+	state->membank("bank3")->set_entry(0);
+	state->membank("bank4")->set_entry(0);
+	state->membank("bank5")->set_entry(0);
+	state->membank("bank6")->set_entry(0);
+	state->membank("bank7")->set_entry(0);
+	state->membank("bank8")->set_entry(0);
 }
 
 DRIVER_INIT( mmd2 )
@@ -462,32 +463,32 @@ DRIVER_INIT( mmd2 )
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
 */
-
-	UINT8 *p_ram = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 1, &p_ram[0x0000], 0);
-	memory_configure_bank(machine, "bank1", 1, 1, &p_ram[0xd800], 0);
-	memory_configure_bank(machine, "bank1", 2, 1, &p_ram[0x0c00], 0);
-	memory_configure_bank(machine, "bank2", 0, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank2", 1, 1, &p_ram[0xd800], 0);
-	memory_configure_bank(machine, "bank2", 2, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank3", 0, 1, &p_ram[0x0400], 0);
-	memory_configure_bank(machine, "bank3", 1, 1, &p_ram[0xdc00], 0);
-	memory_configure_bank(machine, "bank3", 2, 1, &p_ram[0xdc00], 0);
-	memory_configure_bank(machine, "bank4", 0, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank4", 1, 1, &p_ram[0xdc00], 0);
-	memory_configure_bank(machine, "bank4", 2, 1, &p_ram[0xdc00], 0);
-	memory_configure_bank(machine, "bank5", 0, 1, &p_ram[0xd800], 0);
-	memory_configure_bank(machine, "bank5", 1, 1, &p_ram[0x0000], 0);
-	memory_configure_bank(machine, "bank5", 2, 1, &p_ram[0x0000], 0);
-	memory_configure_bank(machine, "bank6", 0, 1, &p_ram[0xd800], 0);
-	memory_configure_bank(machine, "bank6", 1, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank6", 2, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank7", 0, 1, &p_ram[0xe400], 0);
-	memory_configure_bank(machine, "bank7", 1, 1, &p_ram[0x0c00], 0);
-	memory_configure_bank(machine, "bank7", 2, 1, &p_ram[0xd800], 0);
-	memory_configure_bank(machine, "bank8", 0, 1, &p_ram[0xe400], 0);
-	memory_configure_bank(machine, "bank8", 1, 1, &p_ram[0x8000], 0);
-	memory_configure_bank(machine, "bank8", 2, 1, &p_ram[0xd800], 0);
+	mmd1_state *state = machine.driver_data<mmd1_state>();
+	UINT8 *p_ram = machine.root_device().memregion("maincpu")->base();
+	state->membank("bank1")->configure_entry(0, &p_ram[0x0000]);
+	state->membank("bank1")->configure_entry(1, &p_ram[0xd800]);
+	state->membank("bank1")->configure_entry(2, &p_ram[0x0c00]);
+	state->membank("bank2")->configure_entry(0, &p_ram[0x8000]);
+	state->membank("bank2")->configure_entry(1, &p_ram[0xd800]);
+	state->membank("bank2")->configure_entry(2, &p_ram[0x8000]);
+	state->membank("bank3")->configure_entry(0, &p_ram[0x0400]);
+	state->membank("bank3")->configure_entry(1, &p_ram[0xdc00]);
+	state->membank("bank3")->configure_entry(2, &p_ram[0xdc00]);
+	state->membank("bank4")->configure_entry(0, &p_ram[0x8000]);
+	state->membank("bank4")->configure_entry(1, &p_ram[0xdc00]);
+	state->membank("bank4")->configure_entry(2, &p_ram[0xdc00]);
+	state->membank("bank5")->configure_entry(0, &p_ram[0xd800]);
+	state->membank("bank5")->configure_entry(1, &p_ram[0x0000]);
+	state->membank("bank5")->configure_entry(2, &p_ram[0x0000]);
+	state->membank("bank6")->configure_entry(0, &p_ram[0xd800]);
+	state->membank("bank6")->configure_entry(1, &p_ram[0x8000]);
+	state->membank("bank6")->configure_entry(2, &p_ram[0x8000]);
+	state->membank("bank7")->configure_entry(0, &p_ram[0xe400]);
+	state->membank("bank7")->configure_entry(1, &p_ram[0x0c00]);
+	state->membank("bank7")->configure_entry(2, &p_ram[0xd800]);
+	state->membank("bank8")->configure_entry(0, &p_ram[0xe400]);
+	state->membank("bank8")->configure_entry(1, &p_ram[0x8000]);
+	state->membank("bank8")->configure_entry(2, &p_ram[0xd800]);
 }
 
 static MACHINE_CONFIG_START( mmd1, mmd1_state )

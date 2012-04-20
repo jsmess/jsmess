@@ -140,7 +140,7 @@ SCREEN_UPDATE_IND16( mc8020 )
 VIDEO_START( mc8030 )
 {
 	mc80_state *state = machine.driver_data<mc80_state>();
-	state->m_p_videoram.set_target(machine.region("vram")->base(),state->m_p_videoram.bytes());
+	state->m_p_videoram.set_target(state->memregion("vram")->base(),state->m_p_videoram.bytes());
 }
 
 SCREEN_UPDATE_IND16( mc8030 )

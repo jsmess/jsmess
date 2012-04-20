@@ -125,26 +125,30 @@ static void gb_init_regs(running_machine &machine)
 
 static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, "bank5", addr );
-	memory_set_bankptr( machine, "bank10", addr + 0x0100 );
-	memory_set_bankptr( machine, "bank6", addr + 0x0200 );
-	memory_set_bankptr( machine, "bank11", addr + 0x0900 );
+	gb_state *state = machine.driver_data<gb_state>();
+	state->membank( "bank5" )->set_base( addr );
+	state->membank( "bank10" )->set_base( addr + 0x0100 );
+	state->membank( "bank6" )->set_base( addr + 0x0200 );
+	state->membank( "bank11" )->set_base( addr + 0x0900 );
 }
 
 static void gb_rom16_4000( running_machine &machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, "bank1", addr );
-	memory_set_bankptr( machine, "bank4", addr + 0x2000 );
+	gb_state *state = machine.driver_data<gb_state>();
+	state->membank( "bank1" )->set_base( addr );
+	state->membank( "bank4" )->set_base( addr + 0x2000 );
 }
 
 static void gb_rom8_4000( running_machine &machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, "bank1", addr );
+	gb_state *state = machine.driver_data<gb_state>();
+	state->membank( "bank1" )->set_base( addr );
 }
 
 static void gb_rom8_6000( running_machine &machine, UINT8 *addr )
 {
-	memory_set_bankptr( machine, "bank4", addr );
+	gb_state *state = machine.driver_data<gb_state>();
+	state->membank( "bank4" )->set_base( addr );
 }
 
 static void gb_init(running_machine &machine)
@@ -163,12 +167,12 @@ static void gb_init(running_machine &machine)
 		if ( state->m_MBCType != MBC_MEGADUCK )
 		{
 			gb_rom16_4000( machine, state->m_ROMMap[state->m_ROMBank] );
-			memory_set_bankptr (machine, "bank2", state->m_RAMMap[state->m_RAMBank] ? state->m_RAMMap[state->m_RAMBank] : state->m_gb_dummy_ram_bank);
+			state->membank ("bank2")->set_base (state->m_RAMMap[state->m_RAMBank] ? state->m_RAMMap[state->m_RAMBank] : state->m_gb_dummy_ram_bank);
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank1", state->m_ROMMap[state->m_ROMBank] );
-			memory_set_bankptr( machine, "bank10", state->m_ROMMap[0] );
+			state->membank( "bank1" )->set_base( state->m_ROMMap[state->m_ROMBank] );
+			state->membank( "bank10" )->set_base( state->m_ROMMap[0] );
 		}
 	}
 
@@ -275,7 +279,7 @@ MACHINE_RESET( gb )
 	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
+	state->membank("bank5")->set_base(state->memregion("maincpu")->base() );
 
 	state->m_divcount = 0x0004;
 }
@@ -309,7 +313,7 @@ MACHINE_RESET( sgb )
 	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
+	state->membank("bank5")->set_base(state->memregion("maincpu")->base() );
 
 	memset( state->m_sgb_tile_data, 0, 0x2000 );
 
@@ -366,8 +370,8 @@ MACHINE_RESET( gbc )
 	gb_rom16_0000( machine, state->m_ROMMap[state->m_ROMBank00] ? state->m_ROMMap[state->m_ROMBank00] : state->m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() );
-	memory_set_bankptr(machine, "bank6", machine.region("maincpu")->base() + 0x100 );
+	state->membank("bank5")->set_base(machine.root_device().memregion("maincpu")->base() );
+	state->membank("bank6")->set_base(state->memregion("maincpu")->base() + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
@@ -395,7 +399,7 @@ static void gb_set_mbc1_banks( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
-	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
+	state->membank( "bank2" )->set_base( state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1)
@@ -527,8 +531,8 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_wisdom)
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( &space.device() ), offset );
 	/* The address determines the bank to select */
 	m_ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( machine(), "bank5", m_ROMMap[ m_ROMBank ] );
-	memory_set_bankptr( machine(), "bank10", m_ROMMap[ m_ROMBank ] + 0x0100 );
+	membank( "bank5" )->set_base( m_ROMMap[ m_ROMBank ] );
+	membank( "bank10" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0100 );
 	gb_rom16_4000( machine(), m_ROMMap[ m_ROMBank + 1 ] );
 }
 
@@ -554,7 +558,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 			if ( data < 5 )
 			{
 				memset( m_MBC3RTCData, m_MBC3RTCMap[m_MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( machine(), "bank2", m_MBC3RTCData );
+				membank( "bank2" )->set_base( m_MBC3RTCData );
 			}
 		}
 	}
@@ -563,7 +567,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 		m_RAMBank = data & 0x3;
 		m_MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( machine(), "bank2", m_RAMMap[m_RAMBank] );
+		membank( "bank2" )->set_base( m_RAMMap[m_RAMBank] );
 	}
 }
 
@@ -577,7 +581,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc5)
 	}
 	m_RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (machine(), "bank2", m_RAMMap[m_RAMBank] );
+	membank ("bank2")->set_base (m_RAMMap[m_RAMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_enable)
@@ -671,7 +675,7 @@ WRITE8_MEMBER(gb_state::gb_ram_tama5)
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
 			m_MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( machine(), "bank2", m_MBC3RTCData );
+			membank( "bank2" )->set_base( m_MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
 			m_MBC3RTCData[0] = m_gbTama5Byte & 0x0F;
@@ -697,8 +701,8 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_0000_w)
 	if ( data & 0x40 )
 	{
 		m_mmm01_bank_offset = m_mmm01_reg1;
-		memory_set_bankptr( machine(), "bank5", m_ROMMap[ m_mmm01_bank_offset ] );
-		memory_set_bankptr( machine(), "bank10", m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
+		membank( "bank5" )->set_base( m_ROMMap[ m_mmm01_bank_offset ] );
+		membank( "bank10" )->set_base( m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
 		gb_rom16_4000( machine(), m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
 	}
 }
@@ -744,7 +748,7 @@ static void gb_set_mbc1_kor_banks( running_machine &machine )
 		gb_rom16_0000( machine, state->m_ROMMap[ state->m_ROMBank & 0x30 ] );
 	}
 	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
-	memory_set_bankptr( machine, "bank2", state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
+	state->membank( "bank2" )->set_base( state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1_kor)
@@ -1987,7 +1991,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 			m_GBC_RAMBank = data & 0x7;
 			if ( ! m_GBC_RAMBank )
 				m_GBC_RAMBank = 1;
-			memory_set_bankptr (machine(), "bank3", m_GBC_RAMMap[m_GBC_RAMBank]);
+			membank ("bank3")->set_base (m_GBC_RAMMap[m_GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2148,7 +2152,7 @@ WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type1)
 		m_ROMBank = data & m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (machine(), "bank1", m_ROMMap[m_ROMBank]);
+		membank ("bank1")->set_base (m_ROMMap[m_ROMBank]);
 	}
 }
 
@@ -2159,8 +2163,8 @@ WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type2)
 		m_ROMBank = (data << 1) & m_ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( machine(), "bank10", m_ROMMap[m_ROMBank]);
-		memory_set_bankptr( machine(), "bank1", m_ROMMap[m_ROMBank + 1]);
+		membank( "bank10" )->set_base( m_ROMMap[m_ROMBank]);
+		membank( "bank1" )->set_base( m_ROMMap[m_ROMBank + 1]);
 	}
 }
 

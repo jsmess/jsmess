@@ -284,7 +284,7 @@ with different data and be able to select the other entries - not tested on a re
 and not supported by this driver */
 PALETTE_INIT( kccomp )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	color_prom = color_prom+0x018000;
@@ -332,7 +332,7 @@ PALETTE_INIT( aleste )
 	int i;
 
 	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
-	unsigned char* pal = machine.region("user4")->base();
+	unsigned char* pal = machine.root_device().memregion("user4")->base();
 
 	for(i=0; i<32; i++)
 	{
@@ -1173,7 +1173,7 @@ static void amstrad_setLowerRom(running_machine &machine)
 	{
 		if ((state->m_gate_array.mrer & (1<<2)) == 0 && state->m_gate_array.romdis == 0)
 		{
-			bank_base = &machine.region("maincpu")->base()[0x010000];
+			bank_base = &state->memregion("maincpu")->base()[0x010000];
 		}
 		else
 		{
@@ -1182,8 +1182,8 @@ static void amstrad_setLowerRom(running_machine &machine)
 			else
 				bank_base = state->m_AmstradCPC_RamBanks[0];
 		}
-		memory_set_bankptr(machine,"bank1", bank_base);
-		memory_set_bankptr(machine,"bank2", bank_base+0x02000);
+		state->membank("bank1")->set_base(bank_base);
+		state->membank("bank2")->set_base(bank_base+0x02000);
 	}
 	else  // CPC+/GX4000
 	{
@@ -1206,12 +1206,12 @@ static void amstrad_setLowerRom(running_machine &machine)
 
 		if(state->m_AmstradCPC_RamBanks[0] != NULL)
 		{
-			memory_set_bankptr(machine,"bank1", state->m_AmstradCPC_RamBanks[0]);
-			memory_set_bankptr(machine,"bank2", state->m_AmstradCPC_RamBanks[0]+0x2000);
-			memory_set_bankptr(machine,"bank3", state->m_AmstradCPC_RamBanks[1]);
-			memory_set_bankptr(machine,"bank4", state->m_AmstradCPC_RamBanks[1]+0x2000);
-			memory_set_bankptr(machine,"bank5", state->m_AmstradCPC_RamBanks[2]);
-			memory_set_bankptr(machine,"bank6", state->m_AmstradCPC_RamBanks[2]+0x2000);
+			state->membank("bank1")->set_base(state->m_AmstradCPC_RamBanks[0]);
+			state->membank("bank2")->set_base(state->m_AmstradCPC_RamBanks[0]+0x2000);
+			state->membank("bank3")->set_base(state->m_AmstradCPC_RamBanks[1]);
+			state->membank("bank4")->set_base(state->m_AmstradCPC_RamBanks[1]+0x2000);
+			state->membank("bank5")->set_base(state->m_AmstradCPC_RamBanks[2]);
+			state->membank("bank6")->set_base(state->m_AmstradCPC_RamBanks[2]+0x2000);
 		}
 
 		if ( (state->m_gate_array.mrer & (1<<2)) == 0 && state->m_gate_array.romdis == 0)
@@ -1219,35 +1219,35 @@ static void amstrad_setLowerRom(running_machine &machine)
 			if ( state->m_asic.enabled )
 			{
 //              logerror("L-ROM: Lower ROM enabled, cart bank %i\n", state->m_asic.rmr2 & 0x07 );
-				bank_base = &machine.region("maincpu")->base()[0x4000 * ( state->m_asic.rmr2 & 0x07 )];
+				bank_base = &machine.root_device().memregion("maincpu")->base()[0x4000 * ( state->m_asic.rmr2 & 0x07 )];
 				switch( state->m_asic.rmr2 & 0x18 )
 				{
 				case 0x00:
 //                  logerror("L-ROM: located at &0000\n");
-					memory_set_bankptr(machine,"bank1", bank_base);
-					memory_set_bankptr(machine,"bank2", bank_base+0x02000);
+					state->membank("bank1")->set_base(bank_base);
+					state->membank("bank2")->set_base(bank_base+0x02000);
 					break;
 				case 0x08:
 //                  logerror("L-ROM: located at &4000\n");
-					memory_set_bankptr(machine,"bank3", bank_base);
-					memory_set_bankptr(machine,"bank4", bank_base+0x02000);
+					state->membank("bank3")->set_base(bank_base);
+					state->membank("bank4")->set_base(bank_base+0x02000);
 					break;
 				case 0x10:
 //                  logerror("L-ROM: located at &8000\n");
-					memory_set_bankptr(machine,"bank5", bank_base);
-					memory_set_bankptr(machine,"bank6", bank_base+0x02000);
+					state->membank("bank5")->set_base(bank_base);
+					state->membank("bank6")->set_base(bank_base+0x02000);
 					break;
 				case 0x18:
 //                  logerror("L-ROM: located at &0000, ASIC registers enabled\n");
-					memory_set_bankptr(machine,"bank1", bank_base);
-					memory_set_bankptr(machine,"bank2", bank_base+0x02000);
+					state->membank("bank1")->set_base(bank_base);
+					state->membank("bank2")->set_base(bank_base+0x02000);
 					break;
 				}
 			}
 			else
 			{
-				memory_set_bankptr( machine, "bank1", machine.region( "maincpu" )->base() );
-				memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0x2000 );
+				state->membank( "bank1" )->set_base( machine.root_device().memregion( "maincpu" )->base() );
+				state->membank( "bank2" )->set_base( machine.root_device().memregion( "maincpu" )->base() + 0x2000 );
 			}
 		}
 	}
@@ -1277,8 +1277,8 @@ static void amstrad_setUpperRom(running_machine &machine)
 
 	if (bank_base)
 	{
-		memory_set_bankptr(machine,"bank7", bank_base);
-		memory_set_bankptr(machine,"bank8", bank_base+0x2000);
+		state->membank("bank7")->set_base(bank_base);
+		state->membank("bank8")->set_base(bank_base+0x2000);
 	}
 }
 
@@ -1725,37 +1725,37 @@ WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			memory_set_bankptr(machine(),"bank1",ram+ramptr);
-			memory_set_bankptr(machine(),"bank2",ram+ramptr+0x2000);
-			memory_set_bankptr(machine(),"bank9",ram+ramptr);
-			memory_set_bankptr(machine(),"bank10",ram+ramptr+0x2000);
+			membank("bank1")->set_base(ram+ramptr);
+			membank("bank2")->set_base(ram+ramptr+0x2000);
+			membank("bank9")->set_base(ram+ramptr);
+			membank("bank10")->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[0] = ram+ramptr;
 			m_aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			memory_set_bankptr(machine(),"bank3",ram+ramptr);
-			memory_set_bankptr(machine(),"bank4",ram+ramptr+0x2000);
-			memory_set_bankptr(machine(),"bank11",ram+ramptr);
-			memory_set_bankptr(machine(),"bank12",ram+ramptr+0x2000);
+			membank("bank3")->set_base(ram+ramptr);
+			membank("bank4")->set_base(ram+ramptr+0x2000);
+			membank("bank11")->set_base(ram+ramptr);
+			membank("bank12")->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[1] = ram+ramptr;
 			m_aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			memory_set_bankptr(machine(),"bank5",ram+ramptr);
-			memory_set_bankptr(machine(),"bank6",ram+ramptr+0x2000);
-			memory_set_bankptr(machine(),"bank13",ram+ramptr);
-			memory_set_bankptr(machine(),"bank14",ram+ramptr+0x2000);
+			membank("bank5")->set_base(ram+ramptr);
+			membank("bank6")->set_base(ram+ramptr+0x2000);
+			membank("bank13")->set_base(ram+ramptr);
+			membank("bank14")->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[2] = ram+ramptr;
 			m_aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			memory_set_bankptr(machine(),"bank7",ram+ramptr);
-			memory_set_bankptr(machine(),"bank8",ram+ramptr+0x2000);
-			memory_set_bankptr(machine(),"bank15",ram+ramptr);
-			memory_set_bankptr(machine(),"bank16",ram+ramptr+0x2000);
+			membank("bank7")->set_base(ram+ramptr);
+			membank("bank8")->set_base(ram+ramptr+0x2000);
+			membank("bank15")->set_base(ram+ramptr);
+			membank("bank16")->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[3] = ram+ramptr;
 			m_aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
@@ -2314,19 +2314,19 @@ static void amstrad_rethinkMemory(running_machine &machine)
 	{
 		if(state->m_aleste_mode & 0x04)
 		{
-			memory_set_bankptr(machine,"bank3", state->m_Aleste_RamBanks[1]);
-			memory_set_bankptr(machine,"bank4", state->m_Aleste_RamBanks[1]+0x2000);
+			state->membank("bank3")->set_base(state->m_Aleste_RamBanks[1]);
+			state->membank("bank4")->set_base(state->m_Aleste_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			memory_set_bankptr(machine,"bank5", state->m_Aleste_RamBanks[2]);
-			memory_set_bankptr(machine,"bank6", state->m_Aleste_RamBanks[2]+0x2000);
+			state->membank("bank5")->set_base(state->m_Aleste_RamBanks[2]);
+			state->membank("bank6")->set_base(state->m_Aleste_RamBanks[2]+0x2000);
 		}
 		else
 		{
-			memory_set_bankptr(machine,"bank3", state->m_AmstradCPC_RamBanks[1]);
-			memory_set_bankptr(machine,"bank4", state->m_AmstradCPC_RamBanks[1]+0x2000);
+			state->membank("bank3")->set_base(state->m_AmstradCPC_RamBanks[1]);
+			state->membank("bank4")->set_base(state->m_AmstradCPC_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			memory_set_bankptr(machine,"bank5", state->m_AmstradCPC_RamBanks[2]);
-			memory_set_bankptr(machine,"bank6", state->m_AmstradCPC_RamBanks[2]+0x2000);
+			state->membank("bank5")->set_base(state->m_AmstradCPC_RamBanks[2]);
+			state->membank("bank6")->set_base(state->m_AmstradCPC_RamBanks[2]+0x2000);
 		}
 	}
 	else
@@ -2338,25 +2338,25 @@ static void amstrad_rethinkMemory(running_machine &machine)
 	/* other banks */
 	if(state->m_aleste_mode & 0x04)
 	{
-		memory_set_bankptr(machine,"bank9", state->m_Aleste_RamBanks[0]);
-		memory_set_bankptr(machine,"bank10", state->m_Aleste_RamBanks[0]+0x2000);
-		memory_set_bankptr(machine,"bank11", state->m_Aleste_RamBanks[1]);
-		memory_set_bankptr(machine,"bank12", state->m_Aleste_RamBanks[1]+0x2000);
-		memory_set_bankptr(machine,"bank13", state->m_Aleste_RamBanks[2]);
-		memory_set_bankptr(machine,"bank14", state->m_Aleste_RamBanks[2]+0x2000);
-		memory_set_bankptr(machine,"bank15", state->m_Aleste_RamBanks[3]);
-		memory_set_bankptr(machine,"bank16", state->m_Aleste_RamBanks[3]+0x2000);
+		state->membank("bank9")->set_base(state->m_Aleste_RamBanks[0]);
+		state->membank("bank10")->set_base(state->m_Aleste_RamBanks[0]+0x2000);
+		state->membank("bank11")->set_base(state->m_Aleste_RamBanks[1]);
+		state->membank("bank12")->set_base(state->m_Aleste_RamBanks[1]+0x2000);
+		state->membank("bank13")->set_base(state->m_Aleste_RamBanks[2]);
+		state->membank("bank14")->set_base(state->m_Aleste_RamBanks[2]+0x2000);
+		state->membank("bank15")->set_base(state->m_Aleste_RamBanks[3]);
+		state->membank("bank16")->set_base(state->m_Aleste_RamBanks[3]+0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,"bank9", state->m_AmstradCPC_RamBanks[0]);
-		memory_set_bankptr(machine,"bank10", state->m_AmstradCPC_RamBanks[0]+0x2000);
-		memory_set_bankptr(machine,"bank11", state->m_AmstradCPC_RamBanks[1]);
-		memory_set_bankptr(machine,"bank12", state->m_AmstradCPC_RamBanks[1]+0x2000);
-		memory_set_bankptr(machine,"bank13", state->m_AmstradCPC_RamBanks[2]);
-		memory_set_bankptr(machine,"bank14", state->m_AmstradCPC_RamBanks[2]+0x2000);
-		memory_set_bankptr(machine,"bank15", state->m_AmstradCPC_RamBanks[3]);
-		memory_set_bankptr(machine,"bank16", state->m_AmstradCPC_RamBanks[3]+0x2000);
+		state->membank("bank9")->set_base(state->m_AmstradCPC_RamBanks[0]);
+		state->membank("bank10")->set_base(state->m_AmstradCPC_RamBanks[0]+0x2000);
+		state->membank("bank11")->set_base(state->m_AmstradCPC_RamBanks[1]);
+		state->membank("bank12")->set_base(state->m_AmstradCPC_RamBanks[1]+0x2000);
+		state->membank("bank13")->set_base(state->m_AmstradCPC_RamBanks[2]);
+		state->membank("bank14")->set_base(state->m_AmstradCPC_RamBanks[2]+0x2000);
+		state->membank("bank15")->set_base(state->m_AmstradCPC_RamBanks[3]);
+		state->membank("bank16")->set_base(state->m_AmstradCPC_RamBanks[3]+0x2000);
 	}
 
 	/* multiface hardware enabled? */
@@ -2912,7 +2912,7 @@ MACHINE_RESET( amstrad )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -2936,7 +2936,7 @@ MACHINE_RESET( amstrad )
 MACHINE_START( plus )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	state->m_asic.ram = machine.region("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
+	state->m_asic.ram = state->memregion("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	state->m_system_type = SYSTEM_PLUS;
 }
 
@@ -2945,7 +2945,7 @@ MACHINE_RESET( plus )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -2983,7 +2983,7 @@ MACHINE_RESET( plus )
 MACHINE_START( gx4000 )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	state->m_asic.ram = machine.region("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
+	state->m_asic.ram = state->memregion("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	state->m_system_type = SYSTEM_GX4000;
 }
 
@@ -2991,7 +2991,7 @@ MACHINE_RESET( gx4000 )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -3037,7 +3037,7 @@ MACHINE_RESET( kccomp )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -3067,7 +3067,7 @@ MACHINE_RESET( aleste )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -3128,7 +3128,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	int chunksize;                // chunk length, calcaulated from the above
 	int ramblock;                 // 16k RAM block chunk is to be loaded in to
 	unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = image.device().machine().region("maincpu")->base();
+	unsigned char* mem = image.device().machine().root_device().memregion("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{

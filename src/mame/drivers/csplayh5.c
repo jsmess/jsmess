@@ -167,9 +167,9 @@ sound HW is identical to Niyanpai
 
 static void csplayh5_soundbank_w(running_machine &machine, int data)
 {
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	machine.root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
@@ -670,8 +670,8 @@ MACHINE_CONFIG_END
 
 void general_init(running_machine &machine, int patchaddress)
 {
-	UINT16 *MAINROM = (UINT16 *)machine.region("maincpu")->base();
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT16 *MAINROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
 
 	// initialize sound rom bank
 	csplayh5_soundbank_w(machine, 0);

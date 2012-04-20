@@ -394,13 +394,13 @@ READ8_MEMBER(nss_state::m50458_r)
 
 	if(m_m50458_rom_bank)
 	{
-		UINT8 *gfx_rom = machine().region("m50458_gfx")->base();
+		UINT8 *gfx_rom = memregion("m50458_gfx")->base();
 
 		return gfx_rom[offset & 0xfff];
 	}
 	else
 	{
-		UINT8 *gfx_ram = machine().region("m50458_vram")->base();
+		UINT8 *gfx_ram = memregion("m50458_vram")->base();
 
 		return gfx_ram[offset & 0xfff];
 	}
@@ -415,7 +415,7 @@ WRITE8_MEMBER(nss_state::m50458_w)
 		logerror("Warning: write to M50458 GFX ROM!\n");
 	else
 	{
-		UINT8 *gfx_ram = machine().region("m50458_vram")->base();
+		UINT8 *gfx_ram = memregion("m50458_vram")->base();
 
 		gfx_ram[offset & 0xfff] = data;
 	}
@@ -481,7 +481,7 @@ WRITE8_MEMBER(nss_state::port80_w)
     ---- ---x BIOS bankswitch
     */
 
-	memory_set_bank(machine(), "bank1", data & 1);
+	membank("bank1")->set_entry(data & 1);
 	m_m50458_rom_bank = data & 4;
 }
 
@@ -510,10 +510,10 @@ ADDRESS_MAP_END
 static MACHINE_START( nss )
 {
 	nss_state *state = machine.driver_data<nss_state>();
-	UINT8 *ROM = machine.region("bios")->base();
+	UINT8 *ROM = state->memregion("bios")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_m50458_rom_bank = 0;
 

@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
-	memory_set_bankptr(machine(),  "bank3", &m_ram1[0x10000+(data&1)*0x800] );
+	membank("bank3")->set_base(&m_ram1[0x10000+(data&1)*0x800] );
 }
 
 READ8_MEMBER(macs_state::macs_input_r)
@@ -136,14 +136,14 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	memory_set_bankptr(machine(),  "bank1", machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
 	m_st0016_rom_bank=data;
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	switch(offset)
 	{
@@ -158,14 +158,14 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
                       but then MACS2 games locks up. */
-			memory_set_bankptr(machine(),  "bank3", &m_ram1[((data&0x20)>>5)*0x1000+0x000] );
+			membank("bank3")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x000] );
 
 			macs_cart_slot = (data & 0xc) >> 2;
 
-			memory_set_bankptr(machine(),  "bank4", &ROM[macs_cart_slot*0x400000+0x10000] );
+			membank("bank4")->set_base(&ROM[macs_cart_slot*0x400000+0x10000] );
 		}
 
-		memory_set_bankptr(machine(),  "bank2", &m_ram1[((data&0x20)>>5)*0x1000+0x800] );
+		membank("bank2")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x800] );
 		break;
 		case 2: m_mux_data = data; break;
 
@@ -676,11 +676,11 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, machine.region("user1")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, machine.region("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, machine.root_device().memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, machine.root_device().memregion("user1")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, machine.region("user1")->base()+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, machine.region("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, machine.root_device().memregion("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, state->memregion("user1")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -716,10 +716,10 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() + 0x10000 );
-		memory_set_bankptr(machine,  "bank2", macs_ram1+0x800);
-		memory_set_bankptr(machine,  "bank3", macs_ram1+0x10000);
-		memory_set_bankptr(machine,  "bank4", machine.region("maincpu")->base() );
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000 );
+		state->membank("bank2")->set_base(macs_ram1+0x800);
+		state->membank("bank3")->set_base(macs_ram1+0x10000);
+		state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() );
 }
 
 static DRIVER_INIT(macs)

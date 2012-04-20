@@ -316,7 +316,7 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
-	memory_set_bankptr(machine(), tag, data);
+	membank(tag)->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
@@ -328,15 +328,15 @@ void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirro
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
 	astring tempstring;
-	if (machine().region("isa")) {
-		UINT8 *src = machine().region(dev->subtag(tempstring, region))->base();
-		UINT8 *dest = machine().region("isa")->base() + start - 0xc0000;
+	if (machine().root_device().memregion("isa")) {
+		UINT8 *src = memregion(dev->subtag(tempstring, region))->base();
+		UINT8 *dest = memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
 		address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 		space->install_read_bank(start, end, mask, mirror, tag);
 		space->unmap_write(start, end, mask, mirror);
-		memory_set_bankptr(machine(), tag, machine().region(dev->subtag(tempstring, region))->base());
+		membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region))->base());
 	}
 }
 

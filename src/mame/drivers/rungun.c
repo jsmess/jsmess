@@ -220,7 +220,7 @@ WRITE8_MEMBER(rungun_state::z80ctrl_w)
 
 	m_z80_control = data;
 
-	memory_set_bank(machine(), "bank2", data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 
 	if (data & 0x10)
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
@@ -366,9 +366,9 @@ static const k053252_interface rng_k053252_intf =
 static MACHINE_START( rng )
 {
 	rungun_state *state = machine.driver_data<rungun_state>();
-	UINT8 *ROM = machine.region("soundcpu")->base();
+	UINT8 *ROM = state->memregion("soundcpu")->base();
 
-	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");

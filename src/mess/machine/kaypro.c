@@ -48,7 +48,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 	{
 		mem->unmap_readwrite (0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x0fff, "bank1");
-		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 		mem->install_readwrite_handler (0x3000, 0x3fff, read8_delegate(FUNC(kaypro_state::kaypro_videoram_r), this), write8_delegate(FUNC(kaypro_state::kaypro_videoram_w), this));
 	}
 	else
@@ -56,8 +56,8 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 		mem->unmap_readwrite(0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x3fff, "bank2");
 		mem->install_write_bank (0x0000, 0x3fff, "bank3");
-		memory_set_bankptr(machine(), "bank2", machine().region("rambank")->base());
-		memory_set_bankptr(machine(), "bank3", machine().region("rambank")->base());
+		membank("bank2")->set_base(machine().root_device().memregion("rambank")->base());
+		membank("bank3")->set_base(machine().root_device().memregion("rambank")->base());
 	}
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));
@@ -161,15 +161,15 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	{
 		mem->unmap_readwrite (0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x1fff, "bank1");
-		memory_set_bankptr(mem->machine(), "bank1", mem->machine().region("maincpu")->base());
+		membank("bank1")->set_base(mem->machine().root_device().memregion("maincpu")->base());
 	}
 	else
 	{
 		mem->unmap_readwrite (0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x3fff, "bank2");
 		mem->install_write_bank (0x0000, 0x3fff, "bank3");
-		memory_set_bankptr(mem->machine(), "bank2", mem->machine().region("rambank")->base());
-		memory_set_bankptr(mem->machine(), "bank3", mem->machine().region("rambank")->base());
+		membank("bank2")->set_base(mem->machine().root_device().memregion("rambank")->base());
+		membank("bank3")->set_base(mem->machine().root_device().memregion("rambank")->base());
 	}
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));
@@ -375,7 +375,7 @@ QUICKLOAD_LOAD( kayproii )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *RAM = image.device().machine().region("rambank")->base();
+	UINT8 *RAM = state->memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 
@@ -398,7 +398,7 @@ QUICKLOAD_LOAD( kaypro2x )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *RAM = image.device().machine().region("rambank")->base();
+	UINT8 *RAM = state->memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 

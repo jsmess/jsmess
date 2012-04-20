@@ -178,7 +178,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 void vdt911_init(running_machine &machine)
 {
 	UINT8 *base;
-	UINT8 *chr = machine.region(vdt911_chr_region)->base();
+	UINT8 *chr = machine.root_device().memregion(vdt911_chr_region)->base();
 
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;

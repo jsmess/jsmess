@@ -76,18 +76,18 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 	switch( m_u_bank )
 	{
 	case 0x00:	/* RAM */
-		memory_set_bankptr( machine(), "bank1", m_ram_1800 );
+		membank( "bank1" )->set_base( m_ram_1800 );
 		break;
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( machine(), "bank1", machine().region("maincpu")->base() + ( 0x800 * m_u_bank ) );
+		membank( "bank1" )->set_base( memregion("maincpu")->base() + ( 0x800 * m_u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() + 0x4000 * m_q_bank );
+	membank( "bank2" )->set_base( memregion("ram_4000")->base() + 0x4000 * m_q_bank );
 }
 
 
@@ -182,8 +182,8 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 MACHINE_RESET_MEMBER(phunsy_state)
 {
-	memory_set_bankptr( machine(), "bank1", m_ram_1800 );
-	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() );
+	membank( "bank1" )->set_base( m_ram_1800 );
+	membank( "bank2" )->set_base( memregion("ram_4000")->base() );
 
 	m_u_bank = 0;
 	m_q_bank = 0;
@@ -204,7 +204,7 @@ static PALETTE_INIT( phunsy )
 
 VIDEO_START_MEMBER( phunsy_state )
 {
-	m_p_chargen = machine().region( "chargen" )->base();
+	m_p_chargen = memregion( "chargen" )->base();
 }
 
 

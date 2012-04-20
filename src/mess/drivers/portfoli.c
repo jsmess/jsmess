@@ -443,7 +443,7 @@ WRITE8_MEMBER( portfolio_state::ncc1_w )
 	if (BIT(data, 0))
 	{
 		// system ROM
-		UINT8 *rom = machine().region(M80C88A_TAG)->base();
+		UINT8 *rom = memregion(M80C88A_TAG)->base();
 		program->install_rom(0xc0000, 0xdffff, rom);
 	}
 	else
@@ -658,7 +658,7 @@ static PALETTE_INIT( portfolio )
 static READ8_DEVICE_HANDLER( hd61830_rd_r )
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
-	UINT8 data = device->machine().region(HD61830_TAG)->base()[address];
+	UINT8 data = device->machine().root_device().memregion(HD61830_TAG)->base()[address];
 
 	return data;
 }

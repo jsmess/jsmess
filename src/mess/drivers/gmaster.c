@@ -17,7 +17,7 @@ READ8_MEMBER(gmaster_state::gmaster_io_r)
     UINT8 data = 0;
     if (m_gmachine.ports[2] & 1)
 	{
-		data = machine().region("maincpu")->base()[0x4000 + offset];
+		data = memregion("maincpu")->base()[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
     }
 	else
@@ -44,7 +44,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 {
     if (m_gmachine.ports[2] & 1)
 	{
-		machine().region("maincpu")->base()[0x4000 + offset] = data;
+		memregion("maincpu")->base()[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
 	}
 	else

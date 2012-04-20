@@ -380,9 +380,9 @@ static MACHINE_START( galivan )
 	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	UINT8 *rombase = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* register for saving */
 	state->save_item(NAME(state->m_scrollx));
@@ -397,9 +397,9 @@ static MACHINE_START( ninjemak )
 	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	UINT8 *rombase = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* register for saving */
 	state->save_item(NAME(state->m_scrollx));
@@ -1034,9 +1034,9 @@ ROM_END
 WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
 {
 	if (data == 0xff)
-		memory_set_bank(machine(), "bank2", 1);
+		membank("bank2")->set_entry(1);
 	else if (data == 0x00)
-		memory_set_bank(machine(), "bank2", 0);
+		membank("bank2")->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
@@ -1085,11 +1085,11 @@ static DRIVER_INIT( youmab )
 	galivan_state *state = machine.driver_data<galivan_state>();
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),state)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x7fff, "bank3");
-	memory_set_bankptr(machine,  "bank3", machine.region("maincpu")->base());
+	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base());
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 2, machine.region("user2")->base(), 0x4000);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->configure_entries(0, 2, state->memregion("user2")->base(), 0x4000);
+	state->membank("bank2")->set_entry(0);
 
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x81, 0x81, write8_delegate(FUNC(galivan_state::youmab_81_w),state)); // ?? often, alternating values
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x84, 0x84, write8_delegate(FUNC(galivan_state::youmab_84_w),state)); // ?? often, sequence..

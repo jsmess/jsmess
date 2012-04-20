@@ -64,8 +64,8 @@ void comx_epr_device::device_start()
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
-	m_rom = subregion("f800")->base();
-	m_eprom = subregion("eprom")->base();
+	m_rom = memregion("f800")->base();
+	m_eprom = memregion("eprom")->base();
 
 	// state saving
 	save_item(NAME(m_select));

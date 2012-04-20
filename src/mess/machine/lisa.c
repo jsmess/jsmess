@@ -1002,8 +1002,8 @@ void init_lisa1(void)
 DRIVER_INIT( lisa2 )
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.region("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = machine.region("maincpu")->base() + ROM_OFFSET;
+	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
 	state->m_model = lisa2;
 	state->m_features.has_fast_timers = 0;
 	state->m_features.floppy_hardware = sony_lisa2;
@@ -1016,8 +1016,8 @@ DRIVER_INIT( lisa2 )
 DRIVER_INIT( lisa210 )
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.region("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = machine.region("maincpu")->base() + ROM_OFFSET;
+	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
 	state->m_model = lisa210;
 	state->m_features.has_fast_timers = 1;
 	state->m_features.floppy_hardware = sony_lisa210;
@@ -1030,8 +1030,8 @@ DRIVER_INIT( lisa210 )
 DRIVER_INIT( mac_xl )
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.region("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = machine.region("maincpu")->base() + ROM_OFFSET;
+	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
 	state->m_model = mac_xl;
 	state->m_features.has_fast_timers = 1;
 	state->m_features.floppy_hardware = sony_lisa210;
@@ -1053,9 +1053,9 @@ MACHINE_START( lisa )
 MACHINE_RESET( lisa )
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.region("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = machine.region("maincpu")->base() + ROM_OFFSET;
-	state->m_videoROM_ptr = machine.region("gfx1")->base();
+	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	state->m_rom_ptr = machine.root_device().memregion("maincpu")->base() + ROM_OFFSET;
+	state->m_videoROM_ptr = state->memregion("gfx1")->base();
 
 //  machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
 //  m68k_set_reset_callback(machine.device("maincpu"), /*lisa_reset_instr_callback*/NULL);

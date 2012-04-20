@@ -59,9 +59,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine(), "bank1", BANK_VIDEO_RAM);
-			memory_set_bank(machine(), "bank2", BANK_VIDEO_RAM);
-			memory_set_bank(machine(), "bank3", BANK_RAM);
+			membank("bank1")->set_entry(BANK_VIDEO_RAM);
+			membank("bank2")->set_entry(BANK_VIDEO_RAM);
+			membank("bank3")->set_entry(BANK_RAM);
 		}
 	}
 	else
@@ -74,9 +74,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine(), "bank1", BANK_ROM);
-			memory_set_bank(machine(), "bank2", BANK_RAM);
-			memory_set_bank(machine(), "bank3", BANK_RAM);
+			membank("bank1")->set_entry(BANK_ROM);
+			membank("bank2")->set_entry(BANK_RAM);
+			membank("bank3")->set_entry(BANK_RAM);
 		}
 		else
 		{
@@ -85,9 +85,9 @@ void tiki100_state::bankswitch()
 			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
 
-			memory_set_bank(machine(), "bank1", BANK_RAM);
-			memory_set_bank(machine(), "bank2", BANK_RAM);
-			memory_set_bank(machine(), "bank3", BANK_RAM);
+			membank("bank1")->set_entry(BANK_RAM);
+			membank("bank2")->set_entry(BANK_RAM);
+			membank("bank3")->set_entry(BANK_RAM);
 		}
 	}
 }
@@ -554,14 +554,14 @@ void tiki100_state::machine_start()
 	/* setup memory banking */
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", BANK_ROM, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", BANK_RAM, 1, ram, 0);
-	memory_configure_bank(machine(), "bank1", BANK_VIDEO_RAM, 1, m_video_ram, 0);
+	membank("bank1")->configure_entry(BANK_ROM, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(BANK_RAM, ram);
+	membank("bank1")->configure_entry(BANK_VIDEO_RAM, m_video_ram);
 
-	memory_configure_bank(machine(), "bank2", BANK_RAM, 1, ram + 0x4000, 0);
-	memory_configure_bank(machine(), "bank2", BANK_VIDEO_RAM, 1, m_video_ram + 0x4000, 0);
+	membank("bank2")->configure_entry(BANK_RAM, ram + 0x4000);
+	membank("bank2")->configure_entry(BANK_VIDEO_RAM, m_video_ram + 0x4000);
 
-	memory_configure_bank(machine(), "bank3", BANK_RAM, 1, ram + 0x8000, 0);
+	membank("bank3")->configure_entry(BANK_RAM, ram + 0x8000);
 
 	bankswitch();
 

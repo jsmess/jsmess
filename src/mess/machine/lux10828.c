@@ -429,7 +429,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_sel1));
 
 	// patch out protection checks
-	UINT8 *rom = subregion("abc830")->base();
+	UINT8 *rom = memregion("abc830")->base();
 	rom[0x00fa] = 0xff;
 	rom[0x0336] = 0xff;
 	rom[0x0718] = 0xff;

@@ -139,7 +139,7 @@ static TIMER_CALLBACK( capbowl_update )
 WRITE8_MEMBER(capbowl_state::capbowl_rom_select_w)
 {
 	// 2009-11 FP: shall we add a check to be sure that bank < 6?
-	memory_set_bank(machine(), "bank1", ((data & 0x0c) >> 1) + (data & 0x01));
+	membank("bank1")->set_entry(((data & 0x0c) >> 1) + (data & 0x01));
 }
 
 
@@ -499,10 +499,10 @@ ROM_END
 
 static DRIVER_INIT( capbowl )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
-	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
 

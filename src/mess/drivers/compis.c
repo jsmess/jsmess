@@ -86,7 +86,7 @@ static SCREEN_UPDATE_IND16( compis2 ) // temporary
 {
 	compis_state *state = screen.machine().driver_data<compis_state>();
 	UINT8 *m_p_chargen;
-	m_p_chargen = screen.machine().region("maincpu")->base()+0xca70; //bios0
+	m_p_chargen = state->memregion("maincpu")->base()+0xca70; //bios0
 	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;

@@ -147,7 +147,7 @@ READ8_MEMBER( fp1100_state::fp1100_mem_r )
 {
 	if(m_mem_bank == 0 && offset <= 0x8fff)
 	{
-		UINT8 *ipl = machine().region("ipl")->base();
+		UINT8 *ipl = memregion("ipl")->base();
 		return ipl[offset];
 	}
 

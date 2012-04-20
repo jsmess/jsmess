@@ -77,7 +77,7 @@ void bw12_state::bankswitch()
 		break;
 	}
 
-	memory_set_bank(machine(), "bank1", m_bank);
+	membank("bank1")->set_entry(m_bank);
 }
 
 void bw12_state::floppy_motor_off()
@@ -405,7 +405,7 @@ static const mc6845_interface bw12_mc6845_interface =
 void bw12_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 /* UPD765 Interface */
@@ -634,9 +634,9 @@ static AY3600_INTERFACE( bw12_ay3600_intf )
 void bw12_state::machine_start()
 {
 	/* setup memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, m_ram->pointer(), 0);
-	memory_configure_bank(machine(), "bank1", 2, 2, m_ram->pointer() + 0x10000, 0x8000);
+	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(1, m_ram->pointer());
+	membank("bank1")->configure_entries(2, 2, m_ram->pointer() + 0x10000, 0x8000);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));

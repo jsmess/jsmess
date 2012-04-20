@@ -19,10 +19,11 @@
 DRIVER_INIT(ut88)
 {
 	/* set initially ROM to be visible on first bank */
-	UINT8 *RAM = machine.region("maincpu")->base();
+	ut88_state *state = machine.driver_data<ut88_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make first page empty by default
-	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
+	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
 }
 
 READ8_MEMBER( ut88_state::ut88_8255_portb_r )
@@ -62,14 +63,15 @@ I8255A_INTERFACE( ut88_ppi8255_interface )
 
 static TIMER_CALLBACK( ut88_reset )
 {
-	memory_set_bank(machine, "bank1", 0);
+	ut88_state *state = machine.driver_data<ut88_state>();
+	state->membank("bank1")->set_entry(0);
 }
 
 MACHINE_RESET( ut88 )
 {
 	ut88_state *state = machine.driver_data<ut88_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 	state->m_keyboard_mask = 0;
 }
 
@@ -101,8 +103,8 @@ READ8_MEMBER( ut88_state::ut88_tape_r )
 READ8_MEMBER( ut88_state::ut88mini_keyboard_r )
 {
 	// This is real keyboard implementation
-	UINT8 *keyrom1 = machine().region("proms")->base();
-	UINT8 *keyrom2 = machine().region("proms")->base()+100;
+	UINT8 *keyrom1 = memregion("proms")->base();
+	UINT8 *keyrom2 = memregion("proms")->base()+100;
 
 	UINT8 key = keyrom2[input_port_read(machine(), "LINE1")];
 

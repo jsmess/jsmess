@@ -77,7 +77,7 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	flip_screen_set(~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	memory_set_bank(machine(), "bank1", (data & 0x06) >> 1);
+	membank("bank1")->set_entry((data & 0x06) >> 1);
 
 	/* bit 3 enables NMI */
 	m_nmi_mask = data & 8;
@@ -748,9 +748,9 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( lwings )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_bg2_image));
 	state->save_item(NAME(state->m_scroll_x));

@@ -380,7 +380,7 @@ static void tmaster_draw(running_machine &machine)
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	machine.region( "blitter" )->base() + state->m_gfx_offs;
+	UINT8 *gfxdata	=	state->memregion( "blitter" )->base() + state->m_gfx_offs;
 
 	UINT16 pen;
 
@@ -642,12 +642,12 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 // Sound
 READ16_MEMBER(tmaster_state::galgames_okiram_r)
 {
-	return machine().region("oki")->base()[offset] | 0xff00;
+	return memregion("oki")->base()[offset] | 0xff00;
 }
 WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().region("oki")->base()[offset] = data & 0xff;
+		memregion("oki")->base()[offset] = data & 0xff;
 }
 
 // Carts (preliminary, PIC communication is not implemented)
@@ -659,10 +659,10 @@ static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 
 	state->m_gfx_offs = 0x200000 * cart;
 
-	if (machine.memory().bank(GALGAMES_BANK_000000_R) == GALGAMES_RAM)
-		memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	if (state->membank(GALGAMES_BANK_000000_R)->entry() == GALGAMES_RAM)
+		state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 
-	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 }
 
 WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
@@ -712,14 +712,14 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			memory_set_bank(machine(), GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);	// ram
 			galgames_update_rombank(machine(), m_galgames_cart);
 			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 		else
 		{
-			memory_set_bank(machine(), GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
-			memory_set_bank(machine(), GALGAMES_BANK_200000_R, GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);	// ram
 			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 	}
@@ -882,7 +882,7 @@ static MACHINE_RESET( tmaster )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	state->m_gfx_offs = 0;
-	state->m_gfx_size = machine.region("blitter")->bytes();
+	state->m_gfx_size = state->memregion("blitter")->bytes();
 
 	state->m_duart68681 = machine.device( "duart68681" );
 }
@@ -951,13 +951,13 @@ static MACHINE_RESET( galgames )
 	state->m_gfx_offs = 0;
 	state->m_gfx_size = 0x200000;
 
-	memory_set_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
-	memory_set_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM);		// ram
-	memory_set_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
 
 	galgames_update_rombank(machine, 0);
 
@@ -1621,7 +1621,7 @@ ROM_END
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1642,7 +1642,7 @@ Protection resembles that of tm5k rather than tm4ka:
 
 static DRIVER_INIT( tm4ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1664,7 +1664,7 @@ Protection starts:
 
 static DRIVER_INIT( tm4kb )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1685,7 +1685,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1708,7 +1708,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5kca )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1720,7 +1720,7 @@ static DRIVER_INIT( tm5kca )
 
 static DRIVER_INIT( tm5ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1741,7 +1741,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1764,7 +1764,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1787,7 +1787,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1810,7 +1810,7 @@ Protection starts:
 
 static DRIVER_INIT( tm8k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1834,41 +1834,41 @@ Protection starts:
 static DRIVER_INIT( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	UINT8 *ROM	=	machine.region("maincpu")->base();
+	UINT8 *ROM	=	machine.root_device().memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
 	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
-	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
+	state->membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
-	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
+	state->membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	memory_configure_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0, 1, ROM+0x040000, 0x1c0000);
+	state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
 
 	// More ROM banks at 0x200000-0x3fffff (carts)
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = machine.region("maincpu")->base();
+		UINT8 *CART = machine.root_device().memregion("maincpu")->base();
 
-		if  (0x200000 * (cart+1) <= machine.region("maincpu")->bytes())
+		if  (0x200000 * (cart+1) <= state->memregion("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
-		memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0+cart, 1, CART,          0x40000);
-		memory_configure_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0+cart, 1, CART+0x040000, 0x1c0000);
+		state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
+		state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
 	}
 }
 
 static DRIVER_INIT( galgame2 )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

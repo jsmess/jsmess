@@ -199,7 +199,7 @@ static void fake_keyboard_data(running_machine &machine)
 
 static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = machine.region("vram")->base();
+	UINT8 *vram = machine.root_device().memregion("vram")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -231,8 +231,8 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *vram = machine.region("vram")->base();
-	UINT8 *gfx_data = machine.region("font")->base();
+	UINT8 *vram = machine.root_device().memregion("vram")->base();
+	UINT8 *gfx_data = state->memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -290,8 +290,8 @@ static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *vram = machine.region("vram")->base();
-	UINT8 *gfx_data = machine.region("font")->base();
+	UINT8 *vram = machine.root_device().memregion("vram")->base();
+	UINT8 *gfx_data = state->memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -391,12 +391,12 @@ static SCREEN_UPDATE_IND16( pasopia7 )
 
 READ8_MEMBER( pasopia7_state::vram_r )
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	UINT8 res;
 
 	if (m_vram_sel == 0)
 	{
-		UINT8 *work_ram = machine().region("maincpu")->base();
+		UINT8 *work_ram = memregion("maincpu")->base();
 
 		return work_ram[offset+0x8000];
 	}
@@ -421,7 +421,7 @@ READ8_MEMBER( pasopia7_state::vram_r )
 
 WRITE8_MEMBER( pasopia7_state::vram_w )
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	if (m_vram_sel)
 	{
@@ -444,7 +444,7 @@ WRITE8_MEMBER( pasopia7_state::vram_w )
 	}
 	else
 	{
-		UINT8 *work_ram = machine().region("maincpu")->base();
+		UINT8 *work_ram = memregion("maincpu")->base();
 
 		work_ram[offset+0x8000] = data;
 	}
@@ -452,23 +452,23 @@ WRITE8_MEMBER( pasopia7_state::vram_w )
 
 WRITE8_MEMBER( pasopia7_state::pasopia7_memory_ctrl_w )
 {
-	UINT8 *work_ram = machine().region("maincpu")->base();
-	UINT8 *basic = machine().region("basic")->base();
+	UINT8 *work_ram = memregion("maincpu")->base();
+	UINT8 *basic = memregion("basic")->base();
 
 	switch(data & 3)
 	{
 		case 0:
 		case 3: //select Basic ROM
-			memory_set_bankptr(machine(), "bank1", basic    + 0x00000);
-			memory_set_bankptr(machine(), "bank2", basic    + 0x04000);
+			membank("bank1")->set_base(basic    + 0x00000);
+			membank("bank2")->set_base(basic    + 0x04000);
 			break;
 		case 1: //select Basic ROM + BIOS ROM
-			memory_set_bankptr(machine(), "bank1", basic    + 0x00000);
-			memory_set_bankptr(machine(), "bank2", work_ram + 0x10000);
+			membank("bank1")->set_base(basic    + 0x00000);
+			membank("bank2")->set_base(work_ram + 0x10000);
 			break;
 		case 2: //select Work RAM
-			memory_set_bankptr(machine(), "bank1", work_ram + 0x00000);
-			memory_set_bankptr(machine(), "bank2", work_ram + 0x04000);
+			membank("bank1")->set_base(work_ram + 0x00000);
+			membank("bank2")->set_base(work_ram + 0x04000);
 			break;
 	}
 
@@ -510,7 +510,7 @@ WRITE8_MEMBER( pasopia7_state::pac2_w )
 			{
 				UINT8 *pac2_ram;
 
-				pac2_ram = machine().region(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
+				pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
 				pac2_ram[m_pac2_index[(m_pac2_bank_select-3) & 1]] = data;
 			}
@@ -545,13 +545,13 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 		{
 			UINT8 *pac2_ram;
 
-			pac2_ram = machine().region(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
+			pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
 			return pac2_ram[m_pac2_index[(m_pac2_bank_select-3) & 1]];
 		}
 		else if(m_pac2_bank_select == 2)
 		{
-			UINT8 *kanji_rom = machine().region("kanji")->base();
+			UINT8 *kanji_rom = memregion("kanji")->base();
 
 			return kanji_rom[m_kanji_index];
 		}
@@ -567,7 +567,7 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
 WRITE8_MEMBER( pasopia7_state::ram_bank_w )
 {
-	UINT8 *work_ram = machine().region("maincpu")->base();
+	UINT8 *work_ram = memregion("maincpu")->base();
 
 	work_ram[offset] = data;
 }
@@ -991,12 +991,12 @@ static I8255_INTERFACE( ppi8255_intf_2 )
 static MACHINE_RESET( pasopia7 )
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *bios = machine.region("maincpu")->base();
+	UINT8 *bios = state->memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", bios + 0x10000);
-	memory_set_bankptr(machine, "bank2", bios + 0x10000);
-//  memory_set_bankptr(machine, "bank3", bios + 0x10000);
-//  memory_set_bankptr(machine, "bank4", bios + 0x10000);
+	state->membank("bank1")->set_base(bios + 0x10000);
+	state->membank("bank2")->set_base(bios + 0x10000);
+//  state->membank("bank3")->set_base(bios + 0x10000);
+//  state->membank("bank4")->set_base(bios + 0x10000);
 
 	state->m_nmi_reset |= 4;
 }

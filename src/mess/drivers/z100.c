@@ -814,7 +814,7 @@ ROM_END
 
 static DRIVER_INIT( z100 )
 {
-	UINT8 *ROM = machine.region("ipl")->base();
+	UINT8 *ROM = machine.root_device().memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;

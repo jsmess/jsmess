@@ -218,7 +218,7 @@ static void microtan_set_cpu_regs(running_machine &machine,const UINT8 *snapshot
 static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buff, int snapshot_size)
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
-    UINT8 *RAM = machine.region("maincpu")->base();
+    UINT8 *RAM = state->memregion("maincpu")->base();
     address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
     via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
     via6522_device *via_1 = machine.device<via6522_device>("via6522_1");

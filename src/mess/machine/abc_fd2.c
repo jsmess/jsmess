@@ -220,7 +220,7 @@ UINT8 abc_fd2_device::abcbus_xmemfl(offs_t offset)
 
 	if (offset >= 0x6000 && offset < 0x6400) // TODO is this mirrored?
 	{
-		data = subregion("abc80")->base()[offset & 0x3ff];
+		data = memregion("abc80")->base()[offset & 0x3ff];
 	}
 
 	return data;

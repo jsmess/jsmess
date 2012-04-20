@@ -846,7 +846,7 @@ READ8_MEMBER( abc1600_state::mac_r )
 	if (!BOOTE && !A19 && !A18 && !A17)
 	{
 		// _BOOTCE
-		UINT8 *rom = machine().region(MC68008P8_TAG)->base();
+		UINT8 *rom = memregion(MC68008P8_TAG)->base();
 		data = rom[offset & 0x3fff];
 	}
 	else if (A19 && !m_ifc2 && !FC1)

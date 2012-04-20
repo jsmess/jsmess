@@ -249,7 +249,7 @@ static void towns_update_kanji_offset(running_machine &machine)
 
 READ8_MEMBER( towns_state::towns_video_cff80_r )
 {
-	UINT8* ROM = space.machine().region("user")->base();
+	UINT8* ROM = space.machine().root_device().memregion("user")->base();
 
 	switch(offset)
 	{
@@ -592,7 +592,7 @@ READ32_MEMBER(towns_state::towns_video_unknown_r)
 READ8_MEMBER(towns_state::towns_spriteram_low_r)
 {
 	UINT8* RAM = m_messram->pointer();
-	UINT8* ROM = space.machine().region("user")->base();
+	UINT8* ROM = space.machine().root_device().memregion("user")->base();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
@@ -1655,7 +1655,7 @@ static void render_text_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 a
 	UINT8 colour;
 	UINT8 data;
 	UINT8 temp;
-	UINT8* font_rom = machine.region("user")->base();
+	UINT8* font_rom = state->memregion("user")->base();
 	int a,b;
 
 	// all characters are 16 pixels high

@@ -29,7 +29,7 @@ void mc1000_state::bankswitch()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
-	memory_set_bank(machine(), "bank2", m_mc6845_bank);
+	membank("bank2")->set_entry(m_mc6845_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
@@ -58,7 +58,7 @@ void mc1000_state::bankswitch()
 		program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 	}
 
-	memory_set_bank(machine(), "bank4", m_mc6847_bank);
+	membank("bank4")->set_entry(m_mc6847_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
@@ -326,29 +326,29 @@ void mc1000_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	UINT8 *rom = machine().region(Z80_TAG)->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 
 	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, rom + 0xc000, 0);
-	memory_set_bank(machine(), "bank1", 1);
+	membank("bank1")->configure_entry(0, rom);
+	membank("bank1")->configure_entry(1, rom + 0xc000);
+	membank("bank1")->set_entry(1);
 
 	m_rom0000 = 1;
 
 	program->install_readwrite_bank(0x2000, 0x27ff, "bank2");
-	memory_configure_bank(machine(), "bank2", 0, 1, rom + 0x2000, 0);
-	memory_configure_bank(machine(), "bank2", 1, 1, m_mc6845_video_ram, 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank2")->configure_entry(0, rom + 0x2000);
+	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
+	membank("bank2")->set_entry(0);
 
-	memory_configure_bank(machine(), "bank3", 0, 1, rom + 0x4000, 0);
-	memory_set_bank(machine(), "bank3", 0);
+	membank("bank3")->configure_entry(0, rom + 0x4000);
+	membank("bank3")->set_entry(0);
 
-	memory_configure_bank(machine(), "bank4", 0, 1, m_mc6847_video_ram, 0);
-	memory_configure_bank(machine(), "bank4", 1, 1, rom + 0x8000, 0);
-	memory_set_bank(machine(), "bank4", 0);
+	membank("bank4")->configure_entry(0, m_mc6847_video_ram);
+	membank("bank4")->configure_entry(1, rom + 0x8000);
+	membank("bank4")->set_entry(0);
 
-	memory_configure_bank(machine(), "bank5", 0, 1, rom + 0x9800, 0);
-	memory_set_bank(machine(), "bank5", 0);
+	membank("bank5")->configure_entry(0, rom + 0x9800);
+	membank("bank5")->set_entry(0);
 
 	bankswitch();
 
@@ -363,7 +363,7 @@ void mc1000_state::machine_start()
 
 void mc1000_state::machine_reset()
 {
-	memory_set_bank(machine(), "bank1", 1);
+	membank("bank1")->set_entry(1);
 
 	m_rom0000 = 1;
 }
@@ -488,7 +488,7 @@ DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
 	{
 		if (address >= 0xc000)
 		{
-			memory_set_bank(machine(), "bank1", 0);
+			membank("bank1")->set_entry(0);
 			m_rom0000 = 0;
 		}
 	}

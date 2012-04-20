@@ -640,8 +640,8 @@ void sb2m600_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());
+	membank("bank1")->set_entry(0);
 
 	switch (m_ram->size())
 	{
@@ -665,8 +665,8 @@ void c1p_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());
+	membank("bank1")->set_entry(0);
 
 	switch (m_ram->size())
 	{

@@ -242,7 +242,7 @@ static MACHINE_START( palmz22 )
 	palmz22_state *state = machine.driver_data<palmz22_state>();
 	state->m_s3c2410 = machine.device( "s3c2410");
 	state->m_nand = machine.device<nand_device>("nand");
-	state->m_nand->set_data_ptr( machine.region("nand")->base());
+	state->m_nand->set_data_ptr( state->memregion("nand")->base());
 }
 
 static MACHINE_RESET( palmz22 )

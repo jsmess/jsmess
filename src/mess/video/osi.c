@@ -59,7 +59,7 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = memregion("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -92,7 +92,7 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				UINT8 videoram_data = m_video_ram[videoram_addr];
 				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
+				UINT8 charrom_data = memregion("chargen")->base()[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -132,7 +132,7 @@ UINT32 uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			UINT8 videoram_data = m_video_ram[videoram_addr++];
 			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-			UINT8 charrom_data = machine().region("chargen")->base()[charrom_addr];
+			UINT8 charrom_data = memregion("chargen")->base()[charrom_addr];
 
 			for (bit = 0; bit < 8; bit++)
 			{

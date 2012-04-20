@@ -39,7 +39,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(codata)
 {
 	codata_state *state = machine.driver_data<codata_state>();
-	UINT8* RAM = machine.region("user1")->base();
+	UINT8* RAM = state->memregion("user1")->base();
 	memcpy(state->m_p_base, RAM, 16);
 	machine.device("maincpu")->reset();
 }

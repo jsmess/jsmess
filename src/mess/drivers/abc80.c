@@ -350,7 +350,7 @@ READ8_MEMBER( abc80_state::read )
 	}
 	else if (!(mmu & MMU_ROM))
 	{
-		data = machine().region(Z80_TAG)->base()[offset & 0x3fff];
+		data = memregion(Z80_TAG)->base()[offset & 0x3fff];
 	}
 	else if (mmu & MMU_VRAMS)
 	{
@@ -664,7 +664,7 @@ static ABC80_KEYBOARD_INTERFACE( kb_intf )
 void abc80_state::machine_start()
 {
 	// find memory regions
-	m_mmu_rom = machine().region("mmu")->base();
+	m_mmu_rom = memregion("mmu")->base();
 
 	// register for state saving
 	save_item(NAME(m_key_data));

@@ -112,7 +112,7 @@ void a2bus_scsi_device::device_start()
 	set_a2bus_device();
 
 	astring tempstring;
-	m_rom = device().machine().region(this->subtag(tempstring, SCSI_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, SCSI_ROM_REGION))->base();
 
     memset(m_ram, 0, 8192);
 

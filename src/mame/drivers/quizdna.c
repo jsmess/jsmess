@@ -18,14 +18,14 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 
 WRITE8_MEMBER(quizdna_state::quizdna_rombank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
-	memory_set_bankptr(machine(), "bank1",&ROM[0x10000+0x4000*(data & 0x3f)]);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0x10000+0x4000*(data & 0x3f)]);
 }
 
 WRITE8_MEMBER(quizdna_state::gekiretu_rombank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
-	memory_set_bankptr(machine(), "bank1",&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
 }
 
 /****************************************************************************/

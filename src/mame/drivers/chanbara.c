@@ -88,7 +88,7 @@ public:
 
 static PALETTE_INIT( chanbara )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -357,7 +357,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 	state->flip_screen_set(data & 0x02);
 
-	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
+	state->membank("bank1")->set_entry((data & 0x04) >> 2);
 
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
@@ -471,9 +471,9 @@ ROM_END
 
 static DRIVER_INIT(chanbara )
 {
-	UINT8	*src = machine.region("gfx4")->base();
-	UINT8	*dst = machine.region("gfx3")->base() + 0x4000;
-	UINT8	*bg = machine.region("user1")->base();
+	UINT8	*src = machine.root_device().memregion("gfx4")->base();
+	UINT8	*dst = machine.root_device().memregion("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine.root_device().memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)
@@ -484,7 +484,7 @@ static DRIVER_INIT(chanbara )
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 2, &bg[0x0000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

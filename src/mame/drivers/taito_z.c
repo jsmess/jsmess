@@ -1417,7 +1417,7 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
 static void reset_sound_region( running_machine &machine )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	memory_set_bank(machine,  "bank10", state->m_banknum);
+	state->membank("bank10")->set_entry(state->m_banknum);
 }
 
 WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
@@ -3060,9 +3060,9 @@ static MACHINE_START( bshark )
 
 static MACHINE_START( taitoz )
 {
-	int banks = (machine.region("audiocpu")->bytes() - 0xc000) / 0x4000;
+	int banks = (machine.root_device().memregion("audiocpu")->bytes() - 0xc000) / 0x4000;
 
-	memory_configure_bank(machine, "bank10", 0, banks, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	machine.root_device().membank("bank10")->configure_entries(0, banks, machine.root_device().memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(taitoz_postload), &machine));
 

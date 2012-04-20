@@ -1039,7 +1039,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 			value = input_port_read(machine(), "PAUSE");
 			break;
 		case RCART:
-			value = *(machine().region("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
+			value = *(machine().root_device().memregion("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
 			break;
 		//case RCART_BANK1: /* we need bank 1 emulation!!! */
@@ -1917,11 +1917,11 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 	}
 
 	if (data & 1)
-		memory_set_bankptr(machine(), "bank1", m_mem_fc00);
+		membank("bank1")->set_base(m_mem_fc00);
 	if (data & 2)
-		memory_set_bankptr(machine(), "bank2", m_mem_fd00);
-	memory_set_bank(machine(), "bank3", (data & 4) ? 1 : 0);
-	memory_set_bank(machine(), "bank4", (data & 8) ? 1 : 0);
+		membank("bank2")->set_base(m_mem_fd00);
+	membank("bank3")->set_entry((data & 4) ? 1 : 0);
+	membank("bank4")->set_entry((data & 8) ? 1 : 0);
 }
 
 static void lynx_reset(running_machine &machine)
@@ -1972,10 +1972,10 @@ MACHINE_START( lynx )
 	state->save_pointer(NAME(state->m_mem_fe00.target()), state->m_mem_fe00.bytes());
 	machine.save().register_postload(save_prepost_delegate(FUNC(lynx_postload), state));
 
-	memory_configure_bank(machine, "bank3", 0, 1, machine.region("maincpu")->base() + 0x0000, 0);
-	memory_configure_bank(machine, "bank3", 1, 1, state->m_mem_fe00, 0);
-	memory_configure_bank(machine, "bank4", 0, 1, machine.region("maincpu")->base() + 0x01fa, 0);
-	memory_configure_bank(machine, "bank4", 1, 1, state->m_mem_fffa, 0);
+	state->membank("bank3")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + 0x0000);
+	state->membank("bank3")->configure_entry(1, state->m_mem_fe00);
+	state->membank("bank4")->configure_entry(0, state->memregion("maincpu")->base() + 0x01fa);
+	state->membank("bank4")->configure_entry(1, state->m_mem_fffa);
 
 	state->m_audio = machine.device("custom");
 
@@ -2044,7 +2044,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
     512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
 
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
-	UINT8 *rom = image.device().machine().region("user1")->base();
+	UINT8 *rom = state->memregion("user1")->base();
 	UINT32 size;
 	UINT8 header[0x40];
 

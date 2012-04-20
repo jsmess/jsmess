@@ -199,9 +199,9 @@ WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
 	}
 
 	if (data & 0x10)
-		memory_set_bank(machine(), "bank1", (data & 0x0e) >> 1);
+		membank("bank1")->set_entry((data & 0x0e) >> 1);
 	else
-		memory_set_bank(machine(), "bank1", 8 + (data & 1));
+		membank("bank1")->set_entry(8 + (data & 1));
 }
 
 WRITE8_MEMBER(combatsc_state::combatscb_io_w)
@@ -237,13 +237,13 @@ WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
 		m_bank_select = data;
 
 		if (data & 0x10)
-			memory_set_bank(machine(), "bank1", (data & 0x0e) >> 1);
+			membank("bank1")->set_entry((data & 0x0e) >> 1);
 		else
-			memory_set_bank(machine(), "bank1", 8 + (data & 1));
+			membank("bank1")->set_entry(8 + (data & 1));
 
 		if (data == 0x1f)
 		{
-			memory_set_bank(machine(), "bank1", 8 + (data & 1));
+			membank("bank1")->set_entry(8 + (data & 1));
 			space.install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(combatsc_state::combatscb_io_w),this));
 			space.install_read_handler(0x4400, 0x4403, read8_delegate(FUNC(combatsc_state::combatscb_io_r),this));/* IO RAM & Video Registers */
 		}
@@ -690,7 +690,7 @@ static const ym2203_interface ym2203_bootleg_config =
 static MACHINE_START( combatsc )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
-	UINT8 *MEM = machine.region("maincpu")->base() + 0x38000;
+	UINT8 *MEM = machine.root_device().memregion("maincpu")->base() + 0x38000;
 
 	state->m_io_ram  = MEM + 0x0000;
 	state->m_page[0] = MEM + 0x4000;
@@ -702,7 +702,7 @@ static MACHINE_START( combatsc )
 	state->m_k007121_1 = machine.device("k007121_1");
 	state->m_k007121_2 = machine.device("k007121_2");
 
-	memory_configure_bank(machine, "bank1", 0, 10, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 10, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_priority));
 	state->save_item(NAME(state->m_vreg));

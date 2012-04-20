@@ -63,7 +63,7 @@ static MACHINE_RESET( zexall )
 {
 // rom is self-modifying, so need to refresh it on each run
 	zexall_state *state = machine.driver_data<zexall_state>();
-	UINT8 *rom = machine.region("romcode")->base();
+	UINT8 *rom = state->memregion("romcode")->base();
 	UINT8 *ram = state->m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);

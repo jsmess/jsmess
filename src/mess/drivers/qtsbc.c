@@ -66,7 +66,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(qtsbc_state)
 {
-	UINT8* bios = machine().region("maincpu")->base()+0x10000;
+	UINT8* bios = memregion("maincpu")->base()+0x10000;
 	memcpy(m_p_ram, bios, 0x800);
 }
 

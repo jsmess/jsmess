@@ -265,7 +265,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	bitmap.fill(machine().pens[0x100], cliprect);
 
@@ -609,7 +609,7 @@ void a7000_state::viddma_transfer_start()
 	UINT32 dst = 0;
 	UINT32 size = m_viddma_addr_end;
 	UINT32 dma_index;
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)

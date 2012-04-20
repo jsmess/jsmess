@@ -110,15 +110,15 @@ void cpc_multiface2_device::multiface_rethink_memory()
 		return;
 
 	t.cat(":multiface");
-	multiface_rom = machine().region(t)->base();
+	multiface_rom = memregion(t)->base();
 
 	if ((m_multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0 && m_romdis != 0)
 	{
 		/* set bank addressess */
-		memory_set_bankptr(machine(),"bank1", multiface_rom);
-		memory_set_bankptr(machine(),"bank2", m_multiface_ram);
-		memory_set_bankptr(machine(),"bank9", multiface_rom);
-		memory_set_bankptr(machine(),"bank10", m_multiface_ram);
+		membank("bank1")->set_base(multiface_rom);
+		membank("bank2")->set_base(m_multiface_ram);
+		membank("bank9")->set_base(multiface_rom);
+		membank("bank10")->set_base(m_multiface_ram);
 	}
 }
 

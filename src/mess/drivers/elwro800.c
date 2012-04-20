@@ -106,7 +106,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 
 static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 {
-	UINT8 *prom = machine.region("proms")->base() + 0x200;
+	UINT8 *prom = machine.root_device().memregion("proms")->base() + 0x200;
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	UINT8 cs;
 	UINT8 ls175;
@@ -118,21 +118,21 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0000); /* BAS0 ROM */
+		state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x0000); /* BAS0 ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000); /* BOOT ROM */
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000); /* BOOT ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
-		memory_set_bankptr(machine, "bank1", messram);
+		state->membank("bank1")->set_base(messram);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		state->m_ram_at_0000 = 1;
 	}
@@ -140,12 +140,12 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
+		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x2000);	/* BAS1 ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
+		state->membank("bank2")->set_base(messram + 0x2000); /* RAM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
 	}
 
@@ -225,7 +225,7 @@ static const centronics_interface elwro800jr_centronics_interface =
 
 READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 {
-	UINT8 *prom = machine().region("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
@@ -321,7 +321,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 {
-	UINT8 *prom = machine().region("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
@@ -515,7 +515,7 @@ static MACHINE_RESET(elwro800)
 	state->m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
 
-	memory_set_bankptr(machine, "bank3", messram + 0x4000);
+	state->membank("bank3")->set_base(messram + 0x4000);
 
 	state->m_port_7ffd_data = 0;
 	state->m_port_1ffd_data = -1;

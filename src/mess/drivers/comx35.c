@@ -24,7 +24,7 @@
 
 READ8_MEMBER( comx35_state::mem_r )
 {
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	UINT8 *ram = m_ram->pointer();
 	int extrom = 1;
 

@@ -50,7 +50,7 @@ MACHINE_RESET( cgenie )
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *ay8910 = machine.device("ay8910");
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
 	AYWriteReg(0, 0, 0);
@@ -87,7 +87,7 @@ MACHINE_RESET( cgenie )
 		{
 			space->install_read_bank(0xc000, 0xdfff, "bank10");
 			space->nop_write(0xc000, 0xdfff);
-			memory_set_bankptr(machine, "bank10", &ROM[0x0c000]);
+			state->membank("bank10")->set_base(&ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
 			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
 		}
@@ -101,7 +101,7 @@ MACHINE_RESET( cgenie )
 	{
 		space->nop_readwrite(0xc000, 0xdfff);
 		logerror("cgenie DOS disabled\n");
-		memset(&machine.region("maincpu")->base()[0x0c000], 0x00, 0x2000);
+		memset(&machine.root_device().memregion("maincpu")->base()[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
@@ -109,14 +109,14 @@ MACHINE_RESET( cgenie )
 	{
 		space->install_rom(0xe000, 0xefff, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
-		memcpy(&machine.region("maincpu")->base()[0x0e000],
-			   &machine.region("maincpu")->base()[0x12000], 0x1000);
+		memcpy(&machine.root_device().memregion("maincpu")->base()[0x0e000],
+			   &machine.root_device().memregion("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
 		space->nop_readwrite(0xe000, 0xefff);
 		logerror("cgenie EXT disabled\n");
-		memset(&machine.region("maincpu")->base()[0x0e000], 0x00, 0x1000);
+		memset(&machine.root_device().memregion("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
 
 	state->m_cass_level = 0;
@@ -127,7 +127,7 @@ MACHINE_START( cgenie )
 {
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *gfx = machine.region("gfx2")->base();
+	UINT8 *gfx = state->memregion("gfx2")->base();
 	int i;
 
 	/* initialize static variables */
@@ -152,7 +152,7 @@ MACHINE_START( cgenie )
 	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	space->install_legacy_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, FUNC(cgenie_videoram_w));
 	state->m_videoram = machine.device<ram_device>(RAM_TAG)->pointer();
-	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	machine.scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));
 }
 

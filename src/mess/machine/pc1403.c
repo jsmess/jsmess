@@ -30,7 +30,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 2/*0x3c00*/:
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("user1")->base()+((data&7)<<14));
+	state->membank("bank1")->set_base(state->memregion("user1")->base()+((data&7)<<14));
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 3/*0x3e00*/: break;
@@ -145,7 +145,7 @@ int pc1403_reset(device_t *device)
 MACHINE_START( pc1403 )
 {
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x8000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
@@ -162,12 +162,12 @@ DRIVER_INIT( pc1403 )
 {
 	pc1403_state *state = machine.driver_data<pc1403_state>();
 	int i;
-	UINT8 *gfx=machine.region("gfx1")->base();
+	UINT8 *gfx=machine.root_device().memregion("gfx1")->base();
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->m_power = 1;
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1403_power_up));
 
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 }

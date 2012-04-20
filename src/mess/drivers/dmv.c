@@ -82,7 +82,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	dmv_state *state = device->machine().driver_data<dmv_state>();
-	UINT8 * chargen = state->machine().region("maincpu")->base() + 0x1000;
+	UINT8 * chargen = state->memregion("maincpu")->base() + 0x1000;
 
 	for( int x = 0; x < pitch; x++ )
 	{

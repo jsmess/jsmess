@@ -33,8 +33,8 @@ public:
 
 static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -42,51 +42,51 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 
 	switch(block1) {
 		case 0:
-				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", ram);
+				machine.root_device().membank("bank1")->set_base(rom + 0x10000);
+				machine.root_device().membank("bank5")->set_base(ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", ram);
-				memory_set_bankptr(machine, "bank5", ram);
+				machine.root_device().membank("bank1")->set_base(ram);
+				machine.root_device().membank("bank5")->set_base(ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				machine.root_device().membank("bank2")->set_base(rom + 0x14000);
+				machine.root_device().membank("bank6")->set_base(ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", ram + 0x4000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				machine.root_device().membank("bank2")->set_base(ram + 0x4000);
+				machine.root_device().membank("bank6")->set_base(ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				machine.root_device().membank("bank3")->set_base(rom + 0x18000);
+				machine.root_device().membank("bank7")->set_base(ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", ram + 0x8000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				machine.root_device().membank("bank3")->set_base(ram + 0x8000);
+				machine.root_device().membank("bank7")->set_base(ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				machine.root_device().membank("bank4")->set_base(rom + 0x1c000);
+				machine.root_device().membank("bank8")->set_base(ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", ram + 0xc000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				machine.root_device().membank("bank4")->set_base(ram + 0xc000);
+				machine.root_device().membank("bank8")->set_base(ram + 0xc000);
 				break;
 	}
 }
@@ -199,7 +199,7 @@ static VIDEO_START( photon )
 
 static SCREEN_UPDATE_IND16( photon )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().region("maincpu")->base());
+	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().root_device().memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )

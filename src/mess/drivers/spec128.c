@@ -213,7 +213,7 @@ void spectrum_128_update_memory(running_machine &machine)
 		ram_page = state->m_port_7ffd_data & 0x07;
 		ram_data = messram + (ram_page<<14);
 
-		memory_set_bankptr(machine, "bank4", ram_data);
+		state->membank("bank4")->set_base(ram_data);
 	}
 
 	/* ROM switching */
@@ -221,9 +221,9 @@ void spectrum_128_update_memory(running_machine &machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = machine.region("maincpu")->base() + 0x010000 + (ROMSelection<<14);
+	ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000 + (ROMSelection<<14);
 
-	memory_set_bankptr(machine, "bank1", ChosenROM);
+	state->membank("bank1")->set_base(ChosenROM);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
@@ -261,10 +261,10 @@ static MACHINE_RESET( spectrum_128 )
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram + (5<<14));
+	state->membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram + (2<<14));
+	state->membank("bank3")->set_base(messram + (2<<14));
 
 	MACHINE_RESET_CALL(spectrum);
 

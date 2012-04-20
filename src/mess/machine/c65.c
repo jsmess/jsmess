@@ -665,7 +665,7 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 		if (data == 0x00) {
 			space->install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
-			memory_set_bankptr(space->machine(), "bank16", space->machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
+			state->membank("bank16")->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
 		} else {
 			space->nop_readwrite(expansion_ram_begin, expansion_ram_end);
 		}
@@ -817,8 +817,8 @@ void c65_bankswitch_interface( running_machine &machine, int value )
 	{
 		if (value & 1)
 		{
-			memory_set_bankptr(machine, "bank8", state->m_colorram + 0x400);
-			memory_set_bankptr(machine, "bank9", state->m_colorram + 0x400);
+			state->membank("bank8")->set_base(state->m_colorram + 0x400);
+			state->membank("bank9")->set_base(state->m_colorram + 0x400);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
 		}
@@ -833,30 +833,30 @@ void c65_bankswitch_interface( running_machine &machine, int value )
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x08)
-		memory_set_bankptr(machine, "bank1", state->m_roml);
+		state->membank("bank1")->set_base(state->m_roml);
 	else
-		memory_set_bankptr(machine, "bank1", state->m_memory + 0x8000);
+		state->membank("bank1")->set_base(state->m_memory + 0x8000);
 
 	if (value & 0x10)
-		memory_set_bankptr(machine, "bank2", state->m_basic);
+		state->membank("bank2")->set_base(state->m_basic);
 	else
-		memory_set_bankptr(machine, "bank2", state->m_memory + 0xa000);
+		state->membank("bank2")->set_base(state->m_memory + 0xa000);
 #endif
 	if ((state->m_old_value^value) & 0x20)
 	{
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20)
-			memory_set_bankptr(machine, "bank3", state->m_interface);
+			state->membank("bank3")->set_base(state->m_interface);
 		else
-			memory_set_bankptr(machine, "bank3", state->m_memory + 0xc000);
+			state->membank("bank3")->set_base(state->m_memory + 0xc000);
 	}
 	state->m_charset_select = value & 0x40;
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x80)
-		memory_set_bankptr(machine, "bank8", state->m_kernal);
+		state->membank("bank8")->set_base(state->m_kernal);
 	else
-		memory_set_bankptr(machine, "bank6", state->m_memory + 0xe000);
+		state->membank("bank6")->set_base(state->m_memory + 0xe000);
 #endif
 	state->m_old_value = value;
 }
@@ -876,22 +876,22 @@ void c65_bankswitch( running_machine &machine )
 	charen = (data & 4) ? 1 : 0;
 
 	if ((!state->m_game && state->m_exrom) || (loram && hiram && !state->m_exrom))
-		memory_set_bankptr(machine, "bank1", state->m_roml);
+		state->membank("bank1")->set_base(state->m_roml);
 	else
-		memory_set_bankptr(machine, "bank1", state->m_memory + 0x8000);
+		state->membank("bank1")->set_base(state->m_memory + 0x8000);
 
 	if ((!state->m_game && state->m_exrom && hiram) || (!state->m_exrom))
-		memory_set_bankptr(machine, "bank2", state->m_romh);
+		state->membank("bank2")->set_base(state->m_romh);
 	else if (loram && hiram)
-		memory_set_bankptr(machine, "bank2", state->m_basic);
+		state->membank("bank2")->set_base(state->m_basic);
 	else
-		memory_set_bankptr(machine, "bank2", state->m_memory + 0xa000);
+		state->membank("bank2")->set_base(state->m_memory + 0xa000);
 
 	if ((!state->m_game && state->m_exrom) || (charen && (loram || hiram)))
 	{
 		state->m_io_on = 1;
-		memory_set_bankptr(machine, "bank6", state->m_colorram);
-		memory_set_bankptr(machine, "bank7", state->m_colorram);
+		state->membank("bank6")->set_base(state->m_colorram);
+		state->membank("bank7")->set_base(state->m_colorram);
 
 		if (state->m_io_dc00_on)
 		{
@@ -902,8 +902,8 @@ void c65_bankswitch( running_machine &machine )
 		{
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
-			memory_set_bankptr(machine, "bank8", state->m_colorram + 0x400);
-			memory_set_bankptr(machine, "bank9", state->m_colorram + 0x400);
+			state->membank("bank8")->set_base(state->m_colorram + 0x400);
+			state->membank("bank9")->set_base(state->m_colorram + 0x400);
 		}
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d000, 0x0d7ff, FUNC(c65_read_io));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0d000, 0x0d7ff, FUNC(c65_write_io));
@@ -911,20 +911,20 @@ void c65_bankswitch( running_machine &machine )
 	else
 	{
 		state->m_io_on = 0;
-		memory_set_bankptr(machine, "bank5", state->m_memory + 0xd000);
-		memory_set_bankptr(machine, "bank7", state->m_memory + 0xd800);
-		memory_set_bankptr(machine, "bank9", state->m_memory + 0xdc00);
+		state->membank("bank5")->set_base(state->m_memory + 0xd000);
+		state->membank("bank7")->set_base(state->m_memory + 0xd800);
+		state->membank("bank9")->set_base(state->m_memory + 0xdc00);
 		if (!charen && (loram || hiram))
 		{
-			memory_set_bankptr(machine, "bank4", state->m_chargen);
-			memory_set_bankptr(machine, "bank6", state->m_chargen + 0x800);
-			memory_set_bankptr(machine, "bank8", state->m_chargen + 0xc00);
+			state->membank("bank4")->set_base(state->m_chargen);
+			state->membank("bank6")->set_base(state->m_chargen + 0x800);
+			state->membank("bank8")->set_base(state->m_chargen + 0xc00);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank4", state->m_memory + 0xd000);
-			memory_set_bankptr(machine, "bank6", state->m_memory + 0xd800);
-			memory_set_bankptr(machine, "bank8", state->m_memory + 0xdc00);
+			state->membank("bank4")->set_base(state->m_memory + 0xd000);
+			state->membank("bank6")->set_base(state->m_memory + 0xd800);
+			state->membank("bank8")->set_base(state->m_memory + 0xdc00);
 		}
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0d000, 0x0d7ff, "bank4");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0d000, 0x0d7ff, "bank5");
@@ -932,17 +932,17 @@ void c65_bankswitch( running_machine &machine )
 
 	if (!state->m_game && state->m_exrom)
 	{
-		memory_set_bankptr(machine, "bank10", state->m_romh);
+		state->membank("bank10")->set_base(state->m_romh);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr(machine, "bank10", state->m_kernal);
+			state->membank("bank10")->set_base(state->m_kernal);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank10", state->m_memory + 0xe000);
+			state->membank("bank10")->set_base(state->m_memory + 0xe000);
 		}
 	}
 	state->m_old_data = data;
@@ -997,11 +997,11 @@ static void c65_common_driver_init( running_machine &machine )
 {
 	c65_state *state = machine.driver_data<c65_state>();
 	state->m_memory = auto_alloc_array_clear(machine, UINT8, 0x10000);
-	memory_set_bankptr(machine, "bank11", state->m_memory + 0x00000);
-	memory_set_bankptr(machine, "bank12", state->m_memory + 0x08000);
-	memory_set_bankptr(machine, "bank13", state->m_memory + 0x0a000);
-	memory_set_bankptr(machine, "bank14", state->m_memory + 0x0c000);
-	memory_set_bankptr(machine, "bank15", state->m_memory + 0x0e000);
+	state->membank("bank11")->set_base(state->m_memory + 0x00000);
+	state->membank("bank12")->set_base(state->m_memory + 0x08000);
+	state->membank("bank13")->set_base(state->m_memory + 0x0a000);
+	state->membank("bank14")->set_base(state->m_memory + 0x0c000);
+	state->membank("bank15")->set_base(state->m_memory + 0x0e000);
 
 	cbm_common_init();
 	state->m_keyline = 0xff;

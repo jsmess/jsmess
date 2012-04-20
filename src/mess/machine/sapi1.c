@@ -45,11 +45,12 @@ MACHINE_RESET( sapizps3 )
 {
 	sapi1_state *state = machine.driver_data<sapi1_state>();
 	state->m_keyboard_mask = 0;
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT( sapizps3 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000], 0xf800);
+	sapi1_state *state = machine.driver_data<sapi1_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }

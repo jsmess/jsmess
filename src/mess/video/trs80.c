@@ -45,7 +45,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_88_w )
 VIDEO_START( trs80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 	state->m_size_store = 0xff;
 	state->m_mode &= 2;
 }

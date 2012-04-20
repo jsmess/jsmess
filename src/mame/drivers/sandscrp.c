@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bank = data & 0x07;
 
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(&space.device()),data);
@@ -277,7 +277,7 @@ WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(machine(), "bank1", RAM);
+	membank("bank1")->set_base(RAM);
 }
 
 READ8_MEMBER(sandscrp_state::sandscrp_latchstatus_r)

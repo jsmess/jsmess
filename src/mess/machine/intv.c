@@ -16,7 +16,7 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 	COMBINE_DATA(&m_intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = machine().region("keyboard")->base();
+	RAM	 = memregion("keyboard")->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = machine().region("keyboard")->base();
+	RAM	 = memregion("keyboard")->base();
 	RAM[offset] = data;
 }
 
@@ -338,11 +338,11 @@ WRITE16_MEMBER( intv_state::ecs_bank1_page_select )
 	{
 		if (data == 0x2A50)
 		{
-			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + (0x2000 << 1));
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (0x2000 << 1));
 		}
 		else if (data == 0x2A51)
 		{
-			memory_set_bankptr(machine(), "bank1", machine().region("ecs_rom")->base() + (0x2000 << 1));
+			membank("bank1")->set_base(machine().root_device().memregion("ecs_rom")->base() + (0x2000 << 1));
 		}
 	}
 }
@@ -353,11 +353,11 @@ WRITE16_MEMBER( intv_state::ecs_bank2_page_select )
 	{
 		if (data == 0x7A50)
 		{
-			memory_set_bankptr(machine(), "bank2", machine().region("ecs_rom")->base() + (0x7000 << 1)); // ECS ROM at 0x7000 is on page 1
+			membank("bank2")->set_base(machine().root_device().memregion("ecs_rom")->base() + (0x7000 << 1)); // ECS ROM at 0x7000 is on page 1
 		}
 		else if (data == 0x7A51 )
 		{
-			memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base() + (0x7000 << 1));
+			membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + (0x7000 << 1));
 		}
 	}
 }
@@ -368,11 +368,11 @@ WRITE16_MEMBER( intv_state::ecs_bank3_page_select )
 	{
 		if (data == 0xEA50)
 		{
-			memory_set_bankptr(machine(), "bank3", machine().region("maincpu")->base() + (0xE000 << 1));
+			membank("bank3")->set_base(machine().root_device().memregion("maincpu")->base() + (0xE000 << 1));
 		}
 		else if (data == 0xEA51)
 		{
-			memory_set_bankptr(machine(), "bank3", machine().region("ecs_rom")->base() + (0xE000 << 1));
+			membank("bank3")->set_base(machine().root_device().memregion("ecs_rom")->base() + (0xE000 << 1));
 		}
 	}
 }
@@ -384,11 +384,11 @@ WRITE16_MEMBER( intv_state::wsmlb_bank_page_select )
 	{
 		if (data == 0xFA50)
 		{
-			memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + (0xF000 << 1));
+			membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + (0xF000 << 1));
 		}
 		else if (data == 0xFA51)
 		{
-			memory_set_bankptr(machine(), "bank4", machine().region("ecs_rom")->base() + (0xF000 << 1));
+			membank("bank4")->set_base(machine().root_device().memregion("ecs_rom")->base() + (0xF000 << 1));
 		}
 	}
 }
@@ -408,7 +408,7 @@ static int intv_load_rom_file(device_image_interface &image)
 	UINT8 high_byte;
 	UINT8 low_byte;
 
-	UINT8 *memory = image.device().machine().region("maincpu")->base();
+	UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 	intv_state *state = image.device().machine().driver_data<intv_state>();
 	address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	const char *filetype = image.filetype();
@@ -554,7 +554,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 	{
 		UINT16 offset[] = {0x4800, 0x5000, 0x6000, 0x7000, 0x9000, 0xa000, 0xc000, 0xd000, 0xf000};
 		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};
-		UINT8 *memory = image.device().machine().region("maincpu")->base();
+		UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 		intv_state *state = image.device().machine().driver_data<intv_state>();
 		address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -577,7 +577,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		}
 		// deal with wsmlb paged rom
 
-		UINT8 *ecs_rom_region = image.device().machine().region("ecs_rom")->base();
+		UINT8 *ecs_rom_region = image.device().machine().root_device().memregion("ecs_rom")->base();
 		size = image.get_software_region_length("F000_bank1");
 		if (size && ecs_rom_region) // only load if ecs is plugged in (should probably be done a different way)
 		{
@@ -632,10 +632,11 @@ MACHINE_RESET( intv )
 
 MACHINE_RESET( intvecs )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + (0x2000 << 1));
-	memory_set_bankptr(machine, "bank2", machine.region("ecs_rom")->base() + (0x7000 << 1));
-	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + (0xE000 << 1));
-	memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + (0xF000 << 1));
+	intv_state *state = machine.driver_data<intv_state>();
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + (0x2000 << 1));
+	state->membank("bank2")->set_base(machine.root_device().memregion("ecs_rom")->base() + (0x7000 << 1));
+	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base() + (0xE000 << 1));
+	state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() + (0xF000 << 1));
 
 	device_set_input_line_vector(machine.device("maincpu"), CP1610_RESET, 0x1000);
 
@@ -830,7 +831,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	{
 		/* First, initialize these as empty so that the intellivision
          * will think that the playcable is not attached */
-		UINT8 *memory = image.device().machine().region("maincpu")->base();
+		UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 
 		/* assume playcable is absent */
 		memory[0x4800 << 1] = 0xff;
@@ -841,7 +842,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 
 	if (strcmp(image.device().tag(),":cart2") == 0) /* Keyboard component cartridge slot */
 	{
-		UINT8 *memory = image.device().machine().region("keyboard")->base();
+		UINT8 *memory = image.device().machine().root_device().memregion("keyboard")->base();
 
 		/* Assume an 8K cart, like BASIC */
 		image.fread( &memory[0xe000], 0x2000);

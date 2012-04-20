@@ -2569,7 +2569,7 @@ static MACHINE_RESET( x68000 )
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = machine.region("user2")->base();
+	UINT8* romdata = state->memregion("user2")->base();
 	attotime irq_time;
 
 	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,machine.device<ram_device>(RAM_TAG)->size());
@@ -2640,20 +2640,20 @@ static MACHINE_START( x68000 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*machine.region("user1"));
+	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	memory_set_bankptr(machine, "bank1",machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
-	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
-	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
-	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2671,20 +2671,20 @@ static MACHINE_START( x68030 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68030_state *state = machine.driver_data<x68030_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*machine.region("user1"));
+	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	memory_set_bankptr(machine, "bank1",machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
-	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
-	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
-	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2700,8 +2700,8 @@ static MACHINE_START( x68030 )
 static DRIVER_INIT( x68000 )
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	unsigned char* rom = machine.region("maincpu")->base();
-	unsigned char* user2 = machine.region("user2")->base();
+	unsigned char* rom = machine.root_device().memregion("maincpu")->base();
+	unsigned char* user2 = machine.root_device().memregion("user2")->base();
 	//FIXME
 //	state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 //	state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
@@ -2711,7 +2711,7 @@ static DRIVER_INIT( x68000 )
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = machine.region("user3")->base();
+		unsigned char* ramptr = state->memregion("user3")->base();
 		memcpy(state->m_sram,ramptr,0x4000);
 	}
 #endif

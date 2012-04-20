@@ -78,7 +78,7 @@ static const res_net_info survival_net_info =
 
 PALETTE_INIT( phoenix )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -96,7 +96,7 @@ PALETTE_INIT( phoenix )
 
 PALETTE_INIT( survival )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -114,7 +114,7 @@ PALETTE_INIT( survival )
 
 PALETTE_INIT( pleiads )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -178,9 +178,9 @@ VIDEO_START( phoenix )
 	state->m_videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram_pg[0], 0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->m_videoram_pg[1], 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, state->m_videoram_pg[0]);
+	state->membank("bank1")->configure_entry(1, state->m_videoram_pg[1]);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_videoram_pg_index = 0;
 	state->m_palette_bank = 0;
@@ -226,7 +226,7 @@ VIDEO_START( phoenix )
 
 WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	m_videoram_pg[m_videoram_pg_index][offset] = data;
 
@@ -249,7 +249,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	{
 		/* set memory bank */
 		m_videoram_pg_index = data & 1;
-		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
+		membank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	{
 		/* set memory bank */
 		m_videoram_pg_index = data & 1;
-		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
+		membank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 

@@ -170,7 +170,7 @@ static MACHINE_START( mini2440 )
 	state->m_nand = machine.device<nand_device>( "nand");
 	state->m_dac[0] = machine.device( "dac1");
 	state->m_dac[1] = machine.device( "dac2");
-	state->m_nand->set_data_ptr(machine.region("nand")->base());
+	state->m_nand->set_data_ptr(state->memregion("nand")->base());
 }
 
 static MACHINE_RESET( mini2440 )

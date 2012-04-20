@@ -142,7 +142,7 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 
 void kc_d004_device::device_start()
 {
-	m_rom  = subregion(Z80_TAG)->base();
+	m_rom  = memregion(Z80_TAG)->base();
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_tc_clear_timer = timer_alloc(TIMER_TC_CLEAR);

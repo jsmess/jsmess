@@ -163,12 +163,12 @@ WRITE8_MEMBER( micronic_state::bank_select_w )
 {
 	if (data < 2)
 	{
-		memory_set_bank(machine(), "bank1", data);
+		membank("bank1")->set_entry(data);
 		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 	else
 	{
-		memory_set_bank(machine(), "bank1", (data <= m_banks_num) ? data : m_banks_num);
+		membank("bank1")->set_entry((data <= m_banks_num) ? data : m_banks_num);
 		m_maincpu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
 	}
 }
@@ -329,11 +329,11 @@ static HD61830_INTERFACE( lcdc_intf )
 void micronic_state::machine_start()
 {
 	/* ROM banks */
-	memory_configure_bank(machine(), "bank1", 0x00, 0x02, machine().region(Z80_TAG)->base(), 0x10000);
+	membank("bank1")->configure_entries(0x00, 0x02, memregion(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
 	m_banks_num = (m_ram->size()>>15) + 1;
-	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
+	membank("bank1")->configure_entries(0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
 
 	/* register for state saving */
 //  save_item(NAME(state->));
@@ -341,7 +341,7 @@ void micronic_state::machine_start()
 
 void micronic_state::machine_reset()
 {
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->set_entry(0);
 	m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 }
 

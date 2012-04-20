@@ -158,7 +158,7 @@ void gime_base_device::device_start(void)
 	m_res_in_floating_bus_func.resolve(config->m_in_floating_bus_func, *this);
 
 	/* set up ROM/RAM pointers */
-	m_rom = machine().region(config->m_maincpu_tag)->base();
+	m_rom = memregion(config->m_maincpu_tag)->base();
 	m_cart_rom = m_cart_device->get_cart_base();
 
 	/* populate palettes */
@@ -602,8 +602,8 @@ void gime_base_device::update_memory(int bank)
 	memory += offset;
 
 	/* set the banks */
-	memory_set_bankptr(machine(), rbank, memory);
-	memory_set_bankptr(machine(), wbank, is_read_only ? m_dummy_bank : memory);
+	membank(rbank)->set_base(memory);
+	membank(wbank)->set_base(is_read_only ? m_dummy_bank : memory);
 }
 
 

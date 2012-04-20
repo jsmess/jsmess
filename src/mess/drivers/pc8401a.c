@@ -86,7 +86,7 @@ void pc8401a_state::bankswitch(UINT8 data)
 			/* internal ROM */
 			program->install_read_bank(0x0000, 0x7fff, "bank1");
 			program->unmap_write(0x0000, 0x7fff);
-			memory_set_bank(machine(), "bank1", rombank);
+			membank("bank1")->set_entry(rombank);
 		}
 		else
 		{
@@ -98,13 +98,13 @@ void pc8401a_state::bankswitch(UINT8 data)
 
 	case 1: /* RAM 0000H to 7FFFH */
 		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
-		memory_set_bank(machine(), "bank1", 4);
+		membank("bank1")->set_entry(4);
 		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
 		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
-		memory_set_bank(machine(), "bank1", 5);
+		membank("bank1")->set_entry(5);
 		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
 
@@ -117,19 +117,19 @@ void pc8401a_state::bankswitch(UINT8 data)
 	{
 	case 0: /* cell addresses 0000H to 3FFFH */
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
-		memory_set_bank(machine(), "bank3", 0);
+		membank("bank3")->set_entry(0);
 		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
-		memory_set_bank(machine(), "bank3", 1);
+		membank("bank3")->set_entry(1);
 		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
-		memory_set_bank(machine(), "bank3", 2);
+		membank("bank3")->set_entry(2);
 		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
 
@@ -137,7 +137,7 @@ void pc8401a_state::bankswitch(UINT8 data)
 		if (m_ram->size() > 64)
 		{
 			program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
-			memory_set_bank(machine(), "bank3", 3); // TODO or 4
+			membank("bank3")->set_entry(3); // TODO or 4
 		}
 		else
 		{
@@ -152,14 +152,14 @@ void pc8401a_state::bankswitch(UINT8 data)
 		/* CRT video RAM */
 		program->install_readwrite_bank(0xc000, 0xdfff, "bank4");
 		program->unmap_readwrite(0xe000, 0xe7ff);
-		memory_set_bank(machine(), "bank4", 1);
+		membank("bank4")->set_entry(1);
 		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
 		program->install_readwrite_bank(0xc000, 0xe7ff, "bank4");
-		memory_set_bank(machine(), "bank4", 0);
+		membank("bank4")->set_entry(0);
 		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}
 }
@@ -261,7 +261,7 @@ WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
 
 READ8_MEMBER( pc8401a_state::io_rom_data_r )
 {
-	UINT8 *iorom = machine().region("iorom")->base();
+	UINT8 *iorom = memregion("iorom")->base();
 
 	//logerror("I/O ROM read from %05x\n", m_io_addr);
 
@@ -496,22 +496,22 @@ void pc8401a_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 
 	/* set up A0/A1 memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 4, machine().region(Z80_TAG)->base(), 0x8000);
-	memory_configure_bank(machine(), "bank1", 4, 2, ram, 0x8000);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entries(0, 4, memregion(Z80_TAG)->base(), 0x8000);
+	membank("bank1")->configure_entries(4, 2, ram, 0x8000);
+	membank("bank1")->set_entry(0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine(), "bank3", 0, 5, ram, 0x4000);
-	memory_set_bank(machine(), "bank3", 0);
+	membank("bank3")->configure_entries(0, 5, ram, 0x4000);
+	membank("bank3")->set_entry(0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine(), "bank4", 0, 1, ram + 0xc000, 0);
-	memory_configure_bank(machine(), "bank4", 1, 1, m_crt_ram, 0);
-	memory_set_bank(machine(), "bank4", 0);
+	membank("bank4")->configure_entry(0, ram + 0xc000);
+	membank("bank4")->configure_entry(1, m_crt_ram);
+	membank("bank4")->set_entry(0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine(), "bank5", 0, 1, ram + 0xe800, 0);
-	memory_set_bank(machine(), "bank5", 0);
+	membank("bank5")->configure_entry(0, ram + 0xe800);
+	membank("bank5")->set_entry(0);
 
 	/* bank switch */
 	bankswitch(0);

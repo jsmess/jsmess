@@ -36,13 +36,13 @@ Model A memory handling functions
 /* for the model A just address the 4 on board ROM sockets */
 WRITE8_MEMBER(bbc_state::bbc_page_selecta_w)
 {
-	memory_set_bankptr(machine(),"bank4",machine().region("user1")->base()+((data&0x03)<<14));
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base()+((data&0x03)<<14));
 }
 
 
 WRITE8_MEMBER(bbc_state::bbc_memorya1_w)
 {
-	machine().region("maincpu")->base()[offset]=data;
+	memregion("maincpu")->base()[offset]=data;
 }
 
 /*************************
@@ -56,11 +56,11 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
 	m_rombank=data&0x0f;
 	if (m_rombank!=1)
 	{
-		memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + (m_rombank << 14));
+		membank("bank4")->set_base(machine().root_device().memregion("user1")->base() + (m_rombank << 14));
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank4", machine().region("user2")->base() + ((m_DFSType) << 14));
+		membank("bank4")->set_base(machine().root_device().memregion("user2")->base() + ((m_DFSType) << 14));
 	}
 }
 
@@ -69,11 +69,11 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
 {
 	if (m_RAMSize)
 	{
-		machine().region("maincpu")->base()[offset + 0x4000] = data;
+		memregion("maincpu")->base()[offset + 0x4000] = data;
 	}
 	else
 	{
-		machine().region("maincpu")->base()[offset] = data;
+		memregion("maincpu")->base()[offset] = data;
 	}
 
 }
@@ -93,14 +93,14 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 	if (m_rombank == 1)
 	{
 		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (m_DFSType == 3) machine().region("user2")->base()[((m_DFSType) << 14) + offset] = data;
+		if (m_DFSType == 3) memregion("user2")->base()[((m_DFSType) << 14) + offset] = data;
 	} else
 	{
 		switch (m_SWRAMtype)
 		{
-			case 1:	if (bbc_SWRAMtype1[m_userport]) machine().region("user1")->base()[(m_userport << 14) + offset] = data;
-			case 2:	if (bbc_SWRAMtype2[m_rombank])  machine().region("user1")->base()[(m_rombank << 14) + offset] = data;
-			case 3:	if (bbc_SWRAMtype3[m_rombank])  machine().region("user1")->base()[(m_rombank << 14) + offset] = data;
+			case 1:	if (bbc_SWRAMtype1[m_userport]) memregion("user1")->base()[(m_userport << 14) + offset] = data;
+			case 2:	if (bbc_SWRAMtype2[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
+			case 3:	if (bbc_SWRAMtype3[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -137,16 +137,16 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 		if (m_pagedRAM)
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
-			memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + 0x8000);
+			membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + 0x8000);
 		}
 		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
-			memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + (m_rombank << 14));
+			membank("bank4")->set_base(machine().root_device().memregion("user1")->base() + (m_rombank << 14));
 		};
 
 		/* set the rom to be read from b000 to bfff */
-		memory_set_bank(machine(), "bank6", m_rombank);
+		membank("bank6")->set_entry(m_rombank);
 	}
 	else
 	{
@@ -154,7 +154,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 		m_vdusel=(data>>7)&0x01;
 		bbcbp_setvideoshadow(machine(), m_vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
-		memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base()+0x3000);
+		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base()+0x3000);
 	}
 }
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 {
-	machine().region("maincpu")->base()[offset]=data;
+	memregion("maincpu")->base()[offset]=data;
 }
 
 
@@ -182,23 +182,23 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = state->memregion("maincpu")->base();
 	if (state->m_vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
-		memory_set_bankptr(machine, "bank2", ram + 0x3000);
+		state->membank("bank2")->set_base(ram + 0x3000);
 	}
 	else
 	{
 		if (vdudriverset(machine))
 		{
 			// if VDUDriver set then read from shadow ram
-			memory_set_bankptr(machine, "bank2", ram + 0xb000);
+			state->membank("bank2")->set_base(ram + 0xb000);
 		}
 		else
 		{
 			// else read from normal ram
-			memory_set_bankptr(machine, "bank2", ram + 0x3000);
+			state->membank("bank2")->set_base(ram + 0x3000);
 		}
 	}
 	return address;
@@ -207,7 +207,7 @@ DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 
 WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 {
-	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	if (m_vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
@@ -235,7 +235,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp4_w)
 {
 	if (m_pagedRAM)
 	{
-		machine().region("maincpu")->base()[offset+0x8000]=data;
+		memregion("maincpu")->base()[offset+0x8000]=data;
 	}
 }
 
@@ -255,13 +255,13 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
 {
 	if (m_pagedRAM)
 	{
-		machine().region("maincpu")->base()[offset+0x8000]=data;
+		memregion("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
 		if (bbc_b_plus_sideways_ram_banks[m_rombank])
 		{
-			machine().region("user1")->base()[offset+(m_rombank<<14)]=data;
+			memregion("user1")->base()[offset+(m_rombank<<14)]=data;
 		}
 	}
 }
@@ -270,7 +270,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp6_128_w)
 {
 	if (bbc_b_plus_sideways_ram_banks[m_rombank])
 	{
-		machine().region("user1")->base()[offset+(m_rombank<<14)+0x3000]=data;
+		memregion("user1")->base()[offset+(m_rombank<<14)+0x3000]=data;
 	}
 }
 
@@ -360,11 +360,11 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (m_ACCCON_Y)
 	{
-		memory_set_bankptr(machine(), "bank7", machine().region("maincpu")->base() + 0x9000);
+		membank("bank7")->set_base(machine().root_device().memregion("maincpu")->base() + 0x9000);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank7", machine().region("user1")->base() + 0x40000);
+		membank("bank7")->set_base(machine().root_device().memregion("user1")->base() + 0x40000);
 	}
 
 	bbcbp_setvideoshadow(machine(), m_ACCCON_D);
@@ -372,11 +372,11 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (m_ACCCON_X)
 	{
-		memory_set_bankptr(machine(), "bank2", machine().region( "maincpu" )->base() + 0xb000 );
+		membank("bank2")->set_base(machine().root_device().memregion( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank2", machine().region( "maincpu" )->base() + 0x3000 );
+		membank("bank2")->set_base(machine().root_device().memregion( "maincpu" )->base() + 0x3000 );
 	}
 
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
@@ -384,7 +384,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
 	if (m_ACCCON_TST)
 	{
-		memory_set_bankptr(machine(), "bank8", machine().region("user1")->base()+0x43c00);
+		membank("bank8")->set_base(machine().root_device().memregion("user1")->base()+0x43c00);
 		space.install_read_bank(0xFC00,0xFEFF,"bank8");
 	}
 	else
@@ -410,13 +410,13 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 
 	if (m_pagedRAM)
 	{
-		memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + 0x8000);
-		memory_set_bank(machine(), "bank5", m_rombank);
+		membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + 0x8000);
+		membank("bank5")->set_entry(m_rombank);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank4", machine().region("user1")->base() + ((m_rombank) << 14));
-		memory_set_bank(machine(), "bank5", m_rombank);
+		membank("bank4")->set_base(machine().root_device().memregion("user1")->base() + ((m_rombank) << 14));
+		membank("bank5")->set_entry(m_rombank);
 	}
 }
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
 {
-	machine().region("maincpu")->base()[offset] = data;
+	memregion("maincpu")->base()[offset] = data;
 }
 
 
@@ -433,17 +433,17 @@ DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 	bbc_state *state = machine.driver_data<bbc_state>();
 	if (state->m_ACCCON_X)
 	{
-		memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0xb000 );
+		state->membank( "bank2" )->set_base( state->memregion( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
 		if (state->m_ACCCON_E && bbcm_vdudriverset(machine))
 		{
-			memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0xb000 );
+			state->membank( "bank2" )->set_base( machine.root_device().memregion( "maincpu" )->base() + 0xb000 );
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank2", machine.region( "maincpu" )->base() + 0x3000 );
+			state->membank( "bank2" )->set_base( machine.root_device().memregion( "maincpu" )->base() + 0x3000 );
 		}
 	}
 
@@ -454,7 +454,7 @@ DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 {
-	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	if (m_ACCCON_X)
 	{
 		ram[offset + 0xb000] = data;
@@ -482,13 +482,13 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 {
 	if (m_pagedRAM)
 	{
-		machine().region("maincpu")->base()[offset+0x8000]=data;
+		memregion("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
 		if (bbc_master_sideways_ram_banks[m_rombank])
 		{
-			machine().region("user1")->base()[offset+(m_rombank<<14)]=data;
+			memregion("user1")->base()[offset+(m_rombank<<14)]=data;
 		}
 	}
 }
@@ -498,7 +498,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
 	if (bbc_master_sideways_ram_banks[m_rombank])
 	{
-		machine().region("user1")->base()[offset+(m_rombank<<14)+0x1000]=data;
+		memregion("user1")->base()[offset+(m_rombank<<14)+0x1000]=data;
 	}
 }
 
@@ -507,7 +507,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 {
 	if (m_ACCCON_Y)
 	{
-		machine().region("maincpu")->base()[offset+0x9000]=data;
+		memregion("maincpu")->base()[offset+0x9000]=data;
 	}
 }
 
@@ -542,7 +542,7 @@ long myo;
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
 //  if ( m_ACCCON_TST )
 //  {
-//      return machine().region("user1")->base()[offset+0x43c00];
+//      return memregion("user1")->base()[offset+0x43c00];
 //  };
 
 	if (offset<=0x0ff) /* FRED */
@@ -1741,7 +1741,7 @@ READ8_MEMBER(bbc_state::bbc_opus_read)
 		}
 		else
 		{
-			return machine().region("disks")->base()[offset + (m_opusbank << 8)];
+			return memregion("disks")->base()[offset + (m_opusbank << 8)];
 		}
 	}
 	return 0xff;
@@ -1783,7 +1783,7 @@ WRITE8_MEMBER(bbc_state::bbc_opus_write)
 		}
 		else
 		{
-			machine().region("disks")->base()[offset + (m_opusbank << 8)] = data;
+			memregion("disks")->base()[offset + (m_opusbank << 8)] = data;
 		}
 	}
 }
@@ -1928,7 +1928,7 @@ WRITE8_MEMBER(bbc_state::bbc_disc_w)
 ***************************************/
 DEVICE_IMAGE_LOAD( bbcb_cart )
 {
-	UINT8 *mem = image.device().machine().region("user1")->base();
+	UINT8 *mem = image.device().machine().root_device().memregion("user1")->base();
 	int size, read_;
 	int addr = 0;
 	int index = 0;
@@ -2005,13 +2005,13 @@ MACHINE_START( bbca )
 MACHINE_RESET( bbca )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 	state->m_RAMSize = 1;
-	memory_set_bankptr(machine, "bank1",ram);
-	memory_set_bankptr(machine, "bank3",ram);
+	state->membank("bank1")->set_base(ram);
+	state->membank("bank3")->set_base(ram);
 
-	memory_set_bankptr(machine, "bank4",machine.region("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	memory_set_bankptr(machine, "bank7",machine.region("user1")->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	state->membank("bank7")->set_base(state->memregion("user1")->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 }
@@ -2040,27 +2040,27 @@ MACHINE_START( bbcb )
 MACHINE_RESET( bbcb )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = state->memregion("maincpu")->base();
 	state->m_DFSType=    (input_port_read(machine, "BBCCONFIG") >> 0) & 0x07;
 	state->m_SWRAMtype = (input_port_read(machine, "BBCCONFIG") >> 3) & 0x03;
 	state->m_RAMSize=    (input_port_read(machine, "BBCCONFIG") >> 5) & 0x01;
 
-	memory_set_bankptr(machine, "bank1",ram);
+	state->membank("bank1")->set_base(ram);
 	if (state->m_RAMSize)
 	{
 		/* 32K Model B */
-		memory_set_bankptr(machine, "bank3", ram + 0x4000);
+		state->membank("bank3")->set_base(ram + 0x4000);
 		state->m_memorySize=32;
 	}
 	else
 	{
 		/* 16K just repeat the lower 16K*/
-		memory_set_bankptr(machine, "bank3", ram);
+		state->membank("bank3")->set_base(ram);
 		state->m_memorySize=16;
 	}
 
-	memory_set_bankptr(machine, "bank4", machine.region("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	memory_set_bankptr(machine, "bank7", machine.region("user1")->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	state->membank("bank7")->set_base(machine.root_device().memregion("user1")->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 
@@ -2084,17 +2084,17 @@ MACHINE_START( bbcbp )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbcbp_direct_handler), &machine));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
-	memory_configure_bank(machine, "bank6", 0, 16, machine.region("user1")->base() + 0x3000, 1<<14);
+	state->membank("bank6")->configure_entries(0, 16, state->memregion("user1")->base() + 0x3000, 1<<14);
 }
 
 MACHINE_RESET( bbcbp )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	memory_set_bankptr(machine, "bank1",machine.region("maincpu")->base());
-	memory_set_bankptr(machine, "bank2",machine.region("maincpu")->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
-	memory_set_bankptr(machine, "bank4",machine.region("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to afff */
-	memory_set_bank(machine, "bank6", 0);
-	memory_set_bankptr(machine, "bank7",machine.region("user1")->base()+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
+	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to afff */
+	state->membank("bank6")->set_entry(0);
+	state->membank("bank7")->set_base(state->memregion("user1")->base()+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 
@@ -2112,21 +2112,21 @@ MACHINE_START( bbcm )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbcm_direct_handler), &machine));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
-	memory_configure_bank(machine, "bank5", 0, 16, machine.region("user1")->base()+0x01000, 1<<14);
+	state->membank("bank5")->configure_entries(0, 16, machine.root_device().memregion("user1")->base()+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
-	memory_set_bankptr( machine, "bank8", machine.region("user1")->base()+0x43c00);
+	state->membank( "bank8" )->set_base( state->memregion("user1")->base()+0x43c00);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xFC00, 0xFEFF, "bank8");
 }
 
 MACHINE_RESET( bbcm )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
-	memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
-	memory_set_bankptr(machine, "bank4", machine.region("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
-	memory_set_bank(machine, "bank5", 0);
-	memory_set_bankptr(machine, "bank7", machine.region("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
+	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
+	state->membank("bank5")->set_entry(0);
+	state->membank("bank7")->set_base(state->memregion("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
 
 	bbcb_IC32_initialise(state);
 

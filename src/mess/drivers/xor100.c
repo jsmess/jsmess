@@ -66,7 +66,7 @@ void xor100_state::bankswitch()
 		if (m_bank < banks)
 		{
 			program->install_write_bank(0x0000, 0xffff, "bank1");
-			memory_set_bank(machine(), "bank1", 1 + m_bank);
+			membank("bank1")->set_entry(1 + m_bank);
 		}
 		else
 		{
@@ -75,8 +75,8 @@ void xor100_state::bankswitch()
 
 		program->install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
 		program->install_read_bank(0xf800, 0xffff, "bank3");
-		memory_set_bank(machine(), "bank2", 0);
-		memory_set_bank(machine(), "bank3", 0);
+		membank("bank2")->set_entry(0);
+		membank("bank3")->set_entry(0);
 		break;
 
 	case EPROM_F800:
@@ -84,8 +84,8 @@ void xor100_state::bankswitch()
 		{
 			program->install_write_bank(0x0000, 0xffff, "bank1");
 			program->install_read_bank(0x0000, 0xf7ff, "bank2");
-			memory_set_bank(machine(), "bank1", 1 + m_bank);
-			memory_set_bank(machine(), "bank2", 1 + m_bank);
+			membank("bank1")->set_entry(1 + m_bank);
+			membank("bank2")->set_entry(1 + m_bank);
 		}
 		else
 		{
@@ -94,7 +94,7 @@ void xor100_state::bankswitch()
 		}
 
 		program->install_read_bank(0xf800, 0xffff, "bank3");
-		memory_set_bank(machine(), "bank3", 0);
+		membank("bank3")->set_entry(0);
 		break;
 
 	case EPROM_OFF:
@@ -103,9 +103,9 @@ void xor100_state::bankswitch()
 			program->install_write_bank(0x0000, 0xffff, "bank1");
 			program->install_read_bank(0x0000, 0xf7ff, "bank2");
 			program->install_read_bank(0xf800, 0xffff, "bank3");
-			memory_set_bank(machine(), "bank1", 1 + m_bank);
-			memory_set_bank(machine(), "bank2", 1 + m_bank);
-			memory_set_bank(machine(), "bank3", 1 + m_bank);
+			membank("bank1")->set_entry(1 + m_bank);
+			membank("bank2")->set_entry(1 + m_bank);
+			membank("bank3")->set_entry(1 + m_bank);
 		}
 		else
 		{
@@ -536,14 +536,14 @@ void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = machine().region(Z80_TAG)->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 
 	/* setup memory banking */
-	memory_configure_bank(machine(), "bank1", 1, banks, ram, 0x10000);
-	memory_configure_bank(machine(), "bank2", 0, 1, rom, 0);
-	memory_configure_bank(machine(), "bank2", 1, banks, ram, 0x10000);
-	memory_configure_bank(machine(), "bank3", 0, 1, rom, 0);
-	memory_configure_bank(machine(), "bank3", 1, banks, ram + 0xf800, 0x10000);
+	membank("bank1")->configure_entries(1, banks, ram, 0x10000);
+	membank("bank2")->configure_entry(0, rom);
+	membank("bank2")->configure_entries(1, banks, ram, 0x10000);
+	membank("bank3")->configure_entry(0, rom);
+	membank("bank3")->configure_entries(1, banks, ram + 0xf800, 0x10000);
 
 	/* register for state saving */
 	save_item(NAME(m_mode));

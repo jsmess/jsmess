@@ -154,7 +154,7 @@ static SCREEN_UPDATE_IND16( jr200 )
 					}
 					else // tile mode
 					{
-						gfx_data = screen.machine().region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
+						gfx_data = screen.machine().root_device().memregion(attr & 0x40 ? "pcg" : "gfx_ram")->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
@@ -170,21 +170,21 @@ static SCREEN_UPDATE_IND16( jr200 )
 
 READ8_MEMBER(jr200_state::jr200_pcg_1_r)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
 	return pcg[offset+0x000];
 }
 
 READ8_MEMBER(jr200_state::jr200_pcg_2_r)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
 	return pcg[offset+0x400];
 }
 
 WRITE8_MEMBER(jr200_state::jr200_pcg_1_w)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
 	pcg[offset+0x000] = data;
 	gfx_element_mark_dirty(machine().gfx[1], (offset+0x000) >> 3);
@@ -192,7 +192,7 @@ WRITE8_MEMBER(jr200_state::jr200_pcg_1_w)
 
 WRITE8_MEMBER(jr200_state::jr200_pcg_2_w)
 {
-	UINT8 *pcg = machine().region("pcg")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
 	pcg[offset+0x400] = data;
 	gfx_element_mark_dirty(machine().gfx[1], (offset+0x400) >> 3);
@@ -200,7 +200,7 @@ WRITE8_MEMBER(jr200_state::jr200_pcg_2_w)
 
 READ8_MEMBER(jr200_state::jr200_bios_char_r)
 {
-	UINT8 *gfx = machine().region("gfx_ram")->base();
+	UINT8 *gfx = memregion("gfx_ram")->base();
 
 	return gfx[offset];
 }
@@ -208,7 +208,7 @@ READ8_MEMBER(jr200_state::jr200_bios_char_r)
 
 WRITE8_MEMBER(jr200_state::jr200_bios_char_w)
 {
-//  UINT8 *gfx = machine().region("gfx_ram")->base();
+//  UINT8 *gfx = memregion("gfx_ram")->base();
 
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  gfx[offset] = data;
@@ -487,8 +487,8 @@ static MACHINE_START(jr200)
 static MACHINE_RESET(jr200)
 {
 	jr200_state *state = machine.driver_data<jr200_state>();
-	UINT8 *gfx_rom = machine.region("gfx_rom")->base();
-	UINT8 *gfx_ram = machine.region("gfx_ram")->base();
+	UINT8 *gfx_rom = machine.root_device().memregion("gfx_rom")->base();
+	UINT8 *gfx_ram = state->memregion("gfx_ram")->base();
 	int i;
 	memset(state->m_mn1271_ram,0,0x800);
 

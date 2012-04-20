@@ -617,7 +617,7 @@ READ32_MEMBER(namcos11_state::keycus_c443_r)
 
 INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
 {
-	memory_set_bank( space->machine(), bank, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	space->machine().root_device().membank( bank )->set_entry( ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
@@ -656,7 +656,7 @@ INLINE void bankswitch_rom64( address_space *space, const char *bank, int n_data
 	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
 	/* todo: verify behaviour */
-	memory_set_bank( space->machine(), bank, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ state->m_n_bankoffset ) );
+	state->membank( bank )->set_entry( ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ state->m_n_bankoffset ) );
 }
 
 WRITE32_MEMBER(namcos11_state::bankswitch_rom64_w)
@@ -877,8 +877,8 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 	// init banks
 	int bank;
-	UINT32 len = machine.region( "user2" )->bytes();
-	UINT8 *rgn = machine.region( "user2" )->base();
+	UINT32 len = machine.root_device().memregion( "user2" )->bytes();
+	UINT8 *rgn = machine.root_device().memregion( "user2" )->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
@@ -891,8 +891,8 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 	for (bank = 0; bank < 8; bank++)
 	{
-		memory_configure_bank(machine, bankname[bank], 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
-		memory_set_bank(machine, bankname[bank], 0 );
+		state->membank(bankname[bank])->configure_entries(0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
+		state->membank(bankname[bank])->set_entry(0 );
 	}
 
 	if (n_daughterboard == 32)

@@ -41,8 +41,8 @@ static void init_nes_core( running_machine &machine )
 	int prg_banks = (state->m_prg_chunks == 1) ? (2 * 2) : (state->m_prg_chunks * 2);
 	int i;
 
-	state->m_rom = machine.region("maincpu")->base();
-	state->m_ciram = machine.region("ciram")->base();
+	state->m_rom = machine.root_device().memregion("maincpu")->base();
+	state->m_ciram = machine.root_device().memregion("ciram")->base();
 	// other pointers got set in the loading routine
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
@@ -51,7 +51,7 @@ static void init_nes_core( running_machine &machine )
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
 
-	memory_set_bankptr(machine, "bank10", state->m_rom);
+	state->membank("bank10")->set_base(state->m_rom);
 
 	/* If there is Disk Expansion and no cart has been loaded, setup memory accordingly */
 	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
@@ -75,8 +75,8 @@ static void init_nes_core( running_machine &machine )
 		space->install_write_handler(0x4020, 0x402f, write8_delegate(FUNC(nes_state::nes_fds_w),state));
 		space->install_write_bank(0x6000, 0xdfff, "bank2");
 
-		memory_set_bankptr(machine, "bank1", &state->m_rom[0xe000]);
-		memory_set_bankptr(machine, "bank2", state->m_fds_ram);
+		state->membank("bank1")->set_base(&state->m_rom[0xe000]);
+		state->membank("bank2")->set_base(state->m_fds_ram);
 		return;
 	}
 
@@ -93,18 +93,18 @@ static void init_nes_core( running_machine &machine )
 	/* configure banks 1-4 */
 	for (i = 0; i < 4; i++)
 	{
-		memory_configure_bank(machine, bank_names[i], 0, prg_banks, state->m_prg, 0x2000);
+		state->membank(bank_names[i])->configure_entries(0, prg_banks, state->m_prg, 0x2000);
 		// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
 		if (state->m_prg_ram)
-			memory_configure_bank(machine, bank_names[i], prg_banks, state->m_wram_size / 0x2000, state->m_wram, 0x2000);
+			state->membank(bank_names[i])->configure_entries(prg_banks, state->m_wram_size / 0x2000, state->m_wram, 0x2000);
 		// however, at start we point to PRG ROM
-		memory_set_bank(machine, bank_names[i], i);
+		state->membank(bank_names[i])->set_entry(i);
 		state->m_prg_bank[i] = i;
 	}
 
 	/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 	/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->m_wram) */
-	memory_configure_bank(machine, "bank5", 0, prg_banks, state->m_prg, 0x2000);
+	state->membank("bank5")->configure_entries(0, prg_banks, state->m_prg, 0x2000);
 	state->m_battery_bank5_start = prg_banks;
 	state->m_prgram_bank5_start = prg_banks;
 	state->m_empty_bank5_start = prg_banks;
@@ -114,18 +114,18 @@ static void init_nes_core( running_machine &machine )
 	{
 		UINT32 bank_size = (state->m_battery_size > 0x2000) ? 0x2000 : state->m_battery_size;
 		int bank_num = (state->m_battery_size > 0x2000) ? state->m_battery_size / 0x2000 : 1;
-		memory_configure_bank(machine, "bank5", prg_banks, bank_num, state->m_battery_ram, bank_size);
+		state->membank("bank5")->configure_entries(prg_banks, bank_num, state->m_battery_ram, bank_size);
 		state->m_prgram_bank5_start += bank_num;
 		state->m_empty_bank5_start += bank_num;
 	}
 	/* add prg ram. */
 	if (state->m_prg_ram)
 	{
-		memory_configure_bank(machine, "bank5", state->m_prgram_bank5_start, state->m_wram_size / 0x2000, state->m_wram, 0x2000);
+		state->membank("bank5")->configure_entries(state->m_prgram_bank5_start, state->m_wram_size / 0x2000, state->m_wram, 0x2000);
 		state->m_empty_bank5_start += state->m_wram_size / 0x2000;
 	}
 
-	memory_configure_bank(machine, "bank5", state->m_empty_bank5_start, 1, state->m_rom + 0x6000, 0x2000);
+	state->membank("bank5")->configure_entry(state->m_empty_bank5_start, state->m_rom + 0x6000);
 
 	/* if we have any additional PRG RAM, point bank5 to its first bank */
 	if (state->m_battery || state->m_prg_ram)
@@ -133,7 +133,7 @@ static void init_nes_core( running_machine &machine )
 	else
 		state->m_prg_bank[4] = state->m_empty_bank5_start; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
 
-	memory_set_bank(machine, "bank5", state->m_prg_bank[4]);
+	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
 
 	if (state->m_four_screen_vram)
 	{
@@ -228,11 +228,11 @@ static TIMER_CALLBACK( nes_irq_callback )
 
 static void nes_banks_restore(nes_state *state)
 {
-	memory_set_bank(state->machine(), "bank1", state->m_prg_bank[0]);
-	memory_set_bank(state->machine(), "bank2", state->m_prg_bank[1]);
-	memory_set_bank(state->machine(), "bank3", state->m_prg_bank[2]);
-	memory_set_bank(state->machine(), "bank4", state->m_prg_bank[3]);
-	memory_set_bank(state->machine(), "bank5", state->m_prg_bank[4]);
+	state->membank("bank1")->set_entry(state->m_prg_bank[0]);
+	state->membank("bank2")->set_entry(state->m_prg_bank[1]);
+	state->membank("bank3")->set_entry(state->m_prg_bank[2]);
+	state->membank("bank4")->set_entry(state->m_prg_bank[3]);
+	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
 }
 
 static void nes_state_register( running_machine &machine )

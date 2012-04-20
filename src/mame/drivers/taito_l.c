@@ -169,11 +169,11 @@ static void machine_reset(running_machine &machine)
 		state->m_cur_rambank[i] = 0x80;
 		state->m_current_notifier[i] = palette_notifier;
 		state->m_current_base[i] = state->m_palette_ram;
-		memory_set_bankptr(machine, bankname[i], state->m_current_base[i]);
+		state->membank(bankname[i])->set_base(state->m_current_base[i]);
 	}
 
 	state->m_cur_rombank = state->m_cur_rombank2 = 0;
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000);
 
 	gfx_element_set_source(machine.gfx[2], state->m_rambanks);
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
 		m_cur_rombank = data;
-		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
 	}
 }
 
@@ -397,7 +397,7 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 
 		m_cur_rombank2 = data;
-		memory_set_bankptr(machine(), "bank6", machine().region("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
+		membank("bank6")->set_base(machine().root_device().memregion("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
 	}
 }
 
@@ -435,7 +435,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 			m_current_notifier[offset] = 0;
 			m_current_base[offset] = m_empty_ram;
 		}
-		memory_set_bankptr(machine(), bankname[offset], m_current_base[offset]);
+		membank(bankname[offset])->set_base(m_current_base[offset]);
 	}
 }
 
@@ -596,7 +596,7 @@ static void champwr_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
 		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
@@ -740,10 +740,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("audiocpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (machine(), "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
+	membank ("bank7")->set_base (&RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
@@ -1784,11 +1784,11 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 	if (state->m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = device->machine().region("audiocpu")->base();
+		UINT8 *RAM = state->memregion("audiocpu")->base();
 
 		state->m_cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (state->m_cur_bank - 1) * 0x4000;
-		memory_set_bankptr(device->machine(), "bank7", &RAM[bankaddress]);
+		state->membank("bank7")->set_base(&RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->m_cur_bank, cpu_get_pc(&space->device()) );
 	}
 }
@@ -2722,7 +2722,7 @@ static DRIVER_INIT( plottinga )
 				v |= 1 << (7 - j);
 		tab[i] = v;
 	}
-	p = machine.region("maincpu")->base();
+	p = machine.root_device().memregion("maincpu")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		*p = tab[*p];
