@@ -124,8 +124,8 @@ void apple2_update_memory(running_machine &machine)
 	}
 
 	/* get critical info */
-	rom = machine.region("maincpu")->base();
-	rom_length = machine.region("maincpu")->bytes() & ~0xFFF;
+	rom = machine.root_device().memregion("maincpu")->base();
+	rom_length = machine.root_device().memregion("maincpu")->bytes() & ~0xFFF;
 
 	/* loop through the entire memory map */
 	bank = state->m_mem_config.first_bank;
@@ -226,7 +226,7 @@ void apple2_update_memory(running_machine &machine)
 			/* set the memory bank */
 			if (rbase)
 			{
-				memory_set_bankptr(machine, rbank, rbase);
+				state->membank(rbank)->set_base(rbase);
 			}
 
 			/* record the current settings */
@@ -322,7 +322,7 @@ void apple2_update_memory(running_machine &machine)
 			/* set the memory bank */
 			if (wbase)
 			{
-				memory_set_bankptr(machine, wbank, wbase);
+				state->membank(wbank)->set_base(wbase);
 			}
 
 			/* record the current settings */
@@ -441,9 +441,9 @@ INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset)
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = machine.region("maincpu")->base();
-	rom_length = machine.region("maincpu")->bytes() & ~0xFFF;
-	slot_length = machine.region("maincpu")->bytes() - rom_length;
+	rom = machine.root_device().memregion("maincpu")->base();
+	rom_length = machine.root_device().memregion("maincpu")->bytes() & ~0xFFF;
+	slot_length = state->memregion("maincpu")->bytes() - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	if (slot_ram)
@@ -492,9 +492,9 @@ static WRITE8_HANDLER ( apple2_c1xx_w )
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = space->machine().region("maincpu")->base();
-	rom_length = space->machine().region("maincpu")->bytes() & ~0xFFF;
-	slot_length = space->machine().region("maincpu")->bytes() - rom_length;
+	rom = space->machine().root_device().memregion("maincpu")->base();
+	rom_length = space->machine().root_device().memregion("maincpu")->bytes() & ~0xFFF;
+	slot_length = state->memregion("maincpu")->bytes() - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	slotnum = ((offset>>8) & 0xf) + 1;
@@ -547,9 +547,9 @@ static WRITE8_HANDLER ( apple2_c3xx_w )
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = space->machine().region("maincpu")->base();
-	rom_length = space->machine().region("maincpu")->bytes() & ~0xFFF;
-	slot_length = space->machine().region("maincpu")->bytes() - rom_length;
+	rom = space->machine().root_device().memregion("maincpu")->base();
+	rom_length = space->machine().root_device().memregion("maincpu")->bytes() & ~0xFFF;
+	slot_length = state->memregion("maincpu")->bytes() - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	slotnum = 3;
@@ -604,9 +604,9 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = space->machine().region("maincpu")->base();
-	rom_length = space->machine().region("maincpu")->bytes() & ~0xFFF;
-	slot_length = space->machine().region("maincpu")->bytes() - rom_length;
+	rom = space->machine().root_device().memregion("maincpu")->base();
+	rom_length = space->machine().root_device().memregion("maincpu")->bytes() & ~0xFFF;
+	slot_length = state->memregion("maincpu")->bytes() - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	slotnum = ((offset>>8) & 0xf) + 4;
@@ -1686,7 +1686,7 @@ void apple2_init_common(running_machine &machine)
 	state->m_a2_set = 0;
 
 	/* disable VAR_ROMSWITCH if the ROM is only 16k */
-	if (machine.region("maincpu")->bytes() < 0x8000)
+	if (state->memregion("maincpu")->bytes() < 0x8000)
 		state->m_a2_mask &= ~VAR_ROMSWITCH;
 
 	if (machine.device<ram_device>(RAM_TAG)->size() <= 64*1024)

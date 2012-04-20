@@ -222,7 +222,7 @@ INPUT_PORTS_END
 void amu880_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -350,7 +350,7 @@ static const z80_daisy_config amu880_daisy_chain[] =
 void amu880_state::machine_start()
 {
 	/* find memory regions */
-	m_kb_rom = machine().region("keyboard")->base();
+	m_kb_rom = memregion("keyboard")->base();
 
 	/* register for state saving */
 	save_item(NAME(m_key_d6));

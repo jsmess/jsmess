@@ -84,38 +84,38 @@ void sms_state::map_cart_8k( UINT16 address, UINT16 bank )
 	case 0x0000:
 		m_banking_cart[1] = bank_start;
 		m_banking_cart[2] = bank_start + 0x400;
-		memory_set_bankptr(machine(), "bank1", m_banking_cart[1]);
-		memory_set_bankptr(machine(), "bank2", m_banking_cart[2]);
+		membank("bank1")->set_base(m_banking_cart[1]);
+		membank("bank2")->set_base(m_banking_cart[2]);
 		break;
 
 	case 0x0400:
 		m_banking_cart[2] = bank_start + 0x400;
-		memory_set_bankptr(machine(), "bank2", m_banking_cart[2]);
+		membank("bank2")->set_base(m_banking_cart[2]);
 		break;
 
 	case 0x2000:
 		m_banking_cart[7] = bank_start;
-		memory_set_bankptr(machine(), "bank7", m_banking_cart[7]);
+		membank("bank7")->set_base(m_banking_cart[7]);
 		break;
 
 	case 0x4000:
 		m_banking_cart[3] = bank_start;
-		memory_set_bankptr(machine(), "bank3", m_banking_cart[3]);
+		membank("bank3")->set_base(m_banking_cart[3]);
 		break;
 
 	case 0x6000:
 		m_banking_cart[4] = bank_start;
-		memory_set_bankptr(machine(), "bank4", m_banking_cart[4]);
+		membank("bank4")->set_base(m_banking_cart[4]);
 		break;
 
 	case 0x8000:
 		m_banking_cart[5] = bank_start;
-		memory_set_bankptr(machine(), "bank5", m_banking_cart[5]);
+		membank("bank5")->set_base(m_banking_cart[5]);
 		break;
 
 	case 0xA000:
 		m_banking_cart[6] = bank_start;
-		memory_set_bankptr(machine(), "bank6", m_banking_cart[6]);
+		membank("bank6")->set_base(m_banking_cart[6]);
 		break;
 
 	default:
@@ -169,7 +169,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 	{
 	case 0x0000:
 		m_banking_bios[1] = bank_start;
-		memory_set_bankptr(machine(), "bank1", m_banking_bios[1]);
+		membank("bank1")->set_base(m_banking_bios[1]);
 		break;
 
 	case 0x0400:
@@ -178,7 +178,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[2] = bank_start + 0x400;
-		memory_set_bankptr(machine(), "bank2", m_banking_bios[2]);
+		membank("bank2")->set_base(m_banking_bios[2]);
 		break;
 
 	case 0x2000:
@@ -187,7 +187,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[7] = bank_start;
-		memory_set_bankptr(machine(), "bank7", m_banking_bios[7]);
+		membank("bank7")->set_base(m_banking_bios[7]);
 		break;
 
 	case 0x4000:
@@ -196,7 +196,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[3] = bank_start;
-		memory_set_bankptr(machine(), "bank3", m_banking_bios[3]);
+		membank("bank3")->set_base(m_banking_bios[3]);
 		break;
 
 	case 0x6000:
@@ -205,7 +205,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[4] = bank_start;
-		memory_set_bankptr(machine(), "bank4", m_banking_bios[4]);
+		membank("bank4")->set_base(m_banking_bios[4]);
 		break;
 
 	case 0x8000:
@@ -214,7 +214,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[5] = bank_start;
-		memory_set_bankptr(machine(), "bank5", m_banking_bios[5]);
+		membank("bank5")->set_base(m_banking_bios[5]);
 		break;
 
 	case 0xA000:
@@ -223,7 +223,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 			break;
 		}
 		m_banking_bios[6] = bank_start;
-		memory_set_bankptr(machine(), "bank6", m_banking_bios[6]);
+		membank("bank6")->set_base(m_banking_bios[6]);
 		break;
 
 	default:
@@ -1019,8 +1019,8 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 				{
 					sram = m_cartridge[m_current_cartridge].cartSRAM;
 				}
-				memory_set_bankptr(machine(),  "bank5", sram);
-				memory_set_bankptr(machine(),  "bank6", sram + 0x2000);
+				membank("bank5")->set_base(sram);
+				membank("bank6")->set_base(sram + 0x2000);
 			}
 		}
 		else /* it's rom */
@@ -1155,12 +1155,12 @@ WRITE8_MEMBER(sms_state::sms_codemasters_page1_w)
 		if (data & 0x80)
 		{
 			m_cartridge[m_current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr(machine(), "bank6", m_cartridge[m_current_cartridge].cartRAM + m_cartridge[m_current_cartridge].ram_page * 0x2000);
+			membank("bank6")->set_base(m_cartridge[m_current_cartridge].cartRAM + m_cartridge[m_current_cartridge].ram_page * 0x2000);
 		}
 		else
 		{
 			map_cart_16k( 0x4000, data );
-			memory_set_bankptr(machine(), "bank6", m_banking_cart[5] + 0x2000);
+			membank("bank6")->set_base(m_banking_cart[5] + 0x2000);
 		}
 	}
 }
@@ -1285,8 +1285,8 @@ WRITE8_MEMBER(sms_state::sms_cartram_w)
 			if (!m_cartridge[m_current_cartridge].ROM)
 				return;
 			m_banking_cart[5] = m_cartridge[m_current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr(machine(), "bank5", m_banking_cart[5]);
-			memory_set_bankptr(machine(), "bank6", m_banking_cart[5] + 0x2000);
+			membank("bank5")->set_base(m_banking_cart[5]);
+			membank("bank6")->set_base(m_banking_cart[5] + 0x2000);
 			LOG(("rom 2 paged in %x (Codemasters mapper).\n", page));
 		}
 		else if (m_cartridge[m_current_cartridge].features & CF_ONCART_RAM)
@@ -1366,16 +1366,15 @@ static void sms_machine_stop( running_machine &machine )
 static void setup_rom( address_space *space )
 {
 	sms_state *state = space->machine().driver_data<sms_state>();
-	running_machine &machine = space->machine();
-
+	
 	/* 1. set up bank pointers to point to nothing */
-	memory_set_bankptr(machine, "bank1", state->m_banking_none);
-	memory_set_bankptr(machine, "bank2", state->m_banking_none);
-	memory_set_bankptr(machine, "bank7", state->m_banking_none);
-	memory_set_bankptr(machine, "bank3", state->m_banking_none);
-	memory_set_bankptr(machine, "bank4", state->m_banking_none);
-	memory_set_bankptr(machine, "bank5", state->m_banking_none);
-	memory_set_bankptr(machine, "bank6", state->m_banking_none);
+	state->membank("bank1")->set_base(state->m_banking_none);
+	state->membank("bank2")->set_base(state->m_banking_none);
+	state->membank("bank7")->set_base(state->m_banking_none);
+	state->membank("bank3")->set_base(state->m_banking_none);
+	state->membank("bank4")->set_base(state->m_banking_none);
+	state->membank("bank5")->set_base(state->m_banking_none);
+	state->membank("bank6")->set_base(state->m_banking_none);
 
 	/* 2. check and set up expansion port */
 	if (!(state->m_bios_port & IO_EXPANSION) && (state->m_bios_port & IO_CARTRIDGE) && (state->m_bios_port & IO_CARD))
@@ -1396,13 +1395,13 @@ static void setup_rom( address_space *space )
 	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
 	if ((!(state->m_bios_port & IO_CARTRIDGE)) || state->m_is_gamegear)
 	{
-		memory_set_bankptr(machine, "bank1", state->m_banking_cart[1]);
-		memory_set_bankptr(machine, "bank2", state->m_banking_cart[2]);
-		memory_set_bankptr(machine, "bank7", state->m_banking_cart[7]);
-		memory_set_bankptr(machine, "bank3", state->m_banking_cart[3]);
-		memory_set_bankptr(machine, "bank4", state->m_banking_cart[3] + 0x2000);
-		memory_set_bankptr(machine, "bank5", state->m_banking_cart[5]);
-		memory_set_bankptr(machine, "bank6", state->m_banking_cart[5] + 0x2000);
+		state->membank("bank1")->set_base(state->m_banking_cart[1]);
+		state->membank("bank2")->set_base(state->m_banking_cart[2]);
+		state->membank("bank7")->set_base(state->m_banking_cart[7]);
+		state->membank("bank3")->set_base(state->m_banking_cart[3]);
+		state->membank("bank4")->set_base(state->m_banking_cart[3] + 0x2000);
+		state->membank("bank5")->set_base(state->m_banking_cart[5]);
+		state->membank("bank6")->set_base(state->m_banking_cart[5] + 0x2000);
 		logerror("Switched in cartridge rom.\n");
 	}
 
@@ -1412,33 +1411,33 @@ static void setup_rom( address_space *space )
 		/* 0x0400 bioses */
 		if (state->m_has_bios_0400)
 		{
-			memory_set_bankptr(machine, "bank1", state->m_banking_bios[1]);
+			state->membank("bank1")->set_base(state->m_banking_bios[1]);
 			logerror("Switched in 0x0400 bios.\n");
 		}
 		/* 0x2000 bioses */
 		if (state->m_has_bios_2000)
 		{
-			memory_set_bankptr(machine, "bank1", state->m_banking_bios[1]);
-			memory_set_bankptr(machine, "bank2", state->m_banking_bios[2]);
+			state->membank("bank1")->set_base(state->m_banking_bios[1]);
+			state->membank("bank2")->set_base(state->m_banking_bios[2]);
 			logerror("Switched in 0x2000 bios.\n");
 		}
 		if (state->m_has_bios_full)
 		{
-			memory_set_bankptr(machine, "bank1", state->m_banking_bios[1]);
-			memory_set_bankptr(machine, "bank2", state->m_banking_bios[2]);
-			memory_set_bankptr(machine, "bank7", state->m_banking_bios[7]);
-			memory_set_bankptr(machine, "bank3", state->m_banking_bios[3]);
-			memory_set_bankptr(machine, "bank4", state->m_banking_bios[3] + 0x2000);
-			memory_set_bankptr(machine, "bank5", state->m_banking_bios[5]);
-			memory_set_bankptr(machine, "bank6", state->m_banking_bios[5] + 0x2000);
+			state->membank("bank1")->set_base(state->m_banking_bios[1]);
+			state->membank("bank2")->set_base(state->m_banking_bios[2]);
+			state->membank("bank7")->set_base(state->m_banking_bios[7]);
+			state->membank("bank3")->set_base(state->m_banking_bios[3]);
+			state->membank("bank4")->set_base(state->m_banking_bios[3] + 0x2000);
+			state->membank("bank5")->set_base(state->m_banking_bios[5]);
+			state->membank("bank6")->set_base(state->m_banking_bios[5] + 0x2000);
 			logerror("Switched in full bios.\n");
 		}
 	}
 
 	if (state->m_cartridge[state->m_current_cartridge].features & CF_ONCART_RAM)
 	{
-		memory_set_bankptr(machine, "bank5", state->m_cartridge[state->m_current_cartridge].cartRAM);
-		memory_set_bankptr(machine, "bank6", state->m_cartridge[state->m_current_cartridge].cartRAM);
+		state->membank("bank5")->set_base(state->m_cartridge[state->m_current_cartridge].cartRAM);
+		state->membank("bank6")->set_base(state->m_cartridge[state->m_current_cartridge].cartRAM);
 	}
 }
 
@@ -1890,7 +1889,7 @@ static void setup_cart_banks( running_machine &machine )
 static void setup_banks( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = machine.root_device().memregion("maincpu")->base();
 	state->m_banking_none = mem;
 	state->m_banking_bios[1] = state->m_banking_cart[1] = mem;
 	state->m_banking_bios[2] = state->m_banking_cart[2] = mem;
@@ -1900,9 +1899,9 @@ static void setup_banks( running_machine &machine )
 	state->m_banking_bios[6] = state->m_banking_cart[6] = mem;
 	state->m_banking_bios[7] = state->m_banking_cart[7] = mem;
 
-	state->m_BIOS = machine.region("user1")->base();
+	state->m_BIOS = machine.root_device().memregion("user1")->base();
 
-	state->m_bios_page_count = (state->m_BIOS ? machine.region("user1")->bytes() / 0x4000 : 0);
+	state->m_bios_page_count = (state->m_BIOS ? state->memregion("user1")->bytes() / 0x4000 : 0);
 
 	setup_cart_banks(machine);
 
@@ -2063,7 +2062,7 @@ WRITE8_MEMBER(sms_state::sms_store_cart_select_w)
 		m_current_cartridge = slot;
 
 	setup_cart_banks(machine());
-	memory_set_bankptr(machine(), "bank10", m_banking_cart[3] + 0x2000);
+	membank("bank10")->set_base(m_banking_cart[3] + 0x2000);
 	setup_rom(&space);
 }
 

@@ -831,7 +831,7 @@ static DEVICE_START( k1ge )
 	k1ge->timer = device->machine().scheduler().timer_alloc(FUNC(k1ge_timer_callback), (void *) device );
 	k1ge->hblank_on_timer = device->machine().scheduler().timer_alloc(FUNC(k1ge_hblank_on_timer_callback), (void *) device );
 	k1ge->screen = device->machine().device<screen_device>(k1ge->intf->screen_tag);
-	k1ge->vram = device->machine().region( k1ge->intf->vram_tag )->base();
+	k1ge->vram = device->machine().root_device().memregion( k1ge->intf->vram_tag )->base();
 	k1ge->bitmap = auto_bitmap_ind16_alloc( device->machine(), k1ge->screen->width(), k1ge->screen->height() );
 	k1ge->draw = k1ge_draw;
 }

@@ -93,7 +93,7 @@ int pc1251_reset(device_t *device)
 MACHINE_START( pc1251 )
 {
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x8000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
@@ -110,7 +110,7 @@ DRIVER_INIT( pc1251 )
 {
 	pc1251_state *state = machine.driver_data<pc1251_state>();
 	int i;
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->m_power = 1;

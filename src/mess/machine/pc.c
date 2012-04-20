@@ -980,12 +980,13 @@ static void pc_set_keyb_int(running_machine &machine, int state)
 
 void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int))
 {
+	pc_state *state = machine.driver_data<pc_state>();
 	if ( set_keyb_int_func != NULL )
 		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( machine.device<ram_device>(RAM_TAG)->pointer() )
-		memory_set_bankptr( machine, "bank10", machine.device<ram_device>(RAM_TAG)->pointer() );
+		state->membank( "bank10" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer() );
 }
 
 
@@ -1016,8 +1017,8 @@ DRIVER_INIT( pcmda )
 
 DRIVER_INIT( europc )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
-	UINT8 *rom = &machine.region("maincpu")->base()[0];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *rom = &machine.root_device().memregion("maincpu")->base()[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1049,7 +1050,7 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1061,7 +1062,7 @@ DRIVER_INIT( pc200 )
 
 DRIVER_INIT( ppc512 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1072,7 +1073,7 @@ DRIVER_INIT( ppc512 )
 }
 DRIVER_INIT( pc1512 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1206,7 +1207,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 
 		size = image.get_software_region_length("rom" );
 
-		memcpy( image.device().machine().region("maincpu")->base() + address, cart, size );
+		memcpy( image.device().machine().root_device().memregion("maincpu")->base() + address, cart, size );
 	}
 	else
 	{
@@ -1235,7 +1236,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 		}
 
 		/* Read the cartridge contents */
-		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().region("maincpu")->base() + address, image_size - 0x200 ) )
+		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().root_device().memregion("maincpu")->base() + address, image_size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;

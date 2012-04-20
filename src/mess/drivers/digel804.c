@@ -174,7 +174,7 @@ static DRIVER_INIT( digel804 )
 	state->m_powerfail_state = 1; // "O11"
 	state->m_chipinsert_state = 0; // PIN
 	state->m_ram_bank = 0;
-	memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
+	state->membank( "bankedram" )->set_base( state->memregion("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
 }
 
@@ -290,7 +290,7 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_ram_bank = data&7;
 	if ((data&0xF8)!=0)
 		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
-	memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 
 }
 

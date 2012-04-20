@@ -48,7 +48,7 @@ READ8_MEMBER( sage2_state::mmu_r )
 
 	if (m_reset || (offset >= 0xfe0000))
 	{
-		data = machine().region(M68000_TAG)->base()[offset & 0x1fff];
+		data = memregion(M68000_TAG)->base()[offset & 0x1fff];
 	}
 	else if (offset < 0x080000)
 	{
@@ -663,8 +663,8 @@ static DRIVER_INIT( sage2 )
 	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
 
 	// patch out i8251 test
-	machine.region(M68000_TAG)->base()[0x1be8] = 0xd6;
-	machine.region(M68000_TAG)->base()[0x1be9] = 0x4e;
+	machine.root_device().memregion(M68000_TAG)->base()[0x1be8] = 0xd6;
+	machine.root_device().memregion(M68000_TAG)->base()[0x1be9] = 0x4e;
 }
 
 

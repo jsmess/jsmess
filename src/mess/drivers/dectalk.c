@@ -268,7 +268,7 @@ static void dectalk_clear_all_fifos( running_machine &machine )
 static void dectalk_x2212_store( running_machine &machine )
 {
 	dectalk_state *state = machine.driver_data<dectalk_state>();
-	UINT8 *nvram = machine.region("nvram")->base();
+	UINT8 *nvram = state->memregion("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
 	nvram[i] = state->m_x2214_sram[i];
@@ -280,7 +280,7 @@ static void dectalk_x2212_store( running_machine &machine )
 static void dectalk_x2212_recall( running_machine &machine )
 {
 	dectalk_state *state = machine.driver_data<dectalk_state>();
-	UINT8 *nvram = machine.region("nvram")->base();
+	UINT8 *nvram = state->memregion("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
 	state->m_x2214_sram[i] = nvram[i];

@@ -115,7 +115,7 @@ public:
 
 
 
-#define CART machine.region("user1")->base()
+#define CART machine.root_device().memregion("user1")->base()
 
 #define MASTER_CLOCK_NTSC	3579545
 #define MASTER_CLOCK_PAL	3546894
@@ -579,37 +579,37 @@ static void modeF8_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeFA_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeF6_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeF4_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void mode3F_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x800 * (data & (state->m_number_banks - 1));
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeUA_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + (offset >> 6) * 0x1000;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeE0_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
@@ -618,37 +618,37 @@ static void modeE0_switch(running_machine &machine, UINT16 offset, UINT8 data)
 	char bank_name[10];
 	sprintf(bank_name,"bank%d",bank);
 	state->m_bank_base[bank] = CART + 0x400 * (offset & 7);
-	memory_set_bankptr(machine,bank_name, state->m_bank_base[bank]);
+	state->membank(bank_name)->set_base(state->m_bank_base[bank]);
 }
 static void modeE7_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x800 * offset;
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void modeE7_RAM_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
-	memory_set_bankptr(machine,"bank9", state->m_extra_RAM->base() + (4 + offset) * 256 );
+	state->membank("bank9")->set_base(state->m_extra_RAM->base() + (4 + offset) * 256 );
 }
 static void modeDC_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x1000 * next_bank(state);
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 }
 static void mode3E_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_bank_base[1] = CART + 0x800 * (data & (state->m_number_banks - 1));
-	memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+	state->membank("bank1")->set_base(state->m_bank_base[1]);
 	state->m_mode3E_ram_enabled = 0;
 }
 static void mode3E_RAM_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	state->m_ram_base = state->m_extra_RAM->base() + 0x200 * ( data & 0x3F );
-	memory_set_bankptr(machine,"bank1", state->m_ram_base );
+	state->membank("bank1")->set_base(state->m_ram_base );
 	state->m_mode3E_ram_enabled = 1;
 }
 static void modeFV_switch(running_machine &machine, UINT16 offset, UINT8 data)
@@ -660,7 +660,7 @@ static void modeFV_switch(running_machine &machine, UINT16 offset, UINT8 data)
 		state->m_FVlocked = 1;
 		state->m_current_bank = state->m_current_bank ^ 0x01;
 		state->m_bank_base[1] = CART + 0x1000 * state->m_current_bank;
-		memory_set_bankptr(machine,"bank1", state->m_bank_base[1]);
+		state->membank("bank1")->set_base(state->m_bank_base[1]);
 	}
 }
 static void modeJVP_switch(running_machine &machine, UINT16 offset, UINT8 data)
@@ -677,7 +677,7 @@ static void modeJVP_switch(running_machine &machine, UINT16 offset, UINT8 data)
 		break;
 	}
 	state->m_bank_base[1] = CART + 0x1000 * state->m_current_bank;
-	memory_set_bankptr(machine, "bank1", state->m_bank_base[1] );
+	state->membank("bank1")->set_base(state->m_bank_base[1] );
 }
 
 
@@ -816,12 +816,12 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		{
 		case 0x00:
 			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? machine().region("maincpu")->base() + 0x1800 : machine().region("user1")->base();
+			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
 			m_modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			m_bank_base[1] = m_extra_RAM->base();
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? machine().region("maincpu")->base() + 0x1800 : machine().region("user1")->base();
+			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
 			m_modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -836,12 +836,12 @@ READ8_MEMBER(a2600_state::modeSS_r)
 			break;
 		case 0x10:
 			m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? machine().region("maincpu")->base() + 0x1800 : machine().region("user1")->base();
+			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
 			m_modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			m_bank_base[1] = m_extra_RAM->base() + 0x800;
-			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? machine().region("maincpu")->base() + 0x1800 : machine().region("user1")->base();
+			m_bank_base[2] = ( m_modeSS_byte & 0x01 ) ? memregion("maincpu")->base() + 0x1800 : memregion("user1")->base();
 			m_modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
@@ -855,8 +855,8 @@ READ8_MEMBER(a2600_state::modeSS_r)
 			m_modeSS_high_ram_enabled = 1;
 			break;
 		}
-		memory_set_bankptr(machine(), "bank1", m_bank_base[1] );
-		memory_set_bankptr(machine(), "bank2", m_bank_base[2] );
+		membank("bank1")->set_base(m_bank_base[1] );
+		membank("bank2")->set_base(m_bank_base[2] );
 	}
 	else if ( offset == 0xFF9 )
 	{
@@ -1015,7 +1015,7 @@ READ8_MEMBER(a2600_state::modeDPC_r)
 	}
 	else
 	{
-		UINT8	display_data = machine().region("user1")->base()[0x2000 + ( ~ ( ( m_dpc.df[data_fetcher].low | ( m_dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
+		UINT8	display_data = memregion("user1")->base()[0x2000 + ( ~ ( ( m_dpc.df[data_fetcher].low | ( m_dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
 
 		switch( offset & 0x38 )
 		{
@@ -1122,8 +1122,8 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
            cpu should be the last byte that was on the data bus and so should determine the bank
            we should switch in. */
-		m_bank_base[1] = machine().region("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-		memory_set_bankptr(machine(), "bank1", m_bank_base[1] );
+		m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
+		membank("bank1")->set_base(m_bank_base[1] );
 		/* and restore old opbase handler */
 		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(m_FE_old_opbase_handler);
 	}
@@ -1291,7 +1291,7 @@ static void install_banks(running_machine &machine, int count, unsigned init)
 			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
 
 		state->m_bank_base[i + 1] = cart + init;
-		memory_set_bankptr(machine,handler[i], state->m_bank_base[i + 1]);
+		state->membank(handler[i])->set_base(state->m_bank_base[i + 1]);
 	}
 }
 
@@ -1584,7 +1584,7 @@ static void common_init(running_machine &machine)
 	a2600_state *state = machine.driver_data<a2600_state>();
 	screen_device *screen = machine.first_screen();
 	state->m_current_screen_height = screen->height();
-	state->m_extra_RAM = machine.region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
+	state->m_extra_RAM = machine.memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
 	memset( state->m_riot_ram, 0x00, 0x80 );
 	state->m_current_reset_bank_counter = 0xFF;
 	state->m_dpc.oscillator = machine.scheduler().timer_alloc(FUNC(modeDPC_timer_callback));
@@ -1956,7 +1956,7 @@ static MACHINE_RESET( a2600 )
 		space->install_write_handler(0x1fe8, 0x1feb, write8_delegate(FUNC(a2600_state::modeE7_RAM_switch_w),state));
 		space->install_read_handler(0x1fe8, 0x1feb, read8_delegate(FUNC(a2600_state::modeE7_RAM_switch_r),state));
 		space->install_readwrite_bank(0x1800, 0x18ff, "bank9");
-		memory_set_bankptr(machine, "bank9", state->m_extra_RAM->base() + 4 * 256 );
+		state->membank("bank9")->set_base(state->m_extra_RAM->base() + 4 * 256 );
 		break;
 
 	case modeDC:
@@ -1979,8 +1979,8 @@ static MACHINE_RESET( a2600 )
 		space->install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeSS_r),state));
 		state->m_bank_base[1] = state->m_extra_RAM->base() + 2 * 0x800;
 		state->m_bank_base[2] = CART;
-		memory_set_bankptr(machine, "bank1", state->m_bank_base[1] );
-		memory_set_bankptr(machine, "bank2", state->m_bank_base[2] );
+		state->membank("bank1")->set_base(state->m_bank_base[1] );
+		state->membank("bank2")->set_base(state->m_bank_base[2] );
 		state->m_modeSS_write_enabled = 0;
 		state->m_modeSS_byte_started = 0;
 		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeSS_opbase), state));
@@ -2012,8 +2012,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case mode32in1:
-		memory_set_bankptr(machine, "bank1", CART + state->m_current_reset_bank_counter * 0x800 );
-		memory_set_bankptr(machine, "bank2", CART + state->m_current_reset_bank_counter * 0x800 );
+		state->membank("bank1")->set_base(CART + state->m_current_reset_bank_counter * 0x800 );
+		state->membank("bank2")->set_base(CART + state->m_current_reset_bank_counter * 0x800 );
 		break;
 
 	case modeJVP:
@@ -2029,7 +2029,7 @@ static MACHINE_RESET( a2600 )
 		space->install_write_bank(0x1000, 0x10ff, "bank9");
 		space->install_read_bank(0x1100, 0x11ff, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->m_extra_RAM->base());
+		state->membank("bank9")->set_base(state->m_extra_RAM->base());
 	}
 
 	if (state->m_banking_mode == modeCV)
@@ -2037,7 +2037,7 @@ static MACHINE_RESET( a2600 )
 		space->install_write_bank(0x1400, 0x17ff, "bank9");
 		space->install_read_bank(0x1000, 0x13ff, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->m_extra_RAM->base());
+		state->membank("bank9")->set_base(state->m_extra_RAM->base());
 	}
 
 	if (chip)
@@ -2045,7 +2045,7 @@ static MACHINE_RESET( a2600 )
 		space->install_write_bank(0x1000, 0x107f, "bank9");
 		space->install_read_bank(0x1080, 0x10ff, "bank9");
 
-		memory_set_bankptr(machine,"bank9", state->m_extra_RAM->base());
+		state->membank("bank9")->set_base(state->m_extra_RAM->base());
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */

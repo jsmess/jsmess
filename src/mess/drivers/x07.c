@@ -333,8 +333,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		break;
 	case 0x1c:	//UDC Init
 		{
-			memcpy(m_t6834_ram + 0x200, (UINT8*)machine().region("gfx1")->base() + 0x400, 0x100);
-			memcpy(m_t6834_ram + 0x300, (UINT8*)machine().region("gfx1")->base() + 0x700, 0x100);
+			memcpy(m_t6834_ram + 0x200, (UINT8*)machine().root_device().memregion("gfx1")->base() + 0x400, 0x100);
+			memcpy(m_t6834_ram + 0x300, (UINT8*)machine().root_device().memregion("gfx1")->base() + 0x700, 0x100);
 		}
 		break;
 
@@ -900,7 +900,7 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 	}
 	else							//charset
 	{
-		return machine().region("gfx1")->base()[pos];
+		return memregion("gfx1")->base()[pos];
 	}
 }
 
@@ -1047,7 +1047,7 @@ static DEVICE_IMAGE_LOAD( x07_card )
 
 	if (image.software_entry() == NULL)
 	{
-		UINT8 *rom = machine.region_alloc( "card", image.length(), 1, ENDIANNESS_LITTLE )->base();
+		UINT8 *rom = machine.memory().region_alloc( "card", image.length(), 1, ENDIANNESS_LITTLE )->base();
 		image.fread(rom, image.length());
 
 		space->install_ram(ram_size, ram_size + 0xfff);
@@ -1353,8 +1353,8 @@ static NVRAM_HANDLER( x07 )
 				strcpy((char*)state->m_t6834_ram + udk_offset[i], udk_ini[i]);
 
 			//copy default chars in the UDC
-			memcpy(state->m_t6834_ram + 0x200, (UINT8*)machine.region("gfx1")->base() + 0x400, 0x100);
-			memcpy(state->m_t6834_ram + 0x300, (UINT8*)machine.region("gfx1")->base() + 0x700, 0x100);
+			memcpy(state->m_t6834_ram + 0x200, (UINT8*)machine.root_device().memregion("gfx1")->base() + 0x400, 0x100);
+			memcpy(state->m_t6834_ram + 0x300, (UINT8*)machine.root_device().memregion("gfx1")->base() + 0x700, 0x100);
 			state->m_warm_start = 0;
 		}
 	}

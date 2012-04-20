@@ -86,13 +86,13 @@ void newbrain_eim_state::bankswitch()
 		case 0:
 			/* ROM */
 			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(machine(), bank_name, 0, 1, machine().region("eim")->base() + eim_bank_start, 0);
+			membank(bank_name)->configure_entry(0, memregion("eim")->base() + eim_bank_start);
 			break;
 
 		case 2:
 			/* RAM */
 			memory_install_ram_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(machine(), bank_name, 0, 1, m_eim_ram + eim_bank_start, 0);
+			membank(bank_name)->configure_entry(0, m_eim_ram + eim_bank_start);
 			break;
 
 		default:
@@ -118,11 +118,11 @@ void newbrain_state::bankswitch()
 		{
 			/* all banks point to ROM at 0xe000 */
 			memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-			memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + 0xe000, 0);
+			membank(bank_name)->configure_entry(0, memregion(Z80_TAG)->base() + 0xe000);
 		}
 		else
 		{
-			memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + bank_start, 0);
+			membank(bank_name)->configure_entry(0, memregion(Z80_TAG)->base() + bank_start);
 
 			if (bank < 5)
 			{
@@ -132,16 +132,16 @@ void newbrain_state::bankswitch()
 			else if (bank == 5)
 			{
 				/* 0x8000-0x9fff */
-				if (machine().region("eim")->base())
+				if (machine().root_device().memregion("eim")->base())
 				{
 					/* expansion interface ROM */
 					memory_install_rom_helper(program, bank_name, bank_start, bank_end);
-					memory_configure_bank(machine(), bank_name, 0, 1, machine().region("eim")->base() + 0x4000, 0);
+					membank(bank_name)->configure_entry(0, memregion("eim")->base() + 0x4000);
 				}
 				else
 				{
 					/* mirror of 0xa000-0xbfff */
-					if (machine().region(Z80_TAG)->base()[0xa001] == 0)
+					if (machine().root_device().memregion(Z80_TAG)->base()[0xa001] == 0)
 					{
 						/* unmapped on the M model */
 						memory_install_unmapped(program, bank_name, bank_start, bank_end);
@@ -152,13 +152,13 @@ void newbrain_state::bankswitch()
 						memory_install_rom_helper(program, bank_name, bank_start, bank_end);
 					}
 
-					memory_configure_bank(machine(), bank_name, 0, 1, machine().region(Z80_TAG)->base() + 0xa000, 0);
+					membank(bank_name)->configure_entry(0, memregion(Z80_TAG)->base() + 0xa000);
 				}
 			}
 			else if (bank == 6)
 			{
 				/* 0xa000-0xbfff */
-				if (machine().region(Z80_TAG)->base()[0xa001] == 0)
+				if (machine().root_device().memregion(Z80_TAG)->base()[0xa001] == 0)
 				{
 					/* unmapped on the M model */
 					memory_install_unmapped(program, bank_name, bank_start, bank_end);
@@ -176,7 +176,7 @@ void newbrain_state::bankswitch()
 			}
 		}
 
-		memory_set_bank(machine(), bank_name, 0);
+		membank(bank_name)->set_entry(0);
 	}
 }
 

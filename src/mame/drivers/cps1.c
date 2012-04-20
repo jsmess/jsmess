@@ -281,7 +281,7 @@ WRITE16_MEMBER(cps_state::forgottn_dial_1_reset_w)
 
 WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
@@ -348,7 +348,7 @@ static INTERRUPT_GEN( cps1_qsound_interrupt )
 
 READ16_MEMBER(cps_state::qsound_rom_r)
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	if (rom)
 		return rom[offset] | 0xff00;
@@ -387,13 +387,13 @@ WRITE8_MEMBER(cps_state::qsound_banksw_w)
 {
 	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
 	int bank = data & 0x0f;
-	if ((0x10000 + (bank * 0x4000)) >= machine().region("audiocpu")->bytes())
+	if ((0x10000 + (bank * 0x4000)) >= memregion("audiocpu")->bytes())
 	{
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bank = 0;
 	}
 
-	memory_set_bank(machine(), "bank1", bank);
+	membank("bank1")->set_entry(bank);
 }
 
 
@@ -3040,13 +3040,13 @@ static MACHINE_START( common )
 static MACHINE_START( cps1 )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_START( qsound )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank1", 0, 6, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 6, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
@@ -10776,7 +10776,7 @@ static DRIVER_INIT( pang3b )
 
 static DRIVER_INIT( pang3 )
 {
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	int A, src, dst;
 
 	for (A = 0x80000; A < 0x100000; A += 2)
@@ -10806,8 +10806,8 @@ READ16_MEMBER(cps_state::sf2mdt_r)
 static DRIVER_INIT( sf2mdt )
 {
 	int i;
-	UINT32 gfx_size = machine.region( "gfx" )->bytes();
-	UINT8 *rom = machine.region( "gfx" )->base();
+	UINT32 gfx_size = machine.root_device().memregion( "gfx" )->bytes();
+	UINT8 *rom = machine.root_device().memregion( "gfx" )->base();
 	UINT8 tmp;
 
 	for( i = 0; i < gfx_size; i += 8 )

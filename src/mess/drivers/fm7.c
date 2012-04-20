@@ -288,8 +288,8 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 
 READ8_MEMBER(fm7_state::vector_r)
 {
-	UINT8* RAM = machine().region("maincpu")->base();
-	UINT8* ROM = machine().region("init")->base();
+	UINT8* RAM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("init")->base();
 
 	if(m_init_rom_en)
 		return ROM[0x1ff0+offset];
@@ -304,7 +304,7 @@ READ8_MEMBER(fm7_state::vector_r)
 
 WRITE8_MEMBER(fm7_state::vector_w)
 {
-	UINT8* RAM = machine().region("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 
 	if(m_type == SYS_FM7)
 		RAM[0xfff0+offset] = data;
@@ -342,14 +342,14 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	UINT8* RAM = machine().region("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 
 	m_basic_rom_en = 1;
 	if(m_type == SYS_FM7)
 	{
 		space.install_read_bank(0x8000,0xfbff,"bank1");
 		space.nop_write(0x8000,0xfbff);
-		memory_set_bankptr(machine(),"bank1",RAM+0x38000);
+		membank("bank1")->set_base(RAM+0x38000);
 	}
 	else
 		fm7_mmr_refresh(&space);
@@ -359,13 +359,13 @@ READ8_MEMBER(fm7_state::fm7_rom_en_r)
 
 WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
 {
-	UINT8* RAM = machine().region("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 
 	m_basic_rom_en = 0;
 	if(m_type == SYS_FM7)
 	{
 		space.install_readwrite_bank(0x8000,0xfbff,"bank1");
-		memory_set_bankptr(machine(),"bank1",RAM+0x8000);
+		membank("bank1")->set_base(RAM+0x8000);
 	}
 	else
 		fm7_mmr_refresh(&space);
@@ -988,7 +988,7 @@ READ8_MEMBER(fm7_state::fm7_mmr_r)
 static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8* RAM = space->machine().region("maincpu")->base();
+	UINT8* RAM = state->memregion("maincpu")->base();
 	UINT16 size = 0xfff;
 	char bank_name[10];
 
@@ -1038,7 +1038,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 				space->install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),state),write8_delegate(FUNC(fm7_state::fm7_vramB_w),state));
 				break;
 		}
-//      memory_set_bankptr(space->machine(),bank+1,RAM+(physical<<12)-0x10000);
+//      state->membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
 		return;
 	}
 	if(physical == 0x1c)
@@ -1055,10 +1055,10 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->m_init_rom_en && (state->m_type == SYS_FM11 || state->m_type == SYS_FM16))
 		{
-			RAM = space->machine().region("init")->base();
+			RAM = space->machine().root_device().memregion("init")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space->nop_write(bank*0x1000,(bank*0x1000)+size);
-			memory_set_bankptr(space->machine(),bank_name,RAM+(physical<<12)-0x35000);
+			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x35000);
 			return;
 		}
 	}
@@ -1066,10 +1066,10 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->m_init_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
 		{
-			RAM = space->machine().region("init")->base();
+			RAM = space->machine().root_device().memregion("init")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space->nop_write(bank*0x1000,(bank*0x1000)+size);
-			memory_set_bankptr(space->machine(),bank_name,RAM+(physical<<12)-0x36000);
+			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x36000);
 			return;
 		}
 	}
@@ -1077,15 +1077,15 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
 		{
-			RAM = space->machine().region("fbasic")->base();
+			RAM = space->machine().root_device().memregion("fbasic")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space->nop_write(bank*0x1000,(bank*0x1000)+size);
-			memory_set_bankptr(space->machine(),bank_name,RAM+(physical<<12)-0x38000);
+			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
 	space->install_readwrite_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
-	memory_set_bankptr(space->machine(),bank_name,RAM+(physical<<12));
+	state->membank(bank_name)->set_base(RAM+(physical<<12));
 }
 
 static void fm7_mmr_refresh(address_space* space)
@@ -1093,7 +1093,7 @@ static void fm7_mmr_refresh(address_space* space)
 	fm7_state *state = space->machine().driver_data<fm7_state>();
 	int x;
 	UINT16 window_addr;
-	UINT8* RAM = space->machine().region("maincpu")->base();
+	UINT8* RAM = state->memregion("maincpu")->base();
 
 	if(state->m_mmr.enabled)
 	{
@@ -1116,7 +1116,7 @@ static void fm7_mmr_refresh(address_space* space)
 //      if(window_addr < 0xfc00)
 		{
 			space->install_readwrite_bank(0x7c00,0x7fff,"bank24");
-			memory_set_bankptr(space->machine(),"bank24",RAM+window_addr);
+			state->membank("bank24")->set_base(RAM+window_addr);
 		}
 	}
 }
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
  */
 READ8_MEMBER(fm7_state::fm7_kanji_r)
 {
-	UINT8* KROM = machine().region("kanji1")->base();
+	UINT8* KROM = memregion("kanji1")->base();
 	UINT32 addr = m_kanji_address << 1;
 
 	switch(offset)
@@ -1846,7 +1846,7 @@ static MACHINE_START(fm7)
 	fm7_state *state = machine.driver_data<fm7_state>();
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
-	UINT8* RAM = machine.region("maincpu")->base();
+	UINT8* RAM = state->memregion("maincpu")->base();
 
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
@@ -1861,8 +1861,8 @@ static MACHINE_START(fm7)
 static MACHINE_START(fm77av)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.region("maincpu")->base();
-	UINT8* ROM = machine.region("init")->base();
+	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8* ROM = machine.root_device().memregion("init")->base();
 
 	memset(state->m_shared_ram,0xff,0x80);
 
@@ -1870,10 +1870,10 @@ static MACHINE_START(fm77av)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
 	state->m_video.subrom = 0;  // default sub CPU ROM is type C.
-	RAM = machine.region("subsyscg")->base();
-	memory_set_bankptr(machine,"bank20",RAM);
-	RAM = machine.region("subsys_c")->base();
-	memory_set_bankptr(machine,"bank21",RAM+0x800);
+	RAM = machine.root_device().memregion("subsyscg")->base();
+	state->membank("bank20")->set_base(RAM);
+	RAM = state->memregion("subsys_c")->base();
+	state->membank("bank21")->set_base(RAM+0x800);
 
 	state->m_type = SYS_FM77AV;
 	beep_set_frequency(machine.device(BEEPER_TAG),1200);
@@ -1883,8 +1883,8 @@ static MACHINE_START(fm77av)
 static MACHINE_START(fm11)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.region("maincpu")->base();
-	UINT8* ROM = machine.region("init")->base();
+	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8* ROM = state->memregion("init")->base();
 
 	memset(state->m_shared_ram,0xff,0x80);
 	state->m_type = SYS_FM11;
@@ -1906,8 +1906,8 @@ static MACHINE_START(fm16)
 static MACHINE_RESET(fm7)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	UINT8* RAM = machine.region("maincpu")->base();
-	UINT8* ROM = machine.region("init")->base();
+	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8* ROM = state->memregion("init")->base();
 
 	state->m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
 	state->m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
@@ -1938,7 +1938,7 @@ static MACHINE_RESET(fm7)
 	else
 		state->m_init_rom_en = 0;
 	if(state->m_type == SYS_FM7)
-		memory_set_bankptr(machine,"bank1",RAM+0x38000);
+		state->membank("bank1")->set_base(RAM+0x38000);
 	state->m_key_delay = 700;  // 700ms on FM-7
 	state->m_key_repeat = 70;  // 70ms on FM-7
 	state->m_break_flag = 0;
@@ -1958,11 +1958,11 @@ static MACHINE_RESET(fm7)
 	{
 		if(!(input_port_read(machine,"DSW") & 0x02))
 		{  // DOS mode
-			memory_set_bankptr(machine,"bank17",machine.region("dos")->base());
+			state->membank("bank17")->set_base(machine.root_device().memregion("dos")->base());
 		}
 		else
 		{  // BASIC mode
-			memory_set_bankptr(machine,"bank17",machine.region("basic")->base());
+			state->membank("bank17")->set_base(machine.root_device().memregion("basic")->base());
 		}
 	}
 	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX || state->m_type == SYS_FM11)

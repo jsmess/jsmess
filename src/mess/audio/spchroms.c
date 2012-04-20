@@ -33,9 +33,9 @@ void spchroms_config(running_machine &machine, const spchroms_interface *intf)
 	}
 	else
 	{	/* speech ROM */
-		speechrom_data = machine.region(intf->memory_region)->base();
+		speechrom_data = machine.root_device().memregion(intf->memory_region)->base();
 		/* take region length */
-		speechROMlen = machine.region(intf->memory_region)->bytes();
+		speechROMlen = machine.root_device().memregion(intf->memory_region)->bytes();
 	}
 }
 

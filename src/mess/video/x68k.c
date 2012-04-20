@@ -1088,11 +1088,11 @@ VIDEO_START( x68000 )
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine.region("user1")->base(), 32, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine.root_device().memregion("user1")->base(), 32, 0);
 
 	gfx_index++;
 
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, machine.region("user1")->base(), 32, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, state->memregion("user1")->base(), 32, 0);
 	machine.gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
@@ -1150,7 +1150,7 @@ SCREEN_UPDATE_IND16( x68000 )
 		rect.max_y = cliprect.max_y;
 
 	// update tiles
-	//rom = screen.machine().region("user1")->base();
+	//rom = screen.machine().root_device().memregion("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(state->m_video.tile16_dirty[x] != 0)

@@ -320,7 +320,7 @@ static const cassette_interface pegasus_cassette_interface =
 
 VIDEO_START_MEMBER( pegasus_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static const UINT8 mcm6571a_shift[] =
@@ -420,7 +420,7 @@ GFXDECODE_END
     multipart roms will have. */
 static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
 {
-	UINT8 b, *ROM = machine.region("maincpu")->base();
+	UINT8 b, *ROM = machine.root_device().memregion("maincpu")->base();
 	UINT16 i, j;
 	UINT8 buff[0x1000];
 	if (ROM[addr] == 0x02)
@@ -439,7 +439,7 @@ static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
-	image.fread(image.device().machine().region("maincpu")->base() + 0x0000, 0x1000);
+	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x0000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x0000 );
 
 	return IMAGE_INIT_PASS;
@@ -447,7 +447,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 {
-	image.fread(image.device().machine().region("maincpu")->base() + 0x1000, 0x1000);
+	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x1000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x1000 );
 
 	return IMAGE_INIT_PASS;
@@ -455,7 +455,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
-	image.fread(image.device().machine().region("maincpu")->base() + 0x2000, 0x1000);
+	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x2000 );
 
 	return IMAGE_INIT_PASS;
@@ -463,7 +463,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
-	image.fread(image.device().machine().region("maincpu")->base() + 0xc000, 0x1000);
+	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0xc000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0xc000 );
 
 	return IMAGE_INIT_PASS;
@@ -471,7 +471,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 {
-	image.fread( image.device().machine().region("maincpu")->base() + 0xd000, 0x1000);
+	image.fread( image.device().machine().root_device().memregion("maincpu")->base() + 0xd000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0xd000 );
 
 	return IMAGE_INIT_PASS;
@@ -479,7 +479,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 
 MACHINE_START_MEMBER( pegasus_state )
 {
-	m_p_pcgram = machine().region("pcg")->base();
+	m_p_pcgram = memregion("pcg")->base();
 }
 
 MACHINE_RESET_MEMBER( pegasus_state )

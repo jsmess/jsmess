@@ -134,7 +134,8 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( sorcerer_reset )
 {
-	memory_set_bank(machine, "boot", 0);
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
@@ -305,7 +306,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 SNAPSHOT_LOAD(sorcerer)
 {
 	device_t *cpu = image.device().machine().device("maincpu");
-	UINT8 *RAM = image.device().machine().region(cpu->tag())->base();
+	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
 	address_space *space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
@@ -421,6 +422,6 @@ MACHINE_RESET( sorcerer )
 	state->m_fe = 0xff;
 	state->sorcerer_fe_w(*space, 0, 0, 0xff);
 
-	memory_set_bank(machine, "boot", 1);
+	state->membank("boot")->set_entry(1);
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
 }

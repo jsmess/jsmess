@@ -202,7 +202,7 @@ static TIMER_DEVICE_CALLBACK( borisdpl_timer_interrupt )
 
 void chesstrv_state::machine_start()
 {
-	m_ram = machine().region("ram")->base();
+	m_ram = memregion("ram")->base();
 
 	save_item(NAME(m_ram_addr));
 	save_item(NAME(m_matrix));

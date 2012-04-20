@@ -547,7 +547,7 @@ WRITE16_MEMBER( vii_state::vii_audio_w )
 
 void vii_state::vii_switch_bank(UINT32 bank)
 {
-	UINT8 *cart = machine().region("cart")->base();
+	UINT8 *cart = memregion("cart")->base();
 
 	if(bank != m_current_bank)
 	{
@@ -917,7 +917,7 @@ INPUT_PORTS_END
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = image.device().machine().region( "cart" )->base();
+	UINT8 *cart = state->memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -951,7 +951,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 static DEVICE_IMAGE_LOAD( vsmile_cart )
 {
 	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = image.device().machine().region( "cart" )->base();
+	UINT8 *cart = state->memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -996,7 +996,7 @@ static MACHINE_START( vii )
 	state->m_controller_input[6] = 0xff;
 	state->m_controller_input[7] = 0;
 
-	UINT8 *rom = machine.region( "cart" )->base();
+	UINT8 *rom = state->memregion( "cart" )->base();
 	if (rom)
 	{ // to prevent batman crash
 		memcpy(state->m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);

@@ -122,7 +122,7 @@ static MACHINE_START( palm )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_read_bank (0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
 	space->install_write_bank(0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 
 	state->save_item(NAME(state->m_port_f_latch));
 	state->save_item(NAME(state->m_spim_data));
@@ -134,7 +134,7 @@ static MACHINE_START( palm )
 static MACHINE_RESET( palm )
 {
     // Copy boot ROM
-	UINT8* bios = machine.region("bios")->base();
+	UINT8* bios = machine.root_device().memregion("bios")->base();
 	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
 	memcpy(machine.device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
 

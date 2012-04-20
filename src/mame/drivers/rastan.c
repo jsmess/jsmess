@@ -163,7 +163,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 
 static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 {
-	memory_set_bank(device->machine(),  "bank1", data & 3);
+	device->machine().root_device().membank("bank1")->set_entry(data & 3);
 }
 
 
@@ -177,7 +177,7 @@ static void rastan_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
 		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
@@ -359,10 +359,10 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( rastan )
 {
 	rastan_state *state = machine.driver_data<rastan_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 1, 3, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
+	state->membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

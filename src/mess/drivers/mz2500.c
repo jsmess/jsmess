@@ -218,7 +218,7 @@ static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int
 static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *vram = machine.region("maincpu")->base();
+	UINT8 *vram = machine.root_device().memregion("maincpu")->base();
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -243,17 +243,17 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = machine.region("pcg")->base();
+				gfx_data = machine.root_device().memregion("pcg")->base();
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = machine.region("kanji")->base();
+				gfx_data = state->memregion("kanji")->base();
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = machine.region("kanji")->base();
+				gfx_data = machine.root_device().memregion("kanji")->base();
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -261,7 +261,7 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			}
 			else
 			{
-				gfx_data = machine.region("pcg")->base();
+				gfx_data = machine.root_device().memregion("pcg")->base();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -309,7 +309,7 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *vram = machine.region("maincpu")->base();
+	UINT8 *vram = machine.root_device().memregion("maincpu")->base();
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -335,17 +335,17 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = machine.region("pcg")->base();
+				gfx_data = machine.root_device().memregion("pcg")->base();
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = machine.region("kanji")->base();
+				gfx_data = state->memregion("kanji")->base();
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = machine.region("kanji")->base();
+				gfx_data = machine.root_device().memregion("kanji")->base();
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -353,7 +353,7 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			}
 			else
 			{
-				gfx_data = machine.region("pcg")->base();
+				gfx_data = machine.root_device().memregion("pcg")->base();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -399,9 +399,9 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	//mz2500_state *state = machine.driver_data<mz2500_state>();
+	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = machine.region("maincpu")->base();
+	UINT8 *vram = state->memregion("maincpu")->base();
 	UINT8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
@@ -443,7 +443,7 @@ static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,cons
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = machine.region("maincpu")->base();
+	UINT8 *vram = state->memregion("maincpu")->base();
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -501,7 +501,7 @@ static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = machine.region("maincpu")->base();
+	UINT8 *vram = state->memregion("maincpu")->base();
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -733,7 +733,7 @@ UINT8 mz2500_state::mz2500_cg_latch_compare()
 
 UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 {
-	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 	switch(cur_bank)
@@ -768,13 +768,13 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		{
 			if(m_kanji_bank & 0x80) //kanji ROM
 			{
-				UINT8 *knj_rom = machine().region("kanji")->base();
+				UINT8 *knj_rom = memregion("kanji")->base();
 
 				return knj_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = machine().region("pcg")->base();
+				UINT8 *pcg_ram = memregion("pcg")->base();
 
 				return pcg_ram[offset];
 			}
@@ -782,7 +782,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		break;
 		case 0x3a:
 		{
-			UINT8 *dic_rom = machine().region("dictionary")->base();
+			UINT8 *dic_rom = memregion("dictionary")->base();
 
 			return dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 		}
@@ -792,7 +792,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		case 0x3e:
 		case 0x3f:
 		{
-			UINT8 *phone_rom = machine().region("phone")->base();
+			UINT8 *phone_rom = memregion("phone")->base();
 
 			return phone_rom[offset+(cur_bank & 3)*0x2000];
 		}
@@ -805,7 +805,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 
 void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
@@ -898,7 +898,7 @@ void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = machine().region("pcg")->base();
+				UINT8 *pcg_ram = memregion("pcg")->base();
 				pcg_ram[offset] = data;
 				if((offset & 0x1800) == 0x0000)
 					gfx_element_mark_dirty(machine().gfx[3], (offset) >> 3);
@@ -967,7 +967,7 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 
 WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 {
-//  UINT8 *ROM = machine().region("maincpu")->base();
+//  UINT8 *ROM = memregion("maincpu")->base();
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
 	m_bank_val[m_bank_addr] = data & 0x3f;
@@ -975,7 +975,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
 
-//  memory_set_bankptr(machine(), bank_name[m_bank_addr], &ROM[m_bank_val[m_bank_addr]*0x2000]);
+//  membank(bank_name[m_bank_addr])->set_base(&ROM[m_bank_val[m_bank_addr]*0x2000]);
 
 	m_bank_addr++;
 	m_bank_addr&=7;
@@ -1207,7 +1207,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(mz2500_state::mz2500_rom_r)
 {
-	UINT8 *rom = machine().region("rom")->base();
+	UINT8 *rom = memregion("rom")->base();
 	UINT8 res;
 
 	m_lrom_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
@@ -1340,7 +1340,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
-		UINT8 *vram = machine().region("maincpu")->base();
+		UINT8 *vram = memregion("maincpu")->base();
 		UINT32 layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1426,7 +1426,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
 
 READ8_MEMBER(mz2500_state::mz2500_kanji_r)
 {
-	UINT8 *knj2_rom = machine().region("kanji2")->base();
+	UINT8 *knj2_rom = memregion("kanji2")->base();
 
 	printf("Read from kanji 2 ROM\n");
 
@@ -1455,7 +1455,7 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 
 READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
@@ -1479,7 +1479,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 
 WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
@@ -1718,8 +1718,8 @@ static void mz2500_reset(mz2500_state *state, UINT8 type)
 static MACHINE_RESET(mz2500)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
-	UINT8 *IPL = machine.region("ipl")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *IPL = state->memregion("ipl")->base();
 	UINT32 i;
 
 	mz2500_reset(state, IPL_RESET);

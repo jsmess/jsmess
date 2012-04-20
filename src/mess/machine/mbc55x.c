@@ -362,7 +362,7 @@ static void set_ram_size(running_machine &machine)
 
 		if(bankno<nobanks)
 		{
-			memory_set_bankptr(machine, bank, map_base);
+			state->membank(bank)->set_base(map_base);
 			space->install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
 			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
 		}
@@ -374,9 +374,9 @@ static void set_ram_size(running_machine &machine)
 	}
 
 	// Graphics red and blue plane memory mapping, green is in main memory
-	memory_set_bankptr(machine, RED_PLANE_TAG, &state->m_video_mem[RED_PLANE_OFFSET]);
+	state->membank(RED_PLANE_TAG)->set_base(&state->m_video_mem[RED_PLANE_OFFSET]);
 	space->install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
-	memory_set_bankptr(machine, BLUE_PLANE_TAG, &state->m_video_mem[BLUE_PLANE_OFFSET]);
+	state->membank(BLUE_PLANE_TAG)->set_base(&state->m_video_mem[BLUE_PLANE_OFFSET]);
 	space->install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 

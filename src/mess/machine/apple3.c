@@ -275,9 +275,9 @@ static UINT8 *apple3_bankaddr(running_machine &machine,UINT16 bank, offs_t offse
 static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT16 bank, offs_t offset)
 {
 	UINT8 *ptr;
-
+	apple3_state *state = machine.driver_data<apple3_state>();
 	ptr = apple3_bankaddr(machine,bank, offset);
-	memory_set_bankptr(machine, mame_bank, ptr);
+	state->membank(mame_bank)->set_base(ptr);
 
 	if (LOG_MEMORY)
 	{
@@ -438,7 +438,7 @@ static void apple3_update_memory(running_machine &machine)
 	else
 		space->install_write_bank(0xF000, 0xFFFF, "bank7");
 	if (state->m_via_0_a & 0x01)
-		memory_set_bankptr(machine,"bank7", machine.region("maincpu")->base());
+		state->membank("bank7")->set_base(machine.root_device().memregion("maincpu")->base());
 	else
 		apple3_setbank(machine,"bank7", ~0, 0x7000);
 
@@ -632,7 +632,7 @@ READ8_MEMBER(apple3_state::apple3_indexed_read)
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
-		result = machine().region("maincpu")->base()[offset % machine().region("maincpu")->bytes()];
+		result = memregion("maincpu")->base()[offset % memregion("maincpu")->bytes()];
 	return result;
 }
 
@@ -718,7 +718,7 @@ DRIVER_INIT( apple3 )
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	/* hack to get around VIA problem */
-	machine.region("maincpu")->base()[0x0685] = 0x00;
+	state->memregion("maincpu")->base()[0x0685] = 0x00;
 
 	state->m_enable_mask = 0;
 	apple3_update_drives(machine.device("fdc"));

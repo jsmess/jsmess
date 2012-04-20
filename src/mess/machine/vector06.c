@@ -66,7 +66,7 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT8 *romdisk = machine().region("maincpu")->base() + 0x18000;
+	UINT8 *romdisk = memregion("maincpu")->base() + 0x18000;
 	UINT16 addr = (m_romdisk_msb | m_romdisk_lsb) & 0x7fff;
 	return romdisk[addr];
 }
@@ -139,17 +139,18 @@ static IRQ_CALLBACK( vector06_irq_callback )
 
 static TIMER_CALLBACK( reset_check_callback )
 {
+	vector06_state *state = machine.driver_data<vector06_state>();
 	UINT8 val = input_port_read(machine, "RESET");
 
 	if (BIT(val, 0))
 	{
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000);
 		machine.device("maincpu")->reset();
 	}
 
 	if (BIT(val, 1))
 	{
-		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -178,10 +179,10 @@ MACHINE_RESET( vector06 )
 	space->install_read_bank (0x8000, 0xffff, "bank3");
 	space->install_write_bank(0x8000, 0xffff, "bank4");
 
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
-	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
-	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
-	memory_set_bankptr(machine, "bank4", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000);
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 
 	state->m_keyboard_mask = 0;
 	state->m_color_index = 0;

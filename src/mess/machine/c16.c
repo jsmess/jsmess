@@ -106,45 +106,45 @@ READ8_DEVICE_HANDLER(c16_m7501_port_read)
 static void c16_bankswitch( running_machine &machine )
 {
 	c16_state *state = machine.driver_data<c16_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank9", state->m_messram->pointer());
+	UINT8 *rom = state->memregion("maincpu")->base();
+	state->membank("bank9")->set_base(state->m_messram->pointer());
 
 	switch (state->m_lowrom)
 	{
 	case 0:
-		memory_set_bankptr(machine, "bank2", rom + 0x10000);
+		state->membank("bank2")->set_base(rom + 0x10000);
 		break;
 	case 1:
-		memory_set_bankptr(machine, "bank2", rom + 0x18000);
+		state->membank("bank2")->set_base(rom + 0x18000);
 		break;
 	case 2:
-		memory_set_bankptr(machine, "bank2", rom + 0x20000);
+		state->membank("bank2")->set_base(rom + 0x20000);
 		break;
 	case 3:
-		memory_set_bankptr(machine, "bank2", rom + 0x28000);
+		state->membank("bank2")->set_base(rom + 0x28000);
 		break;
 	}
 
 	switch (state->m_highrom)
 	{
 	case 0:
-		memory_set_bankptr(machine, "bank3", rom + 0x14000);
-		memory_set_bankptr(machine, "bank8", rom + 0x17f20);
+		state->membank("bank3")->set_base(rom + 0x14000);
+		state->membank("bank8")->set_base(rom + 0x17f20);
 		break;
 	case 1:
-		memory_set_bankptr(machine, "bank3", rom + 0x1c000);
-		memory_set_bankptr(machine, "bank8", rom + 0x1ff20);
+		state->membank("bank3")->set_base(rom + 0x1c000);
+		state->membank("bank8")->set_base(rom + 0x1ff20);
 		break;
 	case 2:
-		memory_set_bankptr(machine, "bank3", rom + 0x24000);
-		memory_set_bankptr(machine, "bank8", rom + 0x27f20);
+		state->membank("bank3")->set_base(rom + 0x24000);
+		state->membank("bank8")->set_base(rom + 0x27f20);
 		break;
 	case 3:
-		memory_set_bankptr(machine, "bank3", rom + 0x2c000);
-		memory_set_bankptr(machine, "bank8", rom + 0x2ff20);
+		state->membank("bank3")->set_base(rom + 0x2c000);
+		state->membank("bank8")->set_base(rom + 0x2ff20);
 		break;
 	}
-	memory_set_bankptr(machine, "bank4", rom + 0x17c00);
+	state->membank("bank4")->set_base(rom + 0x17c00);
 }
 
 WRITE8_HANDLER( c16_switch_to_rom )
@@ -186,10 +186,10 @@ WRITE8_HANDLER( c16_switch_to_ram )
 
 	ted7360_rom_switch_w(state->m_ted7360, 0);
 
-	memory_set_bankptr(space->machine(), "bank2", ram + (0x8000 % ram_size));
-	memory_set_bankptr(space->machine(), "bank3", ram + (0xc000 % ram_size));
-	memory_set_bankptr(space->machine(), "bank4", ram + (0xfc00 % ram_size));
-	memory_set_bankptr(space->machine(), "bank8", ram + (0xff20 % ram_size));
+	state->membank("bank2")->set_base(ram + (0x8000 % ram_size));
+	state->membank("bank3")->set_base(ram + (0xc000 % ram_size));
+	state->membank("bank4")->set_base(ram + (0xfc00 % ram_size));
+	state->membank("bank8")->set_base(ram + (0xff20 % ram_size));
 }
 
 UINT8 c16_read_keyboard( running_machine &machine, int databus )
@@ -396,13 +396,13 @@ void c16_interrupt( running_machine &machine, int level )
 static void c16_common_driver_init( running_machine &machine )
 {
 	c16_state *state = machine.driver_data<c16_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	/* initial bankswitch (notice that TED7360 is init to ROM) */
-	memory_set_bankptr(machine, "bank2", rom + 0x10000);
-	memory_set_bankptr(machine, "bank3", rom + 0x14000);
-	memory_set_bankptr(machine, "bank4", rom + 0x17c00);
-	memory_set_bankptr(machine, "bank8", rom + 0x17f20);
+	state->membank("bank2")->set_base(rom + 0x10000);
+	state->membank("bank3")->set_base(rom + 0x14000);
+	state->membank("bank4")->set_base(rom + 0x17c00);
+	state->membank("bank8")->set_base(rom + 0x17f20);
 
 	state->m_mem10000 = rom + 0x10000;
 	state->m_mem14000 = rom + 0x14000;
@@ -466,21 +466,21 @@ MACHINE_RESET( c16 )
 
 	if (state->m_pal)
 	{
-		memory_set_bankptr(machine, "bank1", ram + (0x4000 % ram_size));
+		state->membank("bank1")->set_base(ram + (0x4000 % ram_size));
 
-		memory_set_bankptr(machine, "bank5", ram + (0x4000 % ram_size));
-		memory_set_bankptr(machine, "bank6", ram + (0x8000 % ram_size));
-		memory_set_bankptr(machine, "bank7", ram + (0xc000 % ram_size));
+		state->membank("bank5")->set_base(ram + (0x4000 % ram_size));
+		state->membank("bank6")->set_base(ram + (0x8000 % ram_size));
+		state->membank("bank7")->set_base(ram + (0xc000 % ram_size));
 
 		space->install_write_bank(0xff20, 0xff3d,"bank10");
 		space->install_write_bank(0xff40, 0xffff, "bank11");
-		memory_set_bankptr(machine, "bank10", ram + (0xff20 % ram_size));
-		memory_set_bankptr(machine, "bank11", ram + (0xff40 % ram_size));
+		state->membank("bank10")->set_base(ram + (0xff20 % ram_size));
+		state->membank("bank11")->set_base(ram + (0xff40 % ram_size));
 	}
 	else
 	{
 		space->install_write_bank(0x4000, 0xfcff, "bank10");
-		memory_set_bankptr(machine, "bank10", ram + (0x4000 % ram_size));
+		state->membank("bank10")->set_base(ram + (0x4000 % ram_size));
 	}
 }
 
@@ -622,7 +622,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 static void plus4_software_list_cartridge_load(device_image_interface &image)
 {
-	UINT8 *mem = image.device().machine().region("maincpu")->base();
+	UINT8 *mem = image.device().machine().root_device().memregion("maincpu")->base();
 
 	size_t size = image.get_software_region_length("c1l");
 	if (size)
@@ -643,7 +643,7 @@ static void plus4_software_list_cartridge_load(device_image_interface &image)
 
 static int plus4_crt_load( device_image_interface &image )
 {
-	UINT8 *mem = image.device().machine().region("maincpu")->base();
+	UINT8 *mem = image.device().machine().root_device().memregion("maincpu")->base();
 	int size = image.length(), test;
 	const char *filetype;
 	int address = 0;

@@ -135,7 +135,7 @@ WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 
 VIDEO_START_MEMBER( alphatro_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( alphatro_update_row )
@@ -351,11 +351,11 @@ void alphatro_state::machine_reset()
 {
 	// do what the IPL does
 	//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
-	UINT8* ROM = machine().region("maincpu")->base();
+	UINT8* ROM = memregion("maincpu")->base();
 	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
-	//  memory_set_bankptr(machine(), "bank1", RAM);
+	//  membank("bank1")->set_base(RAM);
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));

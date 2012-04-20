@@ -248,19 +248,19 @@ void qx10_state::update_memory_mapping()
 
 	if (!m_memprom)
 	{
-		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024);
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024);
 	}
 	if (m_memcmos)
 	{
-		memory_set_bankptr(machine(), "bank2", m_cmosram);
+		membank("bank2")->set_base(m_cmosram);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024 + 32*1024);
+		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024 + 32*1024);
 	}
 }
 
@@ -958,7 +958,7 @@ void qx10_state::video_start()
 	//m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
 
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 static UPD7220_INTERFACE( hgdc_intf )

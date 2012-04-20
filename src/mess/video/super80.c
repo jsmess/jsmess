@@ -95,7 +95,7 @@ SCREEN_UPDATE_IND16( super80 )
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen.machine().region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
@@ -137,7 +137,7 @@ SCREEN_UPDATE_IND16( super80d )
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen.machine().region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
@@ -179,7 +179,7 @@ SCREEN_UPDATE_IND16( super80e )
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen.machine().region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
@@ -222,7 +222,7 @@ SCREEN_UPDATE_IND16( super80m )
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 col, bg=0, fg=0, options=input_port_read(screen.machine(), "CONFIG");
-	UINT8 *RAM = screen.machine().region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* get selected character generator */
 	UINT8 cgen = state->m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -284,7 +284,7 @@ VIDEO_START( super80 )
 {
 	super80_state *state = machine.driver_data<super80_state>();
 	state->m_vidpg = 0xfe00;
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -381,9 +381,9 @@ void super80_state::mc6845_cursor_configure()
 VIDEO_START( super80v )
 {
 	super80_state *state = machine.driver_data<super80_state>();
-	state->m_p_pcgram = machine.region("maincpu")->base()+0xf000;
-	state->m_p_videoram = machine.region("videoram")->base();
-	state->m_p_colorram = machine.region("colorram")->base();
+	state->m_p_pcgram = machine.root_device().memregion("maincpu")->base()+0xf000;
+	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
+	state->m_p_colorram = state->memregion("colorram")->base();
 }
 
 SCREEN_UPDATE_RGB32( super80v )

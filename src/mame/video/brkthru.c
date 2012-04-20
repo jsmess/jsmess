@@ -34,7 +34,7 @@
 
 PALETTE_INIT( brkthru )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -129,7 +129,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 	else if (offset == 1)
 	{
 		/* bit 0-2 = ROM bank select */
-		memory_set_bank(machine(), "bank1", data & 0x07);
+		membank("bank1")->set_entry(data & 0x07);
 
 		/* bit 3-5 = background tiles color code */
 		if (((data & 0x38) >> 2) != m_bgbasecolor)

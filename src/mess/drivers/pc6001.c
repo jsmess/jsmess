@@ -367,7 +367,7 @@ static void draw_tile_3bpp(running_machine &machine, bitmap_ind16 &bitmap,const 
 static void draw_tile_text(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
 {
 	int xi,yi,pen,fgcol,color;
-	UINT8 *gfx_data = machine.region("gfx1")->base();
+	UINT8 *gfx_data = machine.root_device().memregion("gfx1")->base();
 
 	for(yi=0;yi<12;yi++)
 	{
@@ -570,7 +570,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 	else if(state->m_exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
-		UINT8 *gfx_data = screen.machine().region("gfx1")->base();
+		UINT8 *gfx_data = screen.machine().root_device().memregion("gfx1")->base();
 
 		for(y=0;y<20;y++)
 		{
@@ -619,7 +619,7 @@ static SCREEN_UPDATE_IND16( pc6001sr )
 	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
 	int xi,yi,pen,fgcol,bgcol,color;
-	UINT8 *gfx_data = screen.machine().region("gfx1")->base();
+	UINT8 *gfx_data = state->memregion("gfx1")->base();
 
 
 	if(state->m_sr_video_mode & 8) // text mode
@@ -760,7 +760,7 @@ static const UINT8 *pc6001_get_video_ram(running_machine &machine, int scanline)
 
 static UINT8 pc6001_get_char_rom(running_machine &machine, UINT8 ch, int line)
 {
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
 	return gfx[ch*16+line];
 }
 #endif
@@ -801,15 +801,15 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 		m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *gfx_data = machine().region("gfx1")->base();
-			UINT8 *ext_rom = machine().region("cart_img")->base();
+			UINT8 *gfx_data = memregion("gfx1")->base();
+			UINT8 *ext_rom = memregion("cart_img")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(machine(), "bank1", &ext_rom[0x2000]);
+				membank("bank1")->set_base(&ext_rom[0x2000]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(machine(), "bank1", &gfx_data[0]);
+				membank("bank1")->set_base(&gfx_data[0]);
 		}
 	}
 	m_ppi->write(space,offset,data);
@@ -1015,38 +1015,38 @@ static const UINT32 banksw_table_r1[0x10*4][4] = {
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
-	UINT8 *gfx_data = machine().region("gfx1")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *gfx_data = memregion("gfx1")->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
-//  memory_set_bankptr(machine(), 1, &ROM[bankaddress]);
+//  membank(1)->set_base(&ROM[bankaddress]);
 
 	m_bank_r0 = data;
 
 //  printf("%02x BANK | %02x\n",data,m_bank_opt);
-	memory_set_bankptr(machine(), "bank1", &ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][0]]);
-	memory_set_bankptr(machine(), "bank2", &ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][1]]);
-	memory_set_bankptr(machine(), "bank3", &ROM[banksw_table_r0[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
+	membank("bank1")->set_base(&ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][0]]);
+	membank("bank2")->set_base(&ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][1]]);
+	membank("bank3")->set_base(&ROM[banksw_table_r0[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
 	if(!m_gfx_bank_on)
-		memory_set_bankptr(machine(), "bank4", &ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+		membank("bank4")->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 	else
-		memory_set_bankptr(machine(), "bank4", &gfx_data[m_cgrom_bank_addr]);
+		membank("bank4")->set_base(&gfx_data[m_cgrom_bank_addr]);
 }
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r1_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
-//  memory_set_bankptr(machine(), 1, &ROM[bankaddress]);
+//  membank(1)->set_base(&ROM[bankaddress]);
 
 	m_bank_r1 = data;
 
 //  printf("%02x BANK\n",data);
-	memory_set_bankptr(machine(), "bank5", &ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][0]]);
-	memory_set_bankptr(machine(), "bank6", &ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][1]]);
-	memory_set_bankptr(machine(), "bank7", &ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	memory_set_bankptr(machine(), "bank8", &ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+	membank("bank5")->set_base(&ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][0]]);
+	membank("bank6")->set_base(&ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][1]]);
+	membank("bank7")->set_base(&ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
+	membank("bank8")->set_base(&ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 }
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_w0_w)
@@ -1056,8 +1056,8 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_bank_w0_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
-	UINT8 *gfx_data = machine().region("gfx1")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *gfx_data = memregion("gfx1")->base();
 
 	/*
     0 - TVROM / VOICE ROM
@@ -1067,66 +1067,66 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
     */
 	m_bank_opt = data & 3;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][0]]);
-	memory_set_bankptr(machine(), "bank2", &ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][1]]);
-	memory_set_bankptr(machine(), "bank3", &ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
+	membank("bank1")->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][0]]);
+	membank("bank2")->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][1]]);
+	membank("bank3")->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
 	if(!m_gfx_bank_on)
-		memory_set_bankptr(machine(), "bank4", &ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+		membank("bank4")->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 	else
-		memory_set_bankptr(machine(), "bank4", &gfx_data[m_cgrom_bank_addr]);
-	memory_set_bankptr(machine(), "bank4", &ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
-	memory_set_bankptr(machine(), "bank5", &ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][0]]);
-	memory_set_bankptr(machine(), "bank6", &ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][1]]);
-	memory_set_bankptr(machine(), "bank7", &ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	memory_set_bankptr(machine(), "bank8", &ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+		membank("bank4")->set_base(&gfx_data[m_cgrom_bank_addr]);
+	membank("bank4")->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+	membank("bank5")->set_base(&ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][0]]);
+	membank("bank6")->set_base(&ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][1]]);
+	membank("bank7")->set_base(&ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
+	membank("bank8")->set_base(&ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram0_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(0) : EXWRAM(0))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram1_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(1) : EXWRAM(1))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram2_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(2) : EXWRAM(2))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram3_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(3) : EXWRAM(3))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram4_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(4) : EXWRAM(4))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram5_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(5) : EXWRAM(5))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram6_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram7_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
 }
 
@@ -1151,20 +1151,20 @@ WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
 		m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *ROM = machine().region("maincpu")->base();
-			UINT8 *gfx_data = machine().region("gfx1")->base();
+			UINT8 *ROM = memregion("maincpu")->base();
+			UINT8 *gfx_data = memregion("gfx1")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
 			{
 				m_gfx_bank_on = 0;
-				memory_set_bankptr(machine(), "bank4", &ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+				membank("bank4")->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 			}
 			if((data & 0x0f) == 0x04)
 			{
 				m_gfx_bank_on = 1;
-				memory_set_bankptr(machine(), "bank4", &gfx_data[m_cgrom_bank_addr]);
+				membank("bank4")->set_base(&gfx_data[m_cgrom_bank_addr]);
 			}
 		}
 	}
@@ -1174,7 +1174,7 @@ WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
 static void vram_bank_change(running_machine &machine,UINT8 vram_bank)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
-	UINT8 *work_ram = machine.region("maincpu")->base();
+	UINT8 *work_ram = state->memregion("maincpu")->base();
 
 //  popmessage("%02x",vram_bank);
 
@@ -1481,7 +1481,7 @@ READ8_MEMBER(pc6001_state::pc6001sr_bank_rn_r)
 WRITE8_MEMBER(pc6001_state::pc6001sr_bank_rn_w)
 {
 	static const char *const bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 bank_num;
 
 	m_sr_bank_r[offset] = data;
@@ -1489,14 +1489,14 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_rn_w)
 
 	switch(data & 0xf0)
 	{
-		case 0xf0: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_SYSROM_1(bank_num)]); break;
-		case 0xe0: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_SYSROM_2(bank_num)]); break;
-		case 0xd0: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_CGROM1(bank_num)]); break;
-		case 0xc0: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_EXROM0(bank_num)]); break;
-		case 0xb0: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_EXROM1(bank_num)]); break;
-		case 0x20: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_EXRAM0(bank_num)]); break;
-		case 0x00: memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_WRAM0(bank_num)]); break;
-		default:   memory_set_bankptr(machine(), bank_name[offset], &ROM[SR_NULL(bank_num)]); break;
+		case 0xf0: membank(bank_name[offset])->set_base(&ROM[SR_SYSROM_1(bank_num)]); break;
+		case 0xe0: membank(bank_name[offset])->set_base(&ROM[SR_SYSROM_2(bank_num)]); break;
+		case 0xd0: membank(bank_name[offset])->set_base(&ROM[SR_CGROM1(bank_num)]); break;
+		case 0xc0: membank(bank_name[offset])->set_base(&ROM[SR_EXROM0(bank_num)]); break;
+		case 0xb0: membank(bank_name[offset])->set_base(&ROM[SR_EXROM1(bank_num)]); break;
+		case 0x20: membank(bank_name[offset])->set_base(&ROM[SR_EXRAM0(bank_num)]); break;
+		case 0x00: membank(bank_name[offset])->set_base(&ROM[SR_WRAM0(bank_num)]); break;
+		default:   membank(bank_name[offset])->set_base(&ROM[SR_NULL(bank_num)]); break;
 	}
 }
 
@@ -1512,7 +1512,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_wn_w)
 
 #define SR_WRAM_BANK_W(_v_) \
 { \
-	UINT8 *ROM = machine().region("maincpu")->base(); \
+	UINT8 *ROM = memregion("maincpu")->base(); \
 	UINT8 bank_num; \
 	bank_num = m_sr_bank_w[_v_] & 0x0f; \
 	if((m_sr_bank_w[_v_] & 0xf0) != 0x20) \
@@ -1540,7 +1540,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_mode_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001sr_vram_bank_w)
 {
-	UINT8 *work_ram = machine().region("maincpu")->base();
+	UINT8 *work_ram = memregion("maincpu")->base();
 
 	m_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
 }
@@ -1591,15 +1591,15 @@ WRITE8_MEMBER(pc6001_state::necsr_ppi8255_w)
 
 		if(0)
 		{
-			UINT8 *gfx_data = machine().region("gfx1")->base();
-			UINT8 *ext_rom = machine().region("cart_img")->base();
+			UINT8 *gfx_data = memregion("gfx1")->base();
+			UINT8 *ext_rom = memregion("cart_img")->base();
 
 			//printf("%02x\n",data);
 
 			if((data & 0x0f) == 0x05)
-				memory_set_bankptr(machine(), "bank1", &ext_rom[0x2000]);
+				membank("bank1")->set_base(&ext_rom[0x2000]);
 			if((data & 0x0f) == 0x04)
-				memory_set_bankptr(machine(), "bank1", &gfx_data[0]);
+				membank("bank1")->set_base(&gfx_data[0]);
 		}
 	}
 	m_ppi->write(space,offset,data);
@@ -2002,7 +2002,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 		else
 			cas_data_i>>=1;
 		#else
-			UINT8 *cas_data = timer.machine().region("cas")->base();
+			UINT8 *cas_data = timer.machine().root_device().memregion("cas")->base();
 
 			state->m_cur_keycode = cas_data[state->m_cas_offset++];
 			popmessage("%04x %04x",state->m_cas_offset,state->m_cas_maxsize);
@@ -2073,7 +2073,7 @@ static MACHINE_START(pc6001)
 static MACHINE_RESET(pc6001)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
-	UINT8 *work_ram = machine.region("maincpu")->base();
+	UINT8 *work_ram = state->memregion("maincpu")->base();
 
 	state->m_video_ram =  work_ram + 0xc000;
 
@@ -2091,7 +2091,7 @@ static MACHINE_RESET(pc6001)
 static MACHINE_RESET(pc6001m2)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
-	UINT8 *work_ram = machine.region("maincpu")->base();
+	UINT8 *work_ram = machine.root_device().memregion("maincpu")->base();
 
 	state->m_video_ram = work_ram + 0xc000 + 0x28000;
 
@@ -2103,17 +2103,17 @@ static MACHINE_RESET(pc6001m2)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = machine.region("maincpu")->base();
+		UINT8 *ROM = state->memregion("maincpu")->base();
 		state->m_bank_r0 = 0x71;
-		memory_set_bankptr(machine, "bank1", &ROM[BASICROM(0)]);
-		memory_set_bankptr(machine, "bank2", &ROM[BASICROM(1)]);
-		memory_set_bankptr(machine, "bank3", &ROM[EXROM(0)]);
-		memory_set_bankptr(machine, "bank4", &ROM[EXROM(1)]);
+		state->membank("bank1")->set_base(&ROM[BASICROM(0)]);
+		state->membank("bank2")->set_base(&ROM[BASICROM(1)]);
+		state->membank("bank3")->set_base(&ROM[EXROM(0)]);
+		state->membank("bank4")->set_base(&ROM[EXROM(1)]);
 		state->m_bank_r1 = 0xdd;
-		memory_set_bankptr(machine, "bank5", &ROM[WRAM(4)]);
-		memory_set_bankptr(machine, "bank6", &ROM[WRAM(5)]);
-		memory_set_bankptr(machine, "bank7", &ROM[WRAM(6)]);
-		memory_set_bankptr(machine, "bank8", &ROM[WRAM(7)]);
+		state->membank("bank5")->set_base(&ROM[WRAM(4)]);
+		state->membank("bank6")->set_base(&ROM[WRAM(5)]);
+		state->membank("bank7")->set_base(&ROM[WRAM(6)]);
+		state->membank("bank8")->set_base(&ROM[WRAM(7)]);
 		state->m_bank_opt = 0x02; //tv rom
 		state->m_bank_w = 0x50; //enable write to work ram 4,5,6,7
 		state->m_gfx_bank_on = 0;
@@ -2127,7 +2127,7 @@ static MACHINE_RESET(pc6001m2)
 static MACHINE_RESET(pc6001sr)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
-	UINT8 *work_ram = machine.region("maincpu")->base();
+	UINT8 *work_ram = machine.root_device().memregion("maincpu")->base();
 
 	state->m_video_ram = work_ram + 0x70000;
 
@@ -2139,15 +2139,15 @@ static MACHINE_RESET(pc6001sr)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = machine.region("maincpu")->base();
-		state->m_sr_bank_r[0] = 0xf8; memory_set_bankptr(machine, "bank1", &ROM[SR_SYSROM_1(0x08)]);
-		state->m_sr_bank_r[1] = 0xfa; memory_set_bankptr(machine, "bank2", &ROM[SR_SYSROM_1(0x0a)]);
-		state->m_sr_bank_r[2] = 0xb0; memory_set_bankptr(machine, "bank3", &ROM[SR_EXROM1(0x00)]);
-		state->m_sr_bank_r[3] = 0xc0; memory_set_bankptr(machine, "bank4", &ROM[SR_EXROM0(0x00)]);
-		state->m_sr_bank_r[4] = 0x08; memory_set_bankptr(machine, "bank5", &ROM[SR_WRAM0(0x08)]);
-		state->m_sr_bank_r[5] = 0x0a; memory_set_bankptr(machine, "bank6", &ROM[SR_WRAM0(0x0a)]);
-		state->m_sr_bank_r[6] = 0x0c; memory_set_bankptr(machine, "bank7", &ROM[SR_WRAM0(0x0c)]);
-		state->m_sr_bank_r[7] = 0x0e; memory_set_bankptr(machine, "bank8", &ROM[SR_WRAM0(0x0e)]);
+		UINT8 *ROM = state->memregion("maincpu")->base();
+		state->m_sr_bank_r[0] = 0xf8; state->membank("bank1")->set_base(&ROM[SR_SYSROM_1(0x08)]);
+		state->m_sr_bank_r[1] = 0xfa; state->membank("bank2")->set_base(&ROM[SR_SYSROM_1(0x0a)]);
+		state->m_sr_bank_r[2] = 0xb0; state->membank("bank3")->set_base(&ROM[SR_EXROM1(0x00)]);
+		state->m_sr_bank_r[3] = 0xc0; state->membank("bank4")->set_base(&ROM[SR_EXROM0(0x00)]);
+		state->m_sr_bank_r[4] = 0x08; state->membank("bank5")->set_base(&ROM[SR_WRAM0(0x08)]);
+		state->m_sr_bank_r[5] = 0x0a; state->membank("bank6")->set_base(&ROM[SR_WRAM0(0x0a)]);
+		state->m_sr_bank_r[6] = 0x0c; state->membank("bank7")->set_base(&ROM[SR_WRAM0(0x0c)]);
+		state->m_sr_bank_r[7] = 0x0e; state->membank("bank8")->set_base(&ROM[SR_WRAM0(0x0e)]);
 //      state->m_bank_opt = 0x02; //tv rom
 
 		/* enable default work RAM writes */
@@ -2237,7 +2237,7 @@ static const cassette_interface pc6001_cassette_interface =
 static DEVICE_IMAGE_LOAD( pc6001_cass )
 {
 	pc6001_state *state = image.device().machine().driver_data<pc6001_state>();
-	UINT8 *cas = image.device().machine().region("cas")->base();
+	UINT8 *cas = state->memregion("cas")->base();
 	UINT32 size;
 
 	size = image.length();

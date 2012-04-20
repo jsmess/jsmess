@@ -891,8 +891,8 @@ static void msx_memory_init (running_machine &machine)
 					/* Check whether the optional FM-PAC rom is present */
 					option = 0x10000;
 					size = 0x10000;
-					mem = machine.region("maincpu")->base() + option;
-					if (machine.region("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
+					mem = machine.root_device().memregion("maincpu")->base() + option;
+					if (machine.root_device().memregion("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
@@ -906,7 +906,7 @@ static void msx_memory_init (running_machine &machine)
 
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
-					mem = machine.region("maincpu")->base() + option;
+					mem = machine.root_device().memregion("maincpu")->base() + option;
 					break;
 				case MSX_MEM_RAM:
 					mem = NULL;
@@ -931,7 +931,7 @@ static void msx_memory_init (running_machine &machine)
 			}
 			break;
 		case MSX_LAYOUT_KANJI_ENTRY:
-			state->m_kanji_mem = machine.region("maincpu")->base() + layout->option;
+			state->m_kanji_mem = machine.root_device().memregion("maincpu")->base() + layout->option;
 			break;
 		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
 			state->m_ramio_set_bits = (UINT8)layout->option;

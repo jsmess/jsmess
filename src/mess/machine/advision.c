@@ -28,10 +28,10 @@
 void advision_state::machine_start()
 {
 	/* configure EA banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region("bios")->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(I8048_TAG)->base(), 0);
+	membank("bank1")->configure_entry(0, memregion("bios")->base());
+	membank("bank1")->configure_entry(1, memregion(I8048_TAG)->base());
 	m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->set_entry(0);
 
 	/* allocate external RAM */
 	m_ext_ram = auto_alloc_array(machine(), UINT8, 0x400);
@@ -41,7 +41,7 @@ void advision_state::machine_reset()
 {
 	/* enable internal ROM */
 	device_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->set_entry(0);
 
 	/* reset sound CPU */
 	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -60,7 +60,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 
 	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
-	memory_set_bank(machine(), "bank1", ea);
+	membank("bank1")->set_entry(ea);
 
 	m_rambank = (data & 0x03) << 8;
 }

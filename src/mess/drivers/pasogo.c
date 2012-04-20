@@ -177,7 +177,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 		if (log)
 			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(m_maincpu),vg230->index,data);
-      //    data=machine.region("maincpu")->base()[0x4000+offset];
+      //    data=machine.root_device().memregion("maincpu")->base()[0x4000+offset];
 	}
 	else
 		data=vg230->index;
@@ -191,7 +191,7 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 
 	if (offset&1)
 	{
-		//  machine.region("maincpu")->base()[0x4000+offset]=data;
+		//  machine.root_device().memregion("maincpu")->base()[0x4000+offset]=data;
 		vg230->data[vg230->index]=data;
 		switch (vg230->index)
 		{
@@ -295,7 +295,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 		case 0: /*external*/
 		case 1: /*ram*/
 			sprintf(bank,"bank%d",ems->index+1);
-			memory_set_bankptr( machine(), bank, machine().region("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			membank( bank )->set_base( memregion("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
 			break;
 		case 3: /* rom 1 */
 		case 4: /* pc card a */
@@ -304,7 +304,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 			break;
 		case 2:
 			sprintf(bank,"bank%d",ems->index+1);
-			memory_set_bankptr( machine(),  bank, machine().region("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			membank( bank )->set_base( memregion("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
 			break;
 		}
 		break;
@@ -392,7 +392,7 @@ static PALETTE_INIT( pasogo )
 static SCREEN_UPDATE_IND16( pasogo )
 {
 	//static int width=-1,height=-1;
-	UINT8 *rom = screen.machine().region("maincpu")->base()+0xb8000;
+	UINT8 *rom = screen.machine().root_device().memregion("maincpu")->base()+0xb8000;
 	static const UINT16 c[]={ 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
@@ -547,8 +547,8 @@ static DRIVER_INIT( pasogo )
 	pasogo_state *state = machine.driver_data<pasogo_state>();
 	vg230_init(machine);
 	memset(&state->m_ems, 0, sizeof(state->m_ems));
-	memory_set_bankptr( machine, "bank27", machine.region("user1")->base() + 0x00000 );
-	memory_set_bankptr( machine, "bank28", machine.region("maincpu")->base() + 0xb8000/*?*/ );
+	state->membank( "bank27" )->set_base( machine.root_device().memregion("user1")->base() + 0x00000 );
+	state->membank( "bank28" )->set_base( state->memregion("maincpu")->base() + 0xb8000/*?*/ );
 }
 
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS

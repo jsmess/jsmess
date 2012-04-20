@@ -169,7 +169,7 @@ void tmc2000_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 
 	if (m_roc)
 	{
@@ -746,7 +746,7 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 
@@ -763,7 +763,7 @@ static const cassette_interface tmc1800_cassette_interface =
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
 	int size = image.length();
 
 	if (size > image.device().machine().device<ram_device>(RAM_TAG)->size())

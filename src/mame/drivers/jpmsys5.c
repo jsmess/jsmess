@@ -249,9 +249,9 @@ static void sys5_draw_lamps(jpmsys5_state *state)
 
 WRITE16_MEMBER(jpmsys5_state::rombank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	data &= 0x1f;
-	memory_set_bankptr(machine(), "bank1", &rom[0x20000 + 0x20000 * data]);
+	membank("bank1")->set_base(&rom[0x20000 + 0x20000 * data]);
 }
 
 READ16_MEMBER(jpmsys5_state::coins_r)
@@ -643,7 +643,7 @@ static ACIA6850_INTERFACE( acia2_if )
 static MACHINE_START( jpmsys5v )
 {
 	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()+0x20000);
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base()+0x20000);
 	state->m_touch_timer = machine.scheduler().timer_alloc(FUNC(touch_cb));
 }
 
@@ -794,7 +794,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( jpmsys5 )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()+0x20000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x20000);
 }
 
 static MACHINE_RESET( jpmsys5 )

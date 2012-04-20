@@ -156,7 +156,7 @@ WRITE8_MEMBER(iq151_state::ppi_portc_w)
 
 WRITE8_MEMBER(iq151_state::boot_bank_w)
 {
-	memory_set_bank(machine(), "boot", data & 1);
+	membank("boot")->set_entry(data & 1);
 }
 
 
@@ -348,9 +348,9 @@ DRIVER_INIT( iq151 )
 {
 	iq151_state *state = machine.driver_data<iq151_state>();
 
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 1, RAM + 0xf800, 0);
-	memory_configure_bank(machine, "boot", 1, 1, RAM + 0x0000, 0);
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entry(0, RAM + 0xf800);
+	state->membank("boot")->configure_entry(1, RAM + 0x0000);
 
 	device_set_irq_callback(state->m_maincpu, iq151_irq_callback);
 
@@ -364,7 +364,7 @@ DRIVER_INIT( iq151 )
 
 MACHINE_RESET_MEMBER( iq151_state )
 {
-	memory_set_bank(machine(), "boot", 0);
+	membank("boot")->set_entry(0);
 
 	m_vblank_irq_state = 0;
 }

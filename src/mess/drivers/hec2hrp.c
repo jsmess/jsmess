@@ -308,28 +308,28 @@ static MACHINE_START( hec2hrx )
 /*****************************************************************************/
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
 	// Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
 
 /******************************************************SPECIFIQUE MX ***************************/
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]                    , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, machine.region("page1")->base() , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, machine.region("page2")->base() , 0); // Rom page 2
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]                    ); // Mess ram
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , machine.root_device().memregion("page1")->base() ); // Rom page 1
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , machine.root_device().memregion("page2")->base() ); // Rom page 2
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 
 /*************************************************SPECIFIQUE DISK II ***************************/
-	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, machine.region("rom_disc2")->base() , 0); // ROM
-	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, machine.region("disc2mem" )->base() , 0); // RAM
-	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+	state->membank("bank3")->configure_entry(DISCII_BANK_ROM , machine.root_device().memregion("rom_disc2")->base() ); // ROM
+	state->membank("bank3")->configure_entry(DISCII_BANK_RAM , state->memregion("disc2mem" )->base() ); // RAM
+	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
@@ -344,19 +344,19 @@ static MACHINE_START( hec2mdhrx )
 //minidisc
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 
 	// Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
 	//Here the bank 5 is not used for the language switch but for the floppy ROM.....
 	/******************************************************SPECIFIQUE Mini disque ***************************/
-	memory_configure_bank(machine, "bank2", HECTOR_BANK_BASE , 1, &RAM[0x0000]                    , 0); // Rom base page
-	memory_configure_bank(machine, "bank2", HECTOR_BANK_DISC , 1, machine.region("page2")->base() , 0); // Rom page mini disc
-	memory_set_bank(machine, "bank2", HECTOR_BANK_BASE);
+	state->membank("bank2")->configure_entry(HECTOR_BANK_BASE , &RAM[0x0000]                    ); // Rom base page
+	state->membank("bank2")->configure_entry(HECTOR_BANK_DISC , state->memregion("page2")->base() ); // Rom page mini disc
+	state->membank("bank2")->set_entry(HECTOR_BANK_BASE);
 	/******************************************************SPECIFIQUE Mini disque ***************************/
 
 	// As video HR ram is in bank, use extern memory
@@ -367,11 +367,12 @@ static MACHINE_START( hec2mdhrx )
 }
 static MACHINE_RESET(hec2hrx)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	//DISK II Memory
-	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Machines init
 	hector_reset(machine, 1, 1);
@@ -380,9 +381,10 @@ static MACHINE_RESET(hec2hrx)
 //minidisc
 static MACHINE_RESET(hec2mdhrx)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 
 	// Machines init
 	hector_reset(machine, 1, 0);

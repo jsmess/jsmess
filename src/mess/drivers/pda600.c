@@ -109,7 +109,7 @@ void pda600_state::machine_reset()
 
 void pda600_state::video_start()
 {
-	m_video_ram = machine().region("videoram")->base();
+	m_video_ram = memregion("videoram")->base();
 }
 
 UINT32 pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

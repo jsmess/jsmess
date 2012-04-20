@@ -100,7 +100,7 @@ static MACHINE_START(merit)
 
 READ8_MEMBER(merit_state::questions_r)
 {
-	UINT8 *questions = machine().region("user1")->base();
+	UINT8 *questions = memregion("user1")->base();
 	int address;
 
 	switch(m_question_address >> 16)
@@ -220,9 +220,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = device->machine().region("gfx1")->base();
-	gfx[1] = device->machine().region("gfx2")->base();
-	rlen = device->machine().region("gfx2")->bytes();
+	gfx[0] = device->machine().root_device().memregion("gfx1")->base();
+	gfx[1] = device->machine().root_device().memregion("gfx2")->base();
+	rlen = state->memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
@@ -335,13 +335,13 @@ WRITE8_MEMBER(merit_state::casino5_bank_w)
 {
 	if ( data == 0 )
 	{
-		memory_set_bank(machine(), "bank1", 1);
-		memory_set_bank(machine(), "bank2", 1);
+		membank("bank1")->set_entry(1);
+		membank("bank2")->set_entry(1);
 	}
 	else if ( data == 0xff )
 	{
-		memory_set_bank(machine(), "bank1", 0);
-		memory_set_bank(machine(), "bank2", 0);
+		membank("bank1")->set_entry(0);
+		membank("bank2")->set_entry(0);
 	}
 	else
 	{
@@ -1215,10 +1215,10 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x2000, 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2, machine.region("maincpu")->base() + 0x6000, 0x2000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x2000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x6000, 0x2000);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
@@ -2021,7 +2021,7 @@ static DRIVER_INIT( key_7 )
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2041,14 +2041,14 @@ static DRIVER_INIT( couple )
       dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
       update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
       all behave the same...*/
-	memory_set_bankptr(machine, "bank1",ROM + 0x10000 + (0x2000 * 2));
+	machine.root_device().membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
 static DRIVER_INIT( dtrvwz5 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;

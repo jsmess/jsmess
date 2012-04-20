@@ -49,13 +49,13 @@ WRITE8_MEMBER( univac_state::uts20_43_w )
 
 READ8_MEMBER( univac_state::uts20_vram_r )
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	return RAM[offset | ((m_screen_num) ? 0xe000 : 0xc000)];
 }
 
 WRITE8_MEMBER( univac_state::uts20_vram_w )
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	RAM[offset | ((m_screen_num) ? 0xe000 : 0xc000)] = data;
 }
 
@@ -86,14 +86,14 @@ MACHINE_RESET_MEMBER(univac_state)
 
 VIDEO_START_MEMBER(univac_state)
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER(univac_state)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = machine().region("maincpu")->base()+((m_screen_num) ? 0xe000 : 0xc000);
+	UINT8 *videoram = memregion("maincpu")->base()+((m_screen_num) ? 0xe000 : 0xc000);
 
 	m_framecnt++;
 

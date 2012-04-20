@@ -40,7 +40,7 @@ static amigacrt_t amigacrt;
 
 static int check_kickstart_12_13( running_machine &machine, const char *cart_name )
 {
-	UINT16 * ksmem = (UINT16 *)(*machine.region( "user1" ));
+	UINT16 * ksmem = (UINT16 *)(*machine.root_device().memregion( "user1" ));
 
 	if ( ksmem[2] == 0x00FC )
 		return 1;
@@ -138,6 +138,7 @@ static void amiga_ar1_check_overlay( running_machine &machine )
 
 static void amiga_ar1_init( running_machine &machine )
 {
+	amiga_state *state = machine.driver_data<amiga_state>();
 	void *ar_ram;
 
 	/* check kickstart version */
@@ -159,8 +160,8 @@ static void amiga_ar1_init( running_machine &machine )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x9fc000, 0x9fffff, "bank3");
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
-	memory_set_bankptr(machine, "bank3", ar_ram);
+	state->membank("bank2")->set_base(machine.root_device().memregion("user2")->base());
+	state->membank("bank3")->set_base(ar_ram);
 
 	amigacrt.ar1_spurious = 0;
 
@@ -221,7 +222,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
 	amiga_state *state = space->machine().driver_data<amiga_state>();
-	UINT16 *mem = (UINT16 *)(*space->machine().region( "user2" ));
+	UINT16 *mem = (UINT16 *)(*state->memregion( "user2" ));
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -232,7 +233,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 		{
 			UINT32 mirror_mask = state->m_chip_ram.bytes();
 
-			memory_set_bank(space->machine(), "bank1", 0);
+			state->membank("bank1")->set_entry(0);
 
 			while( (mirror_mask<<1) < 0x100000 )
 			{
@@ -279,7 +280,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 		}
 
 		/* overlay the cart rom's in chipram */
-		memory_set_bank(machine, "bank1", 2);
+		state->membank("bank1")->set_entry(2);
 
 		/* writes go to chipram */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->m_chip_ram.bytes() - 1, FUNC(amiga_ar23_chipmem_w));
@@ -382,12 +383,12 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400003, 0, mirror, FUNC(amiga_ar23_mode_w));
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
-	memory_set_bankptr(machine, "bank3", ar_ram);
+	state->membank("bank2")->set_base(machine.root_device().memregion("user2")->base());
+	state->membank("bank3")->set_base(ar_ram);
 
-	memory_configure_bank(machine, "bank1", 0, 2, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 2, machine.region("user1")->base(), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, machine.region("user2")->base(), 0);
+	state->membank("bank1")->configure_entries(0, 2, state->m_chip_ram, 0);
+	state->membank("bank1")->configure_entries(1, 2, machine.root_device().memregion("user1")->base(), 0);
+	state->membank("bank1")->configure_entries(2, 2, machine.root_device().memregion("user2")->base(), 0);
 
 	amigacrt.ar23_mode = 3;
 }
@@ -401,7 +402,7 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 void amiga_cart_init( running_machine &machine )
 {
 	/* see what is there */
-	UINT16 *mem = (UINT16 *)(*machine.region( "user2" ));
+	UINT16 *mem = (UINT16 *)(*machine.root_device().memregion( "user2" ));
 
 	amigacrt.cart_type = -1;
 

@@ -417,7 +417,7 @@ static void init_tunit_generic(running_machine &machine, int sound)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	base = machine.region("gfx1")->base();
+	base = machine.root_device().memregion("gfx1")->base();
 	for (i = 0; i < midtunit_gfx_rom_size; i += 4)
 	{
 		midtunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
@@ -526,7 +526,7 @@ DRIVER_INIT( jdreddp )
 	/* sound chip protection (hidden RAM) */
 	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
 	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
-	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
+	state->membank("bank9")->set_base(auto_alloc_array(machine, UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */

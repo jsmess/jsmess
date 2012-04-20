@@ -145,7 +145,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 	}
 	else
 	{
-		UINT16 *rom_base = (UINT16 *)(*space.machine().region("flash"));
+		UINT16 *rom_base = (UINT16 *)(*space.machine().root_device().memregion("flash"));
 
 		return rom_base[offset];
 	}
@@ -420,7 +420,7 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)(*machine().region("flash"));
+	UINT16 *rom = (UINT16 *)(*machine().root_device().memregion("flash"));
 	int i;
 
 	m_flash_mem = !((rom[0x32] & 0x0f) != 0);

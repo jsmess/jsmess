@@ -188,7 +188,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 void c64_xl80_device::device_start()
 {
 	// find memory regions
-	m_char_rom = subregion(HD46505SP_TAG)->base();
+	m_char_rom = memregion(HD46505SP_TAG)->base();
 	c64_ram_pointer(machine(), RAM_SIZE);
 
 	// state saving

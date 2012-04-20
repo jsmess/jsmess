@@ -86,14 +86,14 @@ be verified on real PCB.
 
 WRITE8_MEMBER(dooyong_state::lastday_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(dooyong_state::flip_screen_w)

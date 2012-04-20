@@ -229,8 +229,8 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 static VIDEO_START( v6809 )
 {
 	v6809_state *state = machine.driver_data<v6809_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_videoram = machine.region("videoram")->base();
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_videoram = state->memregion("videoram")->base();
 }
 
 static const mc6845_interface v6809_crtc = {

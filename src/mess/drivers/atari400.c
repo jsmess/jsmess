@@ -746,7 +746,7 @@ static PALETTE_INIT( mess_atari )
 
 static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base1, *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -768,8 +768,8 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 	/* check if BASIC changed */
 	if( new_mmu & 0x02 )
@@ -786,7 +786,7 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		base1 = base + 0x10000;  /* 8K BASIC */
 	}
 
-	memory_set_bankptr(machine, "bank1", base1);
+	machine.root_device().membank("bank1")->set_base(base1);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
@@ -802,13 +802,13 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 /* BASIC was available in a separate cart, so we don't test it */
 static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -830,8 +830,8 @@ static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
@@ -847,12 +847,12 @@ static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5000, 0x57ff);
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -874,8 +874,8 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 
 	/* check if self-test ROM changed */
@@ -892,7 +892,7 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 /**************************************************************
@@ -1466,7 +1466,7 @@ static DRIVER_INIT( xegs )
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

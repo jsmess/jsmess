@@ -248,22 +248,22 @@ MACHINE_RESET( wswan )
 	memset( &state->m_sound_dma, 0, sizeof( state->m_sound_dma ) );
 
 	/* Switch in the banks */
-	memory_set_bankptr( machine, "bank2", state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank3", state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank4", state->m_ROMMap[(state->m_ROMBanks - 12) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank5", state->m_ROMMap[(state->m_ROMBanks - 11) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank6", state->m_ROMMap[(state->m_ROMBanks - 10) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank7", state->m_ROMMap[(state->m_ROMBanks - 9) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank8", state->m_ROMMap[(state->m_ROMBanks - 8) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank9", state->m_ROMMap[(state->m_ROMBanks - 7) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank10", state->m_ROMMap[(state->m_ROMBanks - 6) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank11", state->m_ROMMap[(state->m_ROMBanks - 5) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank12", state->m_ROMMap[(state->m_ROMBanks - 4) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank13", state->m_ROMMap[(state->m_ROMBanks - 3) & (state->m_ROMBanks - 1)] );
-	memory_set_bankptr( machine, "bank14", state->m_ROMMap[(state->m_ROMBanks - 2) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank2" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank3" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank4" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 12) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank5" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 11) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank6" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 10) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank7" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 9) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank8" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 8) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank9" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 7) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank10" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 6) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank11" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 5) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank12" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 4) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank13" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 3) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank14" )->set_base( state->m_ROMMap[(state->m_ROMBanks - 2) & (state->m_ROMBanks - 1)] );
 	state->m_bios_disabled = 0;
-	memory_set_bankptr( machine, "bank15", state->m_ws_bios_bank );
-//  memory_set_bankptr( machine, 15, state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
+	state->membank( "bank15" )->set_base( state->m_ws_bios_bank );
+//  state->membank( 15 )->set_base( state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
 }
 
 READ8_MEMBER( wswan_state::wswan_sram_r )
@@ -848,7 +848,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			if ( ( data & 0x01 ) && !m_bios_disabled )
 			{
 				m_bios_disabled = 1;
-				memory_set_bankptr( machine(), "bank15", m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
+				membank( "bank15" )->set_base( m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xa2:	/* Timer control
@@ -1046,20 +1046,20 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
                    Bit 0-3 - ROM bank base register for banks 4-15
                    Bit 4-7 - Unknown
                 */
-			memory_set_bankptr( machine(), "bank4", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank5", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank6", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank7", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank8", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank9", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank10", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank11", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank12", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank13", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( machine(), "bank14", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank4" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank5" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank6" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank7" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank8" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank9" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank10" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank11" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank12" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank13" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( m_ROMBanks - 1 ) ] );
+			membank( "bank14" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( m_ROMBanks - 1 ) ] );
 			if ( m_bios_disabled )
 			{
-				memory_set_bankptr( machine(), "bank15", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
+				membank( "bank15" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xc1:	/* SRAM bank select
@@ -1073,12 +1073,12 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 		case 0xc2:	/* ROM bank select for segment 2 (0x20000 - 0x2ffff)
                    Bit 0-7 - ROM bank for segment 2
                 */
-			memory_set_bankptr( machine(), "bank2", m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
+			membank( "bank2" )->set_base( m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
 			break;
 		case 0xc3:	/* ROM bank select for segment 3 (0x30000-0x3ffff)
                    Bit 0-7 - ROM bank for segment 3
                 */
-			memory_set_bankptr( machine(), "bank3", m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
+			membank( "bank3" )->set_base( m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
 			break;
 		case 0xc6:	/* EEPROM address lower bits port/EEPROM address and command port
                    1KBit EEPROM:

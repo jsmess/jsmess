@@ -56,18 +56,19 @@ INPUT_PORTS_END
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( c10_reset )
 {
-	memory_set_bank(machine, "boot", 0);
+	c10_state *state = machine.driver_data<c10_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(c10_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
 }
 
 VIDEO_START_MEMBER( c10_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -161,8 +162,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( c10 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
+	c10_state *state = machine.driver_data<c10_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 }
 
 /* ROM definition */

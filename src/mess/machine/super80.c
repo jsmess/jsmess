@@ -100,7 +100,8 @@ static TIMER_CALLBACK( super80_timer )
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( super80_reset )
 {
-	memory_set_bank(machine, "boot", 0);
+	super80_state *state = machine.driver_data<super80_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 static TIMER_CALLBACK( super80_halfspeed )
@@ -202,13 +203,14 @@ void super80_state::machine_reset()
 {
 	m_shared=0xff;
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 }
 
 static void driver_init_common( running_machine &machine )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
+	super80_state *state = machine.driver_data<super80_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 	machine.scheduler().timer_pulse(attotime::from_hz(200000), FUNC(super80_timer));	/* timer for keyboard and cassette */
 }
 

@@ -125,7 +125,7 @@ void atom_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *eprom = machine().region(EXTROM_TAG)->base() + (m_eprom << 12);
+	UINT8 *eprom = memregion(EXTROM_TAG)->base() + (m_eprom << 12);
 
 	program->install_rom(0xa000, 0xafff, eprom);
 }
@@ -750,7 +750,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(image.device().machine().region(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
+		memcpy(image.device().machine().root_device().memregion(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
 
 	auto_free(image.device().machine(), temp_copy);
 

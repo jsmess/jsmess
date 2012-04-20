@@ -73,7 +73,7 @@ public:
 static SCREEN_UPDATE_RGB32( taitowlf )
 {
 	int x,y,count;
-	const UINT8 *blit_ram = screen.machine().region("user5")->base();
+	const UINT8 *blit_ram = screen.machine().root_device().memregion("user5")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -144,11 +144,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
+				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("user1")->base() + 0x30000);
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("user1")->base() + 0x30000);
 			}
 			break;
 		}
@@ -539,7 +539,7 @@ static MACHINE_START(taitowlf)
 
 static MACHINE_RESET(taitowlf)
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x30000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + 0x30000);
 }
 
 

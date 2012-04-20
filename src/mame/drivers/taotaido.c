@@ -123,9 +123,9 @@ WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
 
 WRITE8_MEMBER(taotaido_state::taotaido_sh_bankswitch_w)
 {
-	UINT8 *rom = machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(machine(), "bank1",rom + (data & 0x03) * 0x8000);
+	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taotaido_state )

@@ -89,7 +89,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 	int i;
 	ipds_state *state = device->machine().driver_data<ipds_state>();
 	bitmap_ind16 &bitmap = state->m_bitmap;
-	UINT8 *charmap = device->machine().region("chargen")->base();
+	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
 	if (vsp)

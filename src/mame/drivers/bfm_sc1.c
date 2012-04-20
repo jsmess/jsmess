@@ -192,7 +192,7 @@ static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int dat
 WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
 {
 //  printf("bankswitch %02x\n", data);
-	memory_set_bank(machine(),"bank1",data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -668,10 +668,10 @@ static MACHINE_RESET( bfm_sc1 )
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
-		memory_configure_bank(machine,"bank1", 0, 4, &rom[0x0000], 0x02000);
-		memory_set_bank(machine,"bank1",state->m_defaultbank);
+		state->membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
+		state->membank("bank1")->set_entry(state->m_defaultbank);
 	}
 }
 

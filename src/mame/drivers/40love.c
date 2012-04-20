@@ -274,7 +274,7 @@ WRITE8_MEMBER(fortyl_state::bank_select_w)
 //      popmessage("WRONG BANK SELECT = %x !!!!\n",data);
 	}
 
-	memory_set_bank(machine(), "bank1", data & 1);
+	membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(fortyl_state::pix1_w)
@@ -566,8 +566,8 @@ READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
 static DRIVER_INIT( undoukai )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	state->m_pix_color[0] = 0x000;
 	state->m_pix_color[1] = 0x1e3;
@@ -578,14 +578,14 @@ static DRIVER_INIT( undoukai )
 static DRIVER_INIT( 40love )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
             to show a white line on the opponent side */
 
-		UINT8 *ROM = machine.region("gfx2")->base();
+		UINT8 *ROM = state->memregion("gfx2")->base();
 		int adr = 0x10 * 0x022b;
 		ROM[adr + 0x000a] = 0x00;
 		ROM[adr + 0x000b] = 0x00;

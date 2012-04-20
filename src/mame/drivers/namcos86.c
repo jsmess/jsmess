@@ -184,29 +184,29 @@ TODO:
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 {
-	UINT8 *base = machine().region("cpu1")->base() + 0x10000;
+	UINT8 *base = memregion("cpu1")->base() + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (machine().region("user1")->base()) return;
+	if (machine().root_device().memregion("user1")->base()) return;
 
-	memory_set_bankptr(machine(), "bank1",base + ((data & 0x03) * 0x2000));
+	membank("bank1")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 {
-	UINT8 *base = machine().region("user1")->base();
+	UINT8 *base = memregion("user1")->base();
 
 	if (base == 0) return;
 
-	memory_set_bankptr(machine(), "bank1",base + ((data & 0x1f) * 0x2000));
+	membank("bank1")->set_base(base + ((data & 0x1f) * 0x2000));
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch2_w)
 {
-	UINT8 *base = machine().region("cpu2")->base() + 0x10000;
+	UINT8 *base = memregion("cpu2")->base() + 0x10000;
 
-	memory_set_bankptr(machine(), "bank2",base + ((data & 0x03) * 0x2000));
+	membank("bank2")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -294,7 +294,7 @@ WRITE8_MEMBER(namcos86_state::namcos86_led_w)
 WRITE8_MEMBER(namcos86_state::cus115_w)
 {
 	/* make sure the expansion board is present */
-	if (!machine().region("user1")->base())
+	if (!machine().root_device().memregion("user1")->base())
 	{
 		popmessage("expansion board not present");
 		return;
@@ -324,9 +324,9 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = machine.region("cpu1")->base() + 0x10000;
+	UINT8 *base = machine.root_device().memregion("cpu1")->base() + 0x10000;
 
-	memory_set_bankptr(machine, "bank1",base);
+	machine.root_device().membank("bank1")->set_base(base);
 }
 
 
@@ -1471,8 +1471,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = machine.region("gfx1")->base();
-	size = machine.region("gfx1")->bytes() * 2 / 3;
+	gfx = machine.root_device().memregion("gfx1")->base();
+	size = machine.root_device().memregion("gfx1")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
@@ -1496,8 +1496,8 @@ static DRIVER_INIT( namco86 )
 		auto_free( machine, buffer );
 	}
 
-	gfx = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes() * 2 / 3;
+	gfx = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{

@@ -72,7 +72,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(ccs2422_state)
 {
-	UINT8* user1 = machine().region("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 	memcpy((UINT8*)m_ccs_ram, user1, 0x0800);
 
 	// this should be rom/ram banking

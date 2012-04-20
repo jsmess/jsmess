@@ -292,7 +292,7 @@ static int internal_pc_cga_video_start(running_machine &machine)
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = machine.region( "gfx1" )->base() + 0x1000;
+	cga.chr_gen = machine.root_device().memregion( "gfx1" )->base() + 0x1000;
 
 	state_save_register_item(machine, "pccga", NULL, 0, cga.mode_control);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.color_select);
@@ -340,7 +340,7 @@ static VIDEO_START( pc_cga )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
 	cga.is_superimpose = 0;
 
-	memory_set_bankptr(machine,"bank11", cga.videoram);
+	machine.root_device().membank("bank11")->set_base(cga.videoram);
 }
 
 
@@ -381,12 +381,12 @@ static VIDEO_START( pc_cga32k )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	cga.is_superimpose = 0;
 
-	memory_set_bankptr(machine,"bank11", cga.videoram);
+	machine.root_device().membank("bank11")->set_base(cga.videoram);
 }
 
 SCREEN_UPDATE_RGB32( mc6845_cga )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update( screen, bitmap, cliprect);
 
@@ -407,12 +407,12 @@ SCREEN_UPDATE_RGB32( mc6845_cga )
 static VIDEO_START( cga_poisk2 )
 {
 	VIDEO_START_CALL(pc_cga);
-	cga.chr_gen = machine.region( "gfx1" )->base() + 0x0000;
+	cga.chr_gen = machine.root_device().memregion( "gfx1" )->base() + 0x0000;
 }
 
 static SCREEN_UPDATE_RGB32( cga_poisk2 )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update( screen, bitmap, cliprect);
 
@@ -1103,7 +1103,7 @@ static void pc_cga_plantronics_w(running_machine &machine, int data)
 
 static WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = space->machine().region("gfx1")->base();
+	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1116,7 +1116,7 @@ static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_r
 
 static READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = space->machine().region("gfx1")->base();
+	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
 	return gfx[offset];
 }
 
@@ -1485,7 +1485,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[0]);
+			space->machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1543,7 +1543,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[data & 3]);
+			space->machine().root_device().membank("bank1")->set_base(videoram + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1618,7 +1618,7 @@ static VIDEO_START( pc1512 )
 	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
 
 	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
-	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
+	machine.root_device().membank("bank1")->set_base(cga.videoram + videoram_offset[0]);
 	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram16le_w) );
 
 	io_space->install_legacy_read_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_r) );
@@ -1629,7 +1629,7 @@ static VIDEO_START( pc1512 )
 
 static SCREEN_UPDATE_RGB32( mc6845_pc1512 )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update(screen, bitmap, cliprect);
 

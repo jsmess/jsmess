@@ -115,7 +115,7 @@ WRITE8_MEMBER( geneve_memex_device::write )
 
 void geneve_memex_device::device_start()
 {
-	m_ram = subregion(RAMREGION)->base();
+	m_ram = memregion(RAMREGION)->base();
 }
 
 void geneve_memex_device::device_reset()

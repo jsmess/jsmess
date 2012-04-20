@@ -43,7 +43,7 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 		{
 			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 	}
 	else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
@@ -56,11 +56,11 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 	if(address<=0x3fff)
 	{
 		if (m_ROMSelection == 3) {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().region("maincpu")->base() + 0x018000);
-			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x018000);
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("maincpu")->base() + 0x018000);
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x018000);
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
-			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 		return ~0;
 	}
@@ -75,7 +75,7 @@ static void atm_update_memory(running_machine &machine)
 
 	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, "bank4", messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
+	state->membank("bank4")->set_base(messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
 
 	if (beta->started() && betadisk_is_active(beta) && !( state->m_port_7ffd_data & 0x10 ) )
 	{
@@ -86,7 +86,7 @@ static void atm_update_memory(running_machine &machine)
 		state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ;
 	}
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 }
 
 WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
@@ -135,10 +135,10 @@ static MACHINE_RESET( atm )
 	memset(messram,0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram + (5<<14));
+	state->membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram + (2<<14));
+	state->membank("bank3")->set_base(messram + (2<<14));
 
 	state->m_port_7ffd_data = 0;
 	state->m_port_1ffd_data = -1;

@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -699,8 +699,8 @@ static void alg_init(running_machine &machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 
@@ -713,8 +713,8 @@ static void alg_init(running_machine &machine)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -733,8 +733,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -752,8 +752,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -774,7 +774,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 

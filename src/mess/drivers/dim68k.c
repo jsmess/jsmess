@@ -202,7 +202,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dim68k_state)
 {
-	UINT8* ROM = machine().region("bootrom")->base();
+	UINT8* ROM = memregion("bootrom")->base();
 
 	memcpy((UINT8*)m_ram.target(), ROM, 0x2000);
 
@@ -211,7 +211,7 @@ MACHINE_RESET_MEMBER(dim68k_state)
 
 VIDEO_START_MEMBER( dim68k_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.

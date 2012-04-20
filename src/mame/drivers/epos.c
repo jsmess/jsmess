@@ -44,7 +44,7 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
 
 //  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(&space.device()), m_counter);
 
-	memory_set_bank(machine(), "bank1", m_counter);
+	membank("bank1")->set_entry(m_counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 */
 static WRITE8_DEVICE_HANDLER( write_prtc )
 {
-	memory_set_bank(device->machine(), "bank2", data & 0x01);
+	device->machine().root_device().membank("bank2")->set_entry(data & 0x01);
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -381,12 +381,12 @@ static MACHINE_RESET( epos )
 
 static MACHINE_START( dealer )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x0000], 0x10000);
-	memory_configure_bank(machine, "bank2", 0, 2, &ROM[0x6000], 0x1000);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
 
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
 
 	MACHINE_START_CALL(epos);
 }
@@ -607,7 +607,7 @@ ROM_END
 
 static DRIVER_INIT( dealer )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
 	/* Key 0 */

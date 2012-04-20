@@ -54,13 +54,13 @@ static void partner_window_1(running_machine &machine, UINT8 bank_num, UINT16 of
 	sprintf(bank,"bank%d",bank_num);
 	switch(state->m_win_mem_page) {
 		case 2 : // FDD BIOS
-				memory_set_bankptr(machine, bank, rom + 0x16000 + offset);
+				state->membank(bank)->set_base(rom + 0x16000 + offset);
 				break;
 		case 4 : // MCPG BIOS
-				memory_set_bankptr(machine, bank, rom + 0x14000 + offset);
+				state->membank(bank)->set_base(rom + 0x14000 + offset);
 				break;
 		default : // BIOS
-				memory_set_bankptr(machine, bank, rom + 0x10000 + offset);
+				state->membank(bank)->set_base(rom + 0x10000 + offset);
 				break;
 	}
 }
@@ -72,10 +72,10 @@ static void partner_window_2(running_machine &machine, UINT8 bank_num, UINT16 of
 	sprintf(bank,"bank%d",bank_num);
 	switch(state->m_win_mem_page) {
 		case 4 : // MCPG FONT
-				memory_set_bankptr(machine, bank, rom + 0x18000 + offset);
+				state->membank(bank)->set_base(rom + 0x18000 + offset);
 				break;
 		default : // BIOS
-				memory_set_bankptr(machine, bank, rom + 0x10000 + offset);
+				state->membank(bank)->set_base(rom + 0x10000 + offset);
 				break;
 	}
 }
@@ -137,7 +137,7 @@ static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 				// Timer
 				break;
 		default : // BIOS
-				memory_set_bankptr(machine, "bank11", rom + 0x10000);
+				state->membank("bank11")->set_base(rom + 0x10000);
 				break;
 	}
 }
@@ -145,7 +145,7 @@ static void partner_bank_switch(running_machine &machine)
 {
 	partner_state *state = machine.driver_data<partner_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_write_bank(0x0000, 0x07ff, "bank1");
@@ -166,40 +166,40 @@ static void partner_bank_switch(running_machine &machine)
 	// BANK 1 (0x0000 - 0x07ff)
 	if (state->m_mem_page==0) {
 		space->unmap_write(0x0000, 0x07ff);
-		memory_set_bankptr(machine, "bank1", rom + 0x10000);
+		state->membank("bank1")->set_base(rom + 0x10000);
 	} else {
 		if (state->m_mem_page==7) {
-			memory_set_bankptr(machine, "bank1", ram + 0x8000);
+			state->membank("bank1")->set_base(ram + 0x8000);
 		} else {
-			memory_set_bankptr(machine, "bank1", ram + 0x0000);
+			state->membank("bank1")->set_base(ram + 0x0000);
 		}
 	}
 
 	// BANK 2 (0x0800 - 0x3fff)
 	if (state->m_mem_page==7) {
-		memory_set_bankptr(machine, "bank2", ram + 0x8800);
+		state->membank("bank2")->set_base(ram + 0x8800);
 	} else {
-		memory_set_bankptr(machine, "bank2", ram + 0x0800);
+		state->membank("bank2")->set_base(ram + 0x0800);
 	}
 
 	// BANK 3 (0x4000 - 0x5fff)
 	if (state->m_mem_page==7) {
-		memory_set_bankptr(machine, "bank3", ram + 0xC000);
+		state->membank("bank3")->set_base(ram + 0xC000);
 	} else {
 		if (state->m_mem_page==10) {
 			//window 1
 			space->unmap_write(0x4000, 0x5fff);
 			partner_window_1(machine, 3, 0, rom);
 		} else {
-			memory_set_bankptr(machine, "bank3", ram + 0x4000);
+			state->membank("bank3")->set_base(ram + 0x4000);
 		}
 	}
 
 	// BANK 4 (0x6000 - 0x7fff)
 	if (state->m_mem_page==7) {
-		memory_set_bankptr(machine, "bank4", ram + 0xe000);
+		state->membank("bank4")->set_base(ram + 0xe000);
 	} else {
-		memory_set_bankptr(machine, "bank4", ram + 0x6000);
+		state->membank("bank4")->set_base(ram + 0x6000);
 	}
 
 	// BANK 5 (0x8000 - 0x9fff)
@@ -217,10 +217,10 @@ static void partner_bank_switch(running_machine &machine)
 				partner_window_1(machine, 5, 0, rom);
 				break;
 		case 7:
-				memory_set_bankptr(machine, "bank5", ram + 0x0000);
+				state->membank("bank5")->set_base(ram + 0x0000);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank5", ram + 0x8000);
+				state->membank("bank5")->set_base(ram + 0x8000);
 				break;
 	}
 
@@ -236,13 +236,13 @@ static void partner_bank_switch(running_machine &machine)
 		case 8:
 				//BASIC
 				space->unmap_write(0xa000, 0xb7ff);
-				memory_set_bankptr(machine, "bank6", rom + 0x12000); // BASIC
+				state->membank("bank6")->set_base(rom + 0x12000); // BASIC
 				break;
 		case 7:
-				memory_set_bankptr(machine, "bank6", ram + 0x2000);
+				state->membank("bank6")->set_base(ram + 0x2000);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank6", ram + 0xa000);
+				state->membank("bank6")->set_base(ram + 0xa000);
 				break;
 	}
 
@@ -259,35 +259,35 @@ static void partner_bank_switch(running_machine &machine)
 		case 8:
 				//BASIC
 				space->unmap_write(0xb800, 0xbfff);
-				memory_set_bankptr(machine, "bank7", rom + 0x13800); // BASIC
+				state->membank("bank7")->set_base(rom + 0x13800); // BASIC
 				break;
 		case 7:
-				memory_set_bankptr(machine, "bank7", ram + 0x3800);
+				state->membank("bank7")->set_base(ram + 0x3800);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank7", ram + 0xb800);
+				state->membank("bank7")->set_base(ram + 0xb800);
 				break;
 	}
 
 	// BANK 8 (0xc000 - 0xc7ff)
 	switch (state->m_mem_page) {
 		case 7:
-				memory_set_bankptr(machine, "bank8", ram + 0x4000);
+				state->membank("bank8")->set_base(ram + 0x4000);
 				break;
 		case 8:
 		case 10:
 				space->unmap_write(0xc000, 0xc7ff);
-				memory_set_bankptr(machine, "bank8", rom + 0x10000);
+				state->membank("bank8")->set_base(rom + 0x10000);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				state->membank("bank8")->set_base(ram + 0xc000);
 				break;
 	}
 
 	// BANK 9 (0xc800 - 0xcfff)
 	switch (state->m_mem_page) {
 		case 7:
-				memory_set_bankptr(machine, "bank9", ram + 0x4800);
+				state->membank("bank9")->set_base(ram + 0x4800);
 				break;
 		case 8:
 		case 9:
@@ -297,17 +297,17 @@ static void partner_bank_switch(running_machine &machine)
 				break;
 		case 10:
 				space->unmap_write(0xc800, 0xcfff);
-				memory_set_bankptr(machine, "bank9", rom + 0x10800);
+				state->membank("bank9")->set_base(rom + 0x10800);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank9", ram + 0xc800);
+				state->membank("bank9")->set_base(ram + 0xc800);
 				break;
 	}
 
 	// BANK 10 (0xd000 - 0xd7ff)
 	switch (state->m_mem_page) {
 		case 7:
-				memory_set_bankptr(machine, "bank10", ram + 0x5000);
+				state->membank("bank10")->set_base(ram + 0x5000);
 				break;
 		case 8:
 		case 9:
@@ -316,7 +316,7 @@ static void partner_bank_switch(running_machine &machine)
 				partner_window_2(machine, 10, 0x0800, rom);
 				break;
 		default:
-				memory_set_bankptr(machine, "bank10", ram + 0xd000);
+				state->membank("bank10")->set_base(ram + 0xd000);
 				break;
 	}
 
@@ -325,7 +325,7 @@ static void partner_bank_switch(running_machine &machine)
 
 	// BANK 12 (0xe000 - 0xe7ff)
 	if (state->m_mem_page==1) {
-		memory_set_bankptr(machine, "bank12", rom + 0x10000);
+		state->membank("bank12")->set_base(rom + 0x10000);
 	} else {
 		//window 1
 		partner_window_1(machine, 12, 0, rom);
@@ -341,7 +341,7 @@ static void partner_bank_switch(running_machine &machine)
 				break;
 		default:
 				// BIOS
-				memory_set_bankptr(machine, "bank13", rom + 0x10800);
+				state->membank("bank13")->set_base(rom + 0x10800);
 				break;
 	}
 }

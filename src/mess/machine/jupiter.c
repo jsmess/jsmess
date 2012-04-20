@@ -29,7 +29,7 @@
 
 SNAPSHOT_LOAD(jupiter)
 {
-	UINT8 *RAM = image.device().machine().region("maincpu")->base();
+	UINT8 *RAM = image.device().machine().root_device().memregion("maincpu")->base();
 	device_t *cpu = image.device().machine().device("maincpu");
 	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned char jupiter_repeat, jupiter_byte, loop;

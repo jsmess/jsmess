@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 static DRIVER_INIT( hp49gp )
 {
 	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	UINT8 *rom = (UINT8 *)machine.region( "maincpu")->base();
+	UINT8 *rom = (UINT8 *)machine.root_device().memregion( "maincpu")->base();
 	memcpy( hp49gp->m_steppingstone, rom, 1024);
 	lcd_spi_init( machine);
 }

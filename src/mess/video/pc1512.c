@@ -561,7 +561,7 @@ static const mc6845_interface crtc_intf =
 void pc1512_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region(AMS40041_TAG)->base();
+	m_char_rom = memregion(AMS40041_TAG)->base();
 
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x10000);

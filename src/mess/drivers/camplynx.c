@@ -112,13 +112,13 @@ public:
 WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
 {
 	if (!data)
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->set_entry(0);
 	else
 	if (data & 2)
-		memory_set_bank(machine(), "bank1", 1);
+		membank("bank1")->set_entry(1);
 	else
 	if (data & 4)
-		memory_set_bank(machine(), "bank1", 2);
+		membank("bank1")->set_entry(2);
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(m_maincpu), data);
 }
@@ -127,33 +127,33 @@ WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 {
 	/* get address space */
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *base = mem->machine().region("maincpu")->base();
+	UINT8 *base = mem->machine().root_device().memregion("maincpu")->base();
 
 	/* Set read banks */
 	UINT8 bank = data & 0x0f;
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine(), "bank1", base + 0x00000);
-		memory_set_bankptr(mem->machine(), "bank2", base + 0x02000);
-		memory_set_bankptr(mem->machine(), "bank3", base + 0x04000);
-		memory_set_bankptr(mem->machine(), "bank4", base + 0x16000);
-		memory_set_bankptr(mem->machine(), "bank5", base + 0x18000);
-		memory_set_bankptr(mem->machine(), "bank6", base + 0x1a000);
-		memory_set_bankptr(mem->machine(), "bank7", base + 0x0c000);
-		memory_set_bankptr(mem->machine(), "bank8", base + 0x0e000);
+		membank("bank1")->set_base(base + 0x00000);
+		membank("bank2")->set_base(base + 0x02000);
+		membank("bank3")->set_base(base + 0x04000);
+		membank("bank4")->set_base(base + 0x16000);
+		membank("bank5")->set_base(base + 0x18000);
+		membank("bank6")->set_base(base + 0x1a000);
+		membank("bank7")->set_base(base + 0x0c000);
+		membank("bank8")->set_base(base + 0x0e000);
 	}
 	else
 	if (bank == 0x0e)
 	{
-		memory_set_bankptr(mem->machine(), "bank1", base + 0x20000);
-		memory_set_bankptr(mem->machine(), "bank2", base + 0x22000);
-		memory_set_bankptr(mem->machine(), "bank3", base + 0x24000);
-		memory_set_bankptr(mem->machine(), "bank4", base + 0x26000);
-		memory_set_bankptr(mem->machine(), "bank5", base + 0x28000);
-		memory_set_bankptr(mem->machine(), "bank6", base + 0x2a000);
-		memory_set_bankptr(mem->machine(), "bank7", base + 0x2c000);
-		memory_set_bankptr(mem->machine(), "bank8", base + 0x2e000);
+		membank("bank1")->set_base(base + 0x20000);
+		membank("bank2")->set_base(base + 0x22000);
+		membank("bank3")->set_base(base + 0x24000);
+		membank("bank4")->set_base(base + 0x26000);
+		membank("bank5")->set_base(base + 0x28000);
+		membank("bank6")->set_base(base + 0x2a000);
+		membank("bank7")->set_base(base + 0x2c000);
+		membank("bank8")->set_base(base + 0x2e000);
 	}
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(m_maincpu), data);
@@ -163,26 +163,26 @@ WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 
 	if (!bank)
 	{
-		memory_set_bankptr(mem->machine(), "bank11", base + 0x10000);
-		memory_set_bankptr(mem->machine(), "bank12", base + 0x12000);
-		memory_set_bankptr(mem->machine(), "bank13", base + 0x14000);
-		memory_set_bankptr(mem->machine(), "bank14", base + 0x16000);
-		memory_set_bankptr(mem->machine(), "bank15", base + 0x18000);
-		memory_set_bankptr(mem->machine(), "bank16", base + 0x1a000);
-		memory_set_bankptr(mem->machine(), "bank17", base + 0x1c000);
-		memory_set_bankptr(mem->machine(), "bank18", base + 0x1e000);
+		membank("bank11")->set_base(base + 0x10000);
+		membank("bank12")->set_base(base + 0x12000);
+		membank("bank13")->set_base(base + 0x14000);
+		membank("bank14")->set_base(base + 0x16000);
+		membank("bank15")->set_base(base + 0x18000);
+		membank("bank16")->set_base(base + 0x1a000);
+		membank("bank17")->set_base(base + 0x1c000);
+		membank("bank18")->set_base(base + 0x1e000);
 	}
 	else
 	if (bank == 0xc0)
 	{
-		memory_set_bankptr(mem->machine(), "bank11", base + 0x20000);
-		memory_set_bankptr(mem->machine(), "bank12", base + 0x22000);
-		memory_set_bankptr(mem->machine(), "bank13", base + 0x24000);
-		memory_set_bankptr(mem->machine(), "bank14", base + 0x26000);
-		memory_set_bankptr(mem->machine(), "bank15", base + 0x28000);
-		memory_set_bankptr(mem->machine(), "bank16", base + 0x2a000);
-		memory_set_bankptr(mem->machine(), "bank17", base + 0x2c000);
-		memory_set_bankptr(mem->machine(), "bank18", base + 0x2e000);
+		membank("bank11")->set_base(base + 0x20000);
+		membank("bank12")->set_base(base + 0x22000);
+		membank("bank13")->set_base(base + 0x24000);
+		membank("bank14")->set_base(base + 0x26000);
+		membank("bank15")->set_base(base + 0x28000);
+		membank("bank16")->set_base(base + 0x2a000);
+		membank("bank17")->set_base(base + 0x2c000);
+		membank("bank18")->set_base(base + 0x2e000);
 	}
 	else
 		logerror("%04X: Cannot understand bankswitch command %X\n",cpu_get_pc(m_maincpu), data);
@@ -379,7 +379,7 @@ static PALETTE_INIT( lynx48k )
 
 static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
-	UINT8 *RAM = device->machine().region("maincpu")->base();
+	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
@@ -403,7 +403,7 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 
 static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
-	UINT8 *RAM = device->machine().region("maincpu")->base();
+	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
@@ -514,8 +514,9 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( lynx48k )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 3, &RAM[0x8000],  0x8000);
+	camplynx_state *state = machine.driver_data<camplynx_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 3, &RAM[0x8000],  0x8000);
 }
 
 

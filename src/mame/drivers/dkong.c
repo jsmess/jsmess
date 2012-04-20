@@ -424,7 +424,7 @@ static MACHINE_START( dkong2b )
 static MACHINE_START( s2650 )
 {
     dkong_state *state = machine.driver_data<dkong_state>();
-    UINT8   *p = machine.region("user1")->base();
+    UINT8   *p = state->memregion("user1")->base();
     const char *game_name = machine.system().name;
     int i;
 
@@ -487,27 +487,27 @@ static MACHINE_RESET( dkong )
 static MACHINE_RESET( strtheat )
 {
     dkong_state *state = machine.driver_data<dkong_state>();
-    UINT8 *ROM = machine.region("maincpu")->base();
+    UINT8 *ROM = state->memregion("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x08 */
-    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+    state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
     state->m_decrypt_counter = 0x08;
-    memory_set_bank(machine, "bank1", 0);
+    state->membank("bank1")->set_entry(0);
 }
 
 static MACHINE_RESET( drakton )
 {
     dkong_state *state = machine.driver_data<dkong_state>();
-    UINT8 *ROM = machine.region("maincpu")->base();
+    UINT8 *ROM = state->memregion("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x09 */
-    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+    state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
     state->m_decrypt_counter = 0x09;
-    memory_set_bank(machine, "bank1", 1);
+    state->membank("bank1")->set_entry(1);
 }
 
 
@@ -627,10 +627,10 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 
     switch(m_decrypt_counter)
     {
-        case 0x08:  memory_set_bank(machine(), "bank1", 0);      break;
-        case 0x09:  memory_set_bank(machine(), "bank1", 1);      break;
-        case 0x0A:  memory_set_bank(machine(), "bank1", 2);      break;
-        case 0x0B:  memory_set_bank(machine(), "bank1", 3);      break;
+        case 0x08:  membank("bank1")->set_entry(0);      break;
+        case 0x09:  membank("bank1")->set_entry(1);      break;
+        case 0x0A:  membank("bank1")->set_entry(2);      break;
+        case 0x0B:  membank("bank1")->set_entry(3);      break;
         default:
             logerror("Invalid counter = %02X\n",m_decrypt_counter);
             break;
@@ -1618,8 +1618,8 @@ static READ8_DEVICE_HANDLER( braze_eeprom_r )
 
 WRITE8_MEMBER(dkong_state::braze_a15_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x01);
-	memory_set_bank(machine(), "bank2", data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
+	membank("bank2")->set_entry(data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
@@ -1637,7 +1637,7 @@ static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
 	UINT32 mem;
 	UINT32 newmem;
 
-	ROM = machine.region("braze")->base();
+	ROM = machine.root_device().memregion("braze")->base();
 
 	for (mem=0;mem<0x10000;mem++)
 	{
@@ -3065,7 +3065,7 @@ static void drakton_decrypt_rom(running_machine &machine, UINT8 mod, int offs, i
     UINT8 *ROM;
     int mem;
 
-    ROM = machine.region("maincpu")->base();
+    ROM = machine.root_device().memregion("maincpu")->base();
 
     for (mem=0;mem<0x4000;mem++)
     {
@@ -3091,7 +3091,7 @@ static void drakton_decrypt_rom(running_machine &machine, UINT8 mod, int offs, i
 static DRIVER_INIT( herodk )
 {
     int A;
-    UINT8 *rom = machine.region("maincpu")->base();
+    UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
     /* swap data lines D3 and D4 */
     for (A = 0;A < 0x8000;A++)
@@ -3174,15 +3174,15 @@ static DRIVER_INIT( dkongx )
 
 	braze_decrypt_rom(machine, decrypted);
 
-	memory_configure_bank(machine,"bank1", 0, 2, &decrypted[0], 0x8000);
-	memory_set_bank(machine,"bank1", 0);
-	memory_configure_bank(machine,"bank2", 0, 2, &decrypted[0], 0x8000);
-	memory_set_bank(machine,"bank2", 0);
+	state->membank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	state->membank("bank2")->set_entry(0);
 }
 
 static DRIVER_INIT( dkingjr )
 {
-	UINT8 *prom = machine.region("proms")->base();
+	UINT8 *prom = machine.root_device().memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)
 	{
 		prom[i]^=0xff; // invert color data

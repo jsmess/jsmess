@@ -75,8 +75,8 @@ public:
 static VIDEO_START( paso1600 )
 {
 	paso1600_state *state = machine.driver_data<paso1600_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_pcg = machine.region("pcg")->base();
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_pcg = state->memregion("pcg")->base();
 }
 
 static SCREEN_UPDATE_IND16( paso1600 )

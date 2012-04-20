@@ -324,7 +324,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine.region("gvram")->base();
+	UINT8 *gvram = machine.root_device().memregion("gvram")->base();
 
 	count = 0;
 
@@ -356,7 +356,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap)
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine.region("gvram")->base();
+	UINT8 *gvram = state->memregion("gvram")->base();
 
 	count = 0;
 
@@ -436,7 +436,7 @@ static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
-	UINT8 *vram = machine.region("wram")->base();
+	UINT8 *vram = state->memregion("wram")->base();
 	int i;
 	int fifo_size;
 
@@ -466,7 +466,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
-	UINT8 *vram = machine.region("wram")->base();
+	UINT8 *vram = state->memregion("wram")->base();
 	UINT8 is_cursor;
 	UINT8 y_height;
 
@@ -499,7 +499,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				else
 				{
 					UINT8 char_data;
-					UINT8 *gfx_rom = machine.region("gfx1")->base();
+					UINT8 *gfx_rom = machine.root_device().memregion("gfx1")->base();
 
 					if(yi >= 8 || secret)
 						char_data = 0;
@@ -692,7 +692,7 @@ static SCREEN_UPDATE_IND16( pc8801 )
 READ8_MEMBER(pc8801_state::pc8801_alu_r)
 {
 	int i;
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 	UINT8 b,r,g;
 
 	/* store data to ALU regs */
@@ -712,7 +712,7 @@ READ8_MEMBER(pc8801_state::pc8801_alu_r)
 WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 {
 	int i;
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 
 	switch(m_alu_ctrl2 & 0x30) // alu write mode
 	{
@@ -755,21 +755,21 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 
 READ8_MEMBER(pc8801_state::pc8801_wram_r)
 {
-	UINT8 *work_ram = machine().region("wram")->base();
+	UINT8 *work_ram = memregion("wram")->base();
 
 	return work_ram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_wram_w)
 {
-	UINT8 *work_ram = machine().region("wram")->base();
+	UINT8 *work_ram = memregion("wram")->base();
 
 	work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
 {
-	UINT8 *ext_work_ram = machine().region("ewram")->base();
+	UINT8 *ext_work_ram = memregion("ewram")->base();
 
 	/* TODO: check max range here */
 
@@ -778,7 +778,7 @@ READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
 
 WRITE8_MEMBER(pc8801_state::pc8801_ext_wram_w)
 {
-	UINT8 *ext_work_ram = machine().region("ewram")->base();
+	UINT8 *ext_work_ram = memregion("ewram")->base();
 
 	/* TODO: check max range here */
 
@@ -787,56 +787,56 @@ WRITE8_MEMBER(pc8801_state::pc8801_ext_wram_w)
 
 READ8_MEMBER(pc8801_state::pc8801_nbasic_rom_r)
 {
-	UINT8 *n80_rom = machine().region("n80rom")->base();
+	UINT8 *n80_rom = memregion("n80rom")->base();
 
 	return n80_rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_n88basic_rom_r)
 {
-	UINT8 *n88_rom = machine().region("n88rom")->base();
+	UINT8 *n88_rom = memregion("n88rom")->base();
 
 	return n88_rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_gvram_r)
 {
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 
 	return gvram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gvram_w)
 {
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 
 	gvram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_high_wram_r)
 {
-	UINT8 *hi_work_ram = machine().region("hiwram")->base();
+	UINT8 *hi_work_ram = memregion("hiwram")->base();
 
 	return hi_work_ram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_high_wram_w)
 {
-	UINT8 *hi_work_ram = machine().region("hiwram")->base();
+	UINT8 *hi_work_ram = memregion("hiwram")->base();
 
 	hi_work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801ma_dic_r)
 {
-	UINT8 *dic_rom = machine().region("dictionary")->base();
+	UINT8 *dic_rom = memregion("dictionary")->base();
 
 	return dic_rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_cdbios_rom_r)
 {
-	UINT8 *cdrom_bios = machine().region("cdrom")->base();
+	UINT8 *cdrom_bios = memregion("cdrom")->base();
 
 	return cdrom_bios[offset];
 }
@@ -1335,7 +1335,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
 
 READ8_MEMBER(pc8801_state::pc8801_kanji_r)
 {
-	UINT8 *knj_rom = machine().region("kanji")->base();
+	UINT8 *knj_rom = memregion("kanji")->base();
 	if((offset & 2) == 0)
 		return knj_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
 
@@ -1350,7 +1350,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_kanji_w)
 
 READ8_MEMBER(pc8801_state::pc8801_kanji_lv2_r)
 {
-	UINT8 *knj_rom = machine().region("kanji")->base() + 0x20000;
+	UINT8 *knj_rom = memregion("kanji")->base() + 0x20000;
 	if((offset & 2) == 0)
 		return knj_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
 

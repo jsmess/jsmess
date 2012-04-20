@@ -502,15 +502,15 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
+	state->membank("bank1")->set_entry(0);
 }
 
 
 static DRIVER_INIT( esb )
 {
 	starwars_state *state = machine.driver_data<starwars_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
@@ -532,10 +532,10 @@ static DRIVER_INIT( esb )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, "bank1", 0, 2, rom + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_configure_bank(machine, "bank2", 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank1")->configure_entries(0, 2, rom + 0x6000, 0x10000 - 0x6000);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->configure_entries(0, 2, rom + 0xa000, 0x1c000 - 0xa000);
+	state->membank("bank2")->set_entry(0);
 
 	/* additional globals for state saving */
 	state->save_item(NAME(state->m_slapstic_current_bank));

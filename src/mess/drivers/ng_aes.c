@@ -557,7 +557,7 @@ static CUSTOM_INPUT( get_audio_result )
 static void _set_main_cpu_vector_table_source( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	memory_set_bank(machine, NEOGEO_BANK_VECTORS, state->m_main_cpu_vector_table_source);
+	state->membank(NEOGEO_BANK_VECTORS)->set_entry(state->m_main_cpu_vector_table_source);
 }
 
 
@@ -573,7 +573,7 @@ static void set_main_cpu_vector_table_source( running_machine &machine, UINT8 da
 static void _set_main_cpu_bank_address( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &machine.region("maincpu")->base()[state->m_main_cpu_bank_address]);
+	state->membank(NEOGEO_BANK_CARTRIDGE)->set_base(&state->memregion("maincpu")->base()[state->m_main_cpu_bank_address]);
 }
 
 
@@ -581,7 +581,7 @@ static void _set_main_cpu_bank_address( running_machine &machine )
 WRITE16_MEMBER(ng_aes_state::main_cpu_bank_select_w)
 {
 	UINT32 bank_address;
-	UINT32 len = machine().region("maincpu")->bytes();
+	UINT32 len = memregion("maincpu")->bytes();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(&space.device()), data);
@@ -602,14 +602,15 @@ WRITE16_MEMBER(ng_aes_state::main_cpu_bank_select_w)
 
 static void main_cpu_banking_init( running_machine &machine )
 {
+	ng_aes_state *state = machine.driver_data<ng_aes_state>();
 	address_space *mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* create vector banks */
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, machine.region("mainbios")->base(), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, machine.region("maincpu")->base(), 0);
+	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.root_device().memregion("mainbios")->base());
+	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(1, machine.root_device().memregion("maincpu")->base());
 
 	/* set initial main CPU bank */
-	if (machine.region("maincpu")->bytes() > 0x100000)
+	if (machine.root_device().memregion("maincpu")->bytes() > 0x100000)
 		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
 	else
 		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
@@ -629,7 +630,7 @@ static void set_audio_cpu_banking( running_machine &machine )
 	int region;
 
 	for (region = 0; region < 4; region++)
-		memory_set_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, state->m_audio_cpu_banks[region]);
+		state->membank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region)->set_entry(state->m_audio_cpu_banks[region]);
 }
 
 
@@ -681,10 +682,10 @@ static void _set_audio_cpu_rom_source( address_space *space )
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
-/*  if (!machine.region("audiobios")->base())   */
+/*  if (!state->memregion("audiobios")->base())   */
 		state->m_audio_cpu_rom_source = 1;
 
-	memory_set_bank(space->machine(), NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, state->m_audio_cpu_rom_source);
+	state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->set_entry(state->m_audio_cpu_rom_source);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (state->m_audio_cpu_rom_source != state->m_audio_cpu_rom_source_last)
@@ -716,20 +717,20 @@ static void audio_cpu_banking_init( running_machine &machine )
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	if (machine.region("audiobios")->base())
-		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, machine.region("audiobios")->base(), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, machine.region("audiocpu")->base(), 0);
+	if (machine.root_device().memregion("audiobios")->base())
+		state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(0, machine.root_device().memregion("audiobios")->base());
+	state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(1, machine.root_device().memregion("audiocpu")->base());
 
 	/* audio banking */
-	address_mask = machine.region("audiocpu")->bytes() - 0x10000 - 1;
+	address_mask = machine.root_device().memregion("audiocpu")->bytes() - 0x10000 - 1;
 
-	rgn = machine.region("audiocpu")->base();
+	rgn = state->memregion("audiocpu")->base();
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
 		{
 			UINT32 bank_address = 0x10000 + (((bank << (11 + region)) & 0x3ffff) & address_mask);
-			memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &rgn[bank_address], 0);
+			state->membank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region)->configure_entry(bank, &rgn[bank_address]);
 		}
 	}
 
@@ -1001,10 +1002,10 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 READ16_MEMBER(ng_aes_state::neocd_transfer_r)
 {
 	UINT16 ret = 0x0000;
-	UINT8* Z80 = machine().region("audiocpu")->base();
-	UINT8* PCM = machine().region("ymsnd")->base();
-	UINT8* FIX = machine().region("fixed")->base();
-	UINT16* SPR = (UINT16*)(*machine().region("sprites"));
+	UINT8* Z80 = memregion("audiocpu")->base();
+	UINT8* PCM = memregion("ymsnd")->base();
+	UINT8* FIX = memregion("fixed")->base();
+	UINT16* SPR = (UINT16*)(*machine().root_device().memregion("sprites"));
 
 	switch(m_neocd_ctrl.area_sel)
 	{
@@ -1027,10 +1028,10 @@ READ16_MEMBER(ng_aes_state::neocd_transfer_r)
 
 WRITE16_MEMBER(ng_aes_state::neocd_transfer_w)
 {
-	UINT8* Z80 = machine().region("audiocpu")->base();
-	UINT8* PCM = machine().region("ymsnd")->base();
-	UINT8* FIX = machine().region("fixed")->base();
-	UINT16* SPR = (UINT16*)(*machine().region("sprites"));
+	UINT8* Z80 = memregion("audiocpu")->base();
+	UINT8* PCM = memregion("ymsnd")->base();
+	UINT8* FIX = memregion("fixed")->base();
+	UINT16* SPR = (UINT16*)(*machine().root_device().memregion("sprites"));
 
 	switch(m_neocd_ctrl.area_sel)
 	{
@@ -1150,7 +1151,7 @@ static void common_machine_start(running_machine &machine)
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* set the BIOS bank */
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine.region("mainbios")->base());
+	state->membank(NEOGEO_BANK_BIOS)->set_base(state->memregion("mainbios")->base());
 
 	/* set the initial main CPU bank */
 	main_cpu_banking_init(machine);
@@ -1205,10 +1206,10 @@ static MACHINE_START( neogeo )
 static MACHINE_START(neocd)
 {
 	ng_aes_state *state = machine.driver_data<ng_aes_state>();
-	UINT8* ROM = machine.region("mainbios")->base();
-	UINT8* RAM = machine.region("maincpu")->base();
-	UINT8* Z80bios = machine.region("audiobios")->base();
-	UINT8* FIXbios = machine.region("fixedbios")->base();
+	UINT8* ROM = machine.root_device().memregion("mainbios")->base();
+	UINT8* RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8* Z80bios = machine.root_device().memregion("audiobios")->base();
+	UINT8* FIXbios = state->memregion("fixedbios")->base();
 	int x;
 
 	common_machine_start(machine);

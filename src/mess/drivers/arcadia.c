@@ -453,7 +453,7 @@ static PALETTE_INIT( arcadia )
 
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
-	UINT8 *rom = image.device().machine().region("maincpu")->base();
+	UINT8 *rom = image.device().machine().root_device().memregion("maincpu")->base();
 	int size;
 
 	memset(rom, 0, 0x8000);
@@ -461,8 +461,8 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	{
 		size = image.length();
 
-		if (size > image.device().machine().region("maincpu")->bytes())
-			size = image.device().machine().region("maincpu")->bytes();
+		if (size > image.device().machine().root_device().memregion("maincpu")->bytes())
+			size = image.device().machine().root_device().memregion("maincpu")->bytes();
 
 		if (image.fread(rom, size) != size)
 			return IMAGE_INIT_FAIL;
@@ -733,13 +733,13 @@ ROM_END
 static DRIVER_INIT( arcadia )
 {
 	int i;
-	UINT8 *gfx=machine.region("gfx1")->base();
+	UINT8 *gfx=machine.root_device().memregion("gfx1")->base();
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-		UINT8 *rom=machine.region("maincpu")->base();
+		UINT8 *rom=machine.root_device().memregion("maincpu")->base();
 		/* this is a simple routine to display all rom characters
            on the display for a snapshot */
 		static const UINT8 prog[]={ // address 0 of course

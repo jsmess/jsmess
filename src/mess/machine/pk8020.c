@@ -232,7 +232,7 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 {
 	pk8020_state *state = machine.driver_data<pk8020_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	switch(data & 0x1F) {
@@ -241,12 +241,12 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x37ff, "bank1");
 						space->install_write_bank(0x0000, 0x37ff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Keyboard
 						space->install_read_handler (0x3800, 0x39ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0x3800, 0x39ff, "bank3");
-						memory_set_bankptr(machine, "bank3", ram + 0x3800);
+						state->membank("bank3")->set_base(ram + 0x3800);
 						// System reg
 						space->install_read_handler (0x3a00, 0x3aff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0x3a00, 0x3aff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -259,42 +259,42 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x4000, 0xffff, "bank4");
 						space->install_write_bank(0x4000, 0xffff, "bank5");
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
-						memory_set_bankptr(machine, "bank5", ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
+						state->membank("bank5")->set_base(ram + 0x4000);
 					}
 					break;
 		case 0x01 : {
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xffff, "bank3");
 						space->install_write_bank(0x2000, 0xffff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 					}
 					break;
 		case 0x02 : {
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xffff, "bank3");
 						space->install_write_bank(0x4000, 0xffff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 					}
 					break;
 		case 0x03 : {
 						// RAM
 						space->install_read_bank (0x0000, 0xffff, "bank1");
 						space->install_write_bank(0x0000, 0xffff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram);
 					}
 					break;
 		case 0x04 :
@@ -303,17 +303,17 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xf7ff, "bank3");
 						space->install_write_bank(0x2000, 0xf7ff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank5");
-						memory_set_bankptr(machine, "bank5", ram + 0xf800);
+						state->membank("bank5")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -330,17 +330,17 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xf7ff, "bank3");
 						space->install_write_bank(0x4000, 0xf7ff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank5");
-						memory_set_bankptr(machine, "bank5", ram + 0xf800);
+						state->membank("bank5")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -357,12 +357,12 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xf7ff, "bank1");
 						space->install_write_bank(0x0000, 0xf7ff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank3");
-						memory_set_bankptr(machine, "bank3", ram + 0xf800);
+						state->membank("bank3")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -379,12 +379,12 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Keyboard
 						space->install_read_handler (0x3800, 0x39ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0x3800, 0x39ff, "bank3");
-						memory_set_bankptr(machine, "bank3", ram + 0x3800);
+						state->membank("bank3")->set_base(ram + 0x3800);
 						// System reg
 						space->install_read_handler (0x3a00, 0x3aff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0x3a00, 0x3aff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -397,8 +397,8 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x4000, 0xbfff, "bank4");
 						space->install_write_bank(0x4000, 0xbfff, "bank5");
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
-						memory_set_bankptr(machine, "bank5", ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
+						state->membank("bank5")->set_base(ram + 0x4000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -410,13 +410,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xbfff, "bank3");
 						space->install_write_bank(0x2000, 0xbfff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -427,13 +427,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xbfff, "bank3");
 						space->install_write_bank(0x4000, 0xbfff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -444,8 +444,8 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xbfff, "bank1");
 						space->install_write_bank(0x0000, 0xbfff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(ram + 0x0000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -457,21 +457,21 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0x3fff, "bank3");
 						space->install_write_bank(0x2000, 0x3fff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Video RAM
 						space->install_read_handler (0x4000, 0x7fff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
 						// RAM
 						space->install_read_bank (0x8000, 0xfdff, "bank5");
 						space->install_write_bank(0x8000, 0xfdff, "bank6");
-						memory_set_bankptr(machine, "bank5", ram + 0x8000);
-						memory_set_bankptr(machine, "bank6", ram + 0x8000);
+						state->membank("bank5")->set_base(ram + 0x8000);
+						state->membank("bank6")->set_base(ram + 0x8000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -485,16 +485,16 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Video RAM
 						space->install_read_handler (0x4000, 0x7fff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
 						// RAM
 						space->install_read_bank (0x8000, 0xfdff, "bank5");
 						space->install_write_bank(0x8000, 0xfdff, "bank6");
-						memory_set_bankptr(machine, "bank5", ram + 0x8000);
-						memory_set_bankptr(machine, "bank6", ram + 0x8000);
+						state->membank("bank5")->set_base(ram + 0x8000);
+						state->membank("bank6")->set_base(ram + 0x8000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -508,16 +508,16 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(ram + 0x0000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Video RAM
 						space->install_read_handler (0x4000, 0x7fff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
 						// RAM
 						space->install_read_bank (0x8000, 0xfdff, "bank3");
 						space->install_write_bank(0x8000, 0xfdff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x8000);
-						memory_set_bankptr(machine, "bank4", ram + 0x8000);
+						state->membank("bank3")->set_base(ram + 0x8000);
+						state->membank("bank4")->set_base(ram + 0x8000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -531,17 +531,17 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x5fff, "bank1");
 						space->install_write_bank(0x0000, 0x5fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x6000, 0xf7ff, "bank3");
 						space->install_write_bank(0x6000, 0xf7ff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram + 0x6000);
+						state->membank("bank3")->set_base(ram + 0x6000);
+						state->membank("bank4")->set_base(ram + 0x6000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank5");
-						memory_set_bankptr(machine, "bank5", ram + 0xf800);
+						state->membank("bank5")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -558,17 +558,17 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xf7ff, "bank3");
 						space->install_write_bank(0x2000, 0xf7ff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank5");
-						memory_set_bankptr(machine, "bank5", ram + 0xf800);
+						state->membank("bank5")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -585,17 +585,17 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xf7ff, "bank3");
 						space->install_write_bank(0x4000, 0xf7ff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank5");
-						memory_set_bankptr(machine, "bank5", ram + 0xf800);
+						state->membank("bank5")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -612,12 +612,12 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xf7ff, "bank1");
 						space->install_write_bank(0x0000, 0xf7ff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(ram + 0x0000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// Keyboard
 						space->install_read_handler (0xf800, 0xf9ff, read8_delegate(FUNC(pk8020_state::keyboard_r),state));
 						space->install_write_bank(0xf800, 0xf9ff, "bank3");
-						memory_set_bankptr(machine, "bank3", ram + 0xf800);
+						state->membank("bank3")->set_base(ram + 0xf800);
 						// System reg
 						space->install_read_handler (0xfa00, 0xfaff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -634,13 +634,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x5fff, "bank1");
 						space->install_write_bank(0x0000, 0x5fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x6000, 0xfdff, "bank3");
 						space->install_write_bank(0x6000, 0xfdff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram + 0x6000);
+						state->membank("bank3")->set_base(ram + 0x6000);
+						state->membank("bank4")->set_base(ram + 0x6000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -654,13 +654,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xfdff, "bank3");
 						space->install_write_bank(0x2000, 0xfdff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -674,13 +674,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xfdff, "bank3");
 						space->install_write_bank(0x4000, 0xfdff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -694,8 +694,8 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xfdff, "bank1");
 						space->install_write_bank(0x0000, 0xfdff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram);
 						// Devices
 						space->install_read_handler (0xfe00, 0xfeff, read8_delegate(FUNC(pk8020_state::devices_r),state));
 						space->install_write_handler(0xfe00, 0xfeff, write8_delegate(FUNC(pk8020_state::devices_w),state));
@@ -709,13 +709,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x5fff, "bank1");
 						space->install_write_bank(0x0000, 0x5fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x6000, 0xbeff, "bank3");
 						space->install_write_bank(0x6000, 0xbeff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram + 0x6000);
+						state->membank("bank3")->set_base(ram + 0x6000);
+						state->membank("bank4")->set_base(ram + 0x6000);
 						// System reg
 						space->install_read_handler (0xbf00, 0xbfff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xbf00, 0xbfff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -729,13 +729,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xbeff, "bank3");
 						space->install_write_bank(0x2000, 0xbeff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// System reg
 						space->install_read_handler (0xbf00, 0xbfff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xbf00, 0xbfff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -749,13 +749,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xbeff, "bank3");
 						space->install_write_bank(0x4000, 0xbeff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// System reg
 						space->install_read_handler (0xbf00, 0xbfff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xbf00, 0xbfff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -769,8 +769,8 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xbeff, "bank1");
 						space->install_write_bank(0x0000, 0xbeff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram);
 						// System reg
 						space->install_read_handler (0xbf00, 0xbfff, read8_delegate(FUNC(pk8020_state::sysreg_r),state));
 						space->install_write_handler(0xbf00, 0xbfff, write8_delegate(FUNC(pk8020_state::sysreg_w),state));
@@ -784,13 +784,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x5fff, "bank1");
 						space->install_write_bank(0x0000, 0x5fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x6000, 0xbfff, "bank3");
 						space->install_write_bank(0x6000, 0xbfff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram + 0x6000);
+						state->membank("bank3")->set_base(ram + 0x6000);
+						state->membank("bank4")->set_base(ram + 0x6000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -801,13 +801,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x1fff, "bank1");
 						space->install_write_bank(0x0000, 0x1fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x2000, 0xbfff, "bank3");
 						space->install_write_bank(0x2000, 0xbfff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram + 0x2000);
+						state->membank("bank3")->set_base(ram + 0x2000);
+						state->membank("bank4")->set_base(ram + 0x2000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -818,13 +818,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// ROM
 						space->install_read_bank (0x0000, 0x3fff, "bank1");
 						space->install_write_bank(0x0000, 0x3fff, "bank2");
-						memory_set_bankptr(machine, "bank1", mem + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram + 0x0000);
+						state->membank("bank1")->set_base(mem + 0x10000);
+						state->membank("bank2")->set_base(ram + 0x0000);
 						// RAM
 						space->install_read_bank (0x4000, 0xbfff, "bank3");
 						space->install_write_bank(0x4000, 0xbfff, "bank4");
-						memory_set_bankptr(machine, "bank3", ram + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						state->membank("bank3")->set_base(ram + 0x4000);
+						state->membank("bank4")->set_base(ram + 0x4000);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));
@@ -835,8 +835,8 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 						// RAM
 						space->install_read_bank (0x0000, 0xbfff, "bank1");
 						space->install_write_bank(0x0000, 0xbfff, "bank2");
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram);
 						// Video RAM
 						space->install_read_handler (0xc000, 0xffff, read8_delegate(FUNC(pk8020_state::gzu_r),state));
 						space->install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(pk8020_state::gzu_w),state));

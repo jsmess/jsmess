@@ -655,7 +655,7 @@ static MACHINE_START( pdp1 )
 	};
 
 	/* set up our font */
-	dst = machine.region("gfx1")->base();
+	dst = machine.root_device().memregion("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine));

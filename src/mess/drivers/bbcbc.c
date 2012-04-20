@@ -129,7 +129,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 
 static DEVICE_START( bbcbc_cart )
 {
-	UINT8 *cart = device->machine().region("maincpu" )->base() + 0x4000;
+	UINT8 *cart = device->machine().root_device().memregion("maincpu" )->base() + 0x4000;
 
 	memset( cart, 0xFF, 0x8000 );
 }
@@ -137,7 +137,7 @@ static DEVICE_START( bbcbc_cart )
 
 static DEVICE_IMAGE_LOAD( bbcbc_cart )
 {
-	UINT8 *cart = image.device().machine().region("maincpu" )->base() + 0x4000;
+	UINT8 *cart = image.device().machine().root_device().memregion("maincpu" )->base() + 0x4000;
 
 	if ( image.software_entry() == NULL )
 	{

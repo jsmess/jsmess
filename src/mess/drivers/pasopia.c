@@ -74,7 +74,7 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *m_p_chargen = device->machine().region("chargen")->base();
+	UINT8 *m_p_chargen = state->memregion("chargen")->base();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -104,7 +104,7 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 WRITE8_MEMBER( pasopia_state::pasopia_ctrl_w )
 {
 	m_ram_bank = BIT(data, 1);
-	memory_set_bank(machine(), "bank1", m_ram_bank);
+	membank("bank1")->set_entry(m_ram_bank);
 }
 
 static ADDRESS_MAP_START(pasopia_map, AS_PROGRAM, 8, pasopia_state)
@@ -136,10 +136,10 @@ INPUT_PORTS_END
 static MACHINE_START(pasopia)
 {
 	pasopia_state *state = machine.driver_data<pasopia_state>();
-	state->m_p_vram = machine.region("vram")->base();
+	state->m_p_vram = state->memregion("vram")->base();
 	state->m_hblank = 0;
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->set_entry(0);
 }
 
 static MACHINE_RESET(pasopia)
@@ -331,10 +331,10 @@ DRIVER_INIT( pasopia )
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000 indicates ROMs, 10000 indicates RAM.
 */
-
-	UINT8 *p_ram = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &p_ram[0x00000], 0x10000);
-	memory_configure_bank(machine, "bank2", 0, 1, &p_ram[0x10000], 0);
+	pasopia_state *state = machine.driver_data<pasopia_state>();
+	UINT8 *p_ram = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &p_ram[0x00000], 0x10000);
+	state->membank("bank2")->configure_entry(0, &p_ram[0x10000]);
 }
 
 static MACHINE_CONFIG_START( pasopia, pasopia_state )

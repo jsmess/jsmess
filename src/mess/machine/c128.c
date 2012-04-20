@@ -496,16 +496,16 @@ void c128_bankswitch_64( running_machine &machine, int reset )
 	charen = (data & 4) ? 1 : 0;
 
 	if ((!state->m_game && state->m_exrom) || (loram && hiram && !state->m_exrom))
-		memory_set_bankptr(machine, "bank8", state->m_roml);
+		state->membank("bank8")->set_base(state->m_roml);
 	else
-		memory_set_bankptr(machine, "bank8", state->m_memory + 0x8000);
+		state->membank("bank8")->set_base(state->m_memory + 0x8000);
 
 	if ((!state->m_game && state->m_exrom && hiram) || (!state->m_exrom))
-		memory_set_bankptr(machine, "bank9", state->m_romh);
+		state->membank("bank9")->set_base(state->m_romh);
 	else if (loram && hiram)
-		memory_set_bankptr(machine, "bank9", state->m_basic);
+		state->membank("bank9")->set_base(state->m_basic);
 	else
-		memory_set_bankptr(machine, "bank9", state->m_memory + 0xa000);
+		state->membank("bank9")->set_base(state->m_memory + 0xa000);
 
 	if ((!state->m_game && state->m_exrom) || (charen && (loram || hiram)))
 	{
@@ -517,30 +517,30 @@ void c128_bankswitch_64( running_machine &machine, int reset )
 		machine.device("m8502")->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
 		state->m_write_io = 0;
 		if ((!charen && (loram || hiram)))
-			memory_set_bankptr(machine, "bank13", state->m_chargen);
+			state->membank("bank13")->set_base(state->m_chargen);
 		else
-			memory_set_bankptr(machine, "bank13", state->m_memory + 0xd000);
+			state->membank("bank13")->set_base(state->m_memory + 0xd000);
 	}
 
 	if (!state->m_game && state->m_exrom)
 	{
-		memory_set_bankptr(machine, "bank14", state->m_romh);
-		memory_set_bankptr(machine, "bank15", state->m_romh+0x1f00);
-		memory_set_bankptr(machine, "bank16", state->m_romh+0x1f05);
+		state->membank("bank14")->set_base(state->m_romh);
+		state->membank("bank15")->set_base(state->m_romh+0x1f00);
+		state->membank("bank16")->set_base(state->m_romh+0x1f05);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr(machine, "bank14", state->m_kernal);
-			memory_set_bankptr(machine, "bank15", state->m_kernal+0x1f00);
-			memory_set_bankptr(machine, "bank16", state->m_kernal+0x1f05);
+			state->membank("bank14")->set_base(state->m_kernal);
+			state->membank("bank15")->set_base(state->m_kernal+0x1f00);
+			state->membank("bank16")->set_base(state->m_kernal+0x1f05);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank14", state->m_memory + 0xe000);
-			memory_set_bankptr(machine, "bank15", state->m_memory + 0xff00);
-			memory_set_bankptr(machine, "bank16", state->m_memory + 0xff05);
+			state->membank("bank14")->set_base(state->m_memory + 0xe000);
+			state->membank("bank15")->set_base(state->m_memory + 0xff00);
+			state->membank("bank16")->set_base(state->m_memory + 0xff05);
 		}
 	}
 	state->m_old_data = data;
@@ -556,8 +556,8 @@ static void c128_bankswitch_z80( running_machine &machine )
 	 state->m_ram = state->m_memory + MMU_RAM_ADDR;
 	 state->m_va1617 = MMU_VIC_ADDR;
 #if 1
-	 memory_set_bankptr(machine, "bank10", state->m_z80);
-	 memory_set_bankptr(machine, "bank11", state->m_ram + 0x1000);
+	 state->membank("bank10")->set_base(state->m_z80);
+	 state->membank("bank11")->set_base(state->m_ram + 0x1000);
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 state->m_ram = NULL;
@@ -568,21 +568,21 @@ static void c128_bankswitch_z80( running_machine &machine )
 		 state->m_ram_bottom = 0;
 
 	 if (MMU_RAM_ADDR==0) { /* this is used in z80 mode for rom on/off switching !*/
-		 memory_set_bankptr(machine, "bank10", state->m_z80);
-		 memory_set_bankptr(machine, "bank11", state->m_z80 + 0x400);
+		 state->membank("bank10")->set_base(state->m_z80);
+		 state->membank("bank11")->set_base(state->m_z80 + 0x400);
 	 }
 	 else
 	 {
-		 memory_set_bankptr(machine, "bank10", (state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
-		 memory_set_bankptr(machine, "bank11", (state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
+		 state->membank("bank10")->set_base((state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
+		 state->membank("bank11")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
 	 }
 
-	 memory_set_bankptr(machine, "bank1", (state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
-	 memory_set_bankptr(machine, "bank2", (state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
+	 state->membank("bank1")->set_base((state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
+	 state->membank("bank2")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
 
-	 memory_set_bankptr(machine, "bank3", (state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
-	 memory_set_bankptr(machine, "bank4", (state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
-	 memory_set_bankptr(machine, "bank5", state->m_ram + 0x4000);
+	 state->membank("bank3")->set_base((state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
+	 state->membank("bank4")->set_base((state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
+	 state->membank("bank5")->set_base(state->m_ram + 0x4000);
 
 	 if (MMU_TOP)
 		 state->m_ram_top = 0x10000 - MMU_SIZE;
@@ -590,24 +590,24 @@ static void c128_bankswitch_z80( running_machine &machine )
 		 state->m_ram_top = 0x10000;
 
 	 if (state->m_ram_top > 0xc000)
-		memory_set_bankptr(machine, "bank6", state->m_ram + 0xc000);
+		state->membank("bank6")->set_base(state->m_ram + 0xc000);
 	 else
-		memory_set_bankptr(machine, "bank6", state->m_memory + 0xc000);
+		state->membank("bank6")->set_base(state->m_memory + 0xc000);
 
 	 if (state->m_ram_top > 0xe000)
-		memory_set_bankptr(machine, "bank7", state->m_ram + 0xe000);
+		state->membank("bank7")->set_base(state->m_ram + 0xe000);
 	 else
-		memory_set_bankptr(machine, "bank7", state->m_memory + 0xd000);
+		state->membank("bank7")->set_base(state->m_memory + 0xd000);
 
 	 if (state->m_ram_top > 0xf000)
-		memory_set_bankptr(machine, "bank8", state->m_ram + 0xf000);
+		state->membank("bank8")->set_base(state->m_ram + 0xf000);
 	 else
-		memory_set_bankptr(machine, "bank8", state->m_memory + 0xe000);
+		state->membank("bank8")->set_base(state->m_memory + 0xe000);
 
 	 if (state->m_ram_top > 0xff05)
-		memory_set_bankptr(machine, "bank9", state->m_ram + 0xff05);
+		state->membank("bank9")->set_base(state->m_ram + 0xff05);
 	 else
-		memory_set_bankptr(machine, "bank9", state->m_memory + 0xff05);
+		state->membank("bank9")->set_base(state->m_memory + 0xff05);
 
 	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
@@ -627,17 +627,17 @@ static void c128_bankswitch_128( running_machine &machine, int reset )
 		state->m_ram_bottom = 0;
 		state->m_ram_top = 0x10000;
 
-		memory_set_bankptr(machine, "bank1", state->m_memory);
-		memory_set_bankptr(machine, "bank2", state->m_memory + 0x100);
+		state->membank("bank1")->set_base(state->m_memory);
+		state->membank("bank2")->set_base(state->m_memory + 0x100);
 
-		memory_set_bankptr(machine, "bank3", state->m_memory + 0x200);
-		memory_set_bankptr(machine, "bank4", state->m_memory + 0x400);
-		memory_set_bankptr(machine, "bank5", state->m_memory + 0x1000);
-		memory_set_bankptr(machine, "bank6", state->m_memory + 0x2000);
+		state->membank("bank3")->set_base(state->m_memory + 0x200);
+		state->membank("bank4")->set_base(state->m_memory + 0x400);
+		state->membank("bank5")->set_base(state->m_memory + 0x1000);
+		state->membank("bank6")->set_base(state->m_memory + 0x2000);
 
-		memory_set_bankptr(machine, "bank7", state->m_memory + 0x4000);
+		state->membank("bank7")->set_base(state->m_memory + 0x4000);
 
-		memory_set_bankptr(machine, "bank12", state->m_memory + 0xc000);
+		state->membank("bank12")->set_base(state->m_memory + 0xc000);
 
 		c128_bankswitch_64(machine, reset);
 	}
@@ -645,47 +645,47 @@ static void c128_bankswitch_128( running_machine &machine, int reset )
 	{
 		state->m_ram = state->m_memory + MMU_RAM_ADDR;
 		state->m_va1617 = MMU_VIC_ADDR;
-		memory_set_bankptr(machine, "bank1", state->m_memory + state->m_mmu_page0);
-		memory_set_bankptr(machine, "bank2", state->m_memory + state->m_mmu_page1);
+		state->membank("bank1")->set_base(state->m_memory + state->m_mmu_page0);
+		state->membank("bank2")->set_base(state->m_memory + state->m_mmu_page1);
 		if (MMU_BOTTOM)
 			{
 				state->m_ram_bottom = MMU_SIZE;
 			}
 		else
 			state->m_ram_bottom = 0;
-		memory_set_bankptr(machine, "bank3", (state->m_ram_bottom > 0x200 ? state->m_memory : state->m_ram) + 0x200);
-		memory_set_bankptr(machine, "bank4", (state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
-		memory_set_bankptr(machine, "bank5", (state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
-		memory_set_bankptr(machine, "bank6", (state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
+		state->membank("bank3")->set_base((state->m_ram_bottom > 0x200 ? state->m_memory : state->m_ram) + 0x200);
+		state->membank("bank4")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
+		state->membank("bank5")->set_base((state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
+		state->membank("bank6")->set_base((state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
 
 		if (MMU_RAM_LO)
 		{
-			memory_set_bankptr(machine, "bank7", state->m_ram + 0x4000);
+			state->membank("bank7")->set_base(state->m_ram + 0x4000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank7", state->m_c128_basic);
+			state->membank("bank7")->set_base(state->m_c128_basic);
 		}
 
 		if (MMU_RAM_MID)
 		{
-			memory_set_bankptr(machine, "bank8", state->m_ram + 0x8000);
-			memory_set_bankptr(machine, "bank9", state->m_ram + 0xa000);
+			state->membank("bank8")->set_base(state->m_ram + 0x8000);
+			state->membank("bank9")->set_base(state->m_ram + 0xa000);
 		}
 		else if (MMU_ROM_MID)
 		{
-			memory_set_bankptr(machine, "bank8", state->m_c128_basic + 0x4000);
-			memory_set_bankptr(machine, "bank9", state->m_c128_basic + 0x6000);
+			state->membank("bank8")->set_base(state->m_c128_basic + 0x4000);
+			state->membank("bank9")->set_base(state->m_c128_basic + 0x6000);
 		}
 		else if (MMU_INTERNAL_ROM_MID)
 		{
-			memory_set_bankptr(machine, "bank8", state->m_internal_function);
-			memory_set_bankptr(machine, "bank9", state->m_internal_function + 0x2000);
+			state->membank("bank8")->set_base(state->m_internal_function);
+			state->membank("bank9")->set_base(state->m_internal_function + 0x2000);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank8", state->m_external_function);
-			memory_set_bankptr(machine, "bank9", state->m_external_function + 0x2000);
+			state->membank("bank8")->set_base(state->m_external_function);
+			state->membank("bank9")->set_base(state->m_external_function + 0x2000);
 		}
 
 		if (MMU_TOP)
@@ -713,66 +713,66 @@ static void c128_bankswitch_128( running_machine &machine, int reset )
 		{
 			if (state->m_ram_top > 0xc000)
 			{
-				memory_set_bankptr(machine, "bank12", state->m_ram + 0xc000);
+				state->membank("bank12")->set_base(state->m_ram + 0xc000);
 			}
 			else
 			{
-				memory_set_bankptr(machine, "bank12", state->m_memory + 0xc000);
+				state->membank("bank12")->set_base(state->m_memory + 0xc000);
 			}
 			if (!MMU_IO_ON)
 			{
 				if (state->m_ram_top > 0xd000)
 				{
-					memory_set_bankptr(machine, "bank13", state->m_ram + 0xd000);
+					state->membank("bank13")->set_base(state->m_ram + 0xd000);
 				}
 				else
 				{
-					memory_set_bankptr(machine, "bank13", state->m_memory + 0xd000);
+					state->membank("bank13")->set_base(state->m_memory + 0xd000);
 				}
 			}
 			if (state->m_ram_top > 0xe000)
 			{
-				memory_set_bankptr(machine, "bank14", state->m_ram + 0xe000);
+				state->membank("bank14")->set_base(state->m_ram + 0xe000);
 			}
 			else
 			{
-				memory_set_bankptr(machine, "bank14", state->m_memory + 0xe000);
+				state->membank("bank14")->set_base(state->m_memory + 0xe000);
 			}
 			if (state->m_ram_top > 0xff05)
 			{
-				memory_set_bankptr(machine, "bank16", state->m_ram + 0xff05);
+				state->membank("bank16")->set_base(state->m_ram + 0xff05);
 			}
 			else
 			{
-				memory_set_bankptr(machine, "bank16", state->m_memory + 0xff05);
+				state->membank("bank16")->set_base(state->m_memory + 0xff05);
 			}
 		}
 		else if (MMU_ROM_HI)
 		{
-			memory_set_bankptr(machine, "bank12", state->m_editor);
+			state->membank("bank12")->set_base(state->m_editor);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, "bank13", state->m_c128_chargen);
+				state->membank("bank13")->set_base(state->m_c128_chargen);
 			}
-			memory_set_bankptr(machine, "bank14", state->m_c128_kernal);
-			memory_set_bankptr(machine, "bank16", state->m_c128_kernal + 0x1f05);
+			state->membank("bank14")->set_base(state->m_c128_kernal);
+			state->membank("bank16")->set_base(state->m_c128_kernal + 0x1f05);
 		}
 		else if (MMU_INTERNAL_ROM_HI)
 		{
-			memory_set_bankptr(machine, "bank12", state->m_internal_function);
+			state->membank("bank12")->set_base(state->m_internal_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, "bank13", state->m_internal_function + 0x1000);
+				state->membank("bank13")->set_base(state->m_internal_function + 0x1000);
 			}
-			memory_set_bankptr(machine, "bank14", state->m_internal_function + 0x2000);
-			memory_set_bankptr(machine, "bank16", state->m_internal_function + 0x3f05);
+			state->membank("bank14")->set_base(state->m_internal_function + 0x2000);
+			state->membank("bank16")->set_base(state->m_internal_function + 0x3f05);
 		}
 		else					   /*if (MMU_EXTERNAL_ROM_HI) */
 		{
-			memory_set_bankptr(machine, "bank12", state->m_external_function);
+			state->membank("bank12")->set_base(state->m_external_function);
 			if (!MMU_IO_ON) {
-				memory_set_bankptr(machine, "bank13", state->m_external_function + 0x1000);
+				state->membank("bank13")->set_base(state->m_external_function + 0x1000);
 			}
-			memory_set_bankptr(machine, "bank14", state->m_external_function + 0x2000);
-			memory_set_bankptr(machine, "bank16", state->m_external_function + 0x3f05);
+			state->membank("bank14")->set_base(state->m_external_function + 0x2000);
+			state->membank("bank16")->set_base(state->m_external_function + 0x3f05);
 		}
 
 		if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
@@ -1139,8 +1139,8 @@ READ8_DEVICE_HANDLER(c128_m6510_port_read)
 static void c128_common_driver_init( running_machine &machine )
 {
 	c128_state *state = machine.driver_data<c128_state>();
-	UINT8 *gfx=machine.region("gfx1")->base();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *gfx=machine.root_device().memregion("gfx1")->base();
+	UINT8 *ram = state->memregion("maincpu")->base();
 	int i;
 
 	state->m_memory = ram;

@@ -982,16 +982,16 @@ void cartridge_device::prepare_cartridge()
 
 	UINT8* grom_ptr;
 
-	const memory_region *regg;
-	const memory_region *regr;
-	const memory_region *regr2;
+	memory_region *regg;
+	memory_region *regr;
+	memory_region *regr2;
 
 	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
 	if (VERBOSE>6) LOG("gromport: grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
-		regg = subregion("grom_contents");
+		regg = memregion("grom_contents");
 		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 
@@ -1012,7 +1012,7 @@ void cartridge_device::prepare_cartridge()
 	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom_socket") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
-		regr = subregion("rom_contents");
+		regr = memregion("rom_contents");
 		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
 	}
@@ -1021,7 +1021,7 @@ void cartridge_device::prepare_cartridge()
 	if (rom2_length > 0)
 	{
 		// sizes do not differ between rom and rom2
-		regr2 = subregion("rom2_contents");
+		regr2 = memregion("rom2_contents");
 		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
 	}

@@ -182,8 +182,8 @@ ROM_END
 void myarc_memory_expansion_device::device_start()
 {
 	if (VERBOSE>5) LOG("myarc memexp: start\n");
-	m_dsrrom = subregion(DSRROM)->base();
-	m_ram = subregion(RAMREGION)->base();
+	m_dsrrom = memregion(DSRROM)->base();
+	m_ram = memregion(RAMREGION)->base();
 }
 
 void myarc_memory_expansion_device::device_reset()

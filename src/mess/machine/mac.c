@@ -211,6 +211,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 static void mac_install_memory(running_machine &machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
+	mac_state *state = machine.driver_data<mac_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t memory_mask;
 
@@ -227,7 +228,7 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 		space->install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 
-	memory_set_bankptr(machine, bank, memory_data);
+	state->membank(bank)->set_base(memory_data);
 
 	if (LOG_MEMORY)
 	{
@@ -389,8 +390,8 @@ void mac_state::v8_resize()
 	if (is_rom)
 	{
 		/* ROM mirror */
-		memory_size = machine().region("bootrom")->bytes();
-		memory_data = machine().region("bootrom")->base();
+		memory_size = memregion("bootrom")->bytes();
+		memory_data = memregion("bootrom")->base();
 		is_rom = TRUE;
 	}
 	else
@@ -468,8 +469,8 @@ void mac_state::set_memory_overlay(int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = machine().region("bootrom")->bytes();
-			memory_data = machine().region("bootrom")->base();
+			memory_size = memregion("bootrom")->bytes();
+			memory_data = memregion("bootrom")->base();
 			is_rom = TRUE;
 		}
 		else
@@ -2096,7 +2097,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-			machine.region("bootrom")->bytes(), machine.region("bootrom")->base(), TRUE, "bank3");
+			machine.root_device().memregion("bootrom")->bytes(), machine.root_device().memregion("bootrom")->base(), TRUE, "bank3");
 	}
 
 	mac->m_overlay = -1;

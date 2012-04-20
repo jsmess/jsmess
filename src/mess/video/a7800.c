@@ -321,7 +321,7 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 {
 	a7800_state *state = timer.machine().driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = timer.machine().region("maincpu")->base();
+	UINT8 *ROM = timer.machine().root_device().memregion("maincpu")->base();
 	address_space* space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_maria_scanline++;
@@ -442,7 +442,7 @@ SCREEN_UPDATE_IND16( a7800 )
 
 READ8_MEMBER(a7800_state::a7800_MARIA_r)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	switch (offset)
 	{
 		case 0x08:
@@ -456,7 +456,7 @@ READ8_MEMBER(a7800_state::a7800_MARIA_r)
 
 WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	switch (offset)
 	{
 		case 0x00:

@@ -663,15 +663,15 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	case 40 * 1024:
 		program->install_read_bank(0x8000, 0x9fff, "bank1");
 		program->unmap_write(0x8000, 0x9fff);
-		memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->set_entry(0);
 		break;
 
 	case 48 * 1024:
 		program->install_read_bank(0x8000, 0xbfff, "bank1");
 		program->unmap_write(0x8000, 0xbfff);
-		memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->set_entry(0);
 		break;
 
 	default:
@@ -699,7 +699,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 	UINT32 ram_size = 0x400;
 	bool install_2000_ram = false;
 	UINT32 size;
@@ -813,7 +813,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -869,7 +869,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sc3000_state *state = machine.driver_data<sc3000_state>();
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -947,7 +947,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	}
 
 	/* ROM selection */
-	memory_set_bank(machine(), "bank1", BIT(data, 6));
+	membank("bank1")->set_entry(BIT(data, 6));
 
 	/* printer strobe */
 	m_centronics->strobe_w(BIT(data, 7));
@@ -1032,7 +1032,7 @@ static const floppy_interface sf7000_floppy_interface =
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	UINT8 *rom = machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine.root_device().memregion(Z80_TAG)->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
@@ -1081,9 +1081,9 @@ void sc3000_state::machine_start()
 void sf7000_state::machine_start()
 {
 	/* configure memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, m_ram->pointer(), 0);
-	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
+	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(1, m_ram->pointer());
+	membank("bank2")->configure_entry(0, m_ram->pointer());
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
@@ -1097,8 +1097,8 @@ void sf7000_state::machine_start()
 
 void sf7000_state::machine_reset()
 {
-	memory_set_bank(machine(), "bank1", 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************

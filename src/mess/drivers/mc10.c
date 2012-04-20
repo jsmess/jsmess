@@ -247,29 +247,29 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 
 static DRIVER_INIT( mc10 )
 {
-	mc10_state *mc10 = machine.driver_data<mc10_state>();
+	mc10_state *state = machine.driver_data<mc10_state>();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
-	mc10->m_keyboard_strobe = 0x00;
+	state->m_keyboard_strobe = 0x00;
 
 	/* initialize memory */
-	mc10->m_ram_base = mc10->m_ram->pointer();
-	mc10->m_ram_size = mc10->m_ram->size();
-	mc10->m_pr_state = PRINTER_WAIT;
+	state->m_ram_base = state->m_ram->pointer();
+	state->m_ram_size = state->m_ram->size();
+	state->m_pr_state = PRINTER_WAIT;
 
-	memory_set_bankptr(machine, "bank1", mc10->m_ram_base);
+	state->membank("bank1")->set_base(state->m_ram_base);
 
 	/* initialize memory expansion */
-	if (mc10->m_ram_size == 20*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x1000);
-	else if (mc10->m_ram_size == 24*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x2000);
-	else  if (mc10->m_ram_size != 32*1024)		//ensure that is not alice90
+	if (state->m_ram_size == 20*1024)
+		state->membank("bank2")->set_base(state->m_ram_base + 0x1000);
+	else if (state->m_ram_size == 24*1024)
+		state->membank("bank2")->set_base(state->m_ram_base + 0x2000);
+	else  if (state->m_ram_size != 32*1024)		//ensure that is not alice90
 		prg->nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
-	state_save_register_global(machine, mc10->m_keyboard_strobe);
+	state_save_register_global(machine, state->m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
 	if (!strcmp(machine.system().name, "alice32") || !strcmp(machine.system().name, "alice90"))

@@ -193,7 +193,7 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			break;
 		case 1: // banked RAM
 			sprintf(bank_tag,"bank%d", bank);
-			memory_set_bankptr(machine(), bank_tag, m_ram_base + (((bank == 1 ? m_bank1[0] : m_bank2[0]) & 0x07)<<14));
+			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1[0] : m_bank2[0]) & 0x07)<<14));
 			program->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
 			active_flash = -1;
 			break;
@@ -437,11 +437,11 @@ void mstation_state::machine_start()
 	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
 
 	// allocate the videoram
-	m_vram = (UINT8*)machine().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
+	m_vram = (UINT8*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
 
 	// map firsh RAM bank at 0xc000-0xffff
-	memory_set_bankptr(machine(), "sysram", m_ram_base);
+	membank("sysram")->set_base(m_ram_base);
 }
 
 

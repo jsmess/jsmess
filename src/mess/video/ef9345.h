@@ -89,7 +89,7 @@ private:
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 
-	const memory_region *m_charset;
+	memory_region *m_charset;
 	address_space *m_videoram;
 
 	screen_device *m_screen;				//screen we are acting on

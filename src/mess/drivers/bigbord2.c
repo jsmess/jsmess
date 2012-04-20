@@ -178,7 +178,7 @@ void bigbord2_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine.region("monitor")->base());
+		program->install_rom(0x0000, 0x0fff, machine.root_device().memregion("monitor")->base());
 		program->unmap_readwrite(0x1000, 0x1fff);
 		program->install_ram(0x3000, 0x3fff, m_videoram);
 	}
@@ -442,7 +442,7 @@ static const wd17xx_interface fdc_intf =
 void bigbord2_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 

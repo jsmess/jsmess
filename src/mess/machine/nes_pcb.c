@@ -1729,8 +1729,8 @@ static void mmc5_update_prg( running_machine &machine )
 			{
 				state->m_prg_bank[0] = state->m_prg_chunks + (bank1 & 0x06);
 				state->m_prg_bank[1] = state->m_prg_chunks + (bank1 & 0x06) + 1;
-				memory_set_bank(machine, "bank1", state->m_prg_bank[0]);
-				memory_set_bank(machine, "bank2", state->m_prg_bank[1]);
+				state->membank("bank1")->set_entry(state->m_prg_bank[0]);
+				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
 				prg16_89ab(machine, bank1 >> 1);
@@ -1747,8 +1747,8 @@ static void mmc5_update_prg( running_machine &machine )
 			{
 				state->m_prg_bank[0] = state->m_prg_chunks + (bank1 & 0x06);
 				state->m_prg_bank[1] = state->m_prg_chunks + (bank1 & 0x06) + 1;
-				memory_set_bank(machine, "bank1", state->m_prg_bank[0]);
-				memory_set_bank(machine, "bank2", state->m_prg_bank[1]);
+				state->membank("bank1")->set_entry(state->m_prg_bank[0]);
+				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
 				prg16_89ab(machine, (bank1 & 0x7f) >> 1);
@@ -1756,7 +1756,7 @@ static void mmc5_update_prg( running_machine &machine )
 			if (!BIT(bank3, 7))
 			{
 				state->m_prg_bank[2] = state->m_prg_chunks + (bank3 & 0x07);
-				memory_set_bank(machine, "bank3", state->m_prg_bank[2]);
+				state->membank("bank3")->set_entry(state->m_prg_bank[2]);
 			}
 			else
 				prg8_cd(machine, bank3 & 0x7f);
@@ -1773,7 +1773,7 @@ static void mmc5_update_prg( running_machine &machine )
 			if (!BIT(bank1, 7))
 			{
 				state->m_prg_bank[0] = state->m_prg_chunks + (bank1 & 0x07);
-				memory_set_bank(machine, "bank1", state->m_prg_bank[0]);
+				state->membank("bank1")->set_entry(state->m_prg_bank[0]);
 			}
 			else
 				prg8_89(machine, bank1 & 0x7f);
@@ -1781,7 +1781,7 @@ static void mmc5_update_prg( running_machine &machine )
 			if (!BIT(bank2, 7))
 			{
 				state->m_prg_bank[1] = state->m_prg_chunks + (bank2 & 0x07);
-				memory_set_bank(machine, "bank2", state->m_prg_bank[1]);
+				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
 				prg8_ab(machine, bank2 & 0x7f);
@@ -1789,7 +1789,7 @@ static void mmc5_update_prg( running_machine &machine )
 			if (!BIT(bank3, 7))
 			{
 				state->m_prg_bank[2] = state->m_prg_chunks + (bank3 & 0x07);
-				memory_set_bank(machine, "bank3", state->m_prg_bank[2]);
+				state->membank("bank3")->set_entry(state->m_prg_bank[2]);
 			}
 			else
 				prg8_cd(machine, bank3 & 0x7f);
@@ -2500,7 +2500,7 @@ static WRITE8_HANDLER( jxrom_w )
 					// is PRG RAM
 					space->install_write_bank(0x6000, 0x7fff, "bank5");
 					state->m_prg_bank[4] = state->m_battery_bank5_start + (data & 0x3f);
-					memory_set_bank(space->machine(), "bank5", state->m_prg_bank[4]);
+					state->membank("bank5")->set_entry(state->m_prg_bank[4]);
 				}
 				break;
 
@@ -8854,8 +8854,8 @@ static WRITE8_HANDLER( smb2j_w )
 		{
 			if (bank * 2 >= state->m_prg_chunks)
 			{
-				memory_set_bankptr(space->machine(), "bank3", state->m_wram);
-				memory_set_bankptr(space->machine(), "bank4", state->m_wram);
+				state->membank("bank3")->set_base(state->m_wram);
+				state->membank("bank4")->set_base(state->m_wram);
 			}
 			else
 			{
@@ -8867,8 +8867,8 @@ static WRITE8_HANDLER( smb2j_w )
 		{
 			if (bank * 2 >= state->m_prg_chunks)
 			{
-				memory_set_bankptr(space->machine(), "bank1", state->m_wram);
-				memory_set_bankptr(space->machine(), "bank2", state->m_wram);
+				state->membank("bank1")->set_base(state->m_wram);
+				state->membank("bank2")->set_base(state->m_wram);
 			}
 			else
 			{
@@ -8881,10 +8881,10 @@ static WRITE8_HANDLER( smb2j_w )
 	{
 		if (bank * 2 >= state->m_prg_chunks)
 		{
-			memory_set_bankptr(space->machine(), "bank1", state->m_wram);
-			memory_set_bankptr(space->machine(), "bank2", state->m_wram);
-			memory_set_bankptr(space->machine(), "bank3", state->m_wram);
-			memory_set_bankptr(space->machine(), "bank4", state->m_wram);
+			state->membank("bank1")->set_base(state->m_wram);
+			state->membank("bank2")->set_base(state->m_wram);
+			state->membank("bank3")->set_base(state->m_wram);
+			state->membank("bank4")->set_base(state->m_wram);
 		}
 		else
 		{

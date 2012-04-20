@@ -529,7 +529,8 @@ static const cassette_interface sol20_cassette_interface =
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( sol20_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	sol20_state *state = machine.driver_data<sol20_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_START_MEMBER( sol20_state )
@@ -585,19 +586,20 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_transmitter_clock( m_uart_s, s_clock);
 
 	// boot-bank
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
+	sol20_state *state = machine.driver_data<sol20_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
 VIDEO_START_MEMBER( sol20_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( sol20_state )

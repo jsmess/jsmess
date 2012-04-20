@@ -171,7 +171,7 @@ switch (offset)
 			/*General purpose port (0x08) for the minidisk I/O */
 			{
 			// Rom page bank switching
-			memory_set_bank(machine(), "bank2",BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
+			membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
 
 			// Set drive number
 			if (BIT(data, 6)) wd17xx_set_drive(fdc, 0);  // Set the correct drive number 0
@@ -190,7 +190,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 {
 	if (offset==0x00)	{	/* 0x800 et 0x000=> video page, HR*/
 							if (isHectoreXtend(machine()))
-								memory_set_bank(machine(), "bank1", HECTOR_BANK_VIDEO);
+								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
@@ -200,7 +200,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 	if (offset==0x04)	{	/* 0x804 => video page, BR*/
 							m_hector_flag_hr=0;
 							if (isHectoreXtend(machine()))
-								memory_set_bank(machine(), "bank1", HECTOR_BANK_VIDEO);
+								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
@@ -209,7 +209,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 						}
 	if (offset==0x08)	{	/* 0x808 => base page, HR*/
 							if (isHectoreXtend(machine()))
-								memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
+								membank("bank1")->set_entry(HECTOR_BANK_PROG);
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 	if (offset==0x0c)	{	/* 0x80c => base page, BR*/
 							m_hector_flag_hr=0;
 							if (isHectoreXtend(machine()))
-								memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
+								membank("bank1")->set_entry(HECTOR_BANK_PROG);
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
@@ -252,8 +252,8 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 				m_hector_flag_hr=1;
 				if (isHectoreXtend(machine()))
 					{
-						memory_set_bank(machine(), "bank1", HECTOR_BANK_PROG);
-						memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
+						membank("bank1")->set_entry(HECTOR_BANK_PROG);
+						membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 					}
 				//RESET DISC II unit
 				if (isHectorWithDisc2(machine()) )
@@ -567,14 +567,14 @@ WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
 {
 /* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE1);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE1);
 		m_hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x44) /* Port page 2  => 42 pour MX80*/
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE2);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
 		m_hector_flag_80c=0;/* No 80c in 40c !*/
 }
@@ -583,14 +583,14 @@ WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
 WRITE8_MEMBER(hec2hrp_state::hector_mx80_io_port_w)
 {
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE0);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
 	{
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE1);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE1);
 		m_hector_flag_80c=0;
 	}
 	if ((offset &0x0ff) == 0x42) /* Port page 2  => port different du MX40*/
-		memory_set_bank(machine(), "bank2", HECTORMX_BANK_PAGE2);
+		membank("bank2")->set_entry(HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
 		m_hector_flag_80c=1;
 }

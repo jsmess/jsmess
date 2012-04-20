@@ -51,7 +51,7 @@ iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type ty
 
 void iq151_rom_device::device_start()
 {
-	m_rom = (UINT8*)subregion("rom")->base();
+	m_rom = (UINT8*)memregion("rom")->base();
 }
 
 //-------------------------------------------------

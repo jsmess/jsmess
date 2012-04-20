@@ -163,7 +163,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
 	n64_periphs *periphs = image.device().machine().device<n64_periphs>("rcp");
-	UINT8 *cart = image.device().machine().region("user2")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("user2")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -235,7 +235,7 @@ MACHINE_START( n64dd )
 {
 	MACHINE_START_CALL( n64 );
 
-	UINT8 *ipl = machine.region("ddipl")->base();
+	UINT8 *ipl = machine.root_device().memregion("ddipl")->base();
 
 	for (int i = 0; i < 0x400000; i += 4)
 	{

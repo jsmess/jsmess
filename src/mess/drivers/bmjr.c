@@ -54,7 +54,7 @@ public:
 static VIDEO_START( bmjr )
 {
 	bmjr_state *state = machine.driver_data<bmjr_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 static SCREEN_UPDATE_IND16( bmjr )

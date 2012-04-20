@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8, go2000_state )
@@ -310,13 +310,13 @@ static SCREEN_UPDATE_IND16(go2000)
 static MACHINE_START( go2000 )
 {
 	go2000_state *state = machine.driver_data<go2000_state>();
-	UINT8 *SOUND = machine.region("soundcpu")->base();
+	UINT8 *SOUND = state->memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)
-		memory_configure_bank(machine, "bank1", i, 1, &SOUND[0x00400 + i * 0x10000], 0x10000 - 0x400);
+		state->membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
 
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_soundcpu = machine.device("soundcpu");
 }

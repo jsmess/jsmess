@@ -27,7 +27,7 @@ MACHINE_START( pecom )
 
 MACHINE_RESET( pecom )
 {
-	UINT8 *rom = machine.region(CDP1802_TAG)->base();
+	UINT8 *rom = machine.root_device().memregion(CDP1802_TAG)->base();
 	address_space *space = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 	pecom_state *state = machine.driver_data<pecom_state>();
@@ -38,10 +38,10 @@ MACHINE_RESET( pecom )
 	space->unmap_write(0xf800, 0xffff);
 	space->install_read_bank (0xf000, 0xf7ff, "bank3");
 	space->install_read_bank (0xf800, 0xffff, "bank4");
-	memory_set_bankptr(machine, "bank1", rom + 0x8000);
-	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
-	memory_set_bankptr(machine, "bank3", rom + 0xf000);
-	memory_set_bankptr(machine, "bank4", rom + 0xf800);
+	state->membank("bank1")->set_base(rom + 0x8000);
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+	state->membank("bank3")->set_base(rom + 0xf000);
+	state->membank("bank4")->set_base(rom + 0xf800);
 
 	state->m_reset = 0;
 	state->m_dma = 0;
@@ -71,9 +71,9 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 WRITE8_MEMBER(pecom_state::pecom_bank_w)
 {
 	address_space *space2 = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 
 	if (data==2)
 	{
@@ -88,8 +88,8 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 		space2->unmap_write(0xf800, 0xffff);
 		space2->install_read_bank (0xf000, 0xf7ff, "bank3");
 		space2->install_read_bank (0xf800, 0xffff, "bank4");
-		memory_set_bankptr(machine(), "bank3", rom + 0xf000);
-		memory_set_bankptr(machine(), "bank4", rom + 0xf800);
+		membank("bank3")->set_base(rom + 0xf000);
+		membank("bank4")->set_base(rom + 0xf800);
 	}
 }
 

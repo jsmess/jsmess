@@ -152,7 +152,7 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 		int bankaddress = 0;
 
 		address_space *mainspace;
-		UINT8 *RAM = machine().region("maincpu")->base();
+		UINT8 *RAM = memregion("maincpu")->base();
 
 		mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		m_wardner_membank = data;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
+			membank("bank1")->set_base(&RAM[bankaddress]);
 		}
 		else
 		{
@@ -179,10 +179,10 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
 			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
 			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
-			memory_set_bankptr(machine(), "bank1", &RAM[0x0000]);
-			memory_set_bankptr(machine(), "bank2", m_rambase_ae00);
-			memory_set_bankptr(machine(), "bank3", m_rambase_c000);
-			memory_set_bankptr(machine(), "bank4", m_generic_paletteram_8);
+			membank("bank1")->set_base(&RAM[0x0000]);
+			membank("bank2")->set_base(m_rambase_ae00);
+			membank("bank3")->set_base(m_rambase_c000);
+			membank("bank4")->set_base(m_generic_paletteram_8);
 		}
 	}
 }

@@ -26,10 +26,10 @@ static void samcoupe_update_bank(address_space *space, int bank_num, UINT8 *memo
 {
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
-
+	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	if (memory)
 	{
-		memory_set_bankptr(space->machine(), bank, memory);
+		state->membank(bank)->set_base(memory);
 		space->install_read_bank (((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF, bank);
 		if (is_readonly) {
 			space->unmap_write(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF);
@@ -69,7 +69,7 @@ void samcoupe_update_memory(address_space *space)
 {
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 	const int PAGE_MASK = ((space->machine().device<ram_device>(RAM_TAG)->size() & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	UINT8 *memory;
 	int is_readonly;
 

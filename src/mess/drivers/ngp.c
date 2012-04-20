@@ -634,7 +634,7 @@ static SCREEN_UPDATE_IND16( ngp )
 static DEVICE_START( ngp_cart )
 {
 	ngp_state *state = device->machine().driver_data<ngp_state>();
-	UINT8 *cart = device->machine().region("cart")->base();
+	UINT8 *cart = state->memregion("cart")->base();
 
 	state->m_flash_chip[0].present = 0;
 	state->m_flash_chip[0].state = F_READ;
@@ -661,7 +661,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( image.device().machine().region("cart")->base(), filesize) != filesize)
+		if (image.fread( image.device().machine().root_device().memregion("cart")->base(), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return IMAGE_INIT_FAIL;
@@ -670,11 +670,11 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	else
 	{
 		filesize = image.get_software_region_length("rom");
-		memcpy(image.device().machine().region("cart")->base(), image.get_software_region("rom"), filesize);
+		memcpy(image.device().machine().root_device().memregion("cart")->base(), image.get_software_region("rom"), filesize);
 	}
 
-	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().region("cart")->u8(0x20), (unsigned int) image.device().machine().region("cart")->u8(0x21),
-	//        (unsigned int) image.device().machine().region("cart")->u8(0x22), (unsigned int) image.device().machine().region("cart")->u8(0x23));
+	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x20), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x21),
+	//        (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x22), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x23));
 	state->m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{

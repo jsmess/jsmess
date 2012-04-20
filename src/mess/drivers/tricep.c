@@ -56,7 +56,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(tricep)
 {
 	tricep_state *state = machine.driver_data<tricep_state>();
-	UINT8* user1 = machine.region("user1")->base();
+	UINT8* user1 = state->memregion("user1")->base();
 
 	memcpy((UINT8*)state->m_p_ram.target(),user1,0x2000);
 

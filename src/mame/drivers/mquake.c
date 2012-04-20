@@ -35,7 +35,7 @@
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -87,7 +87,7 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 
 static READ8_HANDLER( es5503_sample_r )
 {
-	UINT8 *rom = space->machine().region("es5503")->base();
+	UINT8 *rom = space->machine().root_device().memregion("es5503")->base();
 	es5503_device *es5503 = space->machine().device<es5503_device>("es5503");
 
 	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
@@ -444,8 +444,8 @@ static DRIVER_INIT(mquake)
 	amiga_machine_config(machine, &mquake_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 

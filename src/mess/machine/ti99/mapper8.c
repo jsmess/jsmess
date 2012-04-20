@@ -447,9 +447,9 @@ void ti998_mapper_device::device_start()
 	if (VERBOSE>5) LOG("ti99_8: Starting mapper\n");
 
 	const mapper8_list_entry *entry = reinterpret_cast<const mapper8_list_entry *>(static_config());
-	m_sram = machine().region(SRAM_TAG)->base();
-	m_dram = machine().region(DRAM_TAG)->base();
-	m_rom  = machine().region("maincpu")->base();
+	m_sram = memregion(SRAM_TAG)->base();
+	m_dram = memregion(DRAM_TAG)->base();
+	m_rom  = memregion("maincpu")->base();
 
 	// Clear the lists
 	m_logcomp.reset();

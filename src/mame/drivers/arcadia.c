@@ -104,7 +104,7 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
 static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -757,7 +757,7 @@ ROM_END
 
 INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)machine.region(tag)->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -766,8 +766,8 @@ INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, 
 
 	#if 0
 	{
-		UINT8 *ROM = machine.region(tag)->base();
-		int size = machine.region(tag)->bytes();
+		UINT8 *ROM = machine.root_device().memregion(tag)->base();
+		int size = machine.root_device().memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
@@ -808,11 +808,11 @@ static void arcadia_init(running_machine &machine)
 	amiga_machine_config(machine, &arcadia_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)machine.region("user2")->base();
+	biosrom = (UINT16 *)machine.root_device().memregion("user2")->base();
 	if (biosrom[0] != 0x4afc)
 		generic_decode(machine, "user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }

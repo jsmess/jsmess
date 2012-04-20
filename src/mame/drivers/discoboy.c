@@ -199,9 +199,9 @@ static SCREEN_UPDATE_IND16( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank( running_machine &machine, UINT8 data )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	data &= 0x2f;
-	memory_set_bankptr(space->machine(), "bank1", &ROM[0x6000 + (data * 0x1000)] );
+	space->machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
 #endif
 
@@ -225,7 +225,7 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_01_w)
 	// discoboy gfxbank
 	m_gfxbank = data & 0xf0;
 
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
@@ -329,7 +329,7 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 	/* Note: this is bit 5 on yunsung8.c */
 	msm5205_reset_w(device, (data & 0x08) >> 3);
 
-	memory_set_bank(device->machine(), "sndbank", data & 0x07);
+	device->machine().root_device().membank("sndbank")->set_entry(data & 0x07);
 
 	if (data != (data & (~0x0f)))
 		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
@@ -560,8 +560,8 @@ ROM_END
 static DRIVER_INIT( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
 	memset(state->m_ram_1, 0, sizeof(state->m_ram_1));
 	memset(state->m_ram_2, 0, sizeof(state->m_ram_2));
@@ -575,10 +575,10 @@ static DRIVER_INIT( discoboy )
 	state->save_item(NAME(state->m_ram_3));
 	state->save_item(NAME(state->m_ram_4));
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_configure_bank(machine, "sndbank", 0, 8, &AUDIO[0x00000], 0x4000);
-	memory_set_bank(machine, "sndbank", 0);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->set_entry(0);
+	state->membank("sndbank")->configure_entries(0, 8, &AUDIO[0x00000], 0x4000);
+	state->membank("sndbank")->set_entry(0);
 }
 
 

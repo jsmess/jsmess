@@ -55,7 +55,7 @@ WRITE32_MEMBER(ami1200_state::aga_overlay_w)
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(machine(), "bank1", data & 1);
+		membank("bank1")->set_entry(data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
@@ -400,8 +400,8 @@ static DRIVER_INIT( a1200 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* initialize keyboard */
 	amigakbd_init(machine);

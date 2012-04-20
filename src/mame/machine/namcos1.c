@@ -554,10 +554,10 @@ static WRITE8_HANDLER( key_type3_w )
 
 WRITE8_MEMBER(namcos1_state::namcos1_sound_bankswitch_w)
 {
-	UINT8 *rom = machine().region("audiocpu")->base() + 0xc000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
-	memory_set_bankptr(machine(), "bank17",rom + 0x4000 * bank);
+	membank("bank17")->set_base(rom + 0x4000 * bank);
 }
 
 
@@ -677,7 +677,7 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 
 	/* for BANK handlers , memory direct and OP-code base */
 	if (handler->bank_pointer)
-		memory_set_bankptr(machine, banktags[banknum], handler->bank_pointer);
+		state->membank(banktags[banknum])->set_base(handler->bank_pointer);
 
 	/* read handlers */
 	if (!handler->bank_handler_r)
@@ -826,7 +826,7 @@ static void namcos1_build_banks(running_machine &machine,read8_space_func key_r,
 
 	/* PRG0-PRG7 */
 	{
-		UINT8 *rom = machine.region("user1")->base();
+		UINT8 *rom = machine.root_device().memregion("user1")->base();
 
 		namcos1_install_bank(state,0x200,0x3ff,0,rom_w,0,rom);
 
@@ -920,7 +920,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	memory_set_bankptr(machine(), "bank20", machine().region("mcu")->base() + addr);
+	membank("bank20")->set_base(machine().root_device().memregion("mcu")->base() + addr);
 }
 
 
@@ -997,8 +997,8 @@ static void namcos1_driver_init( running_machine &machine, const struct namcos1_
 	state_save_register_global_pointer(machine, state->m_paletteram, 0x8000);
 
 	/* Point mcu & sound shared RAM to destination */
-	memory_set_bankptr(machine,  "bank18", state->m_triram );
-	memory_set_bankptr(machine,  "bank19", state->m_triram );
+	state->membank("bank18")->set_base(state->m_triram );
+	state->membank("bank19")->set_base(state->m_triram );
 
 	/* build bank elements */
 	namcos1_build_banks(machine,specific->key_r,specific->key_w);
@@ -1126,7 +1126,7 @@ DRIVER_INIT( bakutotu )
 		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
-		rombase = machine.region("user1")->base();
+		rombase = machine.root_device().memregion("user1")->base();
 		srcptr = rombase + 0x1e000;
 		endptr = srcptr + 0xa000;
 

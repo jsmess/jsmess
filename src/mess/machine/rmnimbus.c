@@ -2050,7 +2050,7 @@ static void nimbus_bank_memory(running_machine &machine)
         {
             map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
-            memory_set_bankptr(machine, bank, map_base);
+            state->membank(bank)->set_base(map_base);
             space->install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
             //if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
         }

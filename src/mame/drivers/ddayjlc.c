@@ -203,7 +203,7 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 	if (m_bgadr > 2)
 		m_bgadr = 0;
 
-	memory_set_bank(machine(), "bank1", m_bgadr);
+	membank("bank1")->set_entry(m_bgadr);
 }
 
 WRITE8_MEMBER(ddayjlc_state::sound_w)
@@ -486,7 +486,7 @@ static MACHINE_RESET( ddayjlc )
 
 static PALETTE_INIT( ddayjlc )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -675,8 +675,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
-		dst = machine.region("gfx1")->base();
-		length = machine.region("gfx1")->bytes();
+		dst = machine.root_device().memregion("gfx1")->base();
+		length = machine.root_device().memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -690,8 +690,8 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user1")->base(), 0x4000);
-	memory_set_bank(machine, "bank1", 0);
+	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

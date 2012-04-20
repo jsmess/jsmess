@@ -74,9 +74,9 @@ static VIDEO_START( mz2000 )
 static SCREEN_UPDATE_IND16( mz2000 )
 {
 	mz2000_state *state = screen.machine().driver_data<mz2000_state>();
-	UINT8 *tvram = screen.machine().region("tvram")->base();
-	UINT8 *gvram = screen.machine().region("gvram")->base();
-	UINT8 *gfx_data = screen.machine().region("chargen")->base();
+	UINT8 *tvram = screen.machine().root_device().memregion("tvram")->base();
+	UINT8 *gvram = screen.machine().root_device().memregion("gvram")->base();
+	UINT8 *gfx_data = state->memregion("chargen")->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
 	UINT32 count;
@@ -170,49 +170,49 @@ static SCREEN_UPDATE_IND16( mz2000 )
 
 READ8_MEMBER(mz2000_state::mz2000_ipl_r)
 {
-	UINT8 *ipl = machine().region("ipl")->base();
+	UINT8 *ipl = memregion("ipl")->base();
 
 	return ipl[offset];
 }
 
 READ8_MEMBER(mz2000_state::mz2000_wram_r)
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	return wram[offset];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_wram_w)
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	wram[offset] = data;
 }
 
 READ8_MEMBER(mz2000_state::mz2000_tvram_r)
 {
-	UINT8 *tvram = machine().region("tvram")->base();
+	UINT8 *tvram = memregion("tvram")->base();
 
 	return tvram[offset];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_tvram_w)
 {
-	UINT8 *tvram = machine().region("tvram")->base();
+	UINT8 *tvram = memregion("tvram")->base();
 
 	tvram[offset] = data;
 }
 
 READ8_MEMBER(mz2000_state::mz2000_gvram_r)
 {
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 
 	return gvram[offset+m_gvram_bank*0x4000];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
 {
-	UINT8 *gvram = machine().region("gvram")->base();
+	UINT8 *gvram = memregion("gvram")->base();
 
 	gvram[offset+m_gvram_bank*0x4000] = data;
 }

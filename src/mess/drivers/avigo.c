@@ -173,7 +173,7 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 
 		case 0x01: // banked RAM
 			sprintf(bank_tag,"bank%d", bank);
-			memory_set_bankptr(machine(), bank_tag, m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
+			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
 			space->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
 			active_flash = -1;
 			break;
@@ -246,8 +246,8 @@ void avigo_state::machine_reset()
 	/* if is a cold start initialize flash contents */
 	if (!m_warm_start)
 	{
-		memcpy(m_flashes[0]->space()->get_read_ptr(0), machine().region("bios")->base() + 0x000000, 0x100000);
-		memcpy(m_flashes[1]->space()->get_read_ptr(0), machine().region("bios")->base() + 0x100000, 0x100000);
+		memcpy(m_flashes[0]->space()->get_read_ptr(0), memregion("bios")->base() + 0x000000, 0x100000);
+		memcpy(m_flashes[1]->space()->get_read_ptr(0), memregion("bios")->base() + 0x100000, 0x100000);
 	}
 
 	m_irq = 0;
@@ -267,7 +267,7 @@ void avigo_state::machine_start()
 	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// bank3 always first ram bank
-	memory_set_bankptr(machine(), "bank3", m_ram_base);
+	membank("bank3")->set_base(m_ram_base);
 
 	/* keep machine pointers to flash devices */
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");

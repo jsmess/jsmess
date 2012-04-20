@@ -127,14 +127,14 @@ public:
 static void socrates_set_rom_bank( running_machine &machine )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank1", machine.region("maincpu")->base() + ( state->m_rom_bank * 0x4000 ));
+	state->membank( "bank1" )->set_base( state->memregion("maincpu")->base() + ( state->m_rom_bank * 0x4000 ));
 }
 
 static void socrates_set_ram_bank( running_machine &machine )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank2", machine.region("vram")->base() + ( (state->m_ram_bank&0x3) * 0x4000 )); // window 0
-	memory_set_bankptr( machine, "bank3", machine.region("vram")->base() + ( ((state->m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
+	state->membank( "bank2" )->set_base( machine.root_device().memregion("vram")->base() + ( (state->m_ram_bank&0x3) * 0x4000 )); // window 0
+	state->membank( "bank3" )->set_base( state->memregion("vram")->base() + ( ((state->m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
 static void socrates_update_kb( running_machine &machine )
@@ -220,7 +220,7 @@ static MACHINE_RESET( socrates )
 
 static DRIVER_INIT( socrates )
 {
-	UINT8 *gfx = machine.region("vram")->base();
+	UINT8 *gfx = machine.root_device().memregion("vram")->base();
 	int i;
     /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
     for (i = 0; i < 0x10000; i++)
@@ -275,8 +275,8 @@ READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechromint = machine().region("speechint")->base();
-UINT8 *speechromext = machine().region("speechext")->base();
+UINT8 *speechromint = memregion("speechint")->base();
+UINT8 *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
 	temp |= 0x40; // unknown
@@ -588,7 +588,7 @@ static PALETTE_INIT( socrates )
 static VIDEO_START( socrates )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	state->m_videoram = machine.region("vram")->base();
+	state->m_videoram = state->memregion("vram")->base();
 	state->m_scroll_offset = 0;
 }
 

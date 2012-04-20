@@ -163,7 +163,7 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 READ8_MEMBER( mpz80_state::mmu_r )
 {
 	m_addr = get_address(offset);
-	UINT8 *rom = machine().region(Z80_TAG)->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 	UINT8 data = 0;
 
 	if (m_pretrap)
@@ -831,7 +831,7 @@ DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 {
 	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
 	{
-		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, machine().region(Z80_TAG)->base() + ((m_trap_reset << 10) | 0x3f0));
+		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, memregion(Z80_TAG)->base() + ((m_trap_reset << 10) | 0x3f0));
 		return ~0;
 	}
 

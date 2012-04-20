@@ -98,7 +98,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = machine().region("user2")->base();
+		rom = memregion("user2")->base();
 
 		switch(data & 0xf)
 		{
@@ -114,8 +114,8 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(machine(), "bank1", &rom[address]);
-		memory_set_bankptr(machine(), "bank2", &rom[address + 0x1000]);
+		membank("bank1")->set_base(&rom[address]);
+		membank("bank2")->set_base(&rom[address + 0x1000]);
 	}
 	else
 	{
@@ -126,7 +126,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = machine().region("user1")->base();
+		rom = memregion("user1")->base();
 
 		/*
         7
@@ -154,7 +154,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 //      logerror("add = %X\n",address);
 
-		memory_set_bankptr(machine(), "bank1", &rom[address]);
+		membank("bank1")->set_base(&rom[address]);
 	}
 }
 

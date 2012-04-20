@@ -66,7 +66,7 @@ public:
 VIDEO_START_MEMBER( b16_state )
 {
 	// find memory regions
-	m_char_rom = machine().region("pcg")->base();
+	m_char_rom = memregion("pcg")->base();
 }
 
 
@@ -75,7 +75,7 @@ SCREEN_UPDATE16_MEMBER( b16_state )
 	b16_state *state = machine().driver_data<b16_state>();
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = machine().region("pcg")->base();
+	UINT8 *gfx_rom = memregion("pcg")->base();
 
 	for(y=0;y<mc6845_v_display;y++)
 	{

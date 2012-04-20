@@ -450,7 +450,7 @@ void rex6000_state::machine_start()
 	m_flash[3] = machine().device<fujitsu_29dl16x_device>("flash1b");
 
 	m_ram_base = m_ram->pointer();
-	memory_set_bankptr(machine(), "ram", m_ram_base + 0x4000);
+	membank("ram")->set_base(m_ram_base + 0x4000);
 }
 void rex6000_state::machine_reset()
 {

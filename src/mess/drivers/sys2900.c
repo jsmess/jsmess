@@ -67,19 +67,22 @@ INPUT_PORTS_END
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( sys2900_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	sys2900_state *state = machine.driver_data<sys2900_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 static MACHINE_RESET(sys2900)
 {
-	memory_set_bank(machine, "boot", 1);
+	sys2900_state *state = machine.driver_data<sys2900_state>();
+	state->membank("boot")->set_entry(1);
 	machine.scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
 }
 
 DRIVER_INIT( sys2900 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf000);
+	sys2900_state *state = machine.driver_data<sys2900_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
 }
 
 static VIDEO_START( sys2900 )

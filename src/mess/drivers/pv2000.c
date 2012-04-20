@@ -356,12 +356,12 @@ static MACHINE_RESET( pv2000 )
 	state->m_keyb_column = 0;
 
 	device_set_input_line_vector(machine.device("maincpu"), INPUT_LINE_IRQ0, 0xff);
-	memset(&machine.region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
+	memset(&state->memregion("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
 static DEVICE_IMAGE_LOAD( pv2000_cart )
 {
-	UINT8 *cart = image.device().machine().region("maincpu")->base() + 0xC000;
+	UINT8 *cart = image.device().machine().root_device().memregion("maincpu")->base() + 0xC000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

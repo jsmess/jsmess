@@ -53,8 +53,8 @@ static MACHINE_RESET(vta2000)
 static VIDEO_START( vta2000 )
 {
 	vta2000_state *state = machine.driver_data<vta2000_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_videoram = machine.region("maincpu")->base()+0x8000;
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_videoram = state->memregion("maincpu")->base()+0x8000;
 }
 
 static SCREEN_UPDATE_IND16( vta2000 )

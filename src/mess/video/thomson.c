@@ -870,7 +870,7 @@ void thom_set_mode_point ( running_machine &machine, int point )
 {
 	assert( point >= 0 && point <= 1 );
 	thom_mode_point = ( ! point ) * 0x2000;
-	memory_set_bank( machine, THOM_VRAM_BANK, ! point );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( ! point );
 }
 
 
@@ -1149,7 +1149,7 @@ VIDEO_START ( thom )
 
 	thom_mode_point = 0;
 	state_save_register_global(machine,  thom_mode_point );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
 
 	thom_floppy_rcount = 0;
 	thom_floppy_wcount = 0;

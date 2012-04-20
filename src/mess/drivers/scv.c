@@ -227,45 +227,45 @@ static void scv_set_banks( running_machine &machine )
 	{
 	case 0:
 	case 0x2000:
-		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank1", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank2", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank3", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x1000 );
+		state->membank( "bank0" )->set_base( state->m_cart_rom );
+		state->membank( "bank1" )->set_base( state->m_cart_rom );
+		state->membank( "bank2" )->set_base( state->m_cart_rom );
+		state->membank( "bank3" )->set_base( state->m_cart_rom );
+		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x1000 );
 		break;
 	case 0x4000:
-		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank1", state->m_cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank3", state->m_cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x3000 );
+		state->membank( "bank0" )->set_base( state->m_cart_rom );
+		state->membank( "bank1" )->set_base( state->m_cart_rom + 0x2000 );
+		state->membank( "bank2" )->set_base( state->m_cart_rom );
+		state->membank( "bank3" )->set_base( state->m_cart_rom + 0x2000 );
+		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x3000 );
 		break;
 	case 0x8000:
-		memory_set_bankptr( machine, "bank0", state->m_cart_rom );
-		memory_set_bankptr( machine, "bank1", state->m_cart_rom + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->m_cart_rom + 0x4000 );
-		memory_set_bankptr( machine, "bank3", state->m_cart_rom + 0x6000 );
-		memory_set_bankptr( machine, "bank4", state->m_cart_rom + 0x7000 );
+		state->membank( "bank0" )->set_base( state->m_cart_rom );
+		state->membank( "bank1" )->set_base( state->m_cart_rom + 0x2000 );
+		state->membank( "bank2" )->set_base( state->m_cart_rom + 0x4000 );
+		state->membank( "bank3" )->set_base( state->m_cart_rom + 0x6000 );
+		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x7000 );
 		break;
 	case 0x10000:
-		memory_set_bankptr( machine, "bank0", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0x8000 : 0 ) );
-		memory_set_bankptr( machine, "bank1", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
-		memory_set_bankptr( machine, "bank2", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
-		memory_set_bankptr( machine, "bank3", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
-		memory_set_bankptr( machine, "bank4", state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
+		state->membank( "bank0" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0x8000 : 0 ) );
+		state->membank( "bank1" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
+		state->membank( "bank2" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
+		state->membank( "bank3" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
+		state->membank( "bank4" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
 		break;
 	case 0x20000:	/* Pole Position 2 */
 		int base = ( ( state->m_portc >> 5 ) & 0x03 ) * 0x8000 ;
-		memory_set_bankptr( machine, "bank0", state->m_cart_rom + base + 0 );
-		memory_set_bankptr( machine, "bank1", state->m_cart_rom + base + 0x2000 );
-		memory_set_bankptr( machine, "bank2", state->m_cart_rom + base + 0x4000 );
-		memory_set_bankptr( machine, "bank3", state->m_cart_rom + base + 0x6000 );
-		memory_set_bankptr( machine, "bank4", state->m_cart_rom + base + 0x7000 );
+		state->membank( "bank0" )->set_base( state->m_cart_rom + base + 0 );
+		state->membank( "bank1" )->set_base( state->m_cart_rom + base + 0x2000 );
+		state->membank( "bank2" )->set_base( state->m_cart_rom + base + 0x4000 );
+		state->membank( "bank3" )->set_base( state->m_cart_rom + base + 0x6000 );
+		state->membank( "bank4" )->set_base( state->m_cart_rom + base + 0x7000 );
 		/* On-cart RAM is enabled when PC6 is high */
 		if ( state->m_cart_ram && state->m_portc & 0x40 )
 		{
 			state->m_cart_ram_enabled = true;
-			memory_set_bankptr( machine, "bank4", state->m_cart_ram );
+			state->membank( "bank4" )->set_base( state->m_cart_ram );
 		}
 		break;
 	}
@@ -275,12 +275,12 @@ static void scv_set_banks( running_machine &machine )
 	{
 		if ( state->m_cart_ram_size == 0x1000 )
 		{
-			memory_set_bankptr( machine, "bank4", state->m_cart_ram );
+			state->membank( "bank4" )->set_base( state->m_cart_ram );
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank3", state->m_cart_ram );
-			memory_set_bankptr( machine, "bank4", state->m_cart_ram + 0x1000 );
+			state->membank( "bank3" )->set_base( state->m_cart_ram );
+			state->membank( "bank4" )->set_base( state->m_cart_ram + 0x1000 );
 		}
 		state->m_cart_ram_enabled = true;
 	}
@@ -302,7 +302,7 @@ static DEVICE_START( scv_cart )
 {
 	scv_state *state = device->machine().driver_data<scv_state>();
 
-	state->m_cart_rom = device->machine().region( "cart" )->base();
+	state->m_cart_rom = state->memregion( "cart" )->base();
 	state->m_cart_rom_size = 0;
 	state->m_cart_ram = NULL;
 	state->m_cart_ram_size = 0;
@@ -317,10 +317,10 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 
 	if ( image.software_entry() == NULL )
 	{
-		UINT8 *cart = image.device().machine().region( "cart" )->base();
+		UINT8 *cart = image.device().machine().root_device().memregion( "cart" )->base();
 		int size = image.length();
 
-		if ( size > image.device().machine().region( "cart" )->bytes() )
+		if ( size > state->memregion( "cart" )->bytes() )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
 			return IMAGE_INIT_FAIL;
@@ -582,7 +582,7 @@ static SCREEN_UPDATE_IND16( scv )
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = screen.machine().region( "charrom" )->base() + ( d & 0x7f ) * 8;
+				UINT8 *char_data = state->memregion( "charrom" )->base() + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else

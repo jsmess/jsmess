@@ -552,7 +552,7 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 					break;
 
 				case 0x07:	/* synchronize */
-					if (machine.region("maincpu")->bytes() == 0x40000)	/* HACK */
+					if (state->memregion("maincpu")->bytes() == 0x40000)	/* HACK */
 						state->m_adb_command_length = 8;
 					else
 						state->m_adb_command_length = 4;
@@ -827,7 +827,7 @@ static READ8_HANDLER( gssnd_r )
 
 			if (state->m_sndglu_ctrl & 0x40)	// docram access
 			{
-				UINT8 *docram = space->machine().region("es5503")->base();
+				UINT8 *docram = state->memregion("es5503")->base();
 				state->m_sndglu_dummy_read = docram[state->m_sndglu_addr];
 			}
 			else
@@ -868,7 +868,7 @@ static WRITE8_HANDLER( gssnd_w )
 		case 1:	// data write
 			if (state->m_sndglu_ctrl & 0x40)	// docram access
 			{
-				UINT8 *docram = space->machine().region("es5503")->base();
+				UINT8 *docram = space->machine().root_device().memregion("es5503")->base();
 				docram[state->m_sndglu_addr] = data;
 			}
 			else
@@ -1047,8 +1047,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			offset |= (space->machine().region("maincpu")->bytes() - 1) & ~0x3FFF;
-			result = space->machine().region("maincpu")->base()[offset];
+			offset |= (space->machine().root_device().memregion("maincpu")->bytes() - 1) & ~0x3FFF;
+			result = space->machine().root_device().memregion("maincpu")->base()[offset];
 			break;
 
 		case 0x21:	/* C021 - MONOCOLOR */
@@ -1537,8 +1537,8 @@ static UINT8 *apple2gs_getslotmem(running_machine &machine, offs_t address)
 	assert(address >= 0xC000);
 	assert(address <= 0xCFFF);
 
-	rom = machine.region("maincpu")->base();
-	rom += 0x030000 % machine.region("maincpu")->bytes();
+	rom = machine.root_device().memregion("maincpu")->base();
+	rom += 0x030000 % machine.root_device().memregion("maincpu")->bytes();
 	return &rom[address];
 }
 
@@ -1759,7 +1759,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 
 		// ROM 03 hardware: the quoted "1 MB" for a base machine doesn't include banks e0/e1, so map accordingly
 		space->install_readwrite_bank(0x010000, ramsize - 1, "bank1");
-		memory_set_bankptr(machine,"bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
+		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
 		space->install_legacy_read_handler( ramsize, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize >> 16);
@@ -1770,7 +1770,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 
 		// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
 		space->install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
-		memory_set_bankptr(machine,"bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
+		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
 		space->install_legacy_read_handler( ramsize + 0x10000, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize+0x10000) >> 16;
@@ -1783,13 +1783,13 @@ static void apple2gs_setup_memory(running_machine &machine)
 	space->install_legacy_write_handler(0xe02000, 0xe03fff, FUNC(apple2gs_E02xxx_w));
 	space->install_legacy_write_handler(0xe10400, 0xe107ff, FUNC(apple2gs_E104xx_w));
 	space->install_legacy_write_handler(0xe12000, 0xe13fff, FUNC(apple2gs_E12xxx_w));
-	memory_set_bankptr(machine,"bank2", state->m_slowmem);
+	state->membank("bank2")->set_base(state->m_slowmem);
 
 	/* install alternate ROM bank */
-	begin = 0x1000000 - machine.region("maincpu")->bytes();
+	begin = 0x1000000 - machine.root_device().memregion("maincpu")->bytes();
 	end = 0xffffff;
 	space->install_read_bank(begin, end, "bank3");
-	memory_set_bankptr(machine,"bank3", machine.region("maincpu")->base());
+	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base());
 
 	/* install new xxC000-xxCFFF handlers */
 	space->install_legacy_read_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_r));

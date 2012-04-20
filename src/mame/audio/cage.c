@@ -165,8 +165,8 @@ void cage_init(running_machine &machine, offs_t speedup)
 
 	state->irqhandler = NULL;
 
-	memory_set_bankptr(machine, "bank10", machine.region("cageboot")->base());
-	memory_set_bankptr(machine, "bank11", machine.region("cage")->base());
+	machine.root_device().membank("bank10")->set_base(machine.root_device().memregion("cageboot")->base());
+	machine.root_device().membank("bank11")->set_base(machine.root_device().memregion("cage")->base());
 
 	state->cpu = machine.device<cpu_device>("cage");
 	cage_cpu_clock_period = attotime::from_hz(state->cpu->clock());

@@ -258,7 +258,7 @@ static STREAM_UPDATE( svision_update )
 			UINT16 addr = state->dma.start + (unsigned) state->dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = device->machine().region("user1")->base()[(addr & 0x3fff) | state->dma.ca14to16];
+				sample = device->machine().root_device().memregion("user1")->base()[(addr & 0x3fff) | state->dma.ca14to16];
 			}
 			else
 			{

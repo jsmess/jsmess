@@ -380,10 +380,10 @@ WRITE8_MEMBER(witch_state::write_a00x)
 
 			if(newbank != m_bank)
 			{
-				UINT8 *ROM = machine().region("maincpu")->base();
+				UINT8 *ROM = memregion("maincpu")->base();
 				m_bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				memory_set_bankptr(machine(), "bank1",ROM);
+				membank("bank1")->set_base(ROM);
 			}
 		}
 		break;
@@ -419,7 +419,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	case 0x25e:
 		return offset;//enough to pass...
   }
-  return machine().region("sub")->base()[0x7000+offset];
+  return memregion("sub")->base()[0x7000+offset];
 }
 
 /*
@@ -870,8 +870,8 @@ ROM_END
 static DRIVER_INIT(witch)
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	UINT8 *ROM = (UINT8 *)machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
+	UINT8 *ROM = (UINT8 *)state->memregion("maincpu")->base();
+	state->membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
 
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), state));
 	state->m_bank = -1;

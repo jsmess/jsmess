@@ -57,7 +57,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 {
 
 	/* bit 0-1 ROM bank select */
-	memory_set_bank(machine(), "bank1", data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 
 	/* TODO: bit 5 = select work RAM or palette? */
 	//palette_selected = data & 0x20;
@@ -412,9 +412,9 @@ static const k051960_interface mainevt_k051960_intf =
 static MACHINE_START( mainevt )
 {
 	mainevt_state *state = machine.driver_data<mainevt_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

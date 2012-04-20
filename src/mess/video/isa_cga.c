@@ -732,7 +732,7 @@ void isa8_cga_device::device_start()
 	}
 
 	astring tempstring;
-	m_chr_gen_base = machine().region(subtag(tempstring, "gfx1"))->base();
+	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
 	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 }
 
@@ -1858,7 +1858,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 		}
 		else
 		{
-			memory_set_bankptr(machine(),"bank1", m_vram + isa8_cga_pc1512_device::vram_offset[0]);
+			membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[0]);
 		}
 		m_mode_control = data;
 		switch( m_mode_control & 0x3F )
@@ -1916,7 +1916,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 		m_read = data;
 		if ( ( m_mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(machine(),"bank1", m_vram + isa8_cga_pc1512_device::vram_offset[data & 3]);
+			membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[data & 3]);
 		}
 		break;
 
@@ -2031,6 +2031,6 @@ void isa8_cga_pc1512_device::device_reset()
 		m_mc6845_locked_register[i] = 0;
 	}
 
-	memory_set_bankptr(machine(), "bank1", m_vram + isa8_cga_pc1512_device::vram_offset[0]);
+	membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[0]);
 }
 

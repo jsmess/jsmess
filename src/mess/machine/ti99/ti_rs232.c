@@ -1025,7 +1025,7 @@ static const tms9902_interface tms9902_params1 =
 
 void ti_rs232_pio_device::device_start()
 {
-	m_dsrrom = subregion(DSRROM)->base();
+	m_dsrrom = memregion(DSRROM)->base();
 	m_uart[0] = subdevice<tms9902_device>("tms9902_0");
 	m_uart[1] = subdevice<tms9902_device>("tms9902_1");
 	m_serdev[0] = subdevice<ti_rs232_attached_device>("serdev0");

@@ -536,7 +536,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
 	amiga_state *state = device->machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	state->membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -550,7 +550,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
-		if (device->machine().region("user2")->base() != NULL)
+		if (device->machine().root_device().memregion("user2")->base() != NULL)
 			amiga_cart_check_overlay(device->machine());
 	}
 	else
@@ -621,8 +621,8 @@ static DRIVER_INIT( amiga )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -653,8 +653,8 @@ static DRIVER_INIT( amiga_ecs )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, machine.region("user1")->base(), 0);
+	1.root_device().membank(0)->configure_entries(1, state->m_chip_ram, 0);
+	1.root_device().membank(1)->configure_entries(1, machine.root_device().memregion("user1")->base(), 0);
 
 	/* initialize Action Replay (if present) */
 	amiga_cart_init(machine);
@@ -682,8 +682,8 @@ static DRIVER_INIT( cdtv )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
 	amigakbd_init(machine);

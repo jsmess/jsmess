@@ -171,14 +171,14 @@ WRITE8_MEMBER(ppmast93_state::ppmast93_bgram_w)
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_port4_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int bank;
 
 	coin_counter_w(machine(), 0, data & 0x08);
 	coin_counter_w(machine(), 1, data & 0x10);
 
 	bank = data & 0x07;
-	memory_set_bankptr(machine(), "bank1",&rom[0x10000+(bank*0x4000)]);
+	membank("bank1")->set_base(&rom[0x10000+(bank*0x4000)]);
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )

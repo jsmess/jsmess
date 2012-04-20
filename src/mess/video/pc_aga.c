@@ -722,8 +722,8 @@ VIDEO_START( pc_aga )
 
 	memset( &aga, 0, sizeof( aga ) );
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine.region("gfx1")->base() + 0x1000;
-	aga.cga_chr_gen = machine.region("gfx1")->base();
+	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
+	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
@@ -756,8 +756,8 @@ VIDEO_START( pc200 )
 	memset( &aga, 0, sizeof( aga ) );
 
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine.region("gfx1")->base();
-	aga.cga_chr_gen = machine.region("gfx1")->base() + 0x1000;
+	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base();
+	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 

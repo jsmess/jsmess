@@ -895,7 +895,7 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 		data ^= 0xffffffff;
 	}
 
-	// if banks 0 or 1 have 2 subbanks, also kill it, we only want 128 MB
+	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
 	if (sgi_mc_r(&space, 0xc0/4, 0xffffffff) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
@@ -1226,7 +1226,7 @@ static MACHINE_RESET( ip225015 )
 	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 
 	// set up low RAM mirror
-	memory_set_bankptr(machine, "bank1", state->m_mainram);
+	state->membank("bank1")->set_base(state->m_mainram);
 
 	state->m_PBUS_DMA.nActive = 0;
 

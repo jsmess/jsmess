@@ -114,7 +114,7 @@ VIDEO_START_MEMBER( rx78_state )
 
 SCREEN_UPDATE16_MEMBER( rx78_state )
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	int x,y,count;
 
 	bitmap.fill(16, cliprect);
@@ -192,7 +192,7 @@ WRITE8_MEMBER( rx78_state::key_w )
 
 READ8_MEMBER( rx78_state::rx78_vram_r )
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	if(m_vram_read_bank == 0 || m_vram_read_bank > 6)
 		return 0xff;
@@ -202,7 +202,7 @@ READ8_MEMBER( rx78_state::rx78_vram_r )
 
 WRITE8_MEMBER( rx78_state::rx78_vram_w )
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 
 	if(m_vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
 	if(m_vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
@@ -416,7 +416,7 @@ MACHINE_RESET_MEMBER(rx78_state)
 
 static DEVICE_IMAGE_LOAD( rx78_cart )
 {
-	UINT8 *cart = image.device().machine().region("cart_img")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("cart_img")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

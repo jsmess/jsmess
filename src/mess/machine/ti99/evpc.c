@@ -306,7 +306,7 @@ void snug_enhanced_video_device::cruwrite(offs_t offset, UINT8 data)
 
 void snug_enhanced_video_device::device_start()
 {
-	m_dsrrom = subregion(DSRROM)->base();
+	m_dsrrom = memregion(DSRROM)->base();
 	m_novram = (UINT8*)malloc(NOVRAM_SIZE);
 }
 

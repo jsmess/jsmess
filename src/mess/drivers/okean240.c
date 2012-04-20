@@ -358,13 +358,14 @@ INPUT_PORTS_END
 /* after the first 6 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( okean240_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	okean240_state *state = machine.driver_data<okean240_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER( okean240_state )
 {
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	m_term_data = 0;
 	m_j = 0;
 	m_scroll = 0;
@@ -382,8 +383,9 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 DRIVER_INIT( okean240 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
+	okean240_state *state = machine.driver_data<okean240_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
 VIDEO_START_MEMBER( okean240_state )

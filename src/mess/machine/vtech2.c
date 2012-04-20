@@ -84,7 +84,7 @@ static const char *const mwa_bank_hard[4] =
 DRIVER_INIT(laser)
 {
 	vtech2_state *state = machine.driver_data<vtech2_state>();
-	UINT8 *gfx = machine.region("gfx2")->base();
+	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
 	int i;
 
 	state->m_laser_track_x2[0] = state->m_laser_track_x2[1] = 80;
@@ -95,7 +95,7 @@ DRIVER_INIT(laser)
 		gfx[i] = i;
 
 	state->m_laser_latch = -1;
-	state->m_mem = machine.region("maincpu")->base();
+	state->m_mem = state->memregion("maincpu")->base();
 
 	for (i = 0; i < ARRAY_LENGTH(state->m_laser_bank); i++)
 		state->m_laser_bank[i] = -1;
@@ -162,7 +162,7 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 		else
 		{
 			sprintf(bank,"bank%d",offset+1);
-			memory_set_bankptr(machine(), bank, &m_mem[0x4000*m_laser_bank[offset]]);
+			membank(bank)->set_base(&m_mem[0x4000*m_laser_bank[offset]]);
 			if( m_laser_bank_mask & (1 << data) )
 			{
 				/* video RAM bank selected? */

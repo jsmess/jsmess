@@ -138,14 +138,14 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 static VIDEO_START( skimaxx )
 {
 	skimaxx_state *state = machine.driver_data<skimaxx_state>();
-	state->m_blitter_gfx = (UINT16 *) machine.region( "blitter" )->base();
-	state->m_blitter_gfx_len = machine.region( "blitter" )->bytes() / 2;
+	state->m_blitter_gfx = (UINT16 *) machine.root_device().memregion( "blitter" )->base();
+	state->m_blitter_gfx_len = state->memregion( "blitter" )->bytes() / 2;
 
 	state->m_bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
 	state->m_bg_buffer_back  = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
 	state->m_bg_buffer_front = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_bg_buffer_back,  0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->m_bg_buffer_front, 0);
+	state->membank("bank1")->configure_entry(0, state->m_bg_buffer_back);
+	state->membank("bank1")->configure_entry(1, state->m_bg_buffer_front);
 }
 
 static SCREEN_UPDATE_IND16( skimaxx )
@@ -265,7 +265,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 		m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
 		m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
 
-		memory_set_bank(machine(), "bank1", bank_bg_buffer);
+		membank("bank1")->set_entry(bank_bg_buffer);
 	}
 }
 

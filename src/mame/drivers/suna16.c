@@ -260,18 +260,18 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("pcm1")->base();
+	UINT8 *RAM = memregion("pcm1")->base();
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
-	memory_set_bankptr(machine(), "bank1", &RAM[bank * 0x10000 + 0x1000]);
+	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x1000]);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("pcm2")->base();
+	UINT8 *RAM = memregion("pcm2")->base();
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
-	memory_set_bankptr(machine(), "bank2", &RAM[bank * 0x10000 + 0x1000]);
+	membank("bank2")->set_base(&RAM[bank * 0x10000 + 0x1000]);
 }
 
 
@@ -322,10 +322,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("pcm1")->base();
+	UINT8 *RAM = memregion("pcm1")->base();
 	int bank = data & 1;
 	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
-	memory_set_bankptr(machine(), "bank1", &RAM[bank * 0x10000 + 0x400]);
+	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x400]);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -1087,7 +1087,7 @@ ROM_END
 
 static DRIVER_INIT( uballoon )
 {
-	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
 	// Patch out the protection checks
 	RAM[0x0113c/2] = 0x4e71;	// bne $646

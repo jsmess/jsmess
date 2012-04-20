@@ -247,7 +247,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(sun3_state)
 {
-	UINT8* user1 = machine().region("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x10000);
 

@@ -266,7 +266,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 
 void nouspikel_usb_smartmedia_device::device_start()
 {
-	m_ram = (UINT16*)(*subregion(BUFFER_TAG));
+	m_ram = (UINT16*)(*memregion(BUFFER_TAG));
 	/* auto_alloc_array(device->machine(), UINT16, 0x100000/2); */
 	m_smartmedia = subdevice<smartmedia_image_device>("smartmedia");
 	m_strata = subdevice("strata");

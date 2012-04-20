@@ -532,7 +532,7 @@ void cosmicos_state::machine_reset()
 
 static QUICKLOAD_LOAD( cosmicos )
 {
-	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
 	int size = image.length();
 
 	/* load image to RAM */
@@ -615,7 +615,7 @@ DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 	if (m_boot)
 	{
 		/* force A6 and A7 high */
-		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, machine().region(CDP1802_TAG)->base() + 0xc0);
+		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, memregion(CDP1802_TAG)->base() + 0xc0);
 		return ~0;
 	}
 

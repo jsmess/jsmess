@@ -58,7 +58,7 @@ void comx_thm_device::device_start()
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
-	m_rom = subregion("c000")->base();
+	m_rom = memregion("c000")->base();
 }
 
 

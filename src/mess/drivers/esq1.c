@@ -89,7 +89,8 @@ static SCREEN_UPDATE_RGB32( esq1 )
 static MACHINE_RESET( esq1 )
 {
 	// set default OSROM banking
-	memory_set_bankptr(machine, "osbank", machine.region("osrom")->base() );
+	esq1_state *state = machine.driver_data<esq1_state>();
+	state->membank("osbank")->set_base(machine.root_device().memregion("osrom")->base() );
 }
 
 static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
@@ -129,10 +130,10 @@ static UINT8 duart_input(device_t *device)
 static void duart_output(device_t *device, UINT8 data)
 {
 	int bank = ((data >> 1) & 0x7);
-
+	esq1_state *state = device->machine().driver_data<esq1_state>();
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
 //  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine().firstcpu));
-	memory_set_bankptr(device->machine(), "osbank", device->machine().region("osrom")->base() + (bank * 0x1000) );
+	state->membank("osbank")->set_base(device->machine().root_device().memregion("osrom")->base() + (bank * 0x1000) );
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

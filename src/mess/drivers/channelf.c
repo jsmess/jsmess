@@ -230,7 +230,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( image.device().machine().region("maincpu")->base() + 0x0800, size) != size)
+		if (image.fread( image.device().machine().root_device().memregion("maincpu")->base() + 0x0800, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -240,7 +240,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-		memcpy(image.device().machine().region("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
+		memcpy(image.device().machine().root_device().memregion("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;

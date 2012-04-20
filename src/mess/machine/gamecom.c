@@ -7,7 +7,7 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 
 static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
-	UINT8 * RAM = machine.region("maincpu")->base();
+	UINT8 * RAM = machine.root_device().memregion("maincpu")->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
 	cputag_set_input_line(machine, "maincpu", CK_INT, ASSERT_LINE );
@@ -16,11 +16,11 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 MACHINE_RESET( gamecom )
 {
 	gamecom_state *state = machine.driver_data<gamecom_state>();
-	UINT8 *rom = machine.region("kernel")->base();
-	memory_set_bankptr( machine, "bank1", rom );
-	memory_set_bankptr( machine, "bank2", rom );
-	memory_set_bankptr( machine, "bank3", rom );
-	memory_set_bankptr( machine, "bank4", rom );
+	UINT8 *rom = state->memregion("kernel")->base();
+	state->membank( "bank1" )->set_base( rom );
+	state->membank( "bank2" )->set_base( rom );
+	state->membank( "bank3" )->set_base( rom );
+	state->membank( "bank4" )->set_base( rom );
 
 	state->m_cartridge = NULL;
 }
@@ -32,13 +32,13 @@ void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )
 	if (data < 0x20)
 	{
 		/* select internal ROM bank */
-		memory_set_bankptr( machine(), bank, machine().region("kernel")->base() + (data << 13) );
+		membank( bank )->set_base( memregion("kernel")->base() + (data << 13) );
 	}
 	else
 	{
 		/* select cartridge bank */
 		if ( m_cartridge )
-			memory_set_bankptr( machine(), bank, m_cartridge + ( data << 13 ) );
+			membank( bank )->set_base( m_cartridge + ( data << 13 ) );
 	}
 }
 
@@ -345,7 +345,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 void gamecom_handle_dma( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = device->machine().region("maincpu")->base();
+	UINT8 * RAM = device->machine().root_device().memregion("maincpu")->base();
 	UINT8 data = RAM[SM8521_DMC];
 	state->m_dma.overwrite_mode = data & 0x01;
 	state->m_dma.transfer_mode = data & 0x06;
@@ -391,7 +391,7 @@ void gamecom_handle_dma( device_t *device, int cycles )
 		state->m_dma.source_width = 64;
 		state->m_dma.source_mask = 0x3FFF;
 		if ( RAM[SM8521_DMBR] < 16 )
-			state->m_dma.source_bank = device->machine().region("kernel")->base() + (RAM[SM8521_DMBR] << 14);
+			state->m_dma.source_bank = state->memregion("kernel")->base() + (RAM[SM8521_DMBR] << 14);
 		else
 		if (state->m_cartridge)
 			state->m_dma.source_bank = state->m_cartridge + (RAM[SM8521_DMBR] << 14);
@@ -504,7 +504,7 @@ void gamecom_handle_dma( device_t *device, int cycles )
 void gamecom_update_timers( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = device->machine().region("maincpu")->base();
+	UINT8 * RAM = state->memregion("maincpu")->base();
 	if ( state->m_timer[0].enabled )
 	{
 		state->m_timer[0].state_count += cycles;
@@ -539,7 +539,7 @@ DRIVER_INIT( gamecom )
 {
 	gamecom_state *state = machine.driver_data<gamecom_state>();
 	state->m_clock_timer = machine.scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
-	state->m_p_ram = machine.region("maincpu")->base(); // required here because pio_w gets called before machine_reset
+	state->m_p_ram = state->memregion("maincpu")->base(); // required here because pio_w gets called before machine_reset
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart1 )
@@ -548,7 +548,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->m_cartridge1 = image.device().machine().region("cart1")->base();
+	state->m_cartridge1 = state->memregion("cart1")->base();
 
 	if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -595,7 +595,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->m_cartridge2 = image.device().machine().region("cart2")->base();
+	state->m_cartridge2 = state->memregion("cart2")->base();
 
 //  if (image.software_entry() == NULL)
 		filesize = image.length();

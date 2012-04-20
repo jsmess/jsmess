@@ -254,7 +254,7 @@ void comx_eb_device::device_start()
 		m_ef4[slot] = CLEAR_LINE;
 	}
 
-	m_rom = subregion("e000")->base();
+	m_rom = memregion("e000")->base();
 }
 
 

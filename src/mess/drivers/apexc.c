@@ -96,13 +96,13 @@ bool apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( machine().region("maincpu")->base(), /*0x8000*/0x1000);
+	fread( memregion("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *)(*machine().region("maincpu"));
+		RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -126,14 +126,14 @@ void apexc_cylinder_image_device::call_unload()
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *)(*machine().region("maincpu"));
+			RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		fwrite(machine().region("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().root_device().memregion("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
@@ -823,7 +823,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = machine.region("gfx1")->base();
+	dst = machine.root_device().memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }

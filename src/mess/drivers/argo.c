@@ -58,9 +58,9 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
 	UINT8 *RAM;
 	if (m_ram_ctrl)
-		RAM = machine().region("videoram")->base();
+		RAM = memregion("videoram")->base();
 	else
-		RAM = machine().region("extraram")->base();
+		RAM = memregion("extraram")->base();
 
 	RAM[offset] = data;
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
 		if ((m_scroll_ctrl == 2) & (data == 0xe3))
 		{
-			UINT8 *RAM = machine().region("videoram")->base();
+			UINT8 *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
 			memcpy(RAM, RAM+80, 24*80);
 		}
@@ -253,24 +253,26 @@ INPUT_PORTS_END
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( argo_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	argo_state *state = machine.driver_data<argo_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(argo_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
 DRIVER_INIT( argo )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
+	argo_state *state = machine.driver_data<argo_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 VIDEO_START_MEMBER( argo_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( argo_state )
@@ -325,7 +327,7 @@ SCREEN_UPDATE16_MEMBER( argo_state )
 		else
 		{
 			ma=0;
-			p_vram = machine().region("videoram")->base();
+			p_vram = memregion("videoram")->base();
 		}
 	}
 	return 0;

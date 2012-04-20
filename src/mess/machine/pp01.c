@@ -84,7 +84,7 @@ WRITE8_MEMBER(pp01_state::pp01_video_b_2_w)
 static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 {
 	pp01_state *state = machine.driver_data<pp01_state>();
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
@@ -119,11 +119,11 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		memory_set_bankptr(machine, bank, machine.device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
+		state->membank(bank)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		space->install_read_bank (startaddr, endaddr, bank);
 		space->unmap_write(startaddr, endaddr);
-		memory_set_bankptr(machine, bank, mem + ((data & 0x0F)-8)* 0x1000+0x10000);
+		state->membank(bank)->set_base(mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
 		space->unmap_readwrite (startaddr, endaddr);

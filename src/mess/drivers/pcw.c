@@ -253,17 +253,18 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 		space->install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block_name, machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
+	state->membank(block_name)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
 }
 
 
 
 static void pcw_update_write_memory_block(running_machine &machine, int block, int bank)
 {
+	pcw_state *state = machine.driver_data<pcw_state>();
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	memory_set_bankptr(machine, block_name, machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
+	state->membank(block_name)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -343,9 +344,9 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
     {
         unsigned char *FakeROM;
 
-        FakeROM = &machine.region("maincpu")->base()[0x010000];
+        FakeROM = &machine.root_device().memregion("maincpu")->base()[0x010000];
 
-        memory_set_bankptr(machine, "bank1", FakeROM);
+        state->membank("bank1")->set_base(FakeROM);
     }*/
 }
 
@@ -1050,7 +1051,7 @@ static MACHINE_START( pcw )
 static MACHINE_RESET( pcw )
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	UINT8* code = machine.region("printer_mcu")->base();
+	UINT8* code = state->memregion("printer_mcu")->base();
 	int x;
 	/* ram paging is actually undefined at power-on */
 

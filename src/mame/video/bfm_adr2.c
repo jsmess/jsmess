@@ -186,11 +186,11 @@ VIDEO_RESET( adder2 )
 	adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = machine.region("adder2")->base();
+		UINT8 *rom = machine.root_device().memregion("adder2")->base();
 
-		memory_configure_bank(machine, "bank2", 0, 4, &rom[0x00000], 0x08000);
+		machine.root_device().membank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
 
-		memory_set_bank(machine, "bank2",0&0x03);
+		machine.root_device().membank("bank2")->set_entry(0&0x03);
 	}
 }
 
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( normal_ram_w )
 
 static WRITE8_HANDLER( adder2_rom_page_w )
 {
-	memory_set_bank(space->machine(), "bank2",data&0x03);
+	space->machine().root_device().membank("bank2")->set_entry(data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -452,7 +452,7 @@ void adder2_decode_char_roms(running_machine &machine)
 {
 	UINT8 *p;
 
-	p = machine.region("gfx1")->base();
+	p = machine.root_device().memregion("gfx1")->base();
 
 	if ( p )
 	{

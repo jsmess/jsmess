@@ -39,7 +39,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(pt68k4)
 {
 	pt68k4_state *state = machine.driver_data<pt68k4_state>();
-	UINT8* user1 = machine.region("user1")->base();
+	UINT8* user1 = state->memregion("user1")->base();
 
 	memcpy((UINT8*)state->m_p_ram.target(), user1, 8);
 

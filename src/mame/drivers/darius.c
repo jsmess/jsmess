@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 static void reset_sound_region( running_machine &machine )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	memory_set_bank(machine, "bank1", state->m_banknum);
+	state->membank("bank1")->set_entry(state->m_banknum);
 }
 
 WRITE8_MEMBER(darius_state::sound_bankswitch_w)
@@ -842,9 +842,9 @@ static MACHINE_START( darius )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 1, machine.region("audiocpu")->base(), 0x8000);
-	memory_set_bank(machine, "bank1", 4);
+	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entry(4, state->memregion("audiocpu")->base());
+	state->membank("bank1")->set_entry(4);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -1275,7 +1275,7 @@ ROM_END
 static DRIVER_INIT( darius )
 {
 	/**** setup sound bank image ****/
-	UINT8 *RAM = machine.region("audiocpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("audiocpu")->base();
 	int  i;
 
 	for (i = 3; i >= 0; i--)

@@ -331,8 +331,8 @@ void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 
 void horizon_ramdisk_device::device_start(void)
 {
-	m_nvram = subregion(NVRAMREGION)->base();
-	m_ram = subregion(RAMREGION)->base();
+	m_nvram = memregion(NVRAMREGION)->base();
+	m_ram = memregion(RAMREGION)->base();
 	m_ros = m_nvram + MAXRAM_SIZE - 8192;
 	m_cru_horizon = 0;
 	m_cru_phoenix = 0;

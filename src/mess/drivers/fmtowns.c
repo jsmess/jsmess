@@ -157,7 +157,7 @@ void towns_state::init_serial_rom(running_machine &machine)
 	// TODO: init serial ROM contents
 	int x;
 	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = machine.region("serial")->base();
+	UINT8* srom = machine.root_device().memregion("serial")->base();
 
 	memset(m_towns_serial_rom,0,256/8);
 
@@ -1130,50 +1130,51 @@ WRITE8_MEMBER( towns_state::towns_cmos_w )
 
 void towns_state::towns_update_video_banks(address_space& space)
 {
+	towns_state *state = space.machine().driver_data<towns_state>();
 	UINT8* ROM;
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
-		ROM = space.machine().region("user")->base();
+		ROM = state->memregion("user")->base();
 
-//      memory_set_bankptr(space.machine(),1,m_messram->pointer()+0xc0000);
-//      memory_set_bankptr(space.machine(),2,m_messram->pointer()+0xc8000);
-//      memory_set_bankptr(space.machine(),3,m_messram->pointer()+0xc9000);
-//      memory_set_bankptr(space.machine(),4,m_messram->pointer()+0xca000);
-//      memory_set_bankptr(space.machine(),5,m_messram->pointer()+0xca000);
-//      memory_set_bankptr(space.machine(),10,m_messram->pointer()+0xca800);
-		memory_set_bankptr(space.machine(),"bank6",m_messram->pointer()+0xcb000);
-		memory_set_bankptr(space.machine(),"bank7",m_messram->pointer()+0xcb000);
+//      state->membank(1)->set_base(m_messram->pointer()+0xc0000);
+//      state->membank(2)->set_base(m_messram->pointer()+0xc8000);
+//      state->membank(3)->set_base(m_messram->pointer()+0xc9000);
+//      state->membank(4)->set_base(m_messram->pointer()+0xca000);
+//      state->membank(5)->set_base(m_messram->pointer()+0xca000);
+//      state->membank(10)->set_base(m_messram->pointer()+0xca800);
+		state->membank("bank6")->set_base(m_messram->pointer()+0xcb000);
+		state->membank("bank7")->set_base(m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			memory_set_bankptr(space.machine(),"bank11",m_messram->pointer()+0xf8000);
+			state->membank("bank11")->set_base(m_messram->pointer()+0xf8000);
 		else
-			memory_set_bankptr(space.machine(),"bank11",ROM+0x238000);
-		memory_set_bankptr(space.machine(),"bank12",m_messram->pointer()+0xf8000);
+			state->membank("bank11")->set_base(ROM+0x238000);
+		state->membank("bank12")->set_base(m_messram->pointer()+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
 	{
-		ROM = space.machine().region("user")->base();
+		ROM = state->memregion("user")->base();
 
-//      memory_set_bankptr(space.machine(),1,towns_gfxvram+(towns_vram_rplane*0x8000));
-//      memory_set_bankptr(space.machine(),2,towns_txtvram);
-//      memory_set_bankptr(space.machine(),3,state->m_messram->pointer()+0xc9000);
+//      state->membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
+//      state->membank(2)->set_base(towns_txtvram);
+//      state->membank(3)->set_base(state->m_messram->pointer()+0xc9000);
 //      if(towns_ankcg_enable != 0)
-//          memory_set_bankptr(space.machine(),4,ROM+0x180000+0x3d000);  // ANK CG 8x8
+//          state->membank(4)->set_base(ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
-//          memory_set_bankptr(space.machine(),4,towns_txtvram+0x2000);
-//      memory_set_bankptr(space.machine(),5,towns_txtvram+0x2000);
-//      memory_set_bankptr(space.machine(),10,state->m_messram->pointer()+0xca800);
+//          state->membank(4)->set_base(towns_txtvram+0x2000);
+//      state->membank(5)->set_base(towns_txtvram+0x2000);
+//      state->membank(10)->set_base(state->m_messram->pointer()+0xca800);
 		if(m_towns_ankcg_enable != 0)
-			memory_set_bankptr(space.machine(),"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
+			state->membank("bank6")->set_base(ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space.machine(),"bank6",m_messram->pointer()+0xcb000);
-		memory_set_bankptr(space.machine(),"bank7",m_messram->pointer()+0xcb000);
+			state->membank("bank6")->set_base(m_messram->pointer()+0xcb000);
+		state->membank("bank7")->set_base(m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			memory_set_bankptr(space.machine(),"bank11",m_messram->pointer()+0xf8000);
+			state->membank("bank11")->set_base(m_messram->pointer()+0xf8000);
 		else
-			memory_set_bankptr(space.machine(),"bank11",ROM+0x238000);
-		memory_set_bankptr(space.machine(),"bank12",m_messram->pointer()+0xf8000);
+			state->membank("bank11")->set_base(ROM+0x238000);
+		state->membank("bank12")->set_base(m_messram->pointer()+0xf8000);
 		return;
 	}
 }

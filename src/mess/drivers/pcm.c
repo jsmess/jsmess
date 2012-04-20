@@ -208,7 +208,7 @@ MACHINE_RESET_MEMBER(pcm_state)
 
 VIDEO_START_MEMBER( pcm_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( pcm_state )

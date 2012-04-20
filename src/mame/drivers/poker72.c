@@ -77,17 +77,17 @@ WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 
 WRITE8_MEMBER(poker72_state::output_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        memory_set_bankptr(machine(), "bank1", &ROM[0x10000]);
+        membank("bank1")->set_base(&ROM[0x10000]);
     else*/
 	if(data & 8)
-		memory_set_bankptr(machine(), "bank1", &ROM[0x08000]);
+		membank("bank1")->set_base(&ROM[0x08000]);
 	else
-		memory_set_bankptr(machine(), "bank1", &ROM[0x00000]);
+		membank("bank1")->set_base(&ROM[0x00000]);
 }
 
 WRITE8_MEMBER(poker72_state::tile_bank_w)
@@ -339,9 +339,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( poker72 )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )
@@ -393,7 +393,7 @@ ROM_END
 
 static DRIVER_INIT( poker72 )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	rom[0x4a9] = 0x28;
 }

@@ -340,9 +340,9 @@ void bbcbp_setvideoshadow(running_machine &machine, int vdusel)
 	bbc_state *state = machine.driver_data<bbc_state>();
 	if (vdusel)
 	{
-		state->m_BBC_Video_RAM= machine.region("maincpu")->base()+0x8000;
+		state->m_BBC_Video_RAM= state->memregion("maincpu")->base()+0x8000;
 	} else {
-		state->m_BBC_Video_RAM= machine.region("maincpu")->base();
+		state->m_BBC_Video_RAM= machine.root_device().memregion("maincpu")->base();
 	}
 }
 
@@ -362,7 +362,7 @@ static void common_init(running_machine &machine, int memorySize)
 	set_pixel_lookup(state);
 	state->m_saa505x = machine.device("saa505x");
 
-	state->m_BBC_Video_RAM = machine.region("maincpu")->base();
+	state->m_BBC_Video_RAM = state->memregion("maincpu")->base();
 	state->m_memorySize=memorySize;
 
 }

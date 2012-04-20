@@ -152,7 +152,7 @@ WRITE8_MEMBER( mbee_state::mbeeppc_1c_w )
     d3..d0 select state->m_videoram bank */
 
 	m_1c = data;
-	memory_set_bank(machine(), "basic", BIT(data, 5));
+	membank("basic")->set_entry(BIT(data, 5));
 }
 
 WRITE8_MEMBER( mbee_state::mbee256_1c_w )
@@ -333,7 +333,7 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 	case 12:
 		data &= 0x3f; // select alternate character set
 		if( m_sy6545_reg[12] != data )
-			memcpy(m_p_gfxram, machine().region("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
+			memcpy(m_p_gfxram, memregion("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
                 /* This firstly pushes the contents of the transparent registers onto the MA lines,
@@ -362,27 +362,27 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 VIDEO_START( mbee )
 {
 	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.region("videoram")->base();
-	state->m_p_gfxram = machine.region("gfx")->base()+0x1000;
+	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
+	state->m_p_gfxram = state->memregion("gfx")->base()+0x1000;
 	state->m_is_premium = 0;
 }
 
 VIDEO_START( mbeeic )
 {
 	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.region("videoram")->base();
-	state->m_p_colorram = machine.region("colorram")->base();
-	state->m_p_gfxram = machine.region("gfx")->base()+0x1000;
+	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
+	state->m_p_colorram = machine.root_device().memregion("colorram")->base();
+	state->m_p_gfxram = state->memregion("gfx")->base()+0x1000;
 	state->m_is_premium = 0;
 }
 
 VIDEO_START( mbeeppc )
 {
 	mbee_state *state = machine.driver_data<mbee_state>();
-	state->m_p_videoram = machine.region("videoram")->base();
-	state->m_p_colorram = machine.region("colorram")->base();
-	state->m_p_gfxram = machine.region("gfx")->base()+0x1000;
-	state->m_p_attribram = machine.region("attrib")->base();
+	state->m_p_videoram = machine.root_device().memregion("videoram")->base();
+	state->m_p_colorram = machine.root_device().memregion("colorram")->base();
+	state->m_p_gfxram = machine.root_device().memregion("gfx")->base()+0x1000;
+	state->m_p_attribram = state->memregion("attrib")->base();
 	state->m_is_premium = 1;
 }
 
@@ -556,7 +556,7 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 
 PALETTE_INIT( mbeeic )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
@@ -584,7 +584,7 @@ PALETTE_INIT( mbeeic )
 
 PALETTE_INIT( mbeepc85b )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0x80, 0xff };	/* off, half, full intensity */

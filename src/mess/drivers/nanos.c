@@ -272,7 +272,7 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER( nanos_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( nanos_state )
@@ -341,9 +341,9 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	nanos_state *state = device->machine().driver_data<nanos_state>();
 	state->m_key_command = BIT(data,1);
 	if (BIT(data,7)) {
-		memory_set_bankptr(device->machine(), "bank1", device->machine().region("maincpu")->base());
+		state->membank("bank1")->set_base(state->memregion("maincpu")->base());
 	} else {
-		memory_set_bankptr(device->machine(), "bank1", device->machine().device<ram_device>(RAM_TAG)->pointer());
+		state->membank("bank1")->set_base(device->machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 
@@ -455,9 +455,9 @@ MACHINE_RESET_MEMBER(nanos_state)
 	space->install_write_bank(0x0000, 0x0fff, "bank3");
 	space->install_write_bank(0x1000, 0xffff, "bank2");
 
-	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
-	memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
-	memory_set_bankptr(machine(), "bank3", machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);

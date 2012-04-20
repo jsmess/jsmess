@@ -346,7 +346,7 @@ static SCREEN_UPDATE_IND16( sorcerer )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0xf080,x;
-	UINT8 *RAM = screen.machine().region("maincpu")->base();
+	UINT8 *RAM = screen.machine().root_device().memregion("maincpu")->base();
 
 	for (y = 0; y < 30; y++)
 	{
@@ -483,8 +483,9 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( sorcerer )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
 /***************************************************************************

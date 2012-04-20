@@ -142,8 +142,8 @@ static void apple2_text_draw(running_machine &machine, bitmap_ind16 &bitmap, con
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
 	UINT32 address;
-	const UINT8 *textgfx_data = machine.region("gfx1")->base();
-	UINT32 textgfx_datalen = machine.region("gfx1")->bytes();
+	const UINT8 *textgfx_data = machine.root_device().memregion("gfx1")->base();
+	UINT32 textgfx_datalen = state->memregion("gfx1")->bytes();
 	UINT32 my_a2 = effective_a2(state);
 
 	/* perform adjustments */
@@ -346,8 +346,8 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 	state->m_fgcolor = 15;
 	state->m_bgcolor = 0;
 	state->m_flash = 0;
-	apple2_font = machine.region("gfx1")->base();
-	state->m_alt_charset_value = machine.region("gfx1")->bytes() / 16;
+	apple2_font = machine.root_device().memregion("gfx1")->base();
+	state->m_alt_charset_value = machine.root_device().memregion("gfx1")->bytes() / 16;
 	state->m_a2_videoram = vram;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
@@ -382,7 +382,7 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 
 	/* Fix for Ivel Ultra */
 	if (!strcmp(machine.system().name, "ivelultr")) {
-		int len = machine.region("gfx1")->bytes();
+		int len = machine.root_device().memregion("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);
@@ -397,7 +397,7 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 		|| !strcmp(machine.system().name, "ace100")
 		|| !strcmp(machine.system().name, "apple2jp"))
 	{
-		int len = machine.region("gfx1")->bytes();
+		int len = machine.root_device().memregion("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
 			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);

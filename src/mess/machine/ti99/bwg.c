@@ -383,8 +383,8 @@ void snug_bwg_device::cruwrite(offs_t offset, UINT8 data)
 void snug_bwg_device::device_start(void)
 {
 	if (VERBOSE>5) LOG("bwg: BWG start\n");
-	m_dsrrom = subregion(DSRROM)->base();
-	m_buffer_ram = subregion(BUFFER)->base();
+	m_dsrrom = memregion(DSRROM)->base();
+	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_controller = subdevice(FDC_TAG);
 	m_clock = subdevice(CLOCK_TAG);

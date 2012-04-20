@@ -34,7 +34,7 @@ const gfx_layout mz80kj_charlayout =
 VIDEO_START( mz80k )
 {
 	mz80_state *state = machine.driver_data<mz80_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( mz80k )

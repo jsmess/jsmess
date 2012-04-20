@@ -677,7 +677,7 @@ void tandy2k_state::machine_start()
 	program->install_ram(0x00000, ram_size - 1, ram);
 
 	// patch out i186 relocation register check
-	UINT8 *rom = machine().region(I80186_TAG)->base();
+	UINT8 *rom = memregion(I80186_TAG)->base();
 	rom[0x1f16] = 0x90;
 	rom[0x1f17] = 0x90;
 

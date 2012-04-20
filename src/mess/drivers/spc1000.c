@@ -52,13 +52,13 @@ WRITE8_MEMBER(spc1000_state::spc1000_iplk_w)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	if (m_IPLK == 1) {
-		UINT8 *mem = machine().region("maincpu")->base();
-		memory_set_bankptr(machine(), "bank1", mem);
-		memory_set_bankptr(machine(), "bank3", mem);
+		UINT8 *mem = memregion("maincpu")->base();
+		membank("bank1")->set_base(mem);
+		membank("bank3")->set_base(mem);
 	} else {
 		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-		memory_set_bankptr(machine(), "bank1", ram);
-		memory_set_bankptr(machine(), "bank3", ram + 0x8000);
+		membank("bank1")->set_base(ram);
+		membank("bank3")->set_base(ram + 0x8000);
 	}
 }
 
@@ -66,13 +66,13 @@ READ8_MEMBER(spc1000_state::spc1000_iplk_r)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	if (m_IPLK == 1) {
-		UINT8 *mem = machine().region("maincpu")->base();
-		memory_set_bankptr(machine(), "bank1", mem);
-		memory_set_bankptr(machine(), "bank3", mem);
+		UINT8 *mem = memregion("maincpu")->base();
+		membank("bank1")->set_base(mem);
+		membank("bank3")->set_base(mem);
 	} else {
 		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-		memory_set_bankptr(machine(), "bank1", ram);
-		memory_set_bankptr(machine(), "bank3", ram + 0x8000);
+		membank("bank1")->set_base(ram);
+		membank("bank3")->set_base(ram + 0x8000);
 	}
 	return 0;
 }
@@ -225,7 +225,7 @@ static MACHINE_RESET(spc1000)
 {
 	spc1000_state *state = machine.driver_data<spc1000_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_read_bank(0x0000, 0x7fff, "bank1");
@@ -234,10 +234,10 @@ static MACHINE_RESET(spc1000)
 	space->install_write_bank(0x0000, 0x7fff, "bank2");
 	space->install_write_bank(0x8000, 0xffff, "bank4");
 
-	memory_set_bankptr(machine, "bank1", mem);
-	memory_set_bankptr(machine, "bank2", ram);
-	memory_set_bankptr(machine, "bank3", mem);
-	memory_set_bankptr(machine, "bank4", ram + 0x8000);
+	state->membank("bank1")->set_base(mem);
+	state->membank("bank2")->set_base(ram);
+	state->membank("bank3")->set_base(mem);
+	state->membank("bank4")->set_base(ram + 0x8000);
 
 	state->m_IPLK = 1;
 }

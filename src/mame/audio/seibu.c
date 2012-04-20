@@ -106,7 +106,7 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 {
 	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.region(cpu)->base();
+	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 	int i;
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -120,7 +120,7 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 	}
 
 	if (length > 0x10000)
-		memory_configure_bank_decrypted(machine, "bank1", 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine.root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 
@@ -190,7 +190,7 @@ static DEVICE_START( seibu_adpcm )
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->m_base = machine.region(intf->rom_region)->base();
+	state->m_base = machine.root_device().memregion(intf->rom_region)->base();
 	state->m_adpcm.reset();
 }
 
@@ -217,8 +217,8 @@ DEVICE_GET_INFO( seibu_adpcm )
 
 void seibu_adpcm_decrypt(running_machine &machine, const char *region)
 {
-	UINT8 *ROM = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *ROM = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)
@@ -346,17 +346,17 @@ void seibu_ym2203_irqhandler(device_t *device, int linestate)
 
 MACHINE_RESET( seibu_sound )
 {
-	int romlength = machine.region("audiocpu")->bytes();
-	UINT8 *rom = machine.region("audiocpu")->base();
+	int romlength = machine.root_device().memregion("audiocpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 
 	sound_cpu = machine.device("audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 	{
-		memory_configure_bank(machine, "bank1", 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+		machine.root_device().membank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 
 		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 }
 
@@ -367,7 +367,7 @@ static int main2sub_pending,sub2main_pending;
 
 WRITE8_HANDLER( seibu_bank_w )
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	space->machine().root_device().membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_HANDLER( seibu_coin_w )

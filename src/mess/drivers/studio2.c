@@ -437,7 +437,7 @@ DEVICE_IMAGE_LOAD( studio2_cart_load )
 		// WARNING: list code currently assume that cart mapping starts at 0x400.
 		// the five dumps currently available work like this, but the .st2 format
 		// allows for more freedom... how was the content of a real cart mapped?
-		UINT8 *ptr = ((UINT8 *) image.device().machine().region(CDP1802_TAG)->base()) + 0x400;
+		UINT8 *ptr = ((UINT8 *) image.device().machine().root_device().memregion(CDP1802_TAG)->base()) + 0x400;
 		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
 		return IMAGE_INIT_PASS;
 	}

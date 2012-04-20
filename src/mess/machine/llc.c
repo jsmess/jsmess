@@ -112,19 +112,20 @@ DRIVER_INIT(llc2)
 
 MACHINE_RESET( llc2 )
 {
+	llc_state *state = machine.driver_data<llc_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 
 	space->unmap_write(0x4000, 0x5fff);
-	memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x4000);
+	state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
 
 	space->unmap_write(0x6000, 0xbfff);
-	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x6000);
+	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base() + 0x6000);
 
 	space->install_write_bank(0xc000, 0xffff, "bank4");
-	memory_set_bankptr(machine, "bank4", machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000);
+	state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 
 }
 
@@ -134,16 +135,16 @@ WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	mem_space->install_write_bank(0x0000, 0xbfff, "bank1");
-	memory_set_bankptr(machine(), "bank1", ram);
+	membank("bank1")->set_base(ram);
 
 	mem_space->install_write_bank(0x4000, 0x5fff, "bank2");
-	memory_set_bankptr(machine(), "bank2", ram + 0x4000);
+	membank("bank2")->set_base(ram + 0x4000);
 
 	mem_space->install_write_bank(0x6000, 0xbfff, "bank3");
-	memory_set_bankptr(machine(), "bank3", ram + 0x6000);
+	membank("bank3")->set_base(ram + 0x6000);
 
 	mem_space->install_write_bank(0xc000, 0xffff, "bank4");
-	memory_set_bankptr(machine(), "bank4", ram + 0xc000);
+	membank("bank4")->set_base(ram + 0xc000);
 
 }
 
@@ -153,10 +154,10 @@ WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 	address_space *mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (data & 0x02) {
 		mem_space->unmap_write(0x4000, 0x5fff);
-		memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base() + 0x10000);
+		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
 	} else {
 		mem_space->install_write_bank(0x4000, 0x5fff, "bank2");
-		memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	}
 
 }
@@ -178,7 +179,7 @@ static UINT8 key_pos(UINT8 val) {
 }
 static READ8_DEVICE_HANDLER (llc2_port_a_r)
 {
-	UINT8 *k7659 = device->machine().region("k7659")->base();
+	UINT8 *k7659 = device->machine().root_device().memregion("k7659")->base();
 	UINT8 retVal = 0;
 	UINT8 a1 = input_port_read(device->machine(), "A1");
 	UINT8 a2 = input_port_read(device->machine(), "A2");

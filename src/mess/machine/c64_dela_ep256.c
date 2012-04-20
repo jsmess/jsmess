@@ -102,7 +102,7 @@ c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_c
 
 void c64_dela_ep256_cartridge_device::device_start()
 {
-	m_rom = subregion("rom")->base();
+	m_rom = memregion("rom")->base();
 
 	// state saving
 	save_item(NAME(m_bank));

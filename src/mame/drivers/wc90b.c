@@ -99,19 +99,19 @@ Noted added by ClawGrip 28-Mar-2008:
 WRITE8_MEMBER(wc90b_state::wc90b_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(machine(), "bank1",&ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
 {
 	int bankaddress;
-	UINT8 *ROM = machine().region("sub")->base();
+	UINT8 *ROM = memregion("sub")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(machine(), "bank2",&ROM[bankaddress]);
+	membank("bank2")->set_base(&ROM[bankaddress]);
 }
 
 WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
@@ -123,11 +123,11 @@ WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *ROM = device->machine().region("audiocpu")->base();
+	UINT8 *ROM = device->machine().root_device().memregion("audiocpu")->base();
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine(), "bank3",&ROM[bankaddress]);
+	device->machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }

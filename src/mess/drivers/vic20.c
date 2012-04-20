@@ -785,9 +785,9 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 void vic20_state::machine_start()
 {
 	// find memory regions
-	m_basic = machine().region("basic")->base();
-	m_kernal = machine().region("kernal")->base();
-	m_charom = machine().region("charom")->base();
+	m_basic = memregion("basic")->base();
+	m_kernal = memregion("kernal")->base();
+	m_charom = memregion("charom")->base();
 
 	// allocate memory
 	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);

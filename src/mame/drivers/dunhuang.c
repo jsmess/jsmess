@@ -346,7 +346,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 
 	m_block_h = data;
 
-	tile_addr = machine().region("gfx2")->base() + ((m_block_addr_hi << 8) + m_block_addr_lo) * 4;
+	tile_addr = memregion("gfx2")->base() + ((m_block_addr_hi << 8) + m_block_addr_lo) * 4;
 
 	switch (m_block_dest)
 	{
@@ -466,7 +466,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 	// ?                data & 0x01
 	// ?                data & 0x02
 
-	memory_set_bank(machine(), "bank1", ((data >> 2) & 0x7));
+	membank("bank1")->set_entry(((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
 	coin_counter_w(machine(), 0,	data & 0x40);
@@ -766,9 +766,9 @@ static const ay8910_interface dunhuang_ay8910_interface =
 static MACHINE_START( dunhuang )
 {
 	dunhuang_state *state = machine.driver_data<dunhuang_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
 	state->save_item(NAME(state->m_written));
 	state->save_item(NAME(state->m_written2));

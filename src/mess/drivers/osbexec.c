@@ -78,17 +78,17 @@ public:
 		if ( m_pia0_porta & 0x01 )
 			m_ram_0000 += 0x10000;
 
-		memory_set_bankptr( machine, "0000", m_ram_0000 + 0x0000 );
-		memory_set_bankptr( machine, "2000", m_ram_0000 + 0x2000 );
-		memory_set_bankptr( machine, "4000", m_ram_0000 + 0x4000 );
+		membank( "0000" )->set_base( m_ram_0000 + 0x0000 );
+		membank( "2000" )->set_base( m_ram_0000 + 0x2000 );
+		membank( "4000" )->set_base( m_ram_0000 + 0x4000 );
 		m_ram_c000 = m_ram_0000 + 0xc000;
-		memory_set_bankptr( machine, "e000", m_ram_0000 + 0xe000 );
+		membank( "e000" )->set_base( m_ram_0000 + 0xe000 );
 
 		if ( m_pia0_porta & 0x80 )
 		{
-			memory_set_bankptr( machine, "0000", machine.region("maincpu")->base());
+			membank( "0000" )->set_base( memregion("maincpu")->base());
 			/* When BIOS is enabled 2000-3FFF is set to the "ROM RAM" */
-			memory_set_bankptr( machine, "2000", ram_ptr + 0x20000 );
+			membank( "2000" )->set_base( ram_ptr + 0x20000 );
 		}
 
 		if ( m_pia0_porta & 0x40 )
@@ -606,8 +606,8 @@ static DRIVER_INIT( osbexec )
 {
 	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->m_fontram_region = machine.region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
-	state->m_vram_region = machine.region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
+	state->m_fontram_region = machine.memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
+	state->m_vram_region = machine.memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
 	state->m_vram = state->m_vram_region->base();
 	state->m_fontram = state->m_fontram_region->base();
 

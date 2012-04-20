@@ -190,7 +190,7 @@ void cpc_ssa1_device::device_start()
 	address_space* space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	m_rom = subregion("sp0256")->base();
+	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 
@@ -204,7 +204,7 @@ void cpc_dkspeech_device::device_start()
 	address_space* space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	m_rom = subregion("sp0256")->base();
+	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 

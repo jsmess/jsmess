@@ -493,28 +493,28 @@ READ8_MEMBER(px4_state::px4_str_r)
 /* helper function to map rom capsules */
 static void install_rom_capsule(address_space *space, int size, const char *region)
 {
-	px4_state *px4 = space->machine().driver_data<px4_state>();
+	px4_state *state = space->machine().driver_data<px4_state>();
 
 	/* ram, part 1 */
 	space->install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", px4->m_ram->pointer());
+	state->membank("bank1")->set_base(state->m_ram->pointer());
 
 	/* actual rom data, part 1 */
 	space->install_read_bank(0xe000 - size, 0xffff - size, "bank2");
 	space->nop_write(0xe000 - size, 0xffff - size);
-	memory_set_bankptr(space->machine(), "bank2", space->machine().region(region)->base() + (size - 0x2000));
+	state->membank("bank2")->set_base(space->machine().root_device().memregion(region)->base() + (size - 0x2000));
 
 	/* rom data, part 2 */
 	if (size != 0x2000)
 	{
 		space->install_read_bank(0x10000 - size, 0xdfff, "bank3");
 		space->nop_write(0x10000 - size, 0xdfff);
-		memory_set_bankptr(space->machine(), "bank3", space->machine().region(region)->base());
+		state->membank("bank3")->set_base(space->machine().root_device().memregion(region)->base());
 	}
 
 	/* ram, continued */
 	space->install_readwrite_bank(0xe000, 0xffff, "bank4");
-	memory_set_bankptr(space->machine(), "bank4", px4->m_ram->pointer() + 0xe000);
+	state->membank("bank4")->set_base(state->m_ram->pointer() + 0xe000);
 }
 
 /* bank register */
@@ -534,15 +534,15 @@ WRITE8_MEMBER(px4_state::px4_bankr_w)
 		/* system bank */
 		space_program->install_read_bank(0x0000, 0x7fff, "bank1");
 		space_program->nop_write(0x0000, 0x7fff);
-		memory_set_bankptr(machine(), "bank1", machine().region("os")->base());
+		membank("bank1")->set_base(machine().root_device().memregion("os")->base());
 		space_program->install_readwrite_bank(0x8000, 0xffff, "bank2");
-		memory_set_bankptr(machine(), "bank2", m_ram->pointer() + 0x8000);
+		membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
 		space_program->install_readwrite_bank(0x0000, 0xffff, "bank1");
-		memory_set_bankptr(machine(), "bank1", m_ram->pointer());
+		membank("bank1")->set_base(m_ram->pointer());
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -993,7 +993,7 @@ READ8_MEMBER(px4_state::px4_ramdisk_data_r)
 	else if (m_ramdisk_address < 0x40000)
 	{
 		/* read from rom */
-		ret = machine().region("ramdisk")->base()[m_ramdisk_address];
+		ret = memregion("ramdisk")->base()[m_ramdisk_address];
 	}
 
 	m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((m_ramdisk_address & 0xff) + 1);
@@ -1071,35 +1071,35 @@ static SCREEN_UPDATE_IND16( px4 )
 
 static DRIVER_INIT( px4 )
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
+	px4_state *state = machine.driver_data<px4_state>();
 
 	/* find devices */
-	px4->m_ram = machine.device<ram_device>(RAM_TAG);
+	state->m_ram = machine.device<ram_device>(RAM_TAG);
 
 	/* init 7508 */
-	px4->m_one_sec_int_enabled = TRUE;
-	px4->m_key_int_enabled = TRUE;
-	px4->m_alarm_int_enabled = TRUE;
+	state->m_one_sec_int_enabled = TRUE;
+	state->m_key_int_enabled = TRUE;
+	state->m_alarm_int_enabled = TRUE;
 
 	/* art */
-	px4->m_receive_timer = machine.scheduler().timer_alloc(FUNC(receive_data));
-	px4->m_transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
+	state->m_receive_timer = machine.scheduler().timer_alloc(FUNC(receive_data));
+	state->m_transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
 
 	/* printer */
-	px4->m_centronics = machine.device<centronics_device>("centronics");
+	state->m_centronics = machine.device<centronics_device>("centronics");
 
 	/* external cassette or barcode reader */
-	px4->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
-	px4->m_ext_cas = machine.device<cassette_image_device>("extcas");
-	px4->m_ear_last_state = 0;
+	state->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
+	state->m_ext_cas = machine.device<cassette_image_device>("extcas");
+	state->m_ear_last_state = 0;
 
 	/* external devices */
-	px4->m_sio_device = machine.device("floppy");
-	px4->m_rs232c_device = NULL;
+	state->m_sio_device = machine.device("floppy");
+	state->m_rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
-	memory_set_bankptr(machine, "bank1", machine.region("os")->base());
-	memory_set_bankptr(machine, "bank2", px4->m_ram->pointer() + 0x8000);
+	state->membank("bank1")->set_base(machine.root_device().memregion("os")->base());
+	state->membank("bank2")->set_base(state->m_ram->pointer() + 0x8000);
 }
 
 static DRIVER_INIT( px4p )

@@ -130,7 +130,7 @@ READ8_MEMBER( trs80m2_state::read )
 	{
 		if (m_boot_rom)
 		{
-			data = machine().region(Z80_TAG)->base()[offset];
+			data = memregion(Z80_TAG)->base()[offset];
 		}
 		else
 		{
@@ -625,7 +625,7 @@ static const mc6845_interface mc6845_intf =
 void trs80m2_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region(MC6845_TAG)->base();
+	m_char_rom = memregion(MC6845_TAG)->base();
 
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x800);

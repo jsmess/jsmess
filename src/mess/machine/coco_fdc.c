@@ -249,7 +249,7 @@ const rom_entry *coco_fdc_device::device_rom_region() const
 
 UINT8* coco_fdc_device::get_cart_base()
 {
-	return subregion("eprom")->base();
+	return memregion("eprom")->base();
 }
 
 /*-------------------------------------------------

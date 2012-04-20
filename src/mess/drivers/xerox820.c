@@ -147,7 +147,7 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine().region("monitor")->base());
+		program->install_rom(0x0000, 0x0fff, memregion("monitor")->base());
 		program->unmap_readwrite(0x1000, 0x1fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 	}
@@ -166,7 +166,7 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x17ff, machine().region("monitor")->base());
+		program->install_rom(0x0000, 0x17ff, memregion("monitor")->base());
 		program->unmap_readwrite(0x1800, 0x2fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 		program->unmap_readwrite(0x4000, 0xbfff);
@@ -624,7 +624,7 @@ static COM8116_INTERFACE( com8116_intf )
 void xerox820_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 

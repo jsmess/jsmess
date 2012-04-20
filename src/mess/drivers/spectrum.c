@@ -689,7 +689,7 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread(image.device().machine().region("maincpu")->base(), filesize) != filesize)
+		if (image.fread(image.device().machine().root_device().memregion("maincpu")->base(), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return IMAGE_INIT_FAIL;
@@ -698,7 +698,7 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 	else
 	{
 		filesize = image.get_software_region_length("rom");
-		memcpy(image.device().machine().region("maincpu")->base(), image.get_software_region("rom"), filesize);
+		memcpy(image.device().machine().root_device().memregion("maincpu")->base(), image.get_software_region("rom"), filesize);
 	}
 	return IMAGE_INIT_PASS;
 }

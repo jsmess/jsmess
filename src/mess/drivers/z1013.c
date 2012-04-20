@@ -187,7 +187,7 @@ INPUT_PORTS_EXTERN( k7659 );
 VIDEO_START( z1013 )
 {
 	z1013_state *state = machine.driver_data<z1013_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_IND16( z1013 )

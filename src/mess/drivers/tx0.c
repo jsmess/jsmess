@@ -70,7 +70,7 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up our font */
-	dst = machine.region("gfx1")->base();
+	dst = machine.root_device().memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }

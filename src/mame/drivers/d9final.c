@@ -92,11 +92,11 @@ WRITE8_MEMBER(d9final_state::sc0_cram)
 
 WRITE8_MEMBER(d9final_state::d9final_bank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
@@ -273,9 +273,9 @@ GFXDECODE_END
 
 static MACHINE_RESET( d9final )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0x10000]);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )

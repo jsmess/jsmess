@@ -310,16 +310,16 @@ WRITE8_MEMBER( pce220_state::rom_bank_w )
 
 	m_bank_num = data;
 
-	memory_set_bank(machine(), "bank3", bank3);
-	memory_set_bank(machine(), "bank4", bank4);
+	membank("bank3")->set_entry(bank3);
+	membank("bank4")->set_entry(bank4);
 }
 
 WRITE8_MEMBER( pce220_state::ram_bank_w )
 {
 	UINT8 bank = BIT(data,2);
 
-	memory_set_bank(machine(), "bank1", bank);
-	memory_set_bank(machine(), "bank2", bank);
+	membank("bank1")->set_entry(bank);
+	membank("bank2")->set_entry(bank);
 }
 
 READ8_MEMBER( pce220_state::timer_r )
@@ -339,7 +339,7 @@ WRITE8_MEMBER( pce220_state::boot_bank_w )
 	{
 		address_space *space_prg = m_maincpu->memory().space(AS_PROGRAM);
 		space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->set_entry(0);
 	}
 }
 
@@ -474,7 +474,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
 	if (data < 0x16)
 	{
 		space_prg->install_read_bank(0xc000, 0xffff, "bank4");
-		memory_set_bank(machine(), "bank4", data);
+		membank("bank4")->set_entry(data);
 	}
 	else
 	{
@@ -843,30 +843,30 @@ INPUT_PORTS_END
 
 void pce220_state::machine_start()
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", 0, 2, ram + 0x0000, 0x8000);
-	memory_configure_bank(machine(), "bank2", 0, 2, ram + 0x4000, 0x8000);
-	memory_configure_bank(machine(), "bank3", 0, 8, rom, 0x4000);
-	memory_configure_bank(machine(), "bank4", 0, 8, rom, 0x4000);
+	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
+	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
+	membank("bank3")->configure_entries(0, 8, rom, 0x4000);
+	membank("bank4")->configure_entries(0, 8, rom, 0x4000);
 
-	m_vram = (UINT8*)machine().region("lcd_vram")->base();
+	m_vram = (UINT8*)machine().root_device().memregion("lcd_vram")->base();
 
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pcg850v_state::machine_start()
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", 0, 2, ram + 0x0000, 0x8000);
-	memory_configure_bank(machine(), "bank2", 0, 2, ram + 0x4000, 0x8000);
-	memory_configure_bank(machine(), "bank3", 0, 22, rom, 0x4000);
-	memory_configure_bank(machine(), "bank4", 0, 22, rom, 0x4000);
+	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
+	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
+	membank("bank3")->configure_entries(0, 22, rom, 0x4000);
+	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
 
-	m_vram = (UINT8*)machine().region("lcd_vram")->base();
+	m_vram = (UINT8*)machine().root_device().memregion("lcd_vram")->base();
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
@@ -876,7 +876,7 @@ void pce220_state::machine_reset()
 	space->unmap_write(0x0000, 0x3fff);
 
 	// install the boot code into the first bank
-	memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + 0x0000);
+	membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x0000);
 
 	m_lcd_index_row = 0;
 	m_lcd_index_col = 0;

@@ -402,7 +402,7 @@ static void set_ea(address_space &space, int ea)
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->m_eabank != NULL)
-		memory_set_bank(space.machine(), state->m_eabank, ea);
+		state->membank(state->m_eabank)->set_entry(ea);
 }
 
 /****************************************************************
@@ -416,7 +416,7 @@ static SOUND_START( mario )
 	mario_state	*state = machine.driver_data<mario_state>();
 	device_t *audiocpu = machine.device("audiocpu");
 #if USE_8039
-	UINT8 *SND = machine.region("audiocpu")->base();
+	UINT8 *SND = machine.root_device().memregion("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -426,8 +426,8 @@ static SOUND_START( mario )
 	{
 		state->m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM)->install_read_bank(0x000, 0x7ff, "bank1");
-		memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
-	    memory_configure_bank(machine, "bank1", 1, 1, machine.region("audiocpu")->base() + 0x1000, 0x800);
+		state->membank("bank1")->configure_entry(0, machine.root_device().memregion("audiocpu")->base());
+	    state->membank("bank1")->configure_entry(1, state->memregion("audiocpu")->base() + 0x1000);
 	}
 
     state->save_item(NAME(state->m_last));
@@ -482,8 +482,8 @@ READ8_MEMBER(mario_state::mario_sh_t1_r)
 
 READ8_MEMBER(mario_state::mario_sh_tune_r)
 {
-	UINT8 *SND = machine().region("audiocpu")->base();
-	UINT16 mask = machine().region("audiocpu")->bytes()-1;
+	UINT8 *SND = memregion("audiocpu")->base();
+	UINT16 mask = memregion("audiocpu")->bytes()-1;
 	UINT8 p2 = I8035_P2_R(*&space);
 
 	if ((p2 >> 7) & 1)

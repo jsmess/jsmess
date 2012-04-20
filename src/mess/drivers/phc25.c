@@ -322,7 +322,7 @@ static const mc6847_interface pal_vdg_intf =
 void phc25_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region(Z80_TAG)->base() + 0x5000;
+	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
 }
 
 /* AY-3-8910 Interface */

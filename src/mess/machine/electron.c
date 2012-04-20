@@ -155,7 +155,7 @@ WRITE8_MEMBER(electron_state::electron_1mhz_w)
 
 READ8_MEMBER(electron_state::electron_ula_r)
 {
-	UINT8 data = ((UINT8 *)machine().region("user1")->base())[0x43E00 + offset];
+	UINT8 data = ((UINT8 *)machine().root_device().memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
@@ -217,7 +217,7 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 			{
 				space.install_read_bank( 0x8000, 0xbfff, "bank2");
 			}
-			memory_set_bank(machine(), "bank2", m_ula.rompage);
+			membank("bank2")->set_entry(m_ula.rompage);
 		}
 		if ( data & 0x10 )
 		{
@@ -325,7 +325,7 @@ static TIMER_CALLBACK(setup_beep)
 static void electron_reset(running_machine &machine)
 {
 	electron_state *state = machine.driver_data<electron_state>();
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->set_entry(0);
 
 	state->m_ula.communication_mode = 0x04;
 	state->m_ula.screen_mode = 0;
@@ -343,7 +343,7 @@ static void electron_reset(running_machine &machine)
 MACHINE_START( electron )
 {
 	electron_state *state = machine.driver_data<electron_state>();
-	memory_configure_bank(machine, "bank2", 0, 16, machine.region("user1")->base(), 0x4000);
+	state->membank("bank2")->configure_entries(0, 16, state->memregion("user1")->base(), 0x4000);
 
 	state->m_ula.interrupt_status = 0x82;
 	state->m_ula.interrupt_control = 0x00;

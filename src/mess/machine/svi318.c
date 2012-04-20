@@ -91,7 +91,7 @@ DEVICE_START( svi318_cart )
 DEVICE_IMAGE_LOAD( svi318_cart )
 {
 	svi318_state *state = image.device().machine().driver_data<svi318_state>();
-	UINT8 *p = image.device().machine().region("user1")->base();
+	UINT8 *p = state->memregion("user1")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -373,10 +373,10 @@ static void svi318_80col_init(running_machine &machine)
 	svi318_state *state = machine.driver_data<svi318_state>();
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	state->m_svi.svi806_ram = machine.region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE );
+	state->m_svi.svi806_ram = machine.memory().region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE );
 	memset( state->m_svi.svi806_ram->base(), 0x00, 0x800 );
 	memset( state->m_svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
-	state->m_svi.svi806_gfx = machine.region("gfx1")->base();
+	state->m_svi.svi806_gfx = state->memregion("gfx1")->base();
 }
 
 
@@ -651,7 +651,7 @@ static void svi318_set_banks(running_machine &machine)
 	switch( state->m_svi.bankLow )
 	{
 	case SVI_INTERNAL:
-		state->m_svi.bankLow_ptr = machine.region("maincpu")->base();
+		state->m_svi.bankLow_ptr = state->memregion("maincpu")->base();
 		break;
 	case SVI_CART:
 		if ( state->m_pcart )
@@ -731,20 +731,20 @@ static void svi318_set_banks(running_machine &machine)
 		}
 	}
 
-	memory_set_bankptr(machine, "bank1", state->m_svi.bankLow_ptr );
-	memory_set_bankptr(machine, "bank2", state->m_svi.bankHigh1_ptr );
-	memory_set_bankptr(machine, "bank3", state->m_svi.bankHigh2_ptr );
+	state->membank("bank1")->set_base(state->m_svi.bankLow_ptr );
+	state->membank("bank2")->set_base(state->m_svi.bankHigh1_ptr );
+	state->membank("bank3")->set_base(state->m_svi.bankHigh2_ptr );
 
 	/* SVI-806 80 column card specific banking */
 	if ( state->m_svi.svi806_present )
 	{
 		if ( state->m_svi.svi806_ram_enabled )
 		{
-			memory_set_bankptr(machine, "bank4", state->m_svi.svi806_ram );
+			state->membank("bank4")->set_base(state->m_svi.svi806_ram );
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank4", state->m_svi.bankHigh2_ptr + 0x3000 );
+			state->membank("bank4")->set_base(state->m_svi.bankHigh2_ptr + 0x3000 );
 		}
 	}
 }

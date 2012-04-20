@@ -117,7 +117,7 @@ int pc1401_reset(device_t *device)
 MACHINE_START( pc1401 )
 {
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x2000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
@@ -134,7 +134,7 @@ DRIVER_INIT( pc1401 )
 {
 	pc1401_state *state = machine.driver_data<pc1401_state>();
 	int i;
-	UINT8 *gfx=machine.region("gfx1")->base();
+	UINT8 *gfx=state->memregion("gfx1")->base();
 #if 0
 	static const char sucker[]={
 		/* this routine dump the memory (start 0)

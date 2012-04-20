@@ -99,7 +99,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 void mm1_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }

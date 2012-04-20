@@ -27,11 +27,12 @@ void radio86_init_keyboard(running_machine &machine)
 /* Driver initialization */
 DRIVER_INIT(radio86)
 {
+	radio86_state *state = machine.driver_data<radio86_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
+	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
 	radio86_init_keyboard(machine);
 }
 
@@ -157,7 +158,8 @@ I8257_INTERFACE( radio86_dma )
 
 static TIMER_CALLBACK( radio86_reset )
 {
-	memory_set_bank(machine, "bank1", 0);
+	radio86_state *state = machine.driver_data<radio86_state>();
+	state->membank("bank1")->set_entry(0);
 }
 
 
@@ -180,7 +182,7 @@ MACHINE_RESET( radio86 )
 {
 	radio86_state *state = machine.driver_data<radio86_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 
 	state->m_keyboard_mask = 0;
 	state->m_disk_sel = 0;
@@ -195,7 +197,7 @@ WRITE8_MEMBER(radio86_state::radio86_pagesel)
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
-	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x10000;
 	if ((state->m_disk_sel & 0x0f) ==0) {
 		return romdisk[state->m_romdisk_msb*256+state->m_romdisk_lsb];
 	} else {

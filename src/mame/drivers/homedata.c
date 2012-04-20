@@ -291,7 +291,7 @@ READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 	if (m_sndbank & 4)
 		return(soundlatch_byte_r(space, 0));
 	else
-		return machine().region("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
+		return memregion("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
 
 WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
@@ -355,7 +355,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
       */
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(&space.device()), data, BIT(data, 2), BIT(data, 6));
 
-	memory_set_bank(machine(), "bank2", data & 0x03);
+	membank("bank2")->set_entry(data & 0x03);
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
@@ -494,7 +494,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(machine(), "bank2", (data & 0x0c) >> 2);
+	membank("bank2")->set_entry((data & 0x0c) >> 2);
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
@@ -509,13 +509,13 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 WRITE8_MEMBER(homedata_state::bankswitch_w)
 {
-	int last_bank = (machine().region("maincpu")->bytes() - 0x10000) / 0x4000;
+	int last_bank = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	/* last bank is fixed and is #0 for us, other banks start from #1 (hence data+1 below)*/
 	if (data < last_bank)
-		memory_set_bank(machine(), "bank1", data + 1);
+		membank("bank1")->set_entry(data + 1);
 	else
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->set_entry(0);
 }
 
 
@@ -1149,10 +1149,10 @@ static MACHINE_START( homedata )
 static MACHINE_START( reikaids )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0xc000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 4, machine.region("audiocpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 
@@ -1166,10 +1166,10 @@ static MACHINE_START( reikaids )
 static MACHINE_START( pteacher )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 4, machine.region("audiocpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 

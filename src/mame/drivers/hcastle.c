@@ -19,7 +19,7 @@
 
 WRITE8_MEMBER(hcastle_state::hcastle_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 WRITE8_MEMBER(hcastle_state::hcastle_soundirq_w)
@@ -179,9 +179,9 @@ static const ym3812_interface ym3812_config =
 static MACHINE_START( hcastle )
 {
 	hcastle_state *state = machine.driver_data<hcastle_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007121_1 = machine.device("k007121_1");

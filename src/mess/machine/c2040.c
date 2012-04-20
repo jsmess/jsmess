@@ -1464,7 +1464,7 @@ inline void base_c2040_device::mpi_step_motor(int unit, int stp)
 inline void base_c2040_device::initialize(int drives)
 {
 	// find GCR ROM
-	m_gcr = subregion("gcr")->base();
+	m_gcr = memregion("gcr")->base();
 
 	// install image callbacks
 	m_unit[0].m_image = m_image0;

@@ -306,6 +306,6 @@ MACHINE_RESET( sym1 )
        so that the CPU can find its reset vectors */
 	machine.device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
 	machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
-	memory_set_bankptr(machine, "bank1", state->m_monitor + 0x800);
+	state->membank("bank1")->set_base(state->m_monitor + 0x800);
 	machine.device("maincpu")->reset();
 }

@@ -299,7 +299,7 @@ static DEVICE_IMAGE_LOAD( mekd2_cart )
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = image.device().machine().region("maincpu")->base();
+	UINT8 ident, *RAM = image.device().machine().root_device().memregion("maincpu")->base();
 
 	image.fread( buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

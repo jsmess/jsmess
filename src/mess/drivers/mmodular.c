@@ -995,7 +995,7 @@ static MACHINE_START( van32 )
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
 // patches gen32 gen32_41 gen32_oc lond030
 
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
 		if (!strcmp(machine.system().name,"gen32_oc")) {

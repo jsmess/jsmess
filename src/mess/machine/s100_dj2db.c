@@ -278,7 +278,7 @@ void s100_dj2db_device::device_start()
 {
 	m_s100 = machine().device<s100_device>("s100");
 
-	m_rom = subregion("dj2db")->base();
+	m_rom = memregion("dj2db")->base();
 	m_ram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	// find floppy devices
