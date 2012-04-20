@@ -2,7 +2,7 @@
 
     a2scsi.h
 
-    Implementation of the Apple II Memory Expansion Card
+    Implementation of the Apple II SCSI Card
 
 *********************************************************************/
 

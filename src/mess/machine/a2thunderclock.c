@@ -107,6 +107,8 @@ void a2bus_thunderclock_device::device_start()
 
 	astring tempstring;
 	m_rom = device().machine().region(this->subtag(tempstring, THUNDERCLOCK_ROM_REGION))->base();
+
+	save_item(NAME(m_dataout));
 }
 
 void a2bus_thunderclock_device::device_reset()

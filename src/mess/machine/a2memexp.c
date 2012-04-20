@@ -108,6 +108,11 @@ void a2bus_memexp_device::device_start()
 	m_rom = device().machine().region(this->subtag(tempstring, MEMEXP_ROM_REGION))->base();
 
     memset(m_ram, 0xff, 1024*1024*sizeof(UINT8));
+
+	save_item(NAME(m_regs));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_wptr));
+	save_item(NAME(m_liveptr));
 }
 
 void a2bus_memexp_device::device_reset()
