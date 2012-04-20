@@ -113,6 +113,10 @@ void a2bus_cffa2000_device::device_start()
 
 	// patch default setting so slave device is enabled
 	m_rom[0x801] = 4;
+
+	save_item(NAME(m_lastdata));
+	save_item(NAME(m_writeprotect));
+	save_item(NAME(m_eeprom));
 }
 
 void a2bus_cffa2000_device::device_reset()
@@ -222,7 +226,7 @@ void a2bus_cffa2000_device::write_c800(address_space &space, UINT16 offset, UINT
 {
 	if (!m_writeprotect)
 	{
-		printf("Write %02x to EEPROM at %x\n", data, offset);
+//		printf("Write %02x to EEPROM at %x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
 		m_eeprom[offset + 0x800] = data;
 	}
 }

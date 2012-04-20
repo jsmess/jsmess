@@ -2,7 +2,7 @@
 
     a2softcard.h
 
-    Implementation of the Apple II Memory Expansion Card
+    Implementation of the Microsoft SoftCard Z-80 card
 
 *********************************************************************/
 

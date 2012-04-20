@@ -111,6 +111,9 @@ void a2bus_mockingboard_device::device_start()
 {
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
+
+	save_item(NAME(m_porta1));
+	save_item(NAME(m_porta2));
 }
 
 void a2bus_mockingboard_device::device_reset()

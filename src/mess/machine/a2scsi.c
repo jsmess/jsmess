@@ -115,6 +115,10 @@ void a2bus_scsi_device::device_start()
 	m_rom = device().machine().region(this->subtag(tempstring, SCSI_ROM_REGION))->base();
 
     memset(m_ram, 0, 8192);
+
+	save_item(NAME(m_ram));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_rombank));
 }
 
 void a2bus_scsi_device::device_reset()
