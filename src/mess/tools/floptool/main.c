@@ -33,6 +33,7 @@
 #include "formats/pc_dsk.h"
 
 #include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -51,6 +52,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
 
 	FLOPPY_DC42_FORMAT,
+	FLOPPY_A216S_FORMAT,
 };
 
 void CLIB_DECL logerror(const char *format, ...)
