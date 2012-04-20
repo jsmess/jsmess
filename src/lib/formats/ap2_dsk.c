@@ -687,7 +687,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				UINT8 buf[130000]; // originally 13000, multiread dfi disks need larger
 				int ts;
 fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
-				generate_bitstream_from_track(track, head, 200000000/(1552*nsect*6), buf, ts, image); // 3104 needs tweaking, *3 is 3x multiread from a dfi disk
+				generate_bitstream_from_track(track, head, 200000000/(3104*nsect*1), buf, ts, image); // 3104 needs tweaking, *3 is 3x multiread from a dfi disk
 fprintf(stderr,"done.\n");
 				int pos = 0;
 				int wrap = 0;
