@@ -201,7 +201,7 @@ void a2bus_videoterm_device::write_c0nx(address_space &space, UINT8 offset, UINT
 UINT8 a2bus_videoterm_device::read_cnxx(address_space &space, UINT8 offset)
 {
     // one slot image at the start of the ROM, it appears
-    return m_rom[offset];
+    return m_rom[offset+0x300];
 }
 
 /*-------------------------------------------------
