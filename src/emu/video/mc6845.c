@@ -746,8 +746,8 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (m_end_update != NULL)
 			m_end_update(this, bitmap, cliprect, param);
 	}
-	else
-		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
+//	else
+//		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
 	return 0;
 }
 
