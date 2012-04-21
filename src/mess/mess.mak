@@ -649,6 +649,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/a2scsi.o    \
 	$(MESS_MACHINE)/a2thunderclock.o    \
 	$(MESS_MACHINE)/a2softcard.o \
+	$(MESS_MACHINE)/a2videoterm.o \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
