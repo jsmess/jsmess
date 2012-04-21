@@ -434,28 +434,32 @@ WRITE8_HANDLER(apple2_c0xx_w)
 }
 
 /* returns default CnXX slotram for a slot space */
-INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset)
+INT8 apple2_slotram_r(address_space &space, int slotnum, int offset)
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
+	apple2_state *state = space.machine().driver_data<apple2_state>();
 	UINT8 *rom, *slot_ram;
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = machine.root_device().memregion("maincpu")->base();
-	rom_length = machine.root_device().memregion("maincpu")->bytes() & ~0xFFF;
+	rom = space.machine().root_device().memregion("maincpu")->base();
+	rom_length = space.machine().root_device().memregion("maincpu")->bytes() & ~0xFFF;
 	slot_length = state->memregion("maincpu")->bytes() - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	if (slot_ram)
 	{
-        state->m_a2_cnxx_slot = -1;
-		apple2_update_memory(machine);
+		if (!space.debugger_access())
+		{
+//			printf("slotram_r: taking cnxx_slot to -1\n");
+			state->m_a2_cnxx_slot = -1;
+			apple2_update_memory(space.machine());
+		}
 
 		return slot_ram[offset];
 	}
 
 	// else fall through to floating bus
-	return apple2_getfloatingbusvalue(machine);
+	return apple2_getfloatingbusvalue(space.machine());
 }
 
 static READ8_HANDLER( apple2_c1xx_r )
@@ -467,16 +471,20 @@ static READ8_HANDLER( apple2_c1xx_r )
 	slotnum = ((offset>>8) & 0xf) + 1;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-    state->m_a2_cnxx_slot = slotnum;
-    apple2_update_memory(space->machine());
-
 	if (slotdevice != NULL)
 	{
+		if (slotdevice->take_c800())
+		{
+//			printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
+			state->m_a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine());
+		}
+
 		return slotdevice->read_cnxx(*space, offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space->machine(), slotnum, offset);
+		return apple2_slotram_r(*space, slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -521,17 +529,20 @@ static READ8_HANDLER( apple2_c3xx_r )
 	slotnum = 3;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-    state->m_a2_cnxx_slot = slotnum;
-    apple2_update_memory(space->machine());
-
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
+		if (slotdevice->take_c800())
+		{
+//			printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
+			state->m_a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine());
+		}
 		return slotdevice->read_cnxx(*space, offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space->machine(), slotnum, offset);
+		return apple2_slotram_r(*space, slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -555,11 +566,14 @@ static WRITE8_HANDLER ( apple2_c3xx_w )
 	slotnum = 3;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-    state->m_a2_cnxx_slot = slotnum;
-    apple2_update_memory(space->machine());
-
 	if (slotdevice != NULL)
 	{
+		if (slotdevice->take_c800())
+		{
+//			printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
+			state->m_a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine());
+		}
 		slotdevice->write_cnxx(*space, offset&0xff, data);
 	}
 	else
@@ -578,17 +592,20 @@ static READ8_HANDLER( apple2_c4xx_r )
 	slotnum = ((offset>>8) & 0xf) + 4;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-    state->m_a2_cnxx_slot = slotnum;
-    apple2_update_memory(space->machine());
-
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
+		if (slotdevice->take_c800())
+		{
+//			printf("c4xx_r: taking cnxx_slot to %d\n", slotnum);
+			state->m_a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine());
+		}
 		return slotdevice->read_cnxx(*space, offset&0xff);
 	}
 	else
 	{
-		return apple2_slotram_r(space->machine(), slotnum, offset);
+		return apple2_slotram_r(*space, slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -612,11 +629,14 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	slotnum = ((offset>>8) & 0xf) + 4;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-    state->m_a2_cnxx_slot = slotnum;
-    apple2_update_memory(space->machine());
-
 	if (slotdevice != NULL)
 	{
+		if (slotdevice->take_c800())
+		{
+//			printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
+			state->m_a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine());
+		}
 		slotdevice->write_cnxx(*space, offset&0xff, data);
 	}
 	else
@@ -632,6 +652,7 @@ static READ8_HANDLER(apple2_cfff_r)
 	if (!space->debugger_access())
 	{
         apple2_state *state = space->machine().driver_data<apple2_state>();
+//		printf("cfff_r: taking cnxx_slot to -1\n");
 		state->m_a2_cnxx_slot = -1;
 		apple2_update_memory(space->machine());
 	}
@@ -644,6 +665,7 @@ static WRITE8_HANDLER(apple2_cfff_w)
 	if (!space->debugger_access())
 	{
         apple2_state *state = space->machine().driver_data<apple2_state>();
+//		printf("cfff_w: taking cnxx_slot to -1\n");
         state->m_a2_cnxx_slot = -1;
         apple2_update_memory(space->machine());
     }
