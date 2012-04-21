@@ -458,8 +458,8 @@ ADDRESS_MAP_END
 
 */
 static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8, pet_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_SHARE("memory")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("memory")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
@@ -473,8 +473,8 @@ static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8, pet_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8, pet_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1")	/* same memory as m6502 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")	/* same memory as m6502 */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("memory")	/* same memory as m6502 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")	/* same memory as m6502 */
     AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")	/* 64 kbyte ram turned in */
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
