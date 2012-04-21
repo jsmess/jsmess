@@ -1578,14 +1578,13 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card
-				if (1) //state->m_a2_cnxx_slot == -1)
-				{
-					state->m_a2_cnxx_slot = slot;
-                    apple2_update_memory(space.machine());
-				}
-
 				if (slotdevice != NULL)
 				{
+					if (slotdevice->take_c800())
+					{
+						state->m_a2_cnxx_slot = slot;
+						apple2_update_memory(space.machine());
+					}
 					result = slotdevice->read_cnxx(space, address&0xff);
 				}
 				else
@@ -1647,10 +1646,62 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 	}
 	else
 	{
+		device_a2bus_card_interface *slotdevice;
+
 		slot = (address & 0x000F00) / 0x100;
 
-		if ((slot > 7) || ((state->m_sltromsel & (1 << slot)) == 0))
-			*apple2gs_getslotmem(machine, address) = data;
+		if (slot <= 7)	// slots 1-7, it's the slot
+		{
+			slotdevice = state->m_a2bus->get_a2bus_card(slot);
+
+			// is this slot internal or "Your Card"?
+			if ((state->m_sltromsel & (1 << slot)) == 0)
+			{
+				// accessing a slot mapped to internal, let's put back the internal ROM
+				state->m_a2_cnxx_slot = -1;
+                apple2_update_memory(space.machine());
+				*apple2gs_getslotmem(machine, address) = data;
+			}
+			else
+			{
+				// accessing a slot mapped to "Your Card", C800 should belong to that card if it can take it
+				if (slotdevice != NULL)
+				{
+					if (slotdevice->take_c800())
+					{
+						state->m_a2_cnxx_slot = slot;
+						apple2_update_memory(space.machine());
+					}
+					slotdevice->write_cnxx(space, address&0xff, data);
+				}
+				// (else slot is your card but there's no card inserted so the write goes nowhere)
+			}
+		}
+		else	// C800-CFFF, not cards
+		{
+			slotdevice = NULL;
+
+			// if CFFF accessed, reset C800 area to internal ROM
+			if ((address & 0xfff) == 0xfff)
+			{
+				state->m_a2_cnxx_slot = -1;
+                apple2_update_memory(space.machine());
+			}
+
+			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
+			{
+				slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
+			}
+
+			if (slotdevice)
+			{
+				slotdevice->write_c800(space, address&0x7ff, data);
+			}
+			else
+			{
+				*apple2gs_getslotmem(machine, address) = data;
+			}
+		}
 	}
 }
 
