@@ -25,6 +25,7 @@
 #include "machine/c64_fun_play.h"
 #include "machine/c64_geocable.h"
 #include "machine/c64_georam.h"
+#include "machine/c64_ide64.h"
 #include "machine/c64_ieee488.h"
 #include "machine/c64_kingsoft.h"
 #include "machine/c64_mach5.h"
