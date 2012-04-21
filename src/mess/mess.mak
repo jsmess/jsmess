@@ -800,6 +800,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_geocable.o	\
 	$(MESS_MACHINE)/c64_georam.o	\
+	$(MESS_MACHINE)/c64_ide64.o	\
 	$(MESS_MACHINE)/c64_ieee488.o	\
 	$(MESS_MACHINE)/c64_kingsoft.o	\
 	$(MESS_MACHINE)/c64_mach5.o	\
