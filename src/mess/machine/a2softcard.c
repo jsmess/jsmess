@@ -187,3 +187,8 @@ WRITE8_MEMBER( a2bus_softcard_device::dma_w )
     }
 }
 
+bool a2bus_softcard_device::take_c800()
+{
+    return false;
+}
+

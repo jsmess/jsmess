@@ -132,6 +132,7 @@ public:
     virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) { printf("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
     virtual UINT8 read_c800(address_space &space, UINT16 offset) { return 0; }      // C800 - /IOSTB
     virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) { printf("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
+    virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
 
 	device_a2bus_card_interface *next() const { return m_next; }
 
