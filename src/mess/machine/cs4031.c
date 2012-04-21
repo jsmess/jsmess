@@ -127,8 +127,8 @@ void cs4031_device::device_start()
 
 	device_t *cpu = machine().device(m_cputag);
 	m_space = cpu->memory().space(AS_PROGRAM);
-	m_isa = memregion(m_isatag)->base();
-	m_bios = memregion(m_biostag)->base();
+	m_isa = machine().root_device().memregion(m_isatag)->base();
+	m_bios = machine().root_device().memregion(m_biostag)->base();
 
 	m_ram = ram_dev->pointer();
 	UINT32 ram_size = ram_dev->size();
@@ -173,7 +173,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 			logerror("ROM read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
-		membank(region)->set_base(m_bios + start);
+		machine().root_device().membank(region)->set_base(m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
@@ -181,7 +181,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 			logerror("ISA read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
-		membank(region)->set_base(m_isa + start - 0xc0000);
+		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
@@ -189,7 +189,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 			logerror("RAM read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
-		membank(region)->set_base(m_ram + start);
+		machine().root_device().membank(region)->set_base(m_ram + start);
 	}
 	else
 	{
@@ -208,7 +208,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 			logerror("ROM write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
-		membank(region)->set_base(m_bios + start);
+		machine().root_device().membank(region)->set_base(m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
@@ -216,7 +216,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 			logerror("ISA write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
-		membank(region)->set_base(m_isa + start - 0xc0000);
+		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
@@ -224,7 +224,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 			logerror("RAM write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
-		membank(region)->set_base(m_ram + start);
+		machine().root_device().membank(region)->set_base(m_ram + start);
 	}
 	else
 	{
