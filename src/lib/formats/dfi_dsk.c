@@ -97,7 +97,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int data_size = 0;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
-	int rpm = 360; // drive rpm
+	int rpm=360; // drive rpm
 	while(pos < size) {
 		UINT8 h[10];
 		io_generic_read(io, h, pos, 10);
@@ -170,6 +170,8 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				fprintf(stderr, "WARNING: Cannot Guess Speed! Assuming 360rpm, 100Mhz clock!\n");
 			fprintf(stderr,"Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
 		}
+
+        rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
 
 		if(!index_time)
 			index_time = total_time;
