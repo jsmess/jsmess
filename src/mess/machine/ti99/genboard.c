@@ -817,10 +817,10 @@ void geneve_mapper_device::device_start()
 	// This is a preliminary setting; the initial context switch occurs before
 	// device_reset. Luckily, the reset vector at >0000/>0002 is the same for
 	// all variants of the boot eprom.
-	m_eprom = memregion("maincpu")->base();
+	m_eprom = machine().root_device().memregion("maincpu")->base();
 
-	m_sram = memregion(SRAM_TAG)->base();
-	m_dram = memregion(DRAM_TAG)->base();
+	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
+	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
@@ -857,18 +857,18 @@ void geneve_mapper_device::device_reset()
 		{
 		case GENEVE_098:
 			if (VERBOSE>0) LOG("geneve: Using 0.98 boot eprom\n");
-			m_eprom = memregion("maincpu")->base() + 0x4000;
+			m_eprom = machine().root_device().memregion("maincpu")->base() + 0x4000;
 			break;
 		case GENEVE_100:
 			if (VERBOSE>0) LOG("geneve: Using 1.00 boot eprom\n");
-			m_eprom = memregion("maincpu")->base();
+			m_eprom = machine().root_device().memregion("maincpu")->base();
 			break;
 		}
 	}
 	else
 	{
 		if (VERBOSE>0) LOG("geneve: Using GenMod modification\n");
-		m_eprom = memregion("maincpu")->base() + 0x8000;
+		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x8000;
 		if (m_eprom[0] != 0xf0)
 		{
 			fatalerror("genboard: GenMod boot rom missing.\n");
