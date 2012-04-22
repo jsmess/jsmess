@@ -1566,16 +1566,16 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 
 static const tia_interface a2600_tia_interface =
 {
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_read_input_port),
+	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
 	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_tia_vsync_callback)
+	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback)
 };
 
 static const tia_interface a2600_tia_interface_pal =
 {
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_read_input_port),
+	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
 	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_tia_vsync_callback_pal)
+	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback_pal)
 };
 
 
