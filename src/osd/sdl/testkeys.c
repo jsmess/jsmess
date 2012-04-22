@@ -19,6 +19,10 @@
 
 #include "unicode.h"
 
+#ifdef SDLMAME_EMSCRIPTEN
+#include "emscripten.h"
+#endif
+
 typedef struct _key_lookup_table key_lookup_table;
 
 struct _key_lookup_table
@@ -109,11 +113,7 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 	return NULL;
 }
 
-#ifdef SDLMAME_WIN32
-int utf8_main(int argc, char *argv[])
-#else
-int main(int argc, char *argv[])
-#endif
+int main_loop() {
 {
 	SDL_Event event;
 	int quit = 0;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 	SDL_SetVideoMode(100, 50, 16, SDL_ANYFORMAT);
 	SDL_EnableUNICODE(1);
 #endif
-	while(SDL_PollEvent(&event) || !quit) {
+	if(SDL_PollEvent(&event)) {
 		switch(event.type) {
 		case SDL_QUIT:
 			quit = 1;
@@ -191,6 +191,21 @@ int main(int argc, char *argv[])
 		SDL_Delay( 10 );
 		#endif
 	}
+	return quit;
+}
+
+#ifdef SDLMAME_WIN32
+int utf8_main(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+#ifdef SDLMAME_EMSCRIPTEN
+	emscripten_set_main_loop((void(*)())main_loop, 0);
+#else
+	while (!main_loop());
+#endif
+	
 	SDL_Quit();
 	return(0);
 }
