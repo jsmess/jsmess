@@ -1002,7 +1002,7 @@ static kt_table * sdlinput_read_keymap(running_machine &machine)
 //  sdlinput_register_keyboards
 //============================================================
 
-#if ((1 ||!SDL13_POST_HG4464) && SDL_VERSION_ATLEAST(1,3,0))
+#if ((1 ||!SDL13_POST_HG4464) && SDL_VERSION_ATLEAST(1,3,0)) && SDL2_MULTIAPI
 static void sdlinput_register_keyboards(running_machine &machine)
 {
 	int physical_keyboard;
@@ -1306,7 +1306,11 @@ void sdlinput_poll(running_machine &machine)
 		}
 		switch(event.type) {
 		case SDL_KEYDOWN:
+#ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
+#else
+			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
+#endif
 			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
@@ -1314,7 +1318,11 @@ void sdlinput_poll(running_machine &machine)
 #endif
 			break;
 		case SDL_KEYUP:
+#ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
+#else
+			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
+#endif
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x00;
 			break;
 		case SDL_JOYAXISMOTION:
@@ -1389,7 +1397,11 @@ void sdlinput_poll(running_machine &machine)
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
+#ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
+#else
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
+#endif
 			devinfo->mouse.buttons[event.button.button-1] = 0x80;
 			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name);
 			if (event.button.button == 1)
@@ -1422,7 +1434,11 @@ void sdlinput_poll(running_machine &machine)
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
+#ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
+#else
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
+#endif
 			devinfo->mouse.buttons[event.button.button-1] = 0;
 			//printf("But up %d %d %d %d\n", event.button.which, event.button.button, event.button.x, event.button.y);
 
@@ -1438,7 +1454,11 @@ void sdlinput_poll(running_machine &machine)
 			}
 			break;
 		case SDL_MOUSEMOTION:
+#ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.motion.which]);
+#else
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
+#endif
 #if (SDL_VERSION_ATLEAST(1,3,0))
 			// FIXME: may apply to 1.2 as well ...
 			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name);

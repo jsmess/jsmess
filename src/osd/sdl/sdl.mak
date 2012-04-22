@@ -354,7 +354,10 @@ endif
 endif
 
 ifndef SDL_INSTALL_ROOT
+# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
+ifneq ($(TARGETOS),emscripten)
 INCPATH += `sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-D[^ ]*\)::g'`
+endif
 CCOMFLAGS += `sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-I[^ ]*\)::g'`
 LIBS += -lm `sdl-config --libs`
 
