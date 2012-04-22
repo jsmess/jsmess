@@ -202,6 +202,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2thunderclock.h"
 #include "machine/a2softcard.h"
 #include "machine/a2videoterm.h"
+#include "machine/a2ssc.h"
 
 /***************************************************************************
     PARAMETERS
@@ -599,6 +600,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus */
     SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */
     SLOT_INTERFACE("videoterm", A2BUS_VIDEOTERM)    /* Videx VideoTerm */
+    SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
