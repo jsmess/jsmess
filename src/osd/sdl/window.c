@@ -88,6 +88,12 @@ static osd_work_queue *work_queue;
 typedef int SDL_threadID;
 #endif
 
+// Emscripten reports a version of 1.3.0 but does not support most of the 1.3+ drawing API we try to use
+#ifdef SDLMAME_EMSCRIPTEN
+#undef SDL_VERSION_ATLEAST
+#define SDL_VERSION_ATLEAST(x,y,z) 0
+#endif
+
 static SDL_threadID main_threadid;
 static SDL_threadID window_threadid;
 
