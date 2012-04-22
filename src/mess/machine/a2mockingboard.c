@@ -341,7 +341,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
                 chipSel = 1;
             }
 
-            printf("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
+//            printf("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
             switch (data & 3)
             {
                 case 0: // BDIR=0, BC1=0 (inactive)
@@ -448,7 +448,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
                 chipSel = 1;
             }
 
-            printf("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
+//            printf("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
             switch (data & 3)
             {
                 case 0: // BDIR=0, BC1=0 (inactive)
