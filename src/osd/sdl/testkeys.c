@@ -19,6 +19,10 @@
 
 #include "unicode.h"
 
+#ifdef SDLMAME_EMSCRIPTEN
+#include "emscripten.h"
+#endif
+
 // Check whether SDL has compat interface
 #if defined(SDL_AllocSurface) || (!SDL_VERSION_ATLEAST(1,3,0))
 #define SDL_HAS_COMPAT		1
@@ -118,25 +122,13 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 }
 #endif // SDL_HAS_COMPAT
 
-#ifdef SDLMAME_WIN32
-int utf8_main(int argc, char *argv[])
-#else
-int main(int argc, char *argv[])
-#endif
-{
 #if SDL_HAS_COMPAT
+int main_loop() {
 	SDL_Event event;
 	int quit = 0;
 	char buf[20];
-
-	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-		fprintf(stderr, "Couldn't initialize SDL: %s\n",
-							SDL_GetError());
-		exit(1);
-	}
-	SDL_SetVideoMode(100, 50, 16, SDL_ANYFORMAT);
-	SDL_EnableUNICODE(1);
-	while(SDL_PollEvent(&event) || !quit) {
+	
+	if(SDL_PollEvent(&event)) {
 		switch(event.type) {
 		case SDL_QUIT:
 			quit = 1;
@@ -179,6 +171,30 @@ int main(int argc, char *argv[])
 		SDL_Delay( 10 );
 		#endif
 	}
+	return quit;
+}
+#endif
+
+#ifdef SDLMAME_WIN32
+int utf8_main(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+#if SDL_HAS_COMPAT
+	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+		fprintf(stderr, "Couldn't initialize SDL: %s\n",
+							SDL_GetError());
+		exit(1);
+	}
+	SDL_SetVideoMode(100, 50, 16, SDL_ANYFORMAT);
+	SDL_EnableUNICODE(1);
+#ifdef SDLMAME_EMSCRIPTEN
+	emscripten_set_main_loop((void(*)())main_loop, 0);
+#else
+	while (!main_loop());
+#endif
+	
 	SDL_Quit();
 	return(0);
 #else
