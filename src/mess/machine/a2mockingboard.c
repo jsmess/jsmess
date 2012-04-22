@@ -75,18 +75,19 @@ MACHINE_CONFIG_FRAGMENT( phasor )
 	MCFG_VIA6522_ADD(VIA2_TAG, 1022727, mockingboard_via2_intf)
 
     MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+    MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
     MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
     MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
     MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
     MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker2", 1.0)
     MCFG_SOUND_ADD(AY3_TAG, AY8913, 1022727)
     MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
     MCFG_SOUND_ADD(AY4_TAG, AY8913, 1022727)
     MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -272,11 +273,11 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 {
     if (state)
     {
-        raise_slot_nmi();
+        raise_slot_irq();
     }
     else
     {
-        lower_slot_nmi();
+        lower_slot_irq();
     }
 }
 
@@ -297,9 +298,13 @@ READ8_MEMBER( a2bus_ayboard_device::via1_in_b )
 
 WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 {
-    if (!(data & 8))
+    if (!(data & 4))
     {
         ay8910_reset_w(m_ay1, 0, 0);
+        if (m_isPhasor && m_PhasorNative)
+        {
+            ay8910_reset_w(m_ay2, 0, 0);
+        }
     }
     else
     {
@@ -336,8 +341,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
                 chipSel = 1;
             }
 
-//            printf("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
-
+            printf("Phasor: %02x to AY1/2 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta1, chipSel, data & 3, data);
             switch (data & 3)
             {
                 case 0: // BDIR=0, BC1=0 (inactive)
@@ -397,9 +401,17 @@ READ8_MEMBER( a2bus_ayboard_device::via2_in_b )
 
 WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 {
-    if (!(data & 8))
+    if (!(data & 4))
     {
-        ay8910_reset_w(m_ay2, 0, 0);
+        if (m_isPhasor && m_PhasorNative)
+        {
+            ay8910_reset_w(m_ay3, 0, 0);
+            ay8910_reset_w(m_ay4, 0, 0);
+        }
+        else
+        {
+            ay8910_reset_w(m_ay2, 0, 0);
+        }
     }
     else
     {
@@ -436,7 +448,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
                 chipSel = 1;
             }
 
-//            printf("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
+            printf("Phasor: %02x to AY3/4 CS %02x (BDIR/BC1 %02x, data %02x)\n", m_porta2, chipSel, data & 3, data);
             switch (data & 3)
             {
                 case 0: // BDIR=0, BC1=0 (inactive)
