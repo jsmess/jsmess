@@ -235,6 +235,23 @@ memory_bank *device_t::membank(const char *_tag) const
 
 
 //-------------------------------------------------
+//  ioport - return a pointer to the I/O port
+//  object for a given port name
+//-------------------------------------------------
+
+input_port_config *device_t::ioport(const char *tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name and look it up
+	astring fullpath;
+	return machine().ioport().port(subtag(fullpath, tag));
+}
+
+
+//-------------------------------------------------
 //  static_set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------
@@ -907,7 +924,8 @@ void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool requir
 	// check the width and warn if not correct
 	if (width != 0 && share->width() != width)
 	{
-		mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
+		if (required)
+			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
 		return NULL;
 	}
 	

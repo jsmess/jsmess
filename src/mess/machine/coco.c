@@ -102,11 +102,11 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 
 void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag)
 {
-	analog->m_input[0][0] = machine().port(rx_tag);
-	analog->m_input[0][1] = machine().port(ry_tag);
-	analog->m_input[1][0] = machine().port(lx_tag);
-	analog->m_input[1][1] = machine().port(ly_tag);
-	analog->m_buttons = machine().port(buttons_tag);
+	analog->m_input[0][0] =  machine().root_device().ioport(rx_tag);
+	analog->m_input[0][1] =  machine().root_device().ioport(ry_tag);
+	analog->m_input[1][0] =  machine().root_device().ioport(lx_tag);
+	analog->m_input[1][1] =  machine().root_device().ioport(ly_tag);
+	analog->m_buttons =  machine().root_device().ioport(buttons_tag);
 }
 
 
@@ -125,7 +125,7 @@ void coco_state::device_start()
 	{
 		char name[32];
 		snprintf(name, sizeof(name) / sizeof(name[0]), "row%d", i);
-		m_keyboard[i] = machine().port(name);
+		m_keyboard[i] =  machine().root_device().ioport(name);
 	}
 
 	/* look up analog ports */
@@ -137,8 +137,8 @@ void coco_state::device_start()
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
 	/* look up miscellaneous controls */
-	m_joystick_type_control = machine().port(CTRL_SEL_TAG);
-	m_joystick_hires_control = machine().port(HIRES_INTF_TAG);
+	m_joystick_type_control =  machine().root_device().ioport(CTRL_SEL_TAG);
+	m_joystick_hires_control =  machine().root_device().ioport(HIRES_INTF_TAG);
 
 	/* timers */
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);

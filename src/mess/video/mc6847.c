@@ -1448,7 +1448,7 @@ void mc6847_base_device::artifacter::setup_config(device_t *device)
 {
 	char port_name[32];
 	snprintf(port_name, ARRAY_LENGTH(port_name), "%s:%s", device->tag(), ARTIFACTING_TAG);
-	m_config = device->machine().port(port_name);
+	m_config = device->ioport(port_name);
 }
 
 
