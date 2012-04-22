@@ -34,6 +34,11 @@
 #undef DELETE
 #endif
 
+// Emscripten requires the SDL2 API for inputs, but nothing else
+#ifdef SDLMAME_EMSCRIPTEN
+#define SDLMAME_SDL2 1
+#endif
+
 //============================================================
 //  PARAMETERS
 //============================================================
