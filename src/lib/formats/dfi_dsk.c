@@ -31,9 +31,12 @@
 
 ****************************************************************************/
 
-/* TODO:
+/* DONE:
  * Support auto-identification heuristics for determining disk image speed,
    capture clock rate, and number of multireads per image.
+ * TODO:
+ * Scale captured data based on the guessed clock rate and samplerate to match
+   the internal 200mhz representation
  * Handle 0xFF bytes properly
  * Correctly note exact index timing.
  */
@@ -42,18 +45,19 @@
 #include "dfi_dsk.h"
 #include <zlib.h>
 #define NUMBER_OF_MULTIREADS 3
-// clockspeed: 100mhz = 4, 50mhz = 2, 25mhz = 1
-#define CLOCKSPEED 4
 // threshholds for brickwall windowing
-#define MIN_CLOCKS 65
-#define MAX_CLOCKS 260
-#define MIN_THRESH (MIN_CLOCKS*CLOCKSPEED)
-#define MAX_THRESH (MAX_CLOCKS*CLOCKSPEED)
+//define MIN_CLOCKS 65
+#define MIN_CLOCKS 40
+//define MAX_CLOCKS 260
+#define MAX_CLOCKS 270
+#define MIN_THRESH (MIN_CLOCKS*(clock_rate/25000000))
+#define MAX_THRESH (MAX_CLOCKS*(clock_rate/25000000))
 // constants to help guess clockrate and rpm
 // constant is 25mhz / 6 revolutions per second (360rpm) = 4166667 +- 2.5%
 #define REV25_MIN 4062500
 #define REV25_MAX 4270833
 // define the following to show a histogram per track
+//define TRACK_HISTOGRAM 1
 #undef TRACK_HISTOGRAM
 
 dfi_format::dfi_format() : floppy_image_format_t()
@@ -200,7 +204,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				if(v & 0x80) { // 0xFF an index, note the index (TODO: actually do this!) and do not add number
 					index_polarity ^= 1;
 					index_count += index_polarity;
-					if (index_count == NUMBER_OF_MULTIREADS) break;
+					//if (index_count == NUMBER_OF_MULTIREADS) break;
 				}
 			}
 			else if((v & 0x80) == 0) { // 0x00-0x7E: not an index or carry, add the number and store transition
@@ -221,7 +225,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				}
 				if (trans_time > MAX_THRESH) { // we probably missed a transition
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					//fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
+					if (((track%2)==0)&&(head==0)) fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
 					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
 					buf[tpos++] = mg | UINT32(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
@@ -239,6 +243,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				if (((i+1)%10)==0) fprintf(stderr,"\n");
 			}
 		}
+		fprintf(stderr,"\n");
 #endif
 		index_count = 0;
 		image->set_track_size(track, head, tpos);
