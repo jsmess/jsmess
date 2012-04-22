@@ -699,6 +699,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
+				int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 				for(;;) {
 						UINT8 v = gb(buf, ts, pos, wrap);
 						if(v == 0xff)
@@ -707,8 +708,10 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								hb = 2;
 						else if(hb == 2 && v == 0xaa)
 								hb = 3;
-						else if(hb == 3 && v == 0x96)
+						else if(hb == 3 && ((v == 0x96) || (v == 0xab))) { // 0x96 = dos 3.3/16sec, 0xab = dos 3.21 and below/13sec
 								hb = 4;
+								if (v == 0xab) dosver = 1;
+								}
 						else
 								hb = 0;
 
@@ -742,7 +745,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 												else
 														hb = 0;
 										}
-										if(hb == 4) {
+										if((hb == 4)&&(dosver == 0)) {
 												visualgrid[se][track/2] |= DATAFOUND;
 												UINT8 *dest = sectdata+(256)*se;
 												UINT8 data[0x157];
@@ -805,6 +808,8 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 													fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
 												if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
 												if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
+										} else if ((hb == 4)&&(dosver == 1)) {
+											fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
 										} else {
 												pos = opos;
 												wrap = owrap;

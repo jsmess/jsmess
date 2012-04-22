@@ -98,7 +98,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int size = io_generic_size(io);
 	int pos = 4;
 	UINT8 *data = 0;
-	int data_size = 0;
+	int data_size = 0; // size of currently allocated array for a track
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
 	int rpm=360; // drive rpm
@@ -110,12 +110,15 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		// Ignore sector
 		UINT32 tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
 
+		// if the position-so-far-in-file plus 10 (for the header) plus track size
+		// is larger than the size of the file, free buffers and bail out
 		if(pos+tsize+10 > size) {
 			if(data)
 				global_free(data);
 			return false;
 		}
 
+		// reallocate the data array if it gets too small
 		if(tsize > data_size) {
 			if(data)
 				global_free(data);
@@ -123,9 +126,9 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			data = global_alloc_array(UINT8, data_size);
 		}
 
-		io_generic_read(io, data, pos+16, tsize);
-		pos += tsize+10;
-		tsize--; // Drop the extra 0x00 at the end
+		pos += 10; // skip the header, we already read it
+		io_generic_read(io, data, pos, tsize);
+		pos += tsize; // for next time we read, increment to the beginning of next header
 
 		int index_time = 0; // what point the last index happened
 		int index_count = 0; // number of index pulses per track
@@ -133,8 +136,8 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int total_time = 0; // total sampled time per track
 		for(int i=0; i<tsize; i++) {
 			UINT8 v = data[i];
-			//if((v & 0x7f) == 0x7f)
-			if (v == 0x7f)
+			if (v == 0xFF) { fprintf(stderr,"DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN!\n", track, i); exit(1); }
+			if((v & 0x7f) == 0x7f)
 				total_time += 0x7f;
 			else {
 				if((v & 0x80)==0) total_time += v & 0x7f;
@@ -198,8 +201,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
 			UINT8 v = data[i];
-			//if((v & 0x7f) == 0x7f) {// 0x7F or 0xFF: no transition, but a carry
-			if (v == 0x7f) {
+			if((v & 0x7f) == 0x7f) {// 0x7F or 0xFF: no transition, but a carry
 				cur_time += 0x7f; // should this be done if v&80 is also set?
 				if(v & 0x80) { // 0xFF an index, note the index (TODO: actually do this!) and do not add number
 					index_polarity ^= 1;
