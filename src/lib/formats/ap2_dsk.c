@@ -747,7 +747,11 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 										}
 										if((hb == 4)&&(dosver == 0)) {
 												visualgrid[se][track/2] |= DATAFOUND;
-												UINT8 *dest = sectdata+(256)*se;
+												int prodos_translate[16] = {
+												0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
+												0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
+												};
+												UINT8 *dest = sectdata+(256)*prodos_translate[se];
 												UINT8 data[0x157];
 												UINT32 dpost = 0;
 												UINT8 c = 0;
