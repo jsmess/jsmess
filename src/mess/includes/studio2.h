@@ -54,11 +54,13 @@ class visicom_state : public studio2_state
 {
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag)
+		: studio2_state(mconfig, type, tag),
+		  m_color_ram(*this, "color_ram"),
+		  m_color_ram1(*this, "color_ram1")
 	{ }
 
-	UINT8 *m_color_ram;
-	UINT8 *m_color_ram1;
+	required_shared_ptr<UINT8> m_color_ram;
+	required_shared_ptr<UINT8> m_color_ram1;
 };
 
 class mpt02_state : public studio2_state
@@ -66,7 +68,8 @@ class mpt02_state : public studio2_state
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
-		  m_cti(*this, CDP1864_TAG)
+		  m_cti(*this, CDP1864_TAG),
+		  m_color_ram(*this, "color_ram")
 	{ }
 
 	required_device<cdp1864_device> m_cti;
@@ -81,7 +84,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( gdata_r );
 
 	/* video state */
-	UINT8 *m_color_ram;
+	required_shared_ptr<UINT8> m_color_ram;
 	UINT8 m_color;
 };
 
