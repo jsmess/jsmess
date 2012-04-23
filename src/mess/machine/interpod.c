@@ -81,19 +81,6 @@ const device_type INTERPOD = &device_creator<interpod_device>;
 //  IEEE488_INTERFACE( ieee488_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( cbm_ieee488_devices )
-	SLOT_INTERFACE("c2040", C2040)
-	SLOT_INTERFACE("c3040", C3040)
-	SLOT_INTERFACE("c4040", C4040)
-	SLOT_INTERFACE("c8050", C8050)
-	SLOT_INTERFACE("c8250", C8250)
-	SLOT_INTERFACE("sfd1001", SFD1001)
-	SLOT_INTERFACE("c2031", C2031)
-	SLOT_INTERFACE("c8280", C8280)
-	SLOT_INTERFACE("d9060", D9060)
-	SLOT_INTERFACE("d9090", D9090)
-SLOT_INTERFACE_END
-
 static IEEE488_INTERFACE( ieee488_intf )
 {
 	DEVCB_NULL,
@@ -209,11 +196,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 	MCFG_RIOT6532_ADD(R6532_TAG, 1000000, riot_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, NULL)
 MACHINE_CONFIG_END
 
 
@@ -243,7 +226,6 @@ interpod_device::interpod_device(const machine_config &mconfig, const char *tag,
 	  m_via(*this, R6522_TAG),
 	  m_riot(*this, R6532_TAG),
 	  m_acia(*this, MC6850_TAG),
-	  m_iec(*this->owner(), CBM_IEC_TAG),
 	  m_ieee(*this, IEEE488_TAG)
 {
 }
