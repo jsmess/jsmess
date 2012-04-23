@@ -570,7 +570,7 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_SHARE("vram")	// VRAM
+	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_SHARE("vram16")	// VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffff)
 	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
