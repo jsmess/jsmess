@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_READ8_MEMBER(floppy_r);
+	UINT8 selectedline(UINT16 data);
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
@@ -133,7 +134,7 @@ READ8_MEMBER(pyl601_state::vdisk_data_r)
 	return retVal;
 }
 
-static UINT8 selectedline(UINT16 data)
+UINT8 pyl601_state::selectedline(UINT16 data)
 {
 	UINT8 i;
 	for(i = 0; i < 16; i++)
