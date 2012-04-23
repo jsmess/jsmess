@@ -22,6 +22,7 @@ public:
 	UINT8 m_startup_mem_map;
 	DECLARE_READ8_MEMBER(lviv_io_r);
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(lviv_directoverride);
 };
 
 

@@ -161,22 +161,21 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 	}
 }
 
-DIRECT_UPDATE_HANDLER( z80ne_default )
+DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_default)
 {
 	return address;
 }
 /*
  * Handle NMI delay for single step instruction
  */
-DIRECT_UPDATE_HANDLER( z80ne_nmi_delay_count )
+DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
-	state->m_nmi_delay_counter--;
+	m_nmi_delay_counter--;
 
-	if (!state->m_nmi_delay_counter)
+	if (!m_nmi_delay_counter)
 	{
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
-		cputag_set_input_line(machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		cputag_set_input_line(machine(), "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
 }
@@ -185,23 +184,22 @@ DIRECT_UPDATE_HANDLER( z80ne_nmi_delay_count )
  * Handle delayed ROM/RAM banking at RESET
  * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
  */
-DIRECT_UPDATE_HANDLER( z80ne_reset_delay_count )
+DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
-	address_space *space = machine.device("z80ne")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("z80ne")->memory().space(AS_PROGRAM);
 	/*
      * TODO: when debugger is active, his memory access causes this callback
      *
      */
 	if(!space->debugger_access())
-		state->m_reset_delay_counter--;
+		m_reset_delay_counter--;
 
-	if (!state->m_reset_delay_counter)
+	if (!m_reset_delay_counter)
 	{
 		/* remove this callback */
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
+		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
 		/* and switch to RAM bank at address 0x0000 */
-		state->membank( "bank1" )->set_entry( 0 ); /* RAM at 0x0000 (bank 1) */
+		membank( "bank1" )->set_entry( 0 ); /* RAM at 0x0000 (bank 1) */
 	}
 	return address;
 }
@@ -225,7 +223,7 @@ static void reset_lx382_banking(running_machine &machine)
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	state->m_reset_delay_counter = 2;
-	space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_reset_delay_count), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
 }
 
 static void reset_lx390_banking(running_machine &machine)
@@ -244,7 +242,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		state->m_reset_delay_counter = 2;
-		space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_reset_delay_count), &machine));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
 	    break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -253,7 +251,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank2")->set_entry(1);  /* ep548 at 0x0400-0x3FFF */
 	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
 	    state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
+		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
 	    break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
@@ -262,7 +260,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
 	    state->membank("bank4")->set_entry(1);  /* ep390 at 0xF000 */
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
+		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
 	    break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
@@ -271,7 +269,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
 	    state->membank("bank4")->set_entry(2);  /* ep1390 at 0xF000 */
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
+		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
 	    break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
@@ -280,7 +278,7 @@ static void reset_lx390_banking(running_machine &machine)
 	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
 	    state->membank("bank4")->set_entry(3);  /* ep2390 at 0xF000 */
-		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_default), &machine));
+		machine.device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
 	    break;
 	}
 
@@ -487,7 +485,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
     	m_nmi_delay_counter = 1;
-		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_nmi_delay_count), &machine()));
+		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_nmi_delay_count), this));
 }
 
 

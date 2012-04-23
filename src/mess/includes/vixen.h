@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( fdint_w );
+	DIRECT_UPDATE_MEMBER(vixen_direct_update_handler);
 
 	// memory state
 	int m_reset;

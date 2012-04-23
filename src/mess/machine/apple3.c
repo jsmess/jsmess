@@ -651,13 +651,13 @@ WRITE8_MEMBER(apple3_state::apple3_indexed_write)
 
 
 
-DIRECT_UPDATE_HANDLER( apple3_opbase )
+DIRECT_UPDATE_MEMBER(apple3_state::apple3_opbase)
 {
 	UINT8 *opptr;
 
 	if ((address & 0xFF00) == 0x0000)
 	{
-		opptr = apple3_get_zpa_addr(machine,address);
+		opptr = apple3_get_zpa_addr(machine(),address);
 		direct.explicit_configure(address, address, ~0, opptr - address);
 		address = ~0;
 	}
@@ -733,5 +733,5 @@ DRIVER_INIT( apple3 )
 	state->m_via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_opbase), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), state));
 }

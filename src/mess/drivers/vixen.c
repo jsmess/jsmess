@@ -904,26 +904,24 @@ ROM_END
 //  DRIVER_INIT( vixen )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
+DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 {
-	vixen_state *state = machine.driver_data<vixen_state>();
-
 	if (address >= 0xf000)
 	{
-		if (state->m_reset)
+		if (m_reset)
 		{
-			address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
+			address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 			program->install_read_bank(0x0000, 0xefff, "bank1");
 			program->install_write_bank(0x0000, 0xefff, "bank2");
 
-			state->membank("bank1")->set_entry(0);
-			state->membank("bank2")->set_entry(0);
+			membank("bank1")->set_entry(0);
+			membank("bank2")->set_entry(0);
 
-			state->m_reset = 0;
+			m_reset = 0;
 		}
 
-		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine.root_device().memregion(Z8400A_TAG)->base());
+		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine().root_device().memregion(Z8400A_TAG)->base());
 
 		return ~0;
 	}
@@ -933,8 +931,9 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 
 static DRIVER_INIT( vixen )
 {
+	vixen_state *state = machine.driver_data<vixen_state>();
 	address_space *program = machine.device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), state));
 }
 
 

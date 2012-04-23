@@ -321,13 +321,13 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 	m_port_fe_data = data;
 }
 
-DIRECT_UPDATE_HANDLER(spectrum_direct)
+DIRECT_UPDATE_MEMBER(spectrum_state::spectrum_direct)
 {
     /* Hack for correct handling 0xffff interrupt vector */
     if (address == 0x0001)
-        if (cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE)==0xffff)
+        if (cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE)==0xffff)
         {
-            cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xfff4);
+            cpu_set_reg(machine().device("maincpu"), Z80_PC, 0xfff4);
             return 0xfff4;
         }
     return address;
@@ -636,7 +636,7 @@ MACHINE_RESET( spectrum )
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(spectrum_direct), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(spectrum_state::spectrum_direct), state));
 
 	state->m_port_7ffd_data = -1;
 	state->m_port_1ffd_data = -1;

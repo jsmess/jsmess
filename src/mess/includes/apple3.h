@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_indexed_write);
 	UINT8 apple3_profile_r(offs_t offset);
 	void apple3_profile_w(offs_t offset, UINT8 data);
+	DECLARE_DIRECT_UPDATE_MEMBER(apple3_opbase);
 };
 
 

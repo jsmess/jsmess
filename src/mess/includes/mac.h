@@ -436,6 +436,7 @@ public:
 
     DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
 
+	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
 	int has_adb();
 	void rtc_init();

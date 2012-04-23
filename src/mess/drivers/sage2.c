@@ -645,13 +645,11 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
+DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 {
-	sage2_state *state = machine.driver_data<sage2_state>();
-
-	if (state->m_reset && address >= 0xfe0000)
+	if (m_reset && address >= 0xfe0000)
 	{
-		state->m_reset = 0;
+		m_reset = 0;
 	}
 
 	return address;
@@ -659,8 +657,9 @@ DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
 
 static DRIVER_INIT( sage2 )
 {
+	sage2_state *state = machine.driver_data<sage2_state>();
 	address_space *program = machine.device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), state));
 
 	// patch out i8251 test
 	machine.root_device().memregion(M68000_TAG)->base()[0x1be8] = 0xd6;

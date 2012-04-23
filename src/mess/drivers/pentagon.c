@@ -9,37 +9,45 @@
 #include "machine/beta.h"
 #include "machine/ram.h"
 
-DIRECT_UPDATE_HANDLER( pentagon_direct )
+class pentagon_state : public spectrum_state
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
+public:
+	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spectrum_state(mconfig, type, tag) { }
+
+	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
+};
+
+DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
+{
+	device_t *beta = machine().device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE);
 
 	if (beta->started() && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			membank("bank1")->set_base(memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
-	} else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
+	} else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
 	{
-		state->m_ROMSelection = 3;
+		m_ROMSelection = 3;
 		if (beta->started())
 			betadisk_enable(beta);
 
 	}
 	if(address<=0x3fff)
 	{
-		if (state->m_ROMSelection == 3) {
+		if (m_ROMSelection == 3) {
 			if (beta->started()) {
-				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.root_device().memregion("beta:beta")->base());
-				state->membank("bank1")->set_base(machine.root_device().memregion("beta:beta")->base());
+				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().root_device().memregion("beta:beta")->base());
+				membank("bank1")->set_base(machine().root_device().memregion("beta:beta")->base());
 			}
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
-			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 		return ~0;
 	}
@@ -87,7 +95,7 @@ static WRITE8_HANDLER(pentagon_port_7ffd_w)
 	pentagon_update_memory(space->machine());
 }
 
-static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, spectrum_state )
+static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
@@ -102,7 +110,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pentagon )
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
+	pentagon_state *state = machine.driver_data<pentagon_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine.device(BETA_DISK_TAG);
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -114,7 +122,7 @@ static MACHINE_RESET( pentagon )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate(FUNC(pentagon_direct), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), state));
 
 	memset(messram,0,128*1024);
 
@@ -147,7 +155,7 @@ static GFXDECODE_START( pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
+static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pentagon_io)
 	MCFG_MACHINE_RESET( pentagon )
@@ -156,7 +164,7 @@ static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_GFXDECODE(pentagon)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pent1024, pentagon )
+static MACHINE_CONFIG_DERIVED( pent1024, pentagon)
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

@@ -259,6 +259,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bbc_6845_w);
 	DECLARE_READ8_MEMBER(bbc_6845_r);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
+	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
+	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 };
 
 

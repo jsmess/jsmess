@@ -51,6 +51,8 @@ public:
 	UINT8 m_cd_result[8];
 	DECLARE_READ8_MEMBER(psx_cd_r);
 	DECLARE_WRITE8_MEMBER(psx_cd_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(psx_default);
+	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 };
 
 
@@ -416,23 +418,22 @@ static int load_psf( device_t *cpu, unsigned char *p_n_file, int n_len )
 	return n_return;
 }
 
-DIRECT_UPDATE_HANDLER( psx_default )
+DIRECT_UPDATE_MEMBER(psx1_state::psx_default)
 {
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER( psx_setopbase )
+DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 {
-	psx1_state *state = machine.driver_data<psx1_state>();
 	if( address == 0x80030000 )
 	{
-		device_t *cpu = machine.device("maincpu");
+		device_t *cpu = machine().device("maincpu");
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx_default), &machine));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
 
-		if( load_psxexe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
-			load_cpe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
-			load_psf( cpu, state->m_exe_buffer, state->m_exe_size ) )
+		if( load_psxexe( cpu, m_exe_buffer, m_exe_size ) ||
+			load_cpe( cpu, m_exe_buffer, m_exe_size ) ||
+			load_psf( cpu, m_exe_buffer, m_exe_size ) )
 		{
 /*          DEBUGGER_BREAK; */
 
@@ -443,8 +444,8 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 			logerror( "psx_exe_load: invalid exe\n" );
 		}
 
-		state->m_exe_size = 0;
-		free( state->m_exe_buffer );
+		m_exe_size = 0;
+		free( m_exe_buffer );
 	}
 	return address;
 }
@@ -467,7 +468,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	state->m_exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate(FUNC(psx_setopbase), &image.device().machine()));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_setopbase), state));
 
 	return IMAGE_INIT_PASS;
 }

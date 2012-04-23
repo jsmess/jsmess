@@ -169,14 +169,13 @@ WRITE8_MEMBER( osborne1_state::osborne1_bankswitch_w )
 }
 
 
-DIRECT_UPDATE_HANDLER( osborne1_opbase )
+DIRECT_UPDATE_MEMBER(osborne1_state::osborne1_opbase)
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
 	if ( ( address & 0xF000 ) == 0x2000 )
 	{
-		if ( ! state->m_bank2_enabled )
+		if ( ! m_bank2_enabled )
 		{
-			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, machine.device<ram_device>(RAM_TAG)->pointer() + 0x2000);
+			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, machine().device<ram_device>(RAM_TAG)->pointer() + 0x2000);
 			return ~0;
 		}
 	}
@@ -390,7 +389,7 @@ MACHINE_RESET( osborne1 )
 	for(drive=0;drive<2;drive++)
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_opbase), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), state));
 }
 
 
