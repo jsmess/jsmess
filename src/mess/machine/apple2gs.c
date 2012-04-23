@@ -1069,8 +1069,15 @@ static READ8_HANDLER( apple2gs_c0xx_r )
             }
             break;
 
-		default:
-			result = apple2_c0xx_r(space, offset);
+        default:
+            if (offset < 0x80)
+            {
+                result = apple2_c0xx_r(space, offset);
+            }
+            else
+            {
+                result = apple2_c080_r(space, offset);
+            }
 			break;
 	}
 
@@ -1220,7 +1227,14 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
             break;
 
 		default:
-			apple2_c0xx_w(space, offset, data);
+            if (offset < 0x80)
+            {
+                apple2_c0xx_w(space, offset, data);
+            }
+            else
+            {
+                apple2_c080_w(space, offset, data);
+            }
 			break;
 	}
 }

@@ -152,6 +152,20 @@ public:
 	UINT16 *m_hires_artifact_map;
 	UINT16 *m_dhires_artifact_map;
     bool m_monochrome_dhr;
+
+    READ8_MEMBER ( apple2_c00x_r );
+    READ8_MEMBER ( apple2_c01x_r );
+    READ8_MEMBER ( apple2_c02x_r );
+    READ8_MEMBER ( apple2_c03x_r );
+    READ8_MEMBER ( apple2_c05x_r );
+    READ8_MEMBER ( apple2_c06x_r );
+    READ8_MEMBER ( apple2_c07x_r );
+    WRITE8_MEMBER ( apple2_c00x_w );
+    WRITE8_MEMBER ( apple2_c01x_w );
+    WRITE8_MEMBER ( apple2_c02x_w );
+    WRITE8_MEMBER ( apple2_c03x_w );
+    WRITE8_MEMBER ( apple2_c05x_w );
+    WRITE8_MEMBER ( apple2_c07x_w );
 };
 
 
@@ -174,6 +188,8 @@ MACHINE_START( apple2orig );
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
+READ8_HANDLER( apple2_c080_r );
+WRITE8_HANDLER( apple2_c080_w );
 
 TIMER_DEVICE_CALLBACK( apple2_interrupt );
 

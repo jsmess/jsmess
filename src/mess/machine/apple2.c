@@ -48,21 +48,6 @@ static WRITE8_HANDLER ( apple2_mainram2000_w );
 static WRITE8_HANDLER ( apple2_auxram0400_w );
 static WRITE8_HANDLER ( apple2_auxram2000_w );
 
-static READ8_HANDLER ( apple2_c00x_r );
-static READ8_HANDLER ( apple2_c01x_r );
-static READ8_HANDLER ( apple2_c02x_r );
-static READ8_HANDLER ( apple2_c03x_r );
-static READ8_HANDLER ( apple2_c05x_r );
-static READ8_HANDLER ( apple2_c06x_r );
-static READ8_HANDLER ( apple2_c07x_r );
-
-static WRITE8_HANDLER ( apple2_c00x_w );
-static WRITE8_HANDLER ( apple2_c01x_w );
-static WRITE8_HANDLER ( apple2_c02x_w );
-static WRITE8_HANDLER ( apple2_c03x_w );
-static WRITE8_HANDLER ( apple2_c05x_w );
-static WRITE8_HANDLER ( apple2_c07x_w );
-
 static READ8_HANDLER ( apple2_c1xx_r );
 static WRITE8_HANDLER ( apple2_c1xx_w );
 static READ8_HANDLER ( apple2_c3xx_r );
@@ -351,42 +336,25 @@ READ8_HANDLER(apple2_c0xx_r)
 	apple2_state *state = space->machine().driver_data<apple2_state>();
 	if(!space->debugger_access())
 	{
-		static const read8_space_func handlers[] =
+		static const read8_delegate handlers[] =
 		{
-			apple2_c00x_r,
-			apple2_c01x_r,
-			apple2_c02x_r,
-			apple2_c03x_r,
-			NULL,
-			apple2_c05x_r,
-			apple2_c06x_r,
-			apple2_c07x_r
+			read8_delegate(FUNC(apple2_state::apple2_c00x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c01x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c02x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c03x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c03x_r), state),   // not called here, handled elsewhere
+			read8_delegate(FUNC(apple2_state::apple2_c05x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c06x_r), state),
+			read8_delegate(FUNC(apple2_state::apple2_c07x_r), state)
 		};
-		UINT8 result = 0x00;
-		int slotnum;
-		device_a2bus_card_interface *slotdevice;
 
-		offset &= 0xFF;
+		offset &= 0x7F;
 
-		if (offset < 0x80)
-		{
-			/* normal handler */
-			if (handlers[offset / 0x10])
-				result = handlers[offset / 0x10](space, offset % 0x10);
-		}
-		else
-		{
-			/* slot handler; identify the slot number */
-			slotnum = (offset - 0x80) / 0x10;
-
-			/* now identify the device */
-			slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
-
-			/* and if we can, read from the slot */
-			if (slotdevice != NULL)
-				result = slotdevice->read_c0nx(*space, offset % 0x10);
-		}
-		return result;
+        /* normal handler */
+        if (offset / 0x10 != 4)
+        {
+            return handlers[offset / 0x10](*space, offset % 0x10, 0);
+        }
 	}
 
 	return 0;
@@ -397,40 +365,65 @@ READ8_HANDLER(apple2_c0xx_r)
 WRITE8_HANDLER(apple2_c0xx_w)
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
-	static const write8_space_func handlers[] =
+	static const write8_delegate handlers[] =
 	{
-		apple2_c00x_w,
-		apple2_c01x_w,
-		apple2_c02x_w,
-		apple2_c03x_w,
-		NULL,
-		apple2_c05x_w,
-		NULL,
-		apple2_c07x_w
+		write8_delegate(FUNC(apple2_state::apple2_c00x_w), state),
+		write8_delegate(FUNC(apple2_state::apple2_c01x_w), state),
+		write8_delegate(FUNC(apple2_state::apple2_c02x_w), state),
+		write8_delegate(FUNC(apple2_state::apple2_c03x_w), state),
+		write8_delegate(FUNC(apple2_state::apple2_c03x_w), state),      // unused
+		write8_delegate(FUNC(apple2_state::apple2_c05x_w), state),
+		write8_delegate(FUNC(apple2_state::apple2_c05x_w), state),      // unused
+		write8_delegate(FUNC(apple2_state::apple2_c07x_w), state)
 	};
-	int slotnum;
+
+	offset &= 0x7F;
+
+    /* normal handler */
+    if (((offset / 0x10) != 4) && (offset / 0x10) != 6)
+    {
+        handlers[offset / 0x10](*space, offset % 0x10, data, 0);
+    }
+}
+
+READ8_HANDLER(apple2_c080_r)
+{
+	if(!space->debugger_access())
+	{
+        apple2_state *state = space->machine().driver_data<apple2_state>();
+		device_a2bus_card_interface *slotdevice;
+
+		offset &= 0x7F;
+
+        /* now identify the device */
+        slotdevice = state->m_a2bus->get_a2bus_card(offset / 0x10);
+
+        /* and if we can, read from the slot */
+        if (slotdevice != NULL)
+        {
+            return slotdevice->read_c0nx(*space, offset % 0x10);
+        }
+	}
+
+	return 0;
+}
+
+
+WRITE8_HANDLER(apple2_c080_w)
+{
+	apple2_state *state = space->machine().driver_data<apple2_state>();
 	device_a2bus_card_interface *slotdevice;
 
-	offset &= 0xFF;
+	offset &= 0x7F;
 
-	if (offset < 0x80)
-	{
-		/* normal handler */
-		if (handlers[offset / 0x10])
-			handlers[offset / 0x10](space, offset % 0x10, data);
-	}
-	else
-	{
-		/* slot handler; identify the slot number */
-		slotnum = (offset - 0x80) / 0x10;
+    /* now identify the device */
+    slotdevice = state->m_a2bus->get_a2bus_card(offset / 0x10);
 
-		/* now identify the device */
-        slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
-
-		/* and if we can, write to the slot */
-		if (slotdevice != NULL)
-			slotdevice->write_c0nx(*space, offset % 0x10, data);
-	}
+    /* and if we can, write to the slot */
+    if (slotdevice != NULL)
+    {
+        slotdevice->write_c0nx(*space, offset % 0x10, data);
+    }
 }
 
 /* returns default CnXX slotram for a slot space */
@@ -795,6 +788,12 @@ static void apple2_mem_C000(running_machine &machine, offs_t begin, offs_t end, 
 	meminfo->write_handler = apple2_c0xx_w;
 }
 
+static void apple2_mem_C080(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
+{
+	meminfo->read_handler = apple2_c080_r;
+	meminfo->write_handler = apple2_c080_w;
+}
+
 static void apple2_mem_CFFF(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_handler = apple2_cfff_r;
@@ -931,7 +930,8 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 	{ 0x0800, 0x1FFF, apple2_mem_0800, A2MEM_DUAL },
 	{ 0x2000, 0x3FFF, apple2_mem_2000, A2MEM_DUAL },
 	{ 0x4000, 0xBFFF, apple2_mem_4000, A2MEM_DUAL },
-	{ 0xC000, 0xC0FF, apple2_mem_C000, A2MEM_IO },
+	{ 0xC000, 0xC07F, apple2_mem_C000, A2MEM_IO },
+	{ 0xC080, 0xC0FF, apple2_mem_C080, A2MEM_IO },
 	{ 0xC100, 0xC2FF, apple2_mem_Cx00, A2MEM_MONO },
 	{ 0xC300, 0xC3FF, apple2_mem_C300, A2MEM_MONO },
 	{ 0xC400, 0xC7FF, apple2_mem_Cx00, A2MEM_MONO },
@@ -1204,15 +1204,15 @@ static WRITE8_HANDLER ( apple2_auxram2000_w )
   apple2_c00x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c00x_r )
+READ8_MEMBER ( apple2_state::apple2_c00x_r )
 {
 	UINT8 result = 0;
 
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		/* Read the keyboard data and strobe */
 		g_profiler.start(PROFILER_C00X);
-		result = AY3600_keydata_strobe_r(space->machine());
+		result = AY3600_keydata_strobe_r(space.machine());
 		g_profiler.stop();
 	}
 
@@ -1244,12 +1244,12 @@ READ8_HANDLER ( apple2_c00x_r )
   C00F  ALTCHARSETON - use alt character set
 ***************************************************************************/
 
-WRITE8_HANDLER ( apple2_c00x_w )
+WRITE8_MEMBER ( apple2_state::apple2_c00x_w )
 {
 	UINT32 mask;
 
 	mask = 1 << (offset / 2);
-	apple2_setvar(space->machine(), (offset & 1) ? mask : 0, mask);
+	apple2_setvar(space.machine(), (offset & 1) ? mask : 0, mask);
 }
 
 
@@ -1258,34 +1258,33 @@ WRITE8_HANDLER ( apple2_c00x_w )
   apple2_c01x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c01x_r )
+READ8_MEMBER( apple2_state::apple2_c01x_r )
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
-	UINT8 result = apple2_getfloatingbusvalue(space->machine()) & 0x7F;
+	UINT8 result = apple2_getfloatingbusvalue(space.machine()) & 0x7F;
 
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		g_profiler.start(PROFILER_C01X);
 
 		LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
 		switch (offset)
 		{
-			case 0x00:			result |= AY3600_anykey_clearstrobe_r(space->machine());		break;
-			case 0x01:			result |= (state->m_flags & VAR_LCRAM2)		? 0x80 : 0x00;	break;
-			case 0x02:			result |= (state->m_flags & VAR_LCRAM)		? 0x80 : 0x00;	break;
-			case 0x03:			result |= (state->m_flags & VAR_RAMRD)		? 0x80 : 0x00;	break;
-			case 0x04:			result |= (state->m_flags & VAR_RAMWRT)		? 0x80 : 0x00;	break;
-			case 0x05:			result |= (state->m_flags & VAR_INTCXROM)	? 0x80 : 0x00;	break;
-			case 0x06:			result |= (state->m_flags & VAR_ALTZP)		? 0x80 : 0x00;	break;
-			case 0x07:			result |= (state->m_flags & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
-			case 0x08:			result |= (state->m_flags & VAR_80STORE)	? 0x80 : 0x00;	break;
-			case 0x09:			result |= !space->machine().primary_screen->vblank()		? 0x80 : 0x00;	break;
-			case 0x0A:			result |= (state->m_flags & VAR_TEXT)		? 0x80 : 0x00;	break;
-			case 0x0B:			result |= (state->m_flags & VAR_MIXED)		? 0x80 : 0x00;	break;
-			case 0x0C:			result |= (state->m_flags & VAR_PAGE2)		? 0x80 : 0x00;	break;
-			case 0x0D:			result |= (state->m_flags & VAR_HIRES)		? 0x80 : 0x00;	break;
-			case 0x0E:			result |= (state->m_flags & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
-			case 0x0F:			result |= (state->m_flags & VAR_80COL)		? 0x80 : 0x00;	break;
+			case 0x00:			result |= AY3600_anykey_clearstrobe_r(space.machine());		break;
+			case 0x01:			result |= (m_flags & VAR_LCRAM2)		? 0x80 : 0x00;	break;
+			case 0x02:			result |= (m_flags & VAR_LCRAM)		? 0x80 : 0x00;	break;
+			case 0x03:			result |= (m_flags & VAR_RAMRD)		? 0x80 : 0x00;	break;
+			case 0x04:			result |= (m_flags & VAR_RAMWRT)		? 0x80 : 0x00;	break;
+			case 0x05:			result |= (m_flags & VAR_INTCXROM)	? 0x80 : 0x00;	break;
+			case 0x06:			result |= (m_flags & VAR_ALTZP)		? 0x80 : 0x00;	break;
+			case 0x07:			result |= (m_flags & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
+			case 0x08:			result |= (m_flags & VAR_80STORE)	? 0x80 : 0x00;	break;
+			case 0x09:			result |= !space.machine().primary_screen->vblank()		? 0x80 : 0x00;	break;
+			case 0x0A:			result |= (m_flags & VAR_TEXT)		? 0x80 : 0x00;	break;
+			case 0x0B:			result |= (m_flags & VAR_MIXED)		? 0x80 : 0x00;	break;
+			case 0x0C:			result |= (m_flags & VAR_PAGE2)		? 0x80 : 0x00;	break;
+			case 0x0D:			result |= (m_flags & VAR_HIRES)		? 0x80 : 0x00;	break;
+			case 0x0E:			result |= (m_flags & VAR_ALTCHARSET)	? 0x80 : 0x00;	break;
+			case 0x0F:			result |= (m_flags & VAR_80COL)		? 0x80 : 0x00;	break;
 		}
 
 		g_profiler.stop();
@@ -1300,11 +1299,11 @@ READ8_HANDLER ( apple2_c01x_r )
   apple2_c01x_w
 ***************************************************************************/
 
-WRITE8_HANDLER( apple2_c01x_w )
+WRITE8_MEMBER( apple2_state::apple2_c01x_w )
 {
 	/* Clear the keyboard strobe - ignore the returned results */
 	g_profiler.start(PROFILER_C01X);
-	AY3600_anykey_clearstrobe_r(space->machine());
+	AY3600_anykey_clearstrobe_r(space.machine());
 	g_profiler.stop();
 }
 
@@ -1314,13 +1313,13 @@ WRITE8_HANDLER( apple2_c01x_w )
   apple2_c02x_r
 ***************************************************************************/
 
-READ8_HANDLER( apple2_c02x_r )
+READ8_MEMBER( apple2_state::apple2_c02x_r )
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
-		apple2_c02x_w(space, offset, 0);
+		apple2_c02x_w(space, offset, 0, 0);
 	}
-	return apple2_getfloatingbusvalue(space->machine());
+	return apple2_getfloatingbusvalue(space.machine());
 }
 
 
@@ -1329,13 +1328,12 @@ READ8_HANDLER( apple2_c02x_r )
   apple2_c02x_w
 ***************************************************************************/
 
-WRITE8_HANDLER( apple2_c02x_w )
+WRITE8_MEMBER( apple2_state::apple2_c02x_w )
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
 	switch(offset)
 	{
 		case 0x08:
-			apple2_setvar(space->machine(), (state->m_flags & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
+			apple2_setvar(space.machine(), (m_flags & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
 			break;
 	}
 }
@@ -1346,27 +1344,26 @@ WRITE8_HANDLER( apple2_c02x_w )
   apple2_c03x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c03x_r )
+READ8_MEMBER ( apple2_state::apple2_c03x_r )
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		if (!offset)
 		{
-			device_t *speaker_device = space->machine().device("a2speaker");
+			device_t *speaker_device = space.machine().device("a2speaker");
 
-			if (state->m_a2_speaker_state == 1)
+			if (m_a2_speaker_state == 1)
 			{
-				state->m_a2_speaker_state = 0;
+				m_a2_speaker_state = 0;
 			}
 			else
 			{
-				state->m_a2_speaker_state = 1;
+				m_a2_speaker_state = 1;
 			}
-			speaker_level_w(speaker_device, state->m_a2_speaker_state);
+			speaker_level_w(speaker_device, m_a2_speaker_state);
 		}
 	}
-	return apple2_getfloatingbusvalue(space->machine());
+	return apple2_getfloatingbusvalue(space.machine());
 }
 
 
@@ -1375,9 +1372,9 @@ READ8_HANDLER ( apple2_c03x_r )
   apple2_c03x_w
 ***************************************************************************/
 
-WRITE8_HANDLER ( apple2_c03x_w )
+WRITE8_MEMBER ( apple2_state::apple2_c03x_w )
 {
-	apple2_c03x_r(space, offset);
+	apple2_c03x_r(space, offset, 0);
 }
 
 
@@ -1386,9 +1383,9 @@ WRITE8_HANDLER ( apple2_c03x_w )
   apple2_c05x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c05x_r )
+READ8_MEMBER ( apple2_state::apple2_c05x_r )
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		UINT32 mask;
 
@@ -1399,9 +1396,9 @@ READ8_HANDLER ( apple2_c05x_r )
 		}
 
 		mask = 0x100 << (offset / 2);
-		apple2_setvar(space->machine(), (offset & 1) ? mask : 0, mask);
+		apple2_setvar(space.machine(), (offset & 1) ? mask : 0, mask);
 	}
-	return apple2_getfloatingbusvalue(space->machine());
+	return apple2_getfloatingbusvalue(space.machine());
 }
 
 
@@ -1410,9 +1407,9 @@ READ8_HANDLER ( apple2_c05x_r )
   apple2_c05x_w
 ***************************************************************************/
 
-WRITE8_HANDLER ( apple2_c05x_w )
+WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
 {
-	apple2_c05x_r(space, offset);
+	apple2_c05x_r(space, offset, 0);
 }
 
 
@@ -1426,18 +1423,17 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
-READ8_HANDLER ( apple2_c06x_r )
+READ8_MEMBER ( apple2_state::apple2_c06x_r )
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
 	int result = 0;
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		switch (offset & 0x0F)
 		{
 			case 0x00:
 				/* Cassette input */
 				{
-					cassette_image_device *dev = cassette_device_image(space->machine());
+					cassette_image_device *dev = cassette_device_image(space.machine());
 
 					if (dev)
 					{
@@ -1451,37 +1447,37 @@ READ8_HANDLER ( apple2_c06x_r )
 				break;
 			case 0x01:
 				/* Open-Apple/Joystick button 0 */
-				result = apple2_pressed_specialkey(space->machine(), SPECIALKEY_BUTTON0);
+				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON0);
 				break;
 			case 0x02:
 				/* Closed-Apple/Joystick button 1 */
-				result = apple2_pressed_specialkey(space->machine(), SPECIALKEY_BUTTON1);
+				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON1);
 				break;
 			case 0x03:
 				/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-				result = apple2_pressed_specialkey(space->machine(), SPECIALKEY_BUTTON2);
+				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON2);
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
-				result = space->machine().time().as_double() < state->m_joystick_x1_time;
+				result = space.machine().time().as_double() < m_joystick_x1_time;
 				break;
 			case 0x05:
 				/* Y Joystick 1 axis */
-				result = space->machine().time().as_double() < state->m_joystick_y1_time;
+				result = space.machine().time().as_double() < m_joystick_y1_time;
 				break;
 			case 0x06:
 				/* X Joystick 2 axis */
-				result = space->machine().time().as_double() < state->m_joystick_x2_time;
+				result = space.machine().time().as_double() < m_joystick_x2_time;
 				break;
 			case 0x07:
 				/* Y Joystick 2 axis */
-				result = space->machine().time().as_double() < state->m_joystick_y2_time;
+				result = space.machine().time().as_double() < m_joystick_y2_time;
 				break;
 			default:
 				/* c060 Empty Cassette head read
                  * and any other non joystick c06 port returns this according to applewin
                  */
-				return apple2_getfloatingbusvalue(space->machine());
+				return apple2_getfloatingbusvalue(space.machine());
 		}
 	}
 	return result ? 0x80 : 0x00;
@@ -1493,20 +1489,19 @@ READ8_HANDLER ( apple2_c06x_r )
   apple2_c07x_r
 ***************************************************************************/
 
-READ8_HANDLER ( apple2_c07x_r )
+READ8_MEMBER ( apple2_state::apple2_c07x_r )
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
 		double x_calibration = attotime::from_usec(12).as_double();
 		double y_calibration = attotime::from_usec(13).as_double();
 
 		if (offset == 0)
 		{
-			state->m_joystick_x1_time = space->machine().time().as_double() + x_calibration * input_port_read(space->machine(), "joystick_1_x");
-			state->m_joystick_y1_time = space->machine().time().as_double() + y_calibration * input_port_read(space->machine(), "joystick_1_y");
-			state->m_joystick_x2_time = space->machine().time().as_double() + x_calibration * input_port_read(space->machine(), "joystick_2_x");
-			state->m_joystick_y2_time = space->machine().time().as_double() + y_calibration * input_port_read(space->machine(), "joystick_2_y");
+			m_joystick_x1_time = space.machine().time().as_double() + x_calibration * input_port_read(space.machine(), "joystick_1_x");
+			m_joystick_y1_time = space.machine().time().as_double() + y_calibration * input_port_read(space.machine(), "joystick_1_y");
+			m_joystick_x2_time = space.machine().time().as_double() + x_calibration * input_port_read(space.machine(), "joystick_2_x");
+			m_joystick_y2_time = space.machine().time().as_double() + y_calibration * input_port_read(space.machine(), "joystick_2_y");
 		}
 	}
 	return 0;
@@ -1518,9 +1513,9 @@ READ8_HANDLER ( apple2_c07x_r )
   apple2_c07x_w
 ***************************************************************************/
 
-WRITE8_HANDLER ( apple2_c07x_w )
+WRITE8_MEMBER ( apple2_state::apple2_c07x_w )
 {
-	apple2_c07x_r(space, offset);
+	apple2_c07x_r(space, offset, 0);
 }
 
 
