@@ -37,6 +37,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -47,6 +48,14 @@ protected:
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
+
+private:
+	required_device<atmel_29c010_device> m_flash_rom;
+	required_device<device_t> m_ide;
+
+	UINT8 m_bank;
+	UINT8 m_ide_data;
+	int m_wp;
 };
 
 
