@@ -51,11 +51,14 @@ protected:
 
 private:
 	required_device<atmel_29c010_device> m_flash_rom;
+	required_device<ds1302_device> m_rtc;
 	required_device<device_t> m_ide;
 
 	UINT8 m_bank;
 	UINT8 m_ide_data;
 	int m_wp;
+	int m_enable;
+	int m_rtc_ce;
 };
 
 

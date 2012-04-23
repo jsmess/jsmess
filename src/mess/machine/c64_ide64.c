@@ -11,8 +11,7 @@
 
 	TODO:
 
-	- kill port
-	- DS1302
+	- flash write
 	- FT245
 
 */
@@ -98,6 +97,7 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	device_t(mconfig, C64_IDE64, "C64 IDE64 cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AT29C010A_TAG),
+	m_rtc(*this, DS1302_TAG),
 	m_ide(*this, "ide")
 {
 }
@@ -115,6 +115,8 @@ void c64_ide64_cartridge_device::device_start()
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_ide_data));
+	save_item(NAME(m_enable));
+	save_item(NAME(m_rtc_ce));
 }
 
 
@@ -127,6 +129,8 @@ void c64_ide64_cartridge_device::device_reset()
 	m_bank = 0;
 	m_game = 1;
 	m_exrom = 1;
+	m_enable = 1;
+	m_rtc_ce = 0;
 
 	m_wp = input_port_read(*this, "JP1");
 }
@@ -138,6 +142,8 @@ void c64_ide64_cartridge_device::device_reset()
 
 UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
+	if (!m_enable) return 0;
+
 	UINT8 data = 0;
 	int rom_oe = 1, ram_oe = 1;
 
@@ -186,6 +192,33 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 			{
 				data = m_ide_data >> 8;
 			}
+			else if (io1_offset == 0x32)
+			{
+				/*
+				
+				    bit     description
+				
+				    0       GAME
+				    1       EXROM
+				    2       A14
+				    3       A15
+				    4       A16
+				    5       v4.x
+				    6       
+				    7       
+				
+				*/
+
+				data = 0x20 | (m_bank << 2) | (m_exrom << 1) | m_game;
+			}
+			else if ((io1_offset == 0x5f) && m_rtc_ce)
+			{
+				m_rtc->ds1302_clk_w(0, 0);
+
+				m_rtc->ds1302_dat_w(0, BIT(data, 0));
+
+				m_rtc->ds1302_clk_w(0, 1);
+			}
 			else if (io1_offset >= 0x60)
 			{
 				rom_oe = 0;
@@ -213,6 +246,8 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
+	if (!m_enable) return;
+
 	if (!m_game && m_exrom)
 	{
 		if (offset >= 0x1000 && offset < 0x8000)
@@ -251,13 +286,40 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 			{
 				m_ide_data = (data << 8) | (m_ide_data & 0xff);
 			}
-			else if (io1_offset >= 0x32 && io1_offset < 0x36)
+			else if ((io1_offset == 0x5f) && m_rtc_ce)
 			{
-				m_bank = io1_offset - 0x32;
+				m_rtc->ds1302_clk_w(0, 0);
+
+				data = m_rtc->ds1302_read(0);
+				
+				m_rtc->ds1302_clk_w(0, 1);
 			}
 			else if (io1_offset >= 0x60 && io1_offset < 0x68)
 			{
 				m_bank = offset & 0x07;
+			}
+			else if (io1_offset >= 0xfb)
+			{
+				/*
+				
+				    bit     description
+				
+				    0       disable cartridge
+				    1       RTC CE
+				    2       
+				    3       
+				    4       
+				    5       
+				    6       
+				    7       
+				
+				*/
+
+				m_enable = !BIT(data, 0);
+				m_rtc_ce = BIT(data, 1);
+
+				m_game = BIT(offset, 0);
+				m_exrom = BIT(offset, 1);
 			}
 			else if (io1_offset >= 0xfc)
 			{
