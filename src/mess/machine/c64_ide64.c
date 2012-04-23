@@ -7,6 +7,16 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- kill port
+	- DS1302
+	- FT245
+
+*/
+
 #include "c64_ide64.h"
 
 
@@ -15,8 +25,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define AT29C010_TAG		"u3"
+#define AT29C010A_TAG		"u3"
 #define DS1302_TAG			"u4"
+#define FT245R_TAG			"u21"
 
 
 
@@ -32,8 +43,9 @@ const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
-	MCFG_ATMEL_29C010_ADD(AT29C010_TAG)
+	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
 	MCFG_DS1302_ADD(DS1302_TAG)
+	// TODO FT245R
 	// TODO CompactFlash
 	
 	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_image_devices, "hdd", "hdd")
@@ -51,6 +63,28 @@ machine_config_constructor c64_ide64_cartridge_device::device_mconfig_additions(
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( c64_ide64 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c64_ide64 )
+	PORT_START("JP1")
+	PORT_DIPNAME( 0x01, 0x01, "Flash ROM Write Protect" )
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x01, "Enabled" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c64_ide64_cartridge_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c64_ide64 );
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -62,7 +96,9 @@ machine_config_constructor c64_ide64_cartridge_device::device_mconfig_additions(
 
 c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_IDE64, "C64 IDE64 cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_flash_rom(*this, AT29C010A_TAG),
+	m_ide(*this, "ide")
 {
 }
 
@@ -75,6 +111,10 @@ void c64_ide64_cartridge_device::device_start()
 {
 	// allocate memory
 	c64_ram_pointer(machine(), 0x8000);
+
+	// state saving
+	save_item(NAME(m_bank));
+	save_item(NAME(m_ide_data));
 }
 
 
@@ -84,6 +124,11 @@ void c64_ide64_cartridge_device::device_start()
 
 void c64_ide64_cartridge_device::device_reset()
 {
+	m_bank = 0;
+	m_game = 1;
+	m_exrom = 1;
+
+	m_wp = input_port_read(*this, "JP1");
 }
 
 
@@ -94,8 +139,69 @@ void c64_ide64_cartridge_device::device_reset()
 UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
+	int rom_oe = 1, ram_oe = 1;
 
-	// TODO
+	if (!m_game && m_exrom)
+	{
+		if (offset >= 0x1000 && offset < 0x8000)
+		{
+			ram_oe = 0;
+		}
+		else if (offset >= 0xa000 && offset < 0xc000)
+		{
+			rom_oe = 0;
+		}
+		else if (offset >= 0xc000 && offset < 0xd000)
+		{
+			ram_oe = 0;
+		}
+		else if (!romh)
+		{
+			rom_oe = 0;
+		}
+	}
+	else
+	{
+		if (!roml || !romh)
+		{
+			rom_oe = 0;
+		}
+		else if (!io1)
+		{
+			// 0x20-0x2f	IDE
+			// 0x30-0x37	I/O
+			// 0x5d-0x5e	FT245
+			// 0x5f-0x5f	DS1302
+			// 0x60-0xff	ROM
+
+			UINT8 io1_offset = offset & 0xff;
+
+			if (io1_offset >= 0x20 && io1_offset < 0x30)
+			{
+				m_ide_data = ide_bus_r(m_ide, BIT(offset, 3), offset & 0x07);
+
+				data = m_ide_data & 0xff;
+			}
+			else if (io1_offset == 0x31)
+			{
+				data = m_ide_data >> 8;
+			}
+			else if (io1_offset >= 0x60)
+			{
+				rom_oe = 0;
+			}
+		}
+	}
+
+	if (!rom_oe)
+	{
+		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
+		data = m_flash_rom->read(addr);
+	}
+	else if (!ram_oe)
+	{
+		data = m_ram[offset & 0x7fff];
+	}
 
 	return data;
 }
@@ -107,5 +213,57 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
-	// TODO
+	if (!m_game && m_exrom)
+	{
+		if (offset >= 0x1000 && offset < 0x8000)
+		{
+			m_ram[offset & 0x7fff] = data;
+		}
+		else if (offset >= 0xc000 && offset < 0xd000)
+		{
+			m_ram[offset & 0x7fff] = data;
+		}
+	}
+	else
+	{
+		if ((offset >= 0x8000 && offset < 0xc000) && !m_wp)
+		{
+			offs_t addr = (m_bank << 14) | (offset & 0x3fff);
+			m_flash_rom->write(addr, data);
+		}
+		else if (!io1)
+		{
+			// 0x20-0x2f	IDE
+			// 0x30-0x37	I/O
+			// 0x5d-0x5e	FT245
+			// 0x5f-0x5f	DS1302
+			// 0x60-0xff	ROM
+
+			UINT8 io1_offset = offset & 0xff;
+
+			if (io1_offset >= 0x20 && io1_offset < 0x30)
+			{
+				m_ide_data = (m_ide_data & 0xff00) | data;
+
+				ide_bus_w(m_ide, BIT(offset, 3), offset & 0x07, m_ide_data);
+			}
+			else if (io1_offset == 0x31)
+			{
+				m_ide_data = (data << 8) | (m_ide_data & 0xff);
+			}
+			else if (io1_offset >= 0x32 && io1_offset < 0x36)
+			{
+				m_bank = io1_offset - 0x32;
+			}
+			else if (io1_offset >= 0x60 && io1_offset < 0x68)
+			{
+				m_bank = offset & 0x07;
+			}
+			else if (io1_offset >= 0xfc)
+			{
+				m_game = BIT(offset, 0);
+				m_exrom = BIT(offset, 1);
+			}
+		}
+	}
 }
