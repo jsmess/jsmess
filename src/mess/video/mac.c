@@ -142,7 +142,7 @@ SCREEN_UPDATE_IND16( macprtb )
 	int y, x, b;
 	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram.target();
+	video_ram = (const UINT16 *) state->m_vram16.target();
 
 	for (y = 0; y < 400; y++)
 	{

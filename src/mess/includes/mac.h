@@ -230,7 +230,8 @@ public:
         m_539x_1(*this, MAC_539X_1_TAG),
         m_539x_2(*this, MAC_539X_2_TAG),
         m_mackbd(*this, MACKBD_TAG),
-		m_vram(*this,"vram")
+		m_vram(*this,"vram"),
+		m_vram16(*this,"vram16")
 	 { }
 
 	required_device<cpu_device> m_maincpu;
@@ -342,6 +343,7 @@ public:
 
     // this is shared among all video setups with vram
 	optional_shared_ptr<UINT32> m_vram;
+	optional_shared_ptr<UINT16> m_vram16;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
