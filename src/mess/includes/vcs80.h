@@ -31,6 +31,7 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
+	DECLARE_DIRECT_UPDATE_MEMBER(vcs80_direct_update_handler);
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;

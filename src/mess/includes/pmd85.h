@@ -29,6 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_io_w);
 	DECLARE_READ8_MEMBER(mato_io_r);
 	DECLARE_WRITE8_MEMBER(mato_io_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(pmd85_opbaseoverride);
 };
 
 

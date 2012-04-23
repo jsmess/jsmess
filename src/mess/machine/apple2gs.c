@@ -1708,29 +1708,28 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 
 
 
-DIRECT_UPDATE_HANDLER( apple2gs_opbase )
+DIRECT_UPDATE_MEMBER(apple2gs_state::apple2gs_opbase)
 {
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	UINT8 *opptr = NULL;
 	int slot;
 
 	if (((address & 0xFEF000) == 0x00C000) || ((address & 0xFEF000) == 0xE0C000))
 	{
-		if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
+		if ((m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 		{
-			opptr = &machine.device<ram_device>(RAM_TAG)->pointer()[address];
+			opptr = &machine().device<ram_device>(RAM_TAG)->pointer()[address];
 		}
 		else if ((address & 0x000F00) == 0x000000)
 		{
 			if (((address & 0xFF) >= 0x71) && ((address & 0xFF) <= 0x7F))
-				opptr = apple2gs_getslotmem(machine, address);
+				opptr = apple2gs_getslotmem(machine(), address);
 		}
 		else
 		{
 			slot = (address & 0x000F00) / 0x100;
 
-			if ((slot > 7) || ((state->m_sltromsel & (1 << slot)) == 0))
-				opptr = apple2gs_getslotmem(machine, address);
+			if ((slot > 7) || ((m_sltromsel & (1 << slot)) == 0))
+				opptr = apple2gs_getslotmem(machine(), address);
 		}
 
 		if (opptr != NULL)
@@ -1852,7 +1851,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 	space->install_legacy_write_handler(0xe0c000, 0xe0cfff, FUNC(apple2gs_E0Cxxx_w));
 	space->install_legacy_read_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_r));
 	space->install_legacy_write_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_w));
-	space->set_direct_update_handler(direct_update_delegate(FUNC(apple2gs_opbase), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(apple2gs_state::apple2gs_opbase), state));
 
 
 	/* install aux memory writes (for shadowing) */

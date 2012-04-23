@@ -1984,38 +1984,36 @@ static void mac_state_load(mac_state *mac)
 }
 
 
-DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
+DIRECT_UPDATE_MEMBER(mac_state::overlay_opbaseoverride)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
-	if (mac->m_overlay != -1)
+	if (m_overlay != -1)
 	{
-		if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
+		if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
-		else if ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC))
+		else if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
-		else if ((mac->m_model == MODEL_MAC_LC) || (mac->m_model == MODEL_MAC_LC_II) || (mac->m_model == MODEL_MAC_CLASSIC_II) || (mac->m_model == MODEL_MAC_COLOR_CLASSIC))
+		else if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II) || (m_model == MODEL_MAC_COLOR_CLASSIC))
 		{
 			if (((address >= 0xa00000) && (address <= 0xafffff)) || ((address >= 0x40a00000) && (address <= 0x40afffff)))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
 		else
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
 	}
@@ -2112,7 +2110,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mac_state::overlay_opbaseoverride), mac));
 	}
 
 	/* setup keyboard */

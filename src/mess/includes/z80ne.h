@@ -88,6 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
 	DECLARE_READ8_MEMBER(lx388_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_default);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_nmi_delay_count);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_reset_delay_count);
 };
 
 

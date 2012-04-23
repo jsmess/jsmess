@@ -115,6 +115,8 @@ public:
 	bitmap_ind16 *m_legacy_gfx;
     bool m_is_rom3;
     UINT8 m_echo_bank;
+	
+	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
 };
 
 

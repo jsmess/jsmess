@@ -106,6 +106,7 @@ public:
 	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
 	DECLARE_READ8_MEMBER(spectrum_port_df_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	DECLARE_DIRECT_UPDATE_MEMBER(spectrum_direct);
 };
 
 
