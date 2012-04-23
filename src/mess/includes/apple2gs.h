@@ -41,6 +41,18 @@ typedef enum
 	ADBSTATE_INRESPONSE
 } adbstate_t;
 
+#define IRQ_KBD_SRQ			0x01
+#define IRQ_ADB_DATA		0x02
+#define IRQ_ADB_MOUSE		0x04
+#define IRQ_VGC_SCANLINE	0x08
+#define IRQ_VGC_SECOND		0x10
+#define IRQ_INTEN_QSECOND	0x20
+#define IRQ_INTEN_VBL		0x40
+#define IRQ_DOC			    0x80
+#define IRQ_SLOT            0x100
+
+void apple2gs_add_irq(running_machine &machine, UINT16 irq_mask);
+void apple2gs_remove_irq(running_machine &machine, UINT16 irq_mask);
 
 class apple2gs_state : public apple2_state
 {
@@ -66,7 +78,7 @@ public:
 	UINT8 m_inten;
 	UINT8 m_intflag;
 	UINT8 m_shadow;
-	UINT8 m_pending_irqs;
+	UINT16 m_pending_irqs;
 	UINT8 m_mouse_x;
 	UINT8 m_mouse_y;
 	INT8 m_mouse_dx;

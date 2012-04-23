@@ -134,23 +134,9 @@
 #define LOG_ADB				0
 #define LOG_IRQ				0
 
-#define IRQ_KBD_SRQ			0x01
-#define IRQ_ADB_DATA		0x02
-#define IRQ_ADB_MOUSE		0x04
-#define IRQ_VGC_SCANLINE	0x08
-#define IRQ_VGC_SECOND		0x10
-#define IRQ_INTEN_QSECOND	0x20
-#define IRQ_INTEN_VBL		0x40
-#define IRQ_DOC			0x80
-
-
-
-
 /* -----------------------------------------------------------------------
  * Apple IIgs clock
  * ----------------------------------------------------------------------- */
-
-
 
 static void process_clock(running_machine &machine)
 {
@@ -249,7 +235,7 @@ static void process_clock(running_machine &machine)
  * Interrupts
  * ----------------------------------------------------------------------- */
 
-static const char *apple2gs_irq_name(UINT8 irq_mask)
+static const char *apple2gs_irq_name(UINT16 irq_mask)
 {
 	switch(irq_mask)
 	{
@@ -260,17 +246,18 @@ static const char *apple2gs_irq_name(UINT8 irq_mask)
 		case IRQ_VGC_SECOND:		return "IRQ_VGC_SECOND";
 		case IRQ_INTEN_QSECOND:		return "IRQ_INTEN_QSECOND";
 		case IRQ_INTEN_VBL:			return "IRQ_INTEN_VBL";
-		case IRQ_DOC:				return "IRQ_DOC";
+        case IRQ_DOC:				return "IRQ_DOC";
+		case IRQ_SLOT:				return "IRQ_SLOT";
 	}
 	return NULL;
 }
 
-static void apple2gs_add_irq(running_machine &machine, UINT8 irq_mask)
+void apple2gs_add_irq(running_machine &machine, UINT16 irq_mask)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if ((state->m_pending_irqs & irq_mask) == 0x00)
 	{
-		if (LOG_IRQ)
+    	if (LOG_IRQ)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		state->m_pending_irqs |= irq_mask;
@@ -280,7 +267,7 @@ static void apple2gs_add_irq(running_machine &machine, UINT8 irq_mask)
 
 
 
-static void apple2gs_remove_irq(running_machine &machine, UINT8 irq_mask)
+void apple2gs_remove_irq(running_machine &machine, UINT16 irq_mask)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_pending_irqs & irq_mask)

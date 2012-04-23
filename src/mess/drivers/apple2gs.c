@@ -180,13 +180,30 @@ static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
+static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
+{
+    if (data)
+    {
+        apple2gs_add_irq(device->machine(), IRQ_SLOT);
+    }
+    else
+    {
+        apple2gs_remove_irq(device->machine(), IRQ_SLOT);
+    }
+}
+
+static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
+{
+    apple2gs_state *a2 = device->machine().driver_data<apple2gs_state>();
+
+    device_set_input_line(a2->m_maincpu, INPUT_LINE_NMI, data);
+}
+
 static const struct a2bus_interface a2bus_intf =
 {
 	// interrupt lines
-//  DEVCB_HANDLER(a2bus_irq_w),
-//  DEVCB_HANDLER(a2bus_nmi_w)
-    DEVCB_NULL,
-    DEVCB_NULL
+  DEVCB_HANDLER(a2bus_irq_w),
+  DEVCB_HANDLER(a2bus_nmi_w)
 };
 
 static SLOT_INTERFACE_START(apple2_cards)
