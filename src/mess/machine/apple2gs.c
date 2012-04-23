@@ -916,6 +916,11 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 	UINT8 result;
 	scc8530_t *scc;
 
+	if(space->debugger_access())
+    {
+        return 0;
+    }
+
 	offset &= 0xFF;
 
 	switch(offset)
@@ -1599,11 +1604,14 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 			slotdevice = NULL;
 
 			// if CFFF accessed, reset C800 area to internal ROM
-			if ((address & 0xfff) == 0xfff)
-			{
-				state->m_a2_cnxx_slot = -1;
-                apple2_update_memory(space.machine());
-			}
+            if(!space.debugger_access())
+            {
+                if ((address & 0xfff) == 0xfff)
+                {
+                    state->m_a2_cnxx_slot = -1;
+                    apple2_update_memory(space.machine());
+                }
+            }
 
 			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
 			{
@@ -1631,11 +1639,14 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 	int slot;
 
 	// if CFFF accessed, reset C800 area to internal ROM
-	if ((address & 0xfff) == 0xfff)
-	{
-		state->m_a2_cnxx_slot = -1;
-        apple2_update_memory(space.machine());
-	}
+    if(!space.debugger_access())
+    {
+    	if ((address & 0xfff) == 0xfff)
+    	{
+    		state->m_a2_cnxx_slot = -1;
+            apple2_update_memory(space.machine());
+    	}
+    }
 
 	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
