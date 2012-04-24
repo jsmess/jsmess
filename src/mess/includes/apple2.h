@@ -105,7 +105,6 @@ struct _apple2_memmap_config
 	const apple2_memmap_entry *memmap;
 };
 
-
 class apple2_state : public driver_device
 {
 public:
@@ -152,6 +151,7 @@ public:
 	UINT16 *m_hires_artifact_map;
 	UINT16 *m_dhires_artifact_map;
     bool m_monochrome_dhr;
+    int m_inh_slot;
 
     READ8_MEMBER ( apple2_c00x_r );
     READ8_MEMBER ( apple2_c01x_r );
