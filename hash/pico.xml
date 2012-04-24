@@ -14,6 +14,51 @@
 		</part>
 	</software>
 
+	<software name="poohcorng" cloneof="poohcorn" supported="no">
+		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornf" cloneof="poohcorn" supported="no">
+		<description>Une Année en Compagnie de Winnie l'Ourson (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="49021-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="une annee en compagnie de winnie l'ourson (france).bin" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornj" cloneof="poohcorn">
+		<description>Pooh no Ichi Nichi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner (japan).bin" size="524288" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanriocd">
+		<description>Ai to Yume no Kuni - Sanrio Puroland - Chanto Dekirukana? Minna to Tanoshii Oyuugikai (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ai to yume no kuni sanrio pyuurorando chanto dekirukana minna to tanoshii oyuugikai (japan).bin" size="1048576" crc="0087112a" sha1="ce47f2a5d941597475ea1565d76d7d6c0fbf1338" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="berenstbi" cloneof="berenstb">
 		<description>Un Giorno di Scuola degli Orsi Berenstain (Ita)</description>
 		<year>1995</year>
@@ -32,6 +77,17 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="chibi maruko chan issho ni asobouyo (japan).bin" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doranmdt">
+		<description>Doraemon - Nobita no Machinaka Dokidoki Tanken! (Jpn)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="doraemon - nobita no machinaka dokidoki tanken! (japan).bin" size="524288" crc="314f6cb4" sha1="69d3c5754ccbcde0737455bf7bf0eee4ec610972" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -59,25 +115,13 @@
 		</part>
 	</software>
 
-	<software name="poohcorng" cloneof="poohcorn" supported="no">
-		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="gojirado">
+		<description>Gojira Dokidoki Kaijuu Shima (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poohcornf" cloneof="poohcorn" supported="no">
-		<description>Une Année en Compagnie de Winnie l'Ourson (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="49021-09" />
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="une annee en compagnie de winnie l'ourson (france).bin" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+				<rom name="gojira dokidoki kaijuu shima (japan).bin" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -101,6 +145,17 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="richard scarry's - la giornata indaffaratissima di sandrino e zigo-zago (italy).bin" size="1048576" crc="2573131a" sha1="0e5c14fe1fd3360b9269fdf219decb7ef4480304" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawai3s">
+		<description>Kawaii Nakama wo Sodate you! 3-tsu no Shippo (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="kawaii nakama wo sodate you! 3-tsu no shippo (japan).bin" size="2097152" crc="a6dea807" sha1="0a5cb3a917880b755465d3bd9d110dffcb52a2a3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -183,6 +238,17 @@
 		</part>
 	</software>
 
+	<software name="pokemon">
+		<description>Pocket Monsters Advance Generation - Minna De Pico - Pokemon Waiwai Battle! (Jpn)</description>
+		<year>2004</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monsters advance generation minna de pico pokemon waiwai battle! (japan).bin" size="2097152" crc="c3b77d13" sha1="97b88d0b09376b108d611e036e415c37d67bb943" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="profpico" supported="no">
 		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
 		<year>1995</year>
@@ -224,6 +290,28 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sailor stars tokimeki party (japan).bin" size="524288" crc="a503503d" sha1="6737ba2590e6dc48b125ff9725a55430465f707c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk3">
+		<description>Sanou Kaihatsu Series 3 Hikaku - Bunrui (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sanou kaihatsu series 3 hikaku - bunrui (japan).bin" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanman">
+		<description>Soreike! Anpanman - Anpanman to Denwa de Asobou! (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="anpanman no moshimoshi pico set with soreike! anpanman anpanman to denwa de asobou! (japan).bin" size="2097152" crc="f2e1d899" sha1="b5b06d19a41c677afa046e47ad674242c765de06" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -284,6 +372,16 @@
 		</part>
 	</software>
 
+	<software name="tanoyouc">
+		<description>4 5 6 Tanoshii Youchien (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tanoshi ku asonde nouryoku appu!! tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="tokyosea">
 		<description>Tokyo Disney Sea Mickey to Asobou! (Jpn)</description>
 		<year>2002</year>
@@ -1335,7 +1433,7 @@
 		</part>
 	</software>
 
-	<software name="poohcornj" cloneof="poohcorn">
+	<software name="poohcornj1" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1614,17 +1712,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Doraemon - Ensoku Imohori Undoukai (J).bin" size="????" crc="7d9ebcee" sha1="cf626fe6f25435e42ce0c4cdfc8a4d335f64fe76" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doranmdt">
-		<description>Doraemon - Nobita no Machinaka Dokidoki Tanken! (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Doraemon - Nobita no Machinaka Dokidoki Tanken! (J).bin" size="????" crc="314f6cb4" sha1="69d3c5754ccbcde0737455bf7bf0eee4ec610972" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
@@ -1922,17 +2009,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Pooh-san no Hajimete no Eigo (J).bin" size="????" crc="7e4f093c" sha1="29bffce1aecaa7cc439ad18a23ecb4d5c919ad65" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poohichi">
-		<description>Pooh-san no Ichinichi (Jpn, Rev. 1)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Pooh-san no Ichinichi (J) (REV01).bin" size="????" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
