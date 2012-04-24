@@ -1544,7 +1544,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
-		state->m_nvram[offset] = data;
+		COMBINE_DATA(state->m_nvram16 + offset);
 	}
 }
 
@@ -1564,12 +1564,12 @@ static READ16_HANDLER( x68k_sram_r )
 	if(offset == 0x70/2)
 		return 0x0700;
 #endif
-	return state->m_nvram[offset];
+	return state->m_nvram16[offset];
 }
 
 static READ32_HANDLER( x68k_sram32_r )
 {
-	x68030_state *state = space->machine().driver_data<x68030_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset == 0x08/4)
 		return (space->machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
 #if 0
@@ -1580,15 +1580,15 @@ static READ32_HANDLER( x68k_sram32_r )
 	if(offset == 0x70/2)
 		return 0x0700;
 #endif
-	return state->m_nvram[offset];
+	return state->m_nvram32[offset];
 }
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
-	x68030_state *state = space->machine().driver_data<x68030_state>();
+	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(state->m_nvram + offset);
+		COMBINE_DATA(state->m_nvram32 + offset);
 	}
 }
 
@@ -1965,8 +1965,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram16")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
@@ -1990,7 +1990,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // internal SCSI ROM
@@ -2002,8 +2002,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram16")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
@@ -2028,7 +2028,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
@@ -2041,8 +2041,8 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16_LEGACY(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram32")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram32")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16_LEGACY(x68k_crtc_r, x68k_crtc_w,0xffffffff)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16_LEGACY(x68k_vid_r, x68k_vid_w,0xffffffff)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16_LEGACY(x68k_dmac_r, x68k_dmac_w,0xffffffff)
@@ -2066,7 +2066,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16_LEGACY(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram32")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
@@ -2647,13 +2647,13 @@ static MACHINE_START( x68000 )
 	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
-	state->membank("bank2")->set_base(state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
-	state->membank("bank3")->set_base(state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
-	state->membank("bank4")->set_base(state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2669,7 +2669,7 @@ static MACHINE_START( x68000 )
 static MACHINE_START( x68030 )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	x68030_state *state = machine.driver_data<x68030_state>();
+	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
 	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
@@ -2678,13 +2678,13 @@ static MACHINE_START( x68030 )
 	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
-	state->membank("bank2")->set_base(state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
-	state->membank("bank3")->set_base(state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
-	state->membank("bank4")->set_base(state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2738,6 +2738,7 @@ static DRIVER_INIT( x68000 )
 	md_6button_init(machine);
 
 	state->m_sysport.cputype = 0xff;  // 68000, 10MHz
+	state->m_is_32bit = false;
 }
 
 static DRIVER_INIT( x68kxvi )
@@ -2745,6 +2746,7 @@ static DRIVER_INIT( x68kxvi )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->m_sysport.cputype = 0xfe; // 68000, 16MHz
+	state->m_is_32bit = false;
 }
 
 static DRIVER_INIT( x68030 )
@@ -2752,6 +2754,7 @@ static DRIVER_INIT( x68030 )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->m_sysport.cputype = 0xdc; // 68030, 25MHz
+	state->m_is_32bit = true;
 }
 
 static MACHINE_CONFIG_FRAGMENT( x68000_base )
@@ -2817,7 +2820,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_FRAGMENT_ADD(x68000_base)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram16")
 
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 
@@ -2839,7 +2842,7 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( x68030, x68030_state )
+static MACHINE_CONFIG_START( x68030, x68k_state )
 	MCFG_FRAGMENT_ADD(x68000_base)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
@@ -2848,7 +2851,7 @@ static MACHINE_CONFIG_START( x68030, x68030_state )
 	MCFG_MACHINE_START( x68030 )
 	MCFG_MACHINE_RESET( x68000 )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram32")
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
 	MCFG_HARDDISK_ADD("harddisk0")
