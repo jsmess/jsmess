@@ -11,7 +11,7 @@
 #include "formats/ap2_dsk.h"
 
 // our parent's device is the Disk II card (Apple II) or main driver (Mac, IIgs)
-// either way, get the drive from there.                          
+// either way, get the drive from there.
 #define PARENT_FLOPPY_0 "^floppy0"
 #define PARENT_FLOPPY_1 "^floppy1"
 #define PARENT_FLOPPY_2 "^floppy2"

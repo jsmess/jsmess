@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- flash write
-	- FT245
+    - flash write
+    - FT245
 
 */
 
@@ -46,7 +46,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 	MCFG_DS1302_ADD(DS1302_TAG)
 	// TODO FT245R
 	// TODO CompactFlash
-	
+
 	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_image_devices, "hdd", "hdd")
 MACHINE_CONFIG_END
 
@@ -174,11 +174,11 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 		}
 		else if (!io1)
 		{
-			// 0x20-0x2f	IDE
-			// 0x30-0x37	I/O
-			// 0x5d-0x5e	FT245
-			// 0x5f-0x5f	DS1302
-			// 0x60-0xff	ROM
+			// 0x20-0x2f    IDE
+			// 0x30-0x37    I/O
+			// 0x5d-0x5e    FT245
+			// 0x5f-0x5f    DS1302
+			// 0x60-0xff    ROM
 
 			UINT8 io1_offset = offset & 0xff;
 
@@ -195,19 +195,19 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 			else if (io1_offset == 0x32)
 			{
 				/*
-				
-				    bit     description
-				
-				    0       GAME
-				    1       EXROM
-				    2       A14
-				    3       A15
-				    4       A16
-				    5       v4.x
-				    6       
-				    7       
-				
-				*/
+
+                    bit     description
+
+                    0       GAME
+                    1       EXROM
+                    2       A14
+                    3       A15
+                    4       A16
+                    5       v4.x
+                    6
+                    7
+
+                */
 
 				data = 0x20 | (m_bank << 2) | (m_exrom << 1) | m_game;
 			}
@@ -268,11 +268,11 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 		}
 		else if (!io1)
 		{
-			// 0x20-0x2f	IDE
-			// 0x30-0x37	I/O
-			// 0x5d-0x5e	FT245
-			// 0x5f-0x5f	DS1302
-			// 0x60-0xff	ROM
+			// 0x20-0x2f    IDE
+			// 0x30-0x37    I/O
+			// 0x5d-0x5e    FT245
+			// 0x5f-0x5f    DS1302
+			// 0x60-0xff    ROM
 
 			UINT8 io1_offset = offset & 0xff;
 
@@ -291,7 +291,7 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 				m_rtc->ds1302_clk_w(0, 0);
 
 				data = m_rtc->ds1302_read(0);
-				
+
 				m_rtc->ds1302_clk_w(0, 1);
 			}
 			else if (io1_offset >= 0x60 && io1_offset < 0x68)
@@ -301,19 +301,19 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 			else if (io1_offset >= 0xfb)
 			{
 				/*
-				
-				    bit     description
-				
-				    0       disable cartridge
-				    1       RTC CE
-				    2       
-				    3       
-				    4       
-				    5       
-				    6       
-				    7       
-				
-				*/
+
+                    bit     description
+
+                    0       disable cartridge
+                    1       RTC CE
+                    2
+                    3
+                    4
+                    5
+                    6
+                    7
+
+                */
 
 				m_enable = !BIT(data, 0);
 				m_rtc_ce = BIT(data, 1);

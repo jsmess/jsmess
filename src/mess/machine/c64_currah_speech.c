@@ -26,9 +26,9 @@ PCB Layout
 Notes:
     All IC's shown.
 
-	VLSI   - General Instruments LA05-164 custom
-	ROM    - General Instruments R09864CS-2030 8Kx8 ROM "778R01"
-	SP0256 - General Instruments SP0256A-AL2 Speech Synthesizer
+    VLSI   - General Instruments LA05-164 custom
+    ROM    - General Instruments R09864CS-2030 8Kx8 ROM "778R01"
+    SP0256 - General Instruments SP0256A-AL2 Speech Synthesizer
 
 
 LA05-164 Pinout
@@ -50,21 +50,21 @@ _GA+EX  11 |             | 18  CA15
    GND  14 |_____________| 15  CA14
 
 Notes:
-	_GA+EX  - _GAME and _EXROM tied together
+    _GA+EX  - _GAME and _EXROM tied together
 
 */
 
 /*
 
-	BASIC Commands
-	--------------
+    BASIC Commands
+    --------------
 
-	INIT		Initialize the cartridge
-	BYE			Disable the cartridge
-	KON 0		Enable keyvoices, low voice
-	KON 1		Enable keyvoices, high voice
-	KOFF		Disable keyvoices
-	SAY 0/1 ""	Say words
+    INIT        Initialize the cartridge
+    BYE         Disable the cartridge
+    KON 0       Enable keyvoices, low voice
+    KON 1       Enable keyvoices, high voice
+    KOFF        Disable keyvoices
+    SAY 0/1 ""  Say words
 
 */
 
@@ -147,7 +147,7 @@ machine_config_constructor c64_currah_speech_cartridge_device::device_mconfig_ad
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_osc1 - 
+//  set_osc1 -
 //-------------------------------------------------
 
 void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
@@ -211,23 +211,23 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 	else if (!io1)
 	{
 		/*
-		
-		    bit     description
-		
-		    0       
-		    1       
-		    2       
-		    3       
-		    4       
-		    5       
-		    6       
-		    7       SBY
-		
-		*/
+
+            bit     description
+
+            0
+            1
+            2
+            3
+            4
+            5
+            6
+            7       SBY
+
+        */
 
 		data = sp0256_sby_r(m_nsp) << 7;
 	}
-	
+
 	if (!space.debugger_access() && (offset == 0xa7f0))
 	{
 		m_game = !m_game;
@@ -247,19 +247,19 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 	if (!io1)
 	{
 		/*
-		
-		    bit     description
-		
-		    0       A1
-		    1       A2
-		    2       A3
-		    3       A4
-		    4       A5
-		    5       A6
-		    6       
-		    7       intonation
-		
-		*/
+
+            bit     description
+
+            0       A1
+            1       A2
+            2       A3
+            3       A4
+            4       A5
+            5       A6
+            6
+            7       intonation
+
+        */
 
 		int voice = BIT(offset, 0);
 		int intonation = BIT(data, 7);

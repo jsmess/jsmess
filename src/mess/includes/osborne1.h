@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
 	DECLARE_DIRECT_UPDATE_MEMBER(osborne1_opbase);
-	
+
 	bool m_bank2_enabled;
 	bool m_bank3_enabled;
 	UINT8	*m_bank4_ptr;

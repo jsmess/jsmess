@@ -90,7 +90,7 @@ inline void c64_cpm_cartridge_device::update_signals()
             device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
             m_maincpu->set_state(Z80_PC, 0);
         	m_reset = 0;
-        }		
+        }
 	}
 	else
 	{
@@ -99,17 +99,17 @@ inline void c64_cpm_cartridge_device::update_signals()
 	}
 
 /*
-	// NOTE: the following is how it actually works once the Z80 core has been rewritten
+    // NOTE: the following is how it actually works once the Z80 core has been rewritten
 
-	// C64 DMA
-	m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
+    // C64 DMA
+    m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
 
-	// Z80 BUSRQ
-	int busrq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, busrq);
+    // Z80 BUSRQ
+    int busrq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
+    m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, busrq);
 
-	// Z80 WAIT
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);
+    // Z80 WAIT
+    m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);
 */
 }
 

@@ -68,11 +68,11 @@ public:
 	int m_FETimer;
 
 	direct_update_delegate m_FE_old_opbase_handler;
-	
+
 	DECLARE_DIRECT_UPDATE_MEMBER(modeF6_opbase);
 	DECLARE_DIRECT_UPDATE_MEMBER(modeSS_opbase);
 	DECLARE_DIRECT_UPDATE_MEMBER(modeDPC_opbase_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(modeFE_opbase_handler);	
+	DECLARE_DIRECT_UPDATE_MEMBER(modeFE_opbase_handler);
 	DECLARE_READ8_MEMBER(modeF8_switch_r);
 	DECLARE_READ8_MEMBER(modeFA_switch_r);
 	DECLARE_READ8_MEMBER(modeF6_switch_r);

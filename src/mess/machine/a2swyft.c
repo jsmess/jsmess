@@ -25,7 +25,7 @@ const device_type A2BUS_SWYFT = &device_creator<a2bus_swyft_device>;
 
 ROM_START( swyft )
 	ROM_REGION(0x4000, SWYFT_ROM_REGION, 0)
-    ROM_LOAD( "swyftcard rom.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) ) 
+    ROM_LOAD( "swyftcard rom.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) )
 ROM_END
 
 //-------------------------------------------------

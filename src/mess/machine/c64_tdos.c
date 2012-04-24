@@ -12,43 +12,43 @@
     PCB Layout
     ----------
 
-	XM-2206-A (top)
-	XM-2205-A (bottom)
+    XM-2206-A (top)
+    XM-2205-A (bottom)
 
-	            |===========================|
-	            |            CN4            |
-	            |                           |
-	            |      ULA                  |
-	            |                           |
-	            |      6.5MHz               |
-	            |                           |
-	            |      SSDA                 |
-	            |                 LS175     |
-	            |                 LS367     |
-	            |            CN3            |
-	            |=========|||||||||=========|
-	                      |||||||||
-	        |=============|||||||||============|
-	        |                CN2               |
-	        |       LS00     LS02     LS138    |
-	|=======|                                  |
-	|=|             LS245        ROM           |
-	|=|                                        |
-	|=|                                        |
-	|=|                                     CN1|
-	|=|                                        |
-	|=|                                        |
-	|=|                                        |
-	|=|                             SW1        |
-	|==========================================|
+                |===========================|
+                |            CN4            |
+                |                           |
+                |      ULA                  |
+                |                           |
+                |      6.5MHz               |
+                |                           |
+                |      SSDA                 |
+                |                 LS175     |
+                |                 LS367     |
+                |            CN3            |
+                |=========|||||||||=========|
+                          |||||||||
+            |=============|||||||||============|
+            |                CN2               |
+            |       LS00     LS02     LS138    |
+    |=======|                                  |
+    |=|             LS245        ROM           |
+    |=|                                        |
+    |=|                                        |
+    |=|                                     CN1|
+    |=|                                        |
+    |=|                                        |
+    |=|                                        |
+    |=|                             SW1        |
+    |==========================================|
 
-	ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
-	ULA    - Ferranti ULA5RB073E1 XZ-2085-1 custom (?)
-	SSDA   - Motorola MC68A52P SSDA
-	CN1    - C64 expansion connector (pass-thru)
-	CN2,3  - 19x1 flat ribbon cable to other PCB
-	CN4    - 9 wires to 3" drive
-	SW1    - cartridge on/off switch
+    ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
+    ULA    - Ferranti ULA5RB073E1 XZ-2085-1 custom (?)
+    SSDA   - Motorola MC68A52P SSDA
+    CN1    - C64 expansion connector (pass-thru)
+    CN2,3  - 19x1 flat ribbon cable to other PCB
+    CN4    - 9 wires to 3" drive
+    SW1    - cartridge on/off switch
 
 */
 
@@ -188,7 +188,7 @@ c64_tdos_cartridge_device::c64_tdos_cartridge_device(const machine_config &mconf
 	device_t(mconfig, C64_TDOS, "C64 TDOS cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ssda(*this, MC68A52P_TAG),
-    m_exp(*this, C64_EXPANSION_SLOT_TAG)	
+    m_exp(*this, C64_EXPANSION_SLOT_TAG)
 {
 }
 

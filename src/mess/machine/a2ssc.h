@@ -35,7 +35,7 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 
-    virtual UINT8 read_c0nx(address_space &space, UINT8 offset); 
+    virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
     virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
     virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
     virtual UINT8 read_c800(address_space &space, UINT16 offset);

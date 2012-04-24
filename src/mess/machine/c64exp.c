@@ -70,7 +70,7 @@ UINT8* device_c64_expansion_card_interface::c64_roml_pointer(running_machine &ma
 	if (m_roml == NULL)
 	{
 		m_roml = auto_alloc_array(machine, UINT8, size);
-		
+
 		m_roml_mask = size - 1;
 	}
 

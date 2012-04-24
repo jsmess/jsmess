@@ -114,7 +114,7 @@ public:
 
 	// video state
 	optional_shared_ptr<UINT8> m_video_ram; 				// HR video RAM
-	optional_shared_ptr<UINT8> m_char_ram; 				// character RAM
+	optional_shared_ptr<UINT8> m_char_ram;				// character RAM
 	const UINT8 *m_char_rom;		// character generator ROM
 	const UINT8 *m_fgctl_prom;		// foreground control PROM
 	UINT8 m_hrs;					// HR picture start scanline
@@ -142,7 +142,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_DIRECT_UPDATE_MEMBER(abc800m_direct_update_handler);
 };
 
@@ -159,7 +159,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_DIRECT_UPDATE_MEMBER(abc800c_direct_update_handler);
 };
 
@@ -188,7 +188,7 @@ public:
 	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );	
+	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	DECLARE_DIRECT_UPDATE_MEMBER(abc802_direct_update_handler);
 
 	// cpu state

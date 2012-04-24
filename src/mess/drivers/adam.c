@@ -770,7 +770,7 @@ WRITE8_MEMBER( adam_state::ddp6801_p1_w )
 		if(!(data & 0x10)) m_ddp0->go_reverse();
 		m_ddp0->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR); // motor control
 	}
-	
+
 	if(m_ddp1->exists())
 	{
 		m_ddp1->set_speed(BIT(data, 0) ? (double) 80/1.875 : 20/1.875); // speed select
@@ -804,9 +804,9 @@ READ8_MEMBER( adam_state::ddp6801_p2_r )
         4
 
     */
-	
+
 	UINT8 data = 0;
-	
+
 	if (m_reset)
 		data |= M6801_MODE_6;
 	else
@@ -842,7 +842,7 @@ WRITE8_MEMBER( adam_state::ddp6801_p2_w )
 		m_ddp0->set_channel(!BIT(data, 2)); // Track select
 		if (!m_wr0) m_ddp0->output(BIT(data, 0) ? 1.0 : -1.0); // write data
 	}
-	
+
 	if(m_ddp1->exists())
 	{
 		m_ddp1->set_channel(!BIT(data, 2));
@@ -883,17 +883,17 @@ READ8_MEMBER( adam_state::ddp6801_p4_r )
 		data |= 1 << 5; // cassette in place
 		data |= (m_ddp0->input() < 0) << 7; // read data
 	}
-	
+
 	// drive 1
 	if(m_ddp1->exists())
 	{
 		data |= ((m_ddp1->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4; // motion sense
 		data |= (m_ddp1->input() < 0) << 7; // read data
 	}
-	
+
 	// read data 0 (always 1)
 	data |= 0x40;
-		
+
 	return data;
 }
 
