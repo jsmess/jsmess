@@ -1,4 +1,82 @@
-﻿0.145u6
+﻿0.145u7
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+-SAPI 2 [Robbbert]
+-Pyldin 601 [Robbbert]
+
+Skeleton drivers:
+-----------------
+- Powertran Cortex [Robbbert,Kaylee]
+
+System Driver Changes:
+----------------------
+-apple2: CFFA2000 now has savable settings EEPROM, plus default settings 
+ patched to enable two drives [R. Belmont]
+-apple2: Thunderclock Plus card added [R. Belmont]
+-apollo: add alternate layouts for a better experience on XGA (1024x768) 
+ and WXGA (1280x800) displays. [Hans Ostermeyer]
+-apple2: Added Microsoft SoftCard.  Works only on apple2 and apple2p for now, 
+ and only with Microsoft's CP/M boot disks. [R. Belmont]
+-sms: Prevent a crash in sms1pal and some optimizations.  [Enik Land]
+-c64: Added support for the Currah Speech 64 cartridge, pitch is not spot on yet. [Curt Coder]
+-c64: Added support for the NeoRAM cartridge. [Curt Coder]
+-c64: Added support for the Commodore CP/M cartridge. VICE Team, your move ;) [Curt Coder, R. Belmont]
+-adam: Improved the cassette emulation:
+	- added ddp tape image support
+	- edited cassette.c to allow speed / direction / channel selection
+	- changed cassimg.c so multichannel tapes work [huygens]
+-c64: Added support for the 4040+Fast Hack'em cartridge. [Curt Coder]
+-mk83: fixed video, computer responds to commands. [Robbbert]
+-sapi: SAPI1 - modernised. SAPI2 connected to ascii keyboard, works. 
+ Sapi3 connected to terminal. Needs a boot disk & fdc.  [Robbbert]
+-apple2: Added Videx VideoTerm card emulation for slot 3 on II/II+ [R. Belmont]
+-apple2: cards that don't take over c800 now don't have to.
+ Fixes SoftCard compatibility with VideoTerm and IIe - CP/M now 
+ runs in 80 columns in those setups. [R. Belmont]
+-apple2gs: writes to card CnXX and C800 space now honored.
+ CFFA2 settings changes work. [R. Belmont]
+-apple2: Fixed reset bit for Mockingboard/Phasor.  Fixes stuck sounds 
+ in Mockingboard and Phasor utility programs. [R. Belmont]
+-apple2: Enabled AE Phasor, it works pretty well now [R. Belmont]
+-apple2: Added Super Serial Card.  Not terribly useful at present, 
+ but should get interesting in the future. [R. Belmont]
+-apple2: added /INH support to the slots for the D000-FFFF region and 
+ added IAI SwyftCard support.  (It must go in slot 3 of a IIe!)
+
+Software Lists:
+----------------
+- pico.xml: added new Japanese dumps [Team Europe]
+
+Source Changes:
+----------------
+-3c505: Switched to using core device_network_interface [Hans Ostermeyer]
+-Add multiread support (behind a define for now pending heuristics) to the 
+ dfi import support. Fix some inaccuracies regarding index decode position in dfi files. [Lord Nightmare]
+-Modern apple 2 disk decoder for 16-sector disk images implemented using Olivier's 
+ new system for floptool. Only supports importing from .dfi 50mhz multi-read x3 
+ images at the moment. [Lord Nightmare, Balrog, Jason Scott, Karsten Scheibler]
+-fix dsk export from floptool so it can work with just one .dfi read instead of
+ needing 3 reads. Tested at 50mhz sampling rate only. [Lord Nightmare]
+-More work on dfi and apple2 modern disk stuff; most of the auto speed recognition 
+ stuff is in the dfi handler now but the actual data scaling to match the internal 
+ mfi 200mhz sample rate stream is not done yet. There are also some likely issues 
+ with beginnings and ends of index pulses. Brickwall windowing has been implemented 
+ for dfi for regeneration of missed transitions from marginal reads as well as discarding of noise.
+ A histogram has been added (disabled by default) for dfi format as well.
+ [Lord Nightmare, Phil Pemberton, Balrog]
+-Some additional tweaks to ap2 and dfi stuff; disabled the horribly broken load() 
+ code in ap2_dsk. [Lord Nightmare, Balrog]
+-ap2_dsk.c: beginnings of 13-sector format support. gives a warning if you try to read one so far.
+-dfi_dsk.c: fix a bug involving offsets read from source file per track which caused an 
+ occasional 0xFF byte to end up in the stream (reading off end of file buffer) [Lord Nightmare]
+-ap2_dsk now produces valid, runnable ProDOS-order .po disk images. [Lord Nightmare, adtpro]
+
+0.145u6
 
 New System Drivers Supported:
 -----------------------------
