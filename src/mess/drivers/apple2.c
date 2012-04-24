@@ -203,6 +203,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2softcard.h"
 #include "machine/a2videoterm.h"
 #include "machine/a2ssc.h"
+#include "machine/a2swyft.h"
 
 /***************************************************************************
     PARAMETERS
@@ -215,18 +216,26 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #define PADDLE_SENSITIVITY      10
 #define PADDLE_AUTOCENTER       0
 
-WRITE8_DEVICE_HANDLER(a2bus_irq_w)
+static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
 {
     apple2_state *a2 = device->machine().driver_data<apple2_state>();
 
     device_set_input_line(a2->m_maincpu, M6502_IRQ_LINE, data);
 }
 
-WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
+static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
 {
     apple2_state *a2 = device->machine().driver_data<apple2_state>();
 
     device_set_input_line(a2->m_maincpu, INPUT_LINE_NMI, data);
+}
+
+static WRITE8_DEVICE_HANDLER(a2bus_inh_w)
+{
+    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+
+    a2->m_inh_slot = data;
+    apple2_update_memory(device->machine());
 }
 
 /***************************************************************************
@@ -582,7 +591,8 @@ static const struct a2bus_interface a2bus_intf =
 {
 	// interrupt lines
 	DEVCB_HANDLER(a2bus_irq_w),
-	DEVCB_HANDLER(a2bus_nmi_w)
+	DEVCB_HANDLER(a2bus_nmi_w),
+    DEVCB_HANDLER(a2bus_inh_w)
 };
 
 static SLOT_INTERFACE_START(apple2_slot0_cards)
@@ -601,6 +611,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */
     SLOT_INTERFACE("videoterm", A2BUS_VIDEOTERM)    /* Videx VideoTerm */
     SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
+    SLOT_INTERFACE("swyft", A2BUS_SWYFT)    /* IAI SwyftCard */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 

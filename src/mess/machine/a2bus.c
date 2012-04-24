@@ -148,6 +148,7 @@ void a2bus_device::device_config_complete()
 	{
     	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
     	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+    	memset(&m_out_inh_cb, 0, sizeof(m_out_inh_cb));
 	}
 }
 
@@ -179,6 +180,7 @@ void a2bus_device::device_start()
     // resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
+	m_out_inh_func.resolve(m_out_inh_cb, *this);
 
     // clear slots
     for (int i = 0; i < 8; i++)
@@ -218,6 +220,11 @@ void a2bus_device::set_irq_line(int state)
 void a2bus_device::set_nmi_line(int state)
 {
     m_out_nmi_func(state);
+}
+
+void a2bus_device::set_inh_slotnum(int slot)
+{
+    m_out_inh_func(slot);
 }
 
 // interrupt request from a2bus card
@@ -275,5 +282,4 @@ void device_a2bus_card_interface::set_a2bus_device()
 	m_a2bus = dynamic_cast<a2bus_device *>(device().machine().device(m_a2bus_tag));
 	m_a2bus->add_a2bus_card(m_slot, this);
 }
-
 

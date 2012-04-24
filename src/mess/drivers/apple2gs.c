@@ -199,11 +199,20 @@ static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
     device_set_input_line(a2->m_maincpu, INPUT_LINE_NMI, data);
 }
 
+static WRITE8_DEVICE_HANDLER(a2bus_inh_w)
+{
+    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+
+    a2->m_inh_slot = data;
+    apple2_update_memory(device->machine());
+}
+
 static const struct a2bus_interface a2bus_intf =
 {
-	// interrupt lines
-  DEVCB_HANDLER(a2bus_irq_w),
-  DEVCB_HANDLER(a2bus_nmi_w)
+    // interrupt lines
+    DEVCB_HANDLER(a2bus_irq_w),
+    DEVCB_HANDLER(a2bus_nmi_w),
+    DEVCB_HANDLER(a2bus_inh_w)
 };
 
 static SLOT_INTERFACE_START(apple2_cards)
