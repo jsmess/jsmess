@@ -44,7 +44,7 @@ public:
 	/* NR signal */
 	UINT8 m_NR;
 	UINT8 m_df_on_databus;
-	
+
 	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);

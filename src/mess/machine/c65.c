@@ -846,7 +846,7 @@ void c65_bankswitch_interface( running_machine &machine, int value )
 	{
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20)
-			state->membank("bank3")->set_base(state->m_interface);
+			state->membank("bank3")->set_base(state->m_basic);
 		else
 			state->membank("bank3")->set_base(state->m_memory + 0xc000);
 	}

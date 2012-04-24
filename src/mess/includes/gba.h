@@ -141,11 +141,11 @@ public:
 		m_gba_pram(*this, "gba_pram"),
 		m_gba_vram(*this, "gba_vram"),
 		m_gba_oam(*this, "gba_oam") { }
-	
+
 	required_shared_ptr<UINT32> m_gba_pram;
 	required_shared_ptr<UINT32> m_gba_vram;
 	required_shared_ptr<UINT32> m_gba_oam;
-	
+
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -221,7 +221,7 @@ public:
 	int m_bios_protected;
 
 	int m_flash_battery_load;
-	
+
 	DIRECT_UPDATE_MEMBER(gba_direct);
 	DECLARE_READ32_MEMBER(gba_io_r);
 	DECLARE_WRITE32_MEMBER(gba_io_w);

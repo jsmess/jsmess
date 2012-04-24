@@ -9,24 +9,24 @@
 
 /*
 
-	4040 + Fast Hack'em
+    4040 + Fast Hack'em
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|===========================|
-	|=|                         |
-	|=|                     SW1 |
-	|=|         ROM0            |
-	|=|                         |
-	|=|                         |
-	|=|         ROM1            |
-	|=|                         |
-	|=|                         |
-	|===========================|
+    |===========================|
+    |=|                         |
+    |=|                     SW1 |
+    |=|         ROM0            |
+    |=|                         |
+    |=|                         |
+    |=|         ROM1            |
+    |=|                         |
+    |=|                         |
+    |===========================|
 
-	ROM0,1  - National Semiconductor NMC27C64Q 8Kx8 EPROM
-	SW1     - ROM selection switch
+    ROM0,1  - National Semiconductor NMC27C64Q 8Kx8 EPROM
+    SW1     - ROM selection switch
 
 */
 

@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ssc )
 	ROM_REGION(0x000800, SSC_ROM_REGION, 0)
-    ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) ) 
+    ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) )
 ROM_END
 
 static INPUT_PORTS_START( ssc )
@@ -188,7 +188,7 @@ UINT8 a2bus_ssc_device::read_c0nx(address_space &space, UINT8 offset)
         case 0xa:
         case 0xb:
             return m_acia->read(space, offset-8);
-        
+
     }
 
     return 0;
@@ -208,7 +208,7 @@ void a2bus_ssc_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
         case 0xb:
             m_acia->write(space, offset-8, data);
             break;
-        
+
     }
 }
 

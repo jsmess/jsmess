@@ -448,7 +448,7 @@ INT8 apple2_slotram_r(address_space &space, int slotnum, int offset)
 	{
 		if (!space.debugger_access())
 		{
-//			printf("slotram_r: taking cnxx_slot to -1\n");
+//          printf("slotram_r: taking cnxx_slot to -1\n");
 			state->m_a2_cnxx_slot = -1;
 			apple2_update_memory(space.machine());
 		}
@@ -473,7 +473,7 @@ static READ8_HANDLER( apple2_c1xx_r )
 	{
 		if (slotdevice->take_c800())
 		{
-//			printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
+//          printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space->machine());
 		}
@@ -532,7 +532,7 @@ static READ8_HANDLER( apple2_c3xx_r )
 	{
 		if (slotdevice->take_c800())
 		{
-//			printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
+//          printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space->machine());
 		}
@@ -568,7 +568,7 @@ static WRITE8_HANDLER ( apple2_c3xx_w )
 	{
 		if (slotdevice->take_c800())
 		{
-//			printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
+//          printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space->machine());
 		}
@@ -595,7 +595,7 @@ static READ8_HANDLER( apple2_c4xx_r )
 	{
 		if (slotdevice->take_c800())
 		{
-//			printf("c4xx_r: taking cnxx_slot to %d\n", slotnum);
+//          printf("c4xx_r: taking cnxx_slot to %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space->machine());
 		}
@@ -631,7 +631,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	{
 		if (slotdevice->take_c800())
 		{
-//			printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
+//          printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space->machine());
 		}
@@ -650,7 +650,7 @@ static READ8_HANDLER(apple2_cfff_r)
 	if (!space->debugger_access())
 	{
         apple2_state *state = space->machine().driver_data<apple2_state>();
-//		printf("cfff_r: taking cnxx_slot to -1\n");
+//      printf("cfff_r: taking cnxx_slot to -1\n");
 		state->m_a2_cnxx_slot = -1;
 		apple2_update_memory(space->machine());
 	}
@@ -663,7 +663,7 @@ static WRITE8_HANDLER(apple2_cfff_w)
 	if (!space->debugger_access())
 	{
         apple2_state *state = space->machine().driver_data<apple2_state>();
-//		printf("cfff_w: taking cnxx_slot to -1\n");
+//      printf("cfff_w: taking cnxx_slot to -1\n");
         state->m_a2_cnxx_slot = -1;
         apple2_update_memory(space->machine());
     }

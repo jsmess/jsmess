@@ -704,7 +704,7 @@ WRITE8_DEVICE_HANDLER(lx390_motor_w)
 }
 
 READ8_DEVICE_HANDLER(lx390_reset_bank)
-{	
+{
 	z80ne_state *state = device->machine().driver_data<z80ne_state>();
 	offs_t pc;
 

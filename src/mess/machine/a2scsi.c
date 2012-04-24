@@ -10,7 +10,7 @@
 
     Notes:
 
-    C0n0-C0n7 = NCR5380 registers in normal order 
+    C0n0-C0n7 = NCR5380 registers in normal order
     C0n9 = DIP switches
     C0na = RAM and ROM bank switching
     C0nb = reset 5380

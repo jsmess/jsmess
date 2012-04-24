@@ -91,7 +91,7 @@ public:
 
 	required_device<mc6845_device> m_mc6845;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	UINT8 *m_system_rom;
 	int m_LogDatWrites;
 	int m_Keyboard[NoKeyrows];

@@ -3,22 +3,22 @@
     a2videoterm.c
 
     Implementation of the Videx VideoTerm 80-column card
- 
+
     Notes (from Videoterm user's manual, which contains
            schematics and firmware source listings).
- 
+
     C0nX: C0n0 is 6845 register address,
           C0n1 is 6845 register data.
- 
+
           Bits 2 & 3 on any access to C0nX set the VRAM page at CC00.
- 
+
     C800-CBFF: ROM
     CC00-CDFF: VRAM window
- 
+
     TODO:
     Cursor is probably not completely right.
     Add font ROM select.
- 
+
 *********************************************************************/
 
 #include "a2videoterm.h"
@@ -68,19 +68,19 @@ MACHINE_CONFIG_END
 
 ROM_START( a2videoterm )
 	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
-    ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) ) 
+    ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) )
 
 	ROM_REGION(0x5000, VIDEOTERM_GFX_REGION, 0)
-    ROM_LOAD( "videx videoterm character rom normal.bin", 0x000000, 0x000800, CRC(87f89f08) SHA1(410b54f33d13c82e3857f1be906d93a8c5b8d321) ) 
-    ROM_LOAD( "videx videoterm character rom normal uppercase.bin", 0x000800, 0x000800, CRC(3d94a7a4) SHA1(5518254f24bc945aab13bc71ecc9526d6dd8e033) ) 
-    ROM_LOAD( "videx videoterm character rom apl.bin", 0x001000, 0x000800, CRC(1adb704e) SHA1(a95df910eca33188cacee333b1325aa47edbcc25) ) 
-    ROM_LOAD( "videx videoterm character rom epson.bin", 0x001800, 0x000800, CRC(0c6ef8d0) SHA1(db72c0c120086f1aa4a87120c5d7993c4a9d3a18) ) 
-    ROM_LOAD( "videx videoterm character rom french.bin", 0x002000, 0x000800, CRC(266aa837) SHA1(2c6b4e9d342dbb2de8e278740f11925a9d8c6616) ) 
-    ROM_LOAD( "videx videoterm character rom german.bin", 0x002800, 0x000800, CRC(df7324fa) SHA1(0ce58d2ffadbebc8db9f85bbb9a08a4f142af682) ) 
-    ROM_LOAD( "videx videoterm character rom katakana.bin", 0x003000, 0x000800, CRC(b728690e) SHA1(e018fa66b0ff560313bb35757c9ce7adecae0c3a) ) 
-    ROM_LOAD( "videx videoterm character rom spanish.bin", 0x003800, 0x000800, CRC(439eac08) SHA1(d6f9f8eb7702440d9ae39129ea4f480b80fc4608) ) 
-    ROM_LOAD( "videx videoterm character rom super and subscript.bin", 0x004000, 0x000800, CRC(08b7c538) SHA1(7f4029d97be05680fe695debe07cea07666419e0) ) 
-    ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) ) 
+    ROM_LOAD( "videx videoterm character rom normal.bin", 0x000000, 0x000800, CRC(87f89f08) SHA1(410b54f33d13c82e3857f1be906d93a8c5b8d321) )
+    ROM_LOAD( "videx videoterm character rom normal uppercase.bin", 0x000800, 0x000800, CRC(3d94a7a4) SHA1(5518254f24bc945aab13bc71ecc9526d6dd8e033) )
+    ROM_LOAD( "videx videoterm character rom apl.bin", 0x001000, 0x000800, CRC(1adb704e) SHA1(a95df910eca33188cacee333b1325aa47edbcc25) )
+    ROM_LOAD( "videx videoterm character rom epson.bin", 0x001800, 0x000800, CRC(0c6ef8d0) SHA1(db72c0c120086f1aa4a87120c5d7993c4a9d3a18) )
+    ROM_LOAD( "videx videoterm character rom french.bin", 0x002000, 0x000800, CRC(266aa837) SHA1(2c6b4e9d342dbb2de8e278740f11925a9d8c6616) )
+    ROM_LOAD( "videx videoterm character rom german.bin", 0x002800, 0x000800, CRC(df7324fa) SHA1(0ce58d2ffadbebc8db9f85bbb9a08a4f142af682) )
+    ROM_LOAD( "videx videoterm character rom katakana.bin", 0x003000, 0x000800, CRC(b728690e) SHA1(e018fa66b0ff560313bb35757c9ce7adecae0c3a) )
+    ROM_LOAD( "videx videoterm character rom spanish.bin", 0x003800, 0x000800, CRC(439eac08) SHA1(d6f9f8eb7702440d9ae39129ea4f480b80fc4608) )
+    ROM_LOAD( "videx videoterm character rom super and subscript.bin", 0x004000, 0x000800, CRC(08b7c538) SHA1(7f4029d97be05680fe695debe07cea07666419e0) )
+    ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) )
 ROM_END
 
 /***************************************************************************

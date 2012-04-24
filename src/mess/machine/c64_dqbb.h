@@ -27,7 +27,7 @@
 
 class c64_dqbb_cartridge_device : public device_t,
 								  public device_c64_expansion_card_interface,
-							   	  public device_nvram_interface
+								  public device_nvram_interface
 {
 public:
 	// construction/destruction

@@ -613,31 +613,31 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 
 bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-/*		TODO: rewrite me properly
-		UINT8 sector_data[(256)*16];
-		memset(sector_data, 0, sizeof(sector_data));
+/*      TODO: rewrite me properly
+        UINT8 sector_data[(256)*16];
+        memset(sector_data, 0, sizeof(sector_data));
 
-		desc_s sectors[16];
-		int format = 0;
-		int pos_data = 0;
+        desc_s sectors[16];
+        int format = 0;
+        int pos_data = 0;
 
-		int head_count = 1;
+        int head_count = 1;
 
-		for(int track=0; track < 35; track++) {
-				for(int head=0; head < head_count; head++) {
-						for(int si=0; si<16; si++) {
-								UINT8 *data = sector_data + (256)*si;
-								sectors[si].data = data;
-								sectors[si].size = 256;
-								sectors[si].sector_id = si;
-								sectors[si].sector_info = format;
-								io_generic_read(io, data, pos_data, 256);
-								pos_data += 256;
-						}
-						generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
-				}
-		}
-		return true;*/
+        for(int track=0; track < 35; track++) {
+                for(int head=0; head < head_count; head++) {
+                        for(int si=0; si<16; si++) {
+                                UINT8 *data = sector_data + (256)*si;
+                                sectors[si].data = data;
+                                sectors[si].size = 256;
+                                sectors[si].sector_id = si;
+                                sectors[si].sector_info = format;
+                                io_generic_read(io, data, pos_data, 256);
+                                pos_data += 256;
+                        }
+                        generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
+                }
+        }
+        return true;*/
 		return false; // I hope that throws an error...
 }
 

@@ -60,7 +60,7 @@ public:
 
 	/* video state */
 	int m_cdp1864_efx;		/* EFx */
-	required_shared_ptr<UINT8> m_colorram; 		/* color memory */
+	required_shared_ptr<UINT8> m_colorram;		/* color memory */
 	UINT8 m_color;
 
 	/* keyboard state */

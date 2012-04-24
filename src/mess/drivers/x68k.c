@@ -2703,8 +2703,8 @@ static DRIVER_INIT( x68000 )
 	unsigned char* rom = machine.root_device().memregion("maincpu")->base();
 	unsigned char* user2 = machine.root_device().memregion("user2")->base();
 	//FIXME
-//	state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-//	state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+//  state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+//  state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->m_sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
 
 	state->m_spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));

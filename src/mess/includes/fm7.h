@@ -109,7 +109,7 @@ public:
 
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
-	
+
 	UINT8 m_irq_flags;
 	UINT8 m_irq_mask;
 	emu_timer* m_timer;

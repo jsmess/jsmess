@@ -9,35 +9,35 @@
 
 /*
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|===========================|
-	|=|                         |
-	|=|                      SW1|
-	|=|       SC02              |
-	|=|                         |
-	|=|                      CN1|
-	|=|       ROM        LF347  |
-	|=|                         |
-	|=|                         |
-	|===========================|
+    |===========================|
+    |=|                         |
+    |=|                      SW1|
+    |=|       SC02              |
+    |=|                         |
+    |=|                      CN1|
+    |=|       ROM        LF347  |
+    |=|                         |
+    |=|                         |
+    |===========================|
 
-	SC02  - Votrax SSI-263AP Speech Synthesizer
-	ROM   - Hynix Semiconductor HY27C64D-20 8Kx8 EPROM
-	LF347 - National Instruments LF347N JFET Operational Amplifier
-	SW1   - Module on/off switch
-	CN1   - connector to C64 video/audio port
+    SC02  - Votrax SSI-263AP Speech Synthesizer
+    ROM   - Hynix Semiconductor HY27C64D-20 8Kx8 EPROM
+    LF347 - National Instruments LF347N JFET Operational Amplifier
+    SW1   - Module on/off switch
+    CN1   - connector to C64 video/audio port
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- Votrax SC02 emulation
-	- route sound to SID audio input
-	- on/off switch
+    - Votrax SC02 emulation
+    - route sound to SID audio input
+    - on/off switch
 
 */
 
@@ -66,7 +66,7 @@ const device_type C64_PS64 = &device_creator<c64_ps64_cartridge_device>;
 /*
 static struct votrax_sc02_interface votrax_intf =
 {
-	DEVCB_NULL
+    DEVCB_NULL
 };
 */
 

@@ -1366,7 +1366,7 @@ static void sms_machine_stop( running_machine &machine )
 static void setup_rom( address_space *space )
 {
 	sms_state *state = space->machine().driver_data<sms_state>();
-	
+
 	/* 1. set up bank pointers to point to nothing */
 	state->membank("bank1")->set_base(state->m_banking_none);
 	state->membank("bank2")->set_base(state->m_banking_none);

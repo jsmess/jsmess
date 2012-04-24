@@ -1510,7 +1510,7 @@ static DRIVER_INIT( abc802 )
 //-------------------------------------------------
 
 DIRECT_UPDATE_MEMBER(abc806_state::abc806_direct_update_handler)
-{	
+{
 	if (address >= 0x7800 && address < 0x8000)
 	{
 		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
