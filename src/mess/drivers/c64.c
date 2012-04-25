@@ -81,7 +81,7 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
+UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
 {
 	int io1 = 1;
 	int io2 = 1;
@@ -148,7 +148,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 		}
 	}
 
-	data |= m_exp->cd_r(space, offset, roml, romh, io1, io2);
+	data |= m_exp->cd_r(space, offset, ba, roml, romh, io1, io2);
 
 	return data;
 }
@@ -164,7 +164,7 @@ READ8_MEMBER( c64_state::read )
 
 	bankswitch(offset, 0, 1, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, 1, casram, basic, kernal, charom, io, roml, romh);
 }
 
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( c64_state::write )
 		}
 	}
 
-	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, 1, roml, romh, io1, io2);
 }
 
 
@@ -390,7 +390,7 @@ READ8_MEMBER( c64_state::vic_dma_read )
 
 	bankswitch(0, offset, 1, 1, 0, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, 0, casram, basic, kernal, charom, io, roml, romh);
 }
 
 READ8_MEMBER( c64_state::vic_dma_read_color )

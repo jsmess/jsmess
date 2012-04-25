@@ -11,6 +11,7 @@
 
     TODO:
 
+	- DS1302
     - FT245
     - CompactFlash
 
@@ -140,14 +141,14 @@ void c64_ide64_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_enable) return 0;
 
 	UINT8 data = 0;
 	int rom_oe = 1, ram_oe = 1;
 
-	if (!m_game && m_exrom)
+	if (!m_game && m_exrom && ba)
 	{
 		if (offset >= 0x1000 && offset < 0x8000)
 		{
@@ -161,17 +162,11 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 		{
 			ram_oe = 0;
 		}
-		else if (!romh)
-		{
-			rom_oe = 0;
-		}
 	}
-	else
+
+	if (!roml || !romh)
 	{
-		if (!roml || !romh)
-		{
-			rom_oe = 0;
-		}
+		rom_oe = 0;
 	}
 
 	if (!io1)
@@ -245,11 +240,11 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_enable) return;
 
-	if (!m_game && m_exrom)
+	if (!m_game && m_exrom && ba)
 	{
 		if (offset >= 0x1000 && offset < 0x8000)
 		{
@@ -260,14 +255,11 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 			m_ram[offset & 0x7fff] = data;
 		}
 	}
-	else
-	{
-		if ((offset >= 0x8000 && offset < 0xc000) && !m_wp)
-		{
-			offs_t addr = (m_bank << 14) | (offset & 0x3fff);
-			m_flash_rom->write(addr, data);
-		}
 
+	if ((offset >= 0x8000 && offset < 0xc000) && !m_wp)
+	{
+		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
+		m_flash_rom->write(addr, data);
 	}
 
 	if (!io1)

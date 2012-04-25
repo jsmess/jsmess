@@ -294,7 +294,7 @@ bool c64_expansion_slot_device::call_load()
 				size = get_software_region_length("nvram");
 				if (size) memset(m_cart->c64_nvram_pointer(machine(), size), 0, size);
 
-				m_cart->m_exrom = (atol(get_feature("exrom")));
+				m_cart->m_exrom = atol(get_feature("exrom"));
 				m_cart->m_game = atol(get_feature("game"));
 			}
 		}
@@ -340,13 +340,13 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(space, offset, roml, romh, io1, io2);
+		data = m_cart->c64_cd_r(space, offset, ba, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -357,11 +357,11 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int r
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_cart != NULL)
 	{
-		m_cart->c64_cd_w(space, offset, data, roml, romh, io1, io2);
+		m_cart->c64_cd_w(space, offset, data, ba, roml, romh, io1, io2);
 	}
 }
 

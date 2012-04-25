@@ -47,7 +47,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "c64_cpm"; }
 
 	// device_c64_expansion_card_interface overrides
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram);
 
 private:

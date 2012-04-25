@@ -277,9 +277,9 @@ void c64_ieee488_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
-	UINT8 data = m_exp->cd_r(space, offset, roml, romh, io1, io2);
+	UINT8 data = m_exp->cd_r(space, offset, ba, roml, romh, io1, io2);
 
 	if (!roml)
 	{
@@ -301,14 +301,14 @@ UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, int roml
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2)
 	{
 		tpi6525_w(m_tpi, offset & 0x07, data);
 	}
 
-	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
 }
 
 
