@@ -11,6 +11,7 @@
 
     TODO:
 
+	- IDE unknown command (E8)
 	- DS1302
     - FT245
     - CompactFlash
