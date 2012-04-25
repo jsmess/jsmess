@@ -103,9 +103,7 @@ void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8
         if (m_FirstZ80Boot)
         {
             m_FirstZ80Boot = false;
-            device_set_input_line(m_z80, INPUT_LINE_RESET, ASSERT_LINE);
-            device_set_input_line(m_z80, INPUT_LINE_RESET, CLEAR_LINE);
-            m_z80->set_state(Z80_PC, 0);
+            m_z80->reset();
         }
 
         m_bEnabled = true;
