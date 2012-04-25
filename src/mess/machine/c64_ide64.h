@@ -55,7 +55,7 @@ private:
 	required_device<device_t> m_ide;
 
 	UINT8 m_bank;
-	UINT8 m_ide_data;
+	UINT16 m_ide_data;
 	int m_wp;
 	int m_enable;
 	int m_rtc_ce;
