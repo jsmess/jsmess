@@ -28,6 +28,17 @@
 		</part>
 	</software>
 
+	<software name="aslite">
+		<description>Applesoft Lite</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 6000.7FFFR, press emulated F12 (cursor appears), enter at 6000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9457756">
+				<rom name="applesoft lite.wav" size="9457756" crc="b37799c4" sha1="edb1a6c801a0c0a58004eec42116ad7a22730df7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="apple30">
 		<description>Apple 30th</description> <!-- Graphics demo -->
@@ -210,6 +221,18 @@
 		</part>
 	</software>
 
+	<software name="eliza">
+		<description>ELIZA</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="18453608">
+				<rom name="eliza.wav" size="18453608" crc="c8cf353e" sha1="aaec29bd2da471facbeb2f6c5292278a62b48f4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="football">
 		<description>Football</description>
 		<year>19??</year>
@@ -314,6 +337,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18338436">
 				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek2">
+		<description>TREK II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.2FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="8022016">
+				<rom name="trek ii.wav" size="8022016" crc="3d9f5163" sha1="9671f060e417b7715f83fa57cc33588192604017" offset="0" />
 			</dataarea>
 		</part>
 	</software>
