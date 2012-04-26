@@ -241,10 +241,6 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					buf[tpos++] = mg | UINT32(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
 					}
-			} else if(v & 0x80) { // 0x80-0xFF an index, note the index (TODO: actually do this!) and do not add number
-				//index_polarity ^= 1;
-				index_count += 1;//index_polarity;
-				if (index_count == NUMBER_OF_MULTIREADS) break;
 			}
 		}
 #ifdef TRACK_HISTOGRAM
