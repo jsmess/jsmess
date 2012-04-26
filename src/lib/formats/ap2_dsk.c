@@ -738,12 +738,11 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								// sanity check
 								if (tr == track/2 && se < nsect) {
 								visualgrid[se][track/2] |= ADDRFOUND;
-								visualgrid[se][track/2] |= (chk ^ vl ^ tr ^ se)==0?ADDRGOOD:0;
-								}
+								visualgrid[se][track/2] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-								if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
+									if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
 #else
-								if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
+									if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
 #endif
 										int opos = pos;
 										int owrap = wrap;
@@ -845,6 +844,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 												pos = opos;
 												wrap = owrap;
 										}
+									}
 								}
 								hb = 0;
 						}
