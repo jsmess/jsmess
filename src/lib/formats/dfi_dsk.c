@@ -147,7 +147,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				//fprintf(stderr,"index state changed to %d at time=%d\n", index_polarity, total_time);
 				//fprintf(stderr,"index rising edge seen at time=%d\n", total_time);
 				if (onerev_time == 0) onerev_time = total_time;
-				index_count =+ 1;//index_polarity;
+				index_count += 1;//index_polarity;
 			} else // (v & 0x80) == 0
 				total_time += v & 0x7f;
 		}
