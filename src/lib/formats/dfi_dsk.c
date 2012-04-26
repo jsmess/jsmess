@@ -89,7 +89,7 @@ int dfi_format::identify(io_generic *io, UINT32 form_factor)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4))
+	if (memcmp(sign, "DFER", 4)==0)
 		fatalerror("Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
@@ -145,14 +145,17 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				index_time = total_time;
 				//index_polarity ^= 1;
 				//fprintf(stderr,"index state changed to %d at time=%d\n", index_polarity, total_time);
-				fprintf(stderr,"index rising edge seen at time=%d\n", total_time);
+				//fprintf(stderr,"index rising edge seen at time=%d\n", total_time);
 				if (onerev_time == 0) onerev_time = total_time;
 				index_count =+ 1;//index_polarity;
 			} else // (v & 0x80) == 0
 				total_time += v & 0x7f;
 		}
+		
+		// its possible on single read images for there to be no index pulse during the image at all!
+		if (onerev_time == 0) onerev_time = total_time;
 
-		//if(!track && !head)
+		if(!track && !head)
 			fprintf(stderr, "%02d:%d tt=%10d it=%10d\n", track, head, total_time, index_time);
 		if(!track && !head) {
 			fprintf(stderr, "index_count: %d, onerev_time: %d\n", index_count, onerev_time);
