@@ -652,6 +652,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/a2videoterm.o \
     $(MESS_MACHINE)/a2ssc.o \
     $(MESS_MACHINE)/a2swyft.o \
+    $(MESS_MACHINE)/a2eauxslot.o \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
