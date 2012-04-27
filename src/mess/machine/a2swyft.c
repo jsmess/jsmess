@@ -66,6 +66,8 @@ void a2bus_swyft_device::device_start()
 
 	astring tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, SWYFT_ROM_REGION))->base();
+
+	save_item(NAME(m_rombank));
 }
 
 void a2bus_swyft_device::device_reset()

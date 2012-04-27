@@ -117,6 +117,18 @@ public:
     UINT8 m_echo_bank;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
+
+    READ8_MEMBER( apple2gs_c0xx_r );
+    WRITE8_MEMBER( apple2gs_c0xx_w );
+    WRITE8_MEMBER( apple2gs_main0400_w );
+    WRITE8_MEMBER( apple2gs_aux0400_w );
+    WRITE8_MEMBER( apple2gs_main2000_w );
+    WRITE8_MEMBER( apple2gs_aux2000_w );
+    WRITE8_MEMBER( apple2gs_main4000_w );
+    WRITE8_MEMBER( apple2gs_aux4000_w );
+
+    UINT8 adb_read_datareg();
+    UINT8 adb_read_kmstatus();
 };
 
 
