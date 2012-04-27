@@ -248,6 +248,7 @@ ladybugg		// bootleg
 vpool			// bootleg
 drivfrcg		// [1984] Shinkai (Magic Electronics USA license)
 drivfrcb		// bootleg
+drivfrct		// bootleg
 bongo			// (c) 1983 Jetsoft
 hunchbkg		// (c) 1983 Century
 harem			// [1983] I.G.R.
@@ -6181,7 +6182,7 @@ hardhat			// (c) 1982
 fax				// (c) 1983
 fax2			// (c) 1983
 circus			// no copyright notice [1977?]
-circusse		// bootleg
+springbd		// Sub-Electro bootleg of Circus
 robotbwl		// no copyright notice
 crash			// Exidy [1979?]
 smash			// bootleg
@@ -8320,6 +8321,7 @@ wschampa		// (c) 2001 Sammy USA Corporation
 funcube2		// (c) 2001 Namco
 funcube3		// (c) 2001 Namco
 funcube4		// (c) 2001 Namco
+funcube5		// (c) 2002 Namco
 trophyh			// (c) 2002 Sammy USA Corporation
 reelquak		// (c) ???? <unknown>
 
@@ -8473,6 +8475,7 @@ wiseguy			// (c) 1990 Dooyong
 lastday			// (c) 1990 Dooyong
 lastdaya		// (c) 1990 Dooyong
 gulfstrm		// (c) 1991 Dooyong
+gulfstrma		// (c) 1991 Dooyong
 gulfstrmm		// (c) 1991 Dooyong + distributed by Media Shoji
 pollux			// (c) 1991 Dooyong
 polluxa			// (c) 1991 Dooyong
@@ -10354,6 +10357,7 @@ hotblock		// (c) 1993 Nics? / Nix?
 pntnpuzl		// Century?
 trucocl			// (c) 1991 Miky SRL
 ertictac		// (c) 1992 Sisteme
+ertictaca		// (c) 1992 Sisteme
 poizone			// (c) 1990 Sisteme
 ssfindo			// (c) 1999 Icarus
 ppcar			// (c) 1999 Icarus
@@ -12970,6 +12974,10 @@ sc4cckeyh	//
 sc4cckeyi	//
 sc4cckeyj	//
 sc4cckeyk	//
+sc4cckeyl	//
+sc4cckeym	//
+sc4cckeyn	//
+sc4cckeyo	//
 sc4ckx		// Casino King X (Mazooma)
 sc4ckxa		//
 sc4ckxb		//
@@ -13054,6 +13062,8 @@ sc4crcpe	//
 sc4crcpf	//
 sc4crcpg	//
 sc4crcph	//
+sc4crcpi	//
+sc4crcpj	//
 sc4crgc		// Cops 'n' Robbers Gold Club (Bellfruit)
 sc4crgca	//
 sc4crgcb	//
@@ -13110,6 +13120,17 @@ sc4cclimm	//
 sc4cclimn	//
 sc4cclimo	//
 sc4cclimp	//
+sc4cclimq	//
+sc4cclimr	//
+sc4cclims	//
+sc4cclimt	//
+sc4cclimu	//
+sc4clbmn	//
+sc4clbmna	//
+sc4clbmnb	//
+sc4clbmnc	//
+sc4boomb	//
+sc4boomba	//
 sc4cfqps	// Crazy Fruits (Qps)
 sc4cfqpsa	//
 sc4cfqpsb	//
@@ -13123,6 +13144,24 @@ sc4cfqpsi	//
 sc4cfqpsj	//
 sc4cfqpsk	//
 sc4cfcas	// Crazy Fruits Casino (Bellfruit)
+sc4cfcasa	//
+sc4cfcasb	//
+sc4cfcasc	//
+sc4cfcasd	//
+sc4cfcase	//
+sc4cfcasf	//
+sc4cfcasg	//
+sc4cfcash	//
+sc4cfcasi	//
+sc4cfcasj	//
+sc4cfcask	//
+sc4cfcasl	//
+sc4cfcasm	//
+sc4cfcasn	//
+sc4cfcaso	//
+sc4cfcasp	//
+sc4cfcasq	//
+sc4cfcasr	//
 sc4cfcla	// Crazy Fruits Classic (Bellfruit)
 sc4cfclab	//
 sc4cfclac	//
@@ -13196,6 +13235,10 @@ sc4crzkyp	//
 sc4crzkyq	//
 sc4crzkyr	//
 sc4crzkys	//
+sc4crzkyt	//
+sc4crzkyu	//
+sc4crzkyv	//
+sc4crzkyw	//
 sc4crzwl	// Crazy World (Mazooma)
 sc4crzwla	//
 sc4crzwlb	//
@@ -13786,6 +13829,10 @@ sc4luckbx	//
 sc4luckby	//
 sc4luckbz	//
 sc4luckb0	//
+sc4luckb1	//
+sc4luckb2	//
+sc4luckb3	//
+sc4luckb4	//
 sc4magci	// Magic Circle (Qps)
 sc4magcia	//
 sc4magcib	//
@@ -13840,6 +13887,10 @@ sc4mgrf		//
 sc4mgrg		//
 sc4mgrh		//
 sc4mgri		//
+sc4mgrj		//
+sc4mgrk		//
+sc4mgrl		//
+sc4mgrm		//
 sc4mspid	// Money Spider (Bellfruit)
 sc4mspida	//
 sc4mspidb	//
@@ -14027,6 +14078,8 @@ sc4pogbl	// Pots Of Gold Club (Bellfruit)
 sc4pogbla	//
 sc4pogblb	//
 sc4pogblc	//
+sc4pogbld	//
+sc4pogble	//
 sc4pwcrz	// Power Crazy (Bellfruit)
 sc4pwcrza	//
 sc4pwcrzb	//
@@ -14563,6 +14616,10 @@ sc4wldbnj	//
 sc4wldbnk	//
 sc4wldbnl	//
 sc4wldbnm	//
+sc4wldbnn	//
+sc4wldbno	//
+sc4wldbnp	//
+sc4wldbnq	//
 sc4wthng	// Wild Thing (Bellfruit)
 sc4wthnga	//
 sc4wthngb	//
@@ -14778,6 +14835,7 @@ sc4cariqe	//
 sc4cariqf	//
 sc4cariqg	//
 sc4cblas	// Cash Blast (Bellfruit)
+sc4cblasa	//
 sc4casxt	// Casino Xtravaganza  (Mazooma)
 sc4casxta	//
 sc4casxtb	//
@@ -14873,6 +14931,8 @@ sc4dndcs	// Deal Or No Deal Classic (Bellfruit)
 sc4dndcsa	//
 sc4dndcsb	//
 sc4dndcsc	//
+sc4dndcsd	//
+sc4dndcse	//
 sc4dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
 sc4dndbba	//
 sc4dndbbb	//
@@ -14909,9 +14969,13 @@ sc4dndhff	//
 sc4dndhfg	//
 sc4dndhfh	//
 sc4dndhfi	//
+sc4dndhfj	//
+sc4dndhfk	//
+sc4dndhfl	//
 sc4dndys	// Deal Or No Deal It's Your Show (Bellfruit)
 sc4dndysa	//
 sc4dndysb	//
+sc4dndysc	//
 sc4dndlp	// Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
 sc4dndlpa	//
 sc4dndlpb	//
@@ -15049,6 +15113,8 @@ sc4fguy		// Family Guy (Bellfruit)
 sc4fguya	//
 sc4fguyb	//
 sc4fguyc	//
+sc4fguyd	//
+sc4fguye	//
 sc4fbspn	// Fat Boy Spin (Bellfruit)
 sc4fbspna	//
 sc4fbspnb	//
@@ -15195,6 +15261,10 @@ sc4hntcsl	//
 sc4hntcsm	//
 sc4hntcsn	//
 sc4hntcso	//
+sc4hntcsp	//
+sc4hntcsq	//
+sc4hntcsr	//
+sc4hntcss	//
 sc4hellb	// Hells Bells (Bellfruit)
 sc4hellba	//
 sc4hellbb	//
@@ -15249,6 +15319,8 @@ sc4ijobh	//
 sc4ijobi	//
 sc4ijobj	//
 sc4ijobk	//
+sc4ijobl	//
+sc4ijobm	//
 sc4jjok		// Jackpot Jokers (Bellfruit)
 sc4jjoka	//
 sc4ldvl		// Little Devil (Mazooma)
@@ -15368,6 +15440,9 @@ sc4mhph		//
 sc4mhpi		//
 sc4mhpj		//
 sc4mhpk		//
+sc4mhpl		//
+sc4mhpm		//
+sc4mhpn		//
 sc4mmb		// Monopoly Money Bags (Bellfruit)
 sc4mmba		//
 sc4mrh		// Monopoly Red Hot (Mazooma)
@@ -15442,6 +15517,8 @@ sc4popey	// Popeye (Mazooma)
 sc4popeya	//
 sc4popeyb	//
 sc4popeyc	//
+sc4popeyd	//
+sc4popeye	//
 sc4pog		// Pots Of Gold (Bellfruit)
 sc4bulcsb	//
 sc4poga		//
@@ -15452,6 +15529,8 @@ sc4pogd		//
 sc4poge		//
 sc4pogf		//
 sc4pogg		//
+sc4pogh		//
+sc4pogi		//
 sc4pwrpl	// Power Play (Mazooma)
 sc4pwrpla	//
 sc4pwrplb	//
@@ -15516,6 +15595,7 @@ sc4showtb	//
 sc4showtc	//
 sc4showtd	//
 sc4showte	//
+sc4showtf	//
 sc4slad		// Snakes & Ladders (Bellfruit)
 sc4slada	//
 sc4sladb	//
@@ -19738,6 +19818,7 @@ jnero			// (c) 2004 ICE/Play Mechanix
 suprstar		// (c) 1996 Amatic
 am_mg24			// (c) 2000 Amatic
 am_mg3			// (c) 2000 Amatic
+am_mg3a			// (c) 2000 Amatic
 
 neptunp2
 rgum
