@@ -595,6 +595,13 @@ static const struct a2bus_interface a2bus_intf =
     DEVCB_HANDLER(a2bus_inh_w)
 };
 
+static const struct a2eauxslot_interface a2eauxbus_intf =
+{
+	// interrupt lines
+	DEVCB_HANDLER(a2bus_irq_w),
+	DEVCB_HANDLER(a2bus_nmi_w)
+};
+
 static SLOT_INTERFACE_START(apple2_slot0_cards)
     SLOT_INTERFACE("lang", A2BUS_LANG)      /* Apple II Language Card */
 SLOT_INTERFACE_END
@@ -613,6 +620,9 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
     SLOT_INTERFACE("swyft", A2BUS_SWYFT)    /* IAI SwyftCard */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(apple2eaux_cards)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( apple2_common, apple2_state )
@@ -705,6 +715,10 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
     // IIe and later have no physical slot 0, the "language card" is built into the motherboard
     MCFG_A2BUS_SLOT_REMOVE("sl0")
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
+
+    MCFG_A2EAUXSLOT_BUS_ADD(AUXSLOT_TAG, "maincpu", a2eauxbus_intf)
+    MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "slaux", apple2eaux_cards, NULL, NULL)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
@@ -733,6 +747,9 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 
     // TODO: populate the IIc's other virtual slots with ONBOARD_ADD
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKII, NULL)
+
+    MCFG_A2EAUXSLOT_SLOT_REMOVE("slaux")
+    MCFG_A2EAUXSLOT_BUS_REMOVE(AUXSLOT_TAG)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
