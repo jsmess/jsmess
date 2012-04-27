@@ -46,7 +46,7 @@ const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
 
 static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
-	MCFG_DS1302_ADD(DS1302_TAG)
+	MCFG_DS1302_ADD(DS1302_TAG, XTAL_32_768kHz)
 
 	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, NULL, ide_image_devices, "hdd", "hdd")
 MACHINE_CONFIG_END
@@ -117,7 +117,6 @@ void c64_ide64_cartridge_device::device_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_ide_data));
 	save_item(NAME(m_enable));
-	save_item(NAME(m_rtc_ce));
 }
 
 
@@ -130,7 +129,6 @@ void c64_ide64_cartridge_device::device_reset()
 	m_bank = 0;
 
 	m_enable = 1;
-	m_rtc_ce = 0;
 
 	m_wp = input_port_read(*this, "JP1");
 	m_game = !m_wp;
@@ -209,13 +207,13 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 			data = 0x20 | (m_bank << 2) | (m_game << 1) | m_exrom;
 		}
-		else if ((io1_offset == 0x5f) && m_rtc_ce)
+		else if (io1_offset == 0x5f)
 		{
-			m_rtc->ds1302_clk_w(0, 0);
+			m_rtc->sclk_w(0);
 
-			m_rtc->ds1302_dat_w(0, BIT(data, 0));
+			data = m_rtc->io_r();
 
-			m_rtc->ds1302_clk_w(0, 1);
+			m_rtc->sclk_w(1);
 		}
 		else if (io1_offset >= 0x60)
 		{
@@ -283,13 +281,13 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 		{
 			m_ide_data = (data << 8) | (m_ide_data & 0xff);
 		}
-		else if ((io1_offset == 0x5f) && m_rtc_ce)
+		else if (io1_offset == 0x5f)
 		{
-			m_rtc->ds1302_clk_w(0, 0);
+			m_rtc->sclk_w(0);
 
-			data = m_rtc->ds1302_read(0);
+			m_rtc->io_w(BIT(data, 0));
 
-			m_rtc->ds1302_clk_w(0, 1);
+			m_rtc->sclk_w(1);
 		}
 		else if (io1_offset >= 0x60 && io1_offset < 0x68)
 		{
@@ -313,7 +311,7 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
             */
 
 			m_enable = !BIT(data, 0);
-			m_rtc_ce = BIT(data, 1);
+			m_rtc->ce_w(BIT(data, 1));
 		}
 		else if (io1_offset >= 0xfc)
 		{
