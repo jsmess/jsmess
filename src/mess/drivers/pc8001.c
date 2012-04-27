@@ -97,6 +97,58 @@ WRITE8_MEMBER( pc8001mk2_state::port31_w )
     */
 }
 
+READ8_MEMBER( pc8001_state::port40_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       BUSY
+	    1       ACK
+	    2       CMT CDIN
+	    3       EXP /EXTON
+	    4       RTC DATA OUT
+	    5       VRTC
+	    6       
+	    7       
+	
+	*/
+
+	UINT8 data = 0x08;
+
+	data |= m_centronics->busy_r();
+	data |= m_centronics->ack_r() << 1;
+	data |= m_rtc->data_out_r() << 4;
+	data |= m_crtc->vrtc_r() << 5;
+
+	return data;
+}
+
+WRITE8_MEMBER( pc8001_state::port40_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       STROBE
+	    1       RTC STB
+	    2       RTC CLK
+	    3       CRT /CLDS CLK
+	    4       
+	    5       SPEAKER
+	    6       
+	    7       
+	
+	*/
+
+	m_centronics->strobe_w(BIT(data, 0));
+
+	m_rtc->clk_w(BIT(data, 2));
+	m_rtc->stb_w(BIT(data, 1));
+
+	speaker_level_w(m_speaker, BIT(data, 5));
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( pc8001_mem, AS_PROGRAM, 8, pc8001_state )
@@ -122,7 +174,7 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READ_PORT("R40") AM_WRITE_PORT("W40")
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
 	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE_LEGACY(I8257_TAG, i8257_r, i8257_w)
 //  AM_RANGE(0x70, 0x7f) unused
@@ -284,26 +336,6 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)							PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("DSW1")
-
-	PORT_START("R40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, busy_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // CMT CDIN
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // EXP /EXTON
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, data_out_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(UPD3301_TAG, upd3301_device, vrtc_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("W40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, stb_w)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, clk_w)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) // CRT /CLDS CLK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(SPEAKER_TAG, speaker_level_w)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* Video */
@@ -441,7 +473,7 @@ static I8257_INTERFACE( dmac_intf )
 
 /* uPD1990A Interface */
 
-static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
+static UPD1990A_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -540,7 +572,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
@@ -577,7 +609,7 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

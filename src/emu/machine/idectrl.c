@@ -12,7 +12,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE						0
+#define VERBOSE						1
 #define PRINTF_IDE_COMMANDS			0
 #define PRINTF_IDE_PASSWORD			0
 
@@ -1289,9 +1289,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 	if (ide->drive[ide->cur_drive].slot->is_ready()) {
 		ide->status |= IDE_STATUS_DRIVE_READY;
 	} else {
-		ide->status |= IDE_STATUS_DRIVE_READY;
-		ide->status |= IDE_STATUS_ERROR;
-		ide->error = IDE_ERROR_DEFAULT;
+		ide->status = 0;
 	}
 
 	switch (BANK(bank, offset))
