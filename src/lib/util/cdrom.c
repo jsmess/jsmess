@@ -226,7 +226,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	err = cdrom_parse_metadata(chd, &file->cdtoc);
 	if (err != CHDERR_NONE)
 	{
-		delete(file);
+		free(file);
 		return NULL;
 	}
 
@@ -281,7 +281,7 @@ void cdrom_close(cdrom_file *file)
 		}
 	}
 
-	delete(file);
+	free(file);
 }
 
 
