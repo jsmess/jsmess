@@ -731,31 +731,29 @@ WRITE16_HANDLER( x68k_spritereg_w )
 	switch(offset)
 	{
 	case 0x400:
-		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
-		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x401:
 		state->m_bg0_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		state->m_bg0_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x402:
-		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
-		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x403:
 		state->m_bg1_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		state->m_bg1_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		break;
-	case 0x405:  // BG H-DISP (like CRTC reg 2)
+	case 0x406:  // BG H-DISP (normally equals CRTC reg 2 value + 4)
 		if(data != 0x00ff)
 		{
 			state->m_crtc.bg_visible_width = (state->m_crtc.reg[3] - ((data & 0x003f) - 4)) * 8;
-			state->m_crtc.bg_hshift = (state->m_crtc.width - state->m_crtc.bg_visible_width) / 2;
+			state->m_crtc.bg_hshift = ((data - (state->m_crtc.reg[2]+4)) * 8);
 		}
-		else
-			state->m_crtc.bg_hshift = state->m_crtc.hshift;
 		break;
-	case 0x406:  // BG V-DISP (like CRTC reg 6)
+	case 0x407:  // BG V-DISP (like CRTC reg 6)
 		state->m_crtc.bg_vshift = state->m_crtc.vshift;
 		break;
 	}
@@ -1034,6 +1032,7 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, in
 			rect.max_x=rect.min_x + state->m_crtc.visible_width-1;
 			rect.max_y=rect.min_y + state->m_crtc.visible_height-1;
 
+			sx += state->m_crtc.bg_hshift;
 			sx += state->m_sprite_shift;
 
 			if(state->m_crtc.interlace != 0)
