@@ -731,16 +731,16 @@ WRITE16_HANDLER( x68k_spritereg_w )
 	switch(offset)
 	{
 	case 0x400:
-		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
-		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x401:
 		state->m_bg0_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		state->m_bg0_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x402:
-		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
-		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin + state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
+		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x403:
 		state->m_bg1_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
@@ -1224,13 +1224,13 @@ SCREEN_UPDATE_IND16( x68000 )
 			{
 				if((state->m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
 				{
-					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
 					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
@@ -1240,13 +1240,13 @@ SCREEN_UPDATE_IND16( x68000 )
 			{
 				if((state->m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
 				{
-					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
 					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
