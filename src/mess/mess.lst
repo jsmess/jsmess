@@ -872,6 +872,7 @@ x1turbo40 // 1985 Sharp X1 Turbo (Model 40)
 //  x1turboz  // 1986 Sharp X1 TurboZ
 
 x68000	// Sharp X68000 (1987)
+x68ksupr // Sharp X68000 Super (1990)
 x68kxvi   // Sharp X68000 XVI (1991)
 x68030	// Sharp X68030 (1993)
 
