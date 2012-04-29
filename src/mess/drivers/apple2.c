@@ -204,6 +204,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2videoterm.h"
 #include "machine/a2ssc.h"
 #include "machine/a2swyft.h"
+#include "machine/a2themill.h"
 
 /***************************************************************************
     PARAMETERS
@@ -619,6 +620,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("videoterm", A2BUS_VIDEOTERM)    /* Videx VideoTerm */
     SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
     SLOT_INTERFACE("swyft", A2BUS_SWYFT)    /* IAI SwyftCard */
+    SLOT_INTERFACE("themill", A2BUS_THEMILL)    /* Stellation Two The Mill (6809 card) */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
