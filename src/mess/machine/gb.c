@@ -2225,8 +2225,10 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 		state->m_ROMMask = 0;
 	else
 	{
-		for (I = 1; I < state->m_ROMBanks; I <<= 1) ;
-			state->m_ROMMask = I - 1;
+		for (I = 1; I < state->m_ROMBanks; I <<= 1)
+		{
+		}
+		state->m_ROMMask = I - 1;
 	}
 
 	state->m_MBCType = MBC_MEGADUCK;
