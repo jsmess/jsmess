@@ -324,7 +324,7 @@ $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
 $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(FLACOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
+	$(CC) $(CDEFS) $(FLACOPTS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
 
 
 
