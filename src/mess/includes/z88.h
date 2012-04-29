@@ -31,6 +31,15 @@
 #define Z88_SCR_HW_CURS (Z88_SCR_HW_HRS|Z88_SCR_HW_FLS|Z88_SCR_HW_REV)
 #define Z88_SCR_HW_NULL (Z88_SCR_HW_HRS|Z88_SCR_HW_GRY|Z88_SCR_HW_REV)
 
+enum
+{
+	Z88_BANK_ROM = 1,
+	Z88_BANK_RAM,
+	Z88_BANK_CART,
+	Z88_BANK_UNMAP
+};
+
+
 class z88_state : public driver_device
 {
 public:
@@ -44,6 +53,7 @@ public:
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 	void bankswitch_update(int bank, UINT16 page, int rams);
 	DECLARE_READ8_MEMBER(kb_r);
 
@@ -71,6 +81,7 @@ public:
 		UINT8 page;
 	} m_bank[4];
 
+	int					  m_bank_type[4];
 	UINT8 *				  m_bios;
 	UINT8 *				  m_ram_base;
 	z88cart_slot_device * m_carts[4];

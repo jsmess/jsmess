@@ -65,8 +65,12 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 	if (page < 0x20)	// internal ROM
 	{
 		// install read bank
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
-		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+		if (m_bank_type[bank] != Z88_BANK_ROM)
+		{
+			m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+			m_bank_type[bank] = Z88_BANK_ROM;
+		}
 
 		membank(bank_tag)->set_entry(page);
 	}
@@ -75,14 +79,22 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		if((page & 0x1f) < (m_ram->size()>>14))
 		{
 			// install readwrite bank
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			if (m_bank_type[bank] != Z88_BANK_RAM)
+			{
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+				m_bank_type[bank] = Z88_BANK_RAM;
+			}
 
 			// set the bank
 			membank(bank_tag)->set_entry(page);
 		}
 		else
 		{
-			m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+			if (m_bank_type[bank] != Z88_BANK_UNMAP)
+			{
+				m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+				m_bank_type[bank] = Z88_BANK_UNMAP;
+			}
 		}
 	}
 	else	// cartridges
@@ -90,20 +102,25 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		m_bank[bank].slot = (page >> 6) & 3;
 		m_bank[bank].page = page & 0x3f;
 
-		switch (bank)
+		if (m_bank_type[bank] != Z88_BANK_CART)
 		{
-			case 0:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
-				break;
-			case 1:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
-				break;
-			case 2:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
-				break;
-			case 3:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
-				break;
+			switch (bank)
+			{
+				case 0:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					break;
+				case 1:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					break;
+				case 2:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					break;
+				case 3:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					break;
+			}
+
+			m_bank_type[bank] = Z88_BANK_CART;
 		}
 	}
 
@@ -263,6 +280,11 @@ void z88_state::machine_start()
 	m_carts[1] = machine().device<z88cart_slot_device>("slot1");
 	m_carts[2] = machine().device<z88cart_slot_device>("slot2");
 	m_carts[3] = machine().device<z88cart_slot_device>("slot3");
+}
+
+void z88_state::machine_reset()
+{
+	m_bank_type[0] = m_bank_type[1] = m_bank_type[2] = m_bank_type[3] = 0;
 }
 
 READ8_MEMBER(z88_state::kb_r)
