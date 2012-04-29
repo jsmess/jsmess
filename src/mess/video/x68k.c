@@ -751,6 +751,8 @@ WRITE16_HANDLER( x68k_spritereg_w )
 		{
 			state->m_crtc.bg_visible_width = (state->m_crtc.reg[3] - ((data & 0x003f) - 4)) * 8;
 			state->m_crtc.bg_hshift = ((data - (state->m_crtc.reg[2]+4)) * 8);
+			if(state->m_crtc.bg_hshift > 0)
+				state->m_crtc.bg_hshift = 0;
 		}
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
