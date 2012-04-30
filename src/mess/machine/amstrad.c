@@ -577,6 +577,13 @@ static void amstrad_plus_handle_dma(running_machine &machine)
 		amstrad_plus_dma_parse( machine, 2 );
 }
 
+static TIMER_CALLBACK(amstrad_video_update_timer)
+{
+	if(param == 1)
+		amstrad_plus_update_video(machine);
+	else
+		amstrad_update_video(machine);
+}
 
 /* Set the new colour from the GateArray */
 static void amstrad_vh_update_colour(running_machine &machine, int PenIndex, UINT16 hw_colour_index)
@@ -586,7 +593,7 @@ static void amstrad_vh_update_colour(running_machine &machine, int PenIndex, UIN
 	{
 		int val;
 
-		amstrad_plus_update_video( machine );
+		machine.scheduler().timer_set( attotime::from_usec(1), FUNC(amstrad_video_update_timer),1);
 
 		/* CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette */
 		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; /* red */
@@ -597,7 +604,7 @@ static void amstrad_vh_update_colour(running_machine &machine, int PenIndex, UIN
 	}
 	else
 	{
-		amstrad_update_video( machine );
+		machine.scheduler().timer_set( attotime::from_usec(1), FUNC(amstrad_video_update_timer),0);
 	}
 	state->m_GateArray_render_colours[PenIndex] = hw_colour_index;
 }
@@ -606,7 +613,7 @@ static void amstrad_vh_update_colour(running_machine &machine, int PenIndex, UIN
 static void aleste_vh_update_colour(running_machine &machine, int PenIndex, UINT16 hw_colour_index)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	amstrad_update_video( machine );
+	machine.scheduler().timer_set( attotime::from_usec(1), FUNC(amstrad_video_update_timer),0);
 	state->m_GateArray_render_colours[PenIndex] = hw_colour_index+32;
 }
 
@@ -629,6 +636,7 @@ INLINE void amstrad_update_video( running_machine &machine )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	attotime now = machine.time();
+
 
 	if ( state->m_gate_array.draw_p )
 	{
@@ -1962,7 +1970,6 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
-
 /* Offset handler for write */
 WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 {
@@ -2006,9 +2013,9 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 			break;
 		case 0x01:		/* Write to selected internal 6845 register Write Only */
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
-				amstrad_plus_update_video(machine());
+				machine().scheduler().timer_set( attotime::from_usec(1), FUNC(amstrad_video_update_timer),1);
 			else
-				amstrad_update_video(machine());
+				machine().scheduler().timer_set( attotime::from_usec(1), FUNC(amstrad_video_update_timer),0);
 			mc6845->register_w( space, 0, data );
 
 			/* printer port bit 8 */
