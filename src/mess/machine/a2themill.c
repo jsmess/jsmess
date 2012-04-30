@@ -4,13 +4,23 @@
 
     Implementation of the Stellation Two The Mill 6809 card
  
-    OS9 requires this add-on be implemented:
-    http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/CPU/Stellation%20Two%20The%20Mill%20-%206809/Photos/Stellation%20Two%20The%20Mill%20OS9%20ROM%20Interface%20Rev.%20A%20-%20Front.jpg
+    The OS9 add-on changes the address mapping as follows:
+    6809 0x0000-0xafff -> 6502 0x1000-0xbfff
+    6809 0xb000-0xdfff -> 6502 0xd000-0xffff
+    6809 0xe000-0xefff -> 6502 0xc000-0xcfff
+    6809 0xf000-0xffff -> 6502 0x0000-0x0fff
  
-    but the chip numbers are unclear, and it may also require a ROM.
+    (reference: http://mirrors.apple2.org.za/ground.icaen.uiowa.edu/MiscInfo/Hardware/mill.6809 )
  
-    Excel Flex requires a ROM in the on-board socket which is not dumped :(
-
+    ProDOS "Stellation The Mill Disk.po" requires Mill in slot 2; boot
+    the disc and type "-DEMO1" and press Enter to launch the simple demo.
+ 
+    The OS9 disk image available around the internet seems to be bad - the
+    6809 boot vector is 0x4144 which maps to 6502 0x5144 and there's all
+    zeros from 6502 1000-7fff.  There is valid 6809 code from 9000-BFFF
+    at the point where it wants to boot the 6809, but I don't know what
+    is supposed to be the entry point.
+     
 *********************************************************************/
 
 #include "a2themill.h"
@@ -86,8 +96,8 @@ void a2bus_themill_device::device_start()
 	set_a2bus_device();
 
 	save_item(NAME(m_bEnabled));
-	save_item(NAME(m_FirstBoot));
 	save_item(NAME(m_flipAddrSpace));
+	save_item(NAME(m_6809Mode));
 	save_item(NAME(m_status));
 }
 
@@ -95,8 +105,8 @@ void a2bus_themill_device::device_reset()
 {
     m_bEnabled = false;
     m_6502space = NULL;
-    m_FirstBoot = true;
     m_flipAddrSpace = false;
+    m_6809Mode = false;
     m_status = 0xc0;    // OS9 loader relies on this
     device_set_input_line(m_6809, INPUT_LINE_HALT, ASSERT_LINE);
     device_set_input_line(m_6809, INPUT_LINE_RESET, ASSERT_LINE);
@@ -235,13 +245,43 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 {
     if (m_6502space)
     {
-        if (m_flipAddrSpace)
+        if (m_6809Mode)
         {
-            return m_6502space->read_byte(offset^0x8000);
+            if (offset <= 0xafff)
+            {
+                return m_6502space->read_byte(offset+0x1000);
+            }
+            else if (offset <= 0xbfff)
+            {
+                return m_6502space->read_byte((offset&0xfff) + 0xd000);
+            }
+            else if (offset <= 0xcfff)
+            {
+                return m_6502space->read_byte((offset&0xfff) + 0xe000);
+            }
+            else if (offset <= 0xdfff)
+            {
+                return m_6502space->read_byte((offset&0xfff) + 0xf000);
+            }
+            else if (offset <= 0xefff)
+            {
+                return m_6502space->read_byte((offset&0xfff) + 0xc000);
+            }
+            else    // 6809 Fxxx -> 6502 ZP
+            {
+                return m_6502space->read_byte(offset&0xfff);
+            }
         }
         else
         {
-            return m_6502space->read_byte(offset);
+            if (m_flipAddrSpace)
+            {
+                return m_6502space->read_byte(offset^0x8000);
+            }
+            else
+            {
+                return m_6502space->read_byte(offset);
+            }
         }
     }
 
@@ -257,13 +297,43 @@ WRITE8_MEMBER( a2bus_themill_device::dma_w )
 {
     if (m_6502space)
     {
-        if (m_flipAddrSpace)
+        if (m_6809Mode)
         {
-            m_6502space->write_byte(offset^0x8000, data);
+            if (offset <= 0xafff)
+            {
+                m_6502space->write_byte(offset+0x1000, data);
+            }
+            else if (offset <= 0xbfff)
+            {
+                m_6502space->write_byte((offset&0xfff) + 0xd000, data);
+            }
+            else if (offset <= 0xcfff)
+            {
+                m_6502space->write_byte((offset&0xfff) + 0xe000, data);
+            }
+            else if (offset <= 0xdfff)
+            {
+                m_6502space->write_byte((offset&0xfff) + 0xf000, data);
+            }
+            else if (offset <= 0xefff)
+            {
+                m_6502space->write_byte((offset&0xfff) + 0xc000, data);
+            }
+            else    // 6809 Fxxx -> 6502 ZP
+            {
+                m_6502space->write_byte(offset&0xfff, data);
+            }
         }
         else
         {
-            m_6502space->write_byte(offset, data);
+            if (m_flipAddrSpace)
+            {
+                m_6502space->write_byte(offset^0x8000, data);
+            }
+            else
+            {
+                m_6502space->write_byte(offset, data);
+            }
         }
     }
 }
