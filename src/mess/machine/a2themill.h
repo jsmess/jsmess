@@ -44,8 +44,8 @@ protected:
 
 private:
     bool m_bEnabled;
-    bool m_FirstBoot;
     bool m_flipAddrSpace;
+    bool m_6809Mode;
     address_space *m_6502space;
     UINT8 m_status;
 };
