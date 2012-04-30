@@ -17,7 +17,7 @@
  
     The OS9 disk image available around the internet seems to be bad - the
     6809 boot vector is 0x4144 which maps to 6502 0x5144 and there's all
-    zeros from 6502 1000-7fff.  There is valid 6809 code from 9000-BFFF
+    zeros from 6502 1000-8fff.  There is valid 6809 code from 9000-BFFF
     at the point where it wants to boot the 6809, but I don't know what
     is supposed to be the entry point.
      
@@ -78,7 +78,7 @@ a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device
 }
 
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, A2BUS_THEMILL, "Microsoft SoftCard", tag, owner, clock),
+    device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock),
     device_a2bus_card_interface(mconfig, *this),
     m_6809(*this, M6809_TAG),
     m_6502space(NULL)
