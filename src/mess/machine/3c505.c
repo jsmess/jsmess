@@ -107,6 +107,7 @@ static int verbose = VERBOSE;
 enum
 {
 	/* host PCB commands */
+	CMD_RESET = 0x00,
 	CMD_CONFIGURE_ADAPTER_MEMORY = 0x01,
 	CMD_CONFIGURE_82586 = 0x02,
 	CMD_STATION_ADDRESS = 0x03,
@@ -132,6 +133,7 @@ enum
 	CMD_MC_FA =0xfa,
 
 	/*adapter PCB commands */
+	CMD_RESET_RESPONSE = 0x30,
 	CMD_CONFIGURE_ADAPTER_RESPONSE = 0x31,
 	CMD_CONFIGURE_82586_RESPONSE = 0x32,
 	CMD_ADDRESS_RESPONSE = 0x33,
@@ -236,6 +238,8 @@ void threecom3c505_device::device_reset()
 	m_control = 0;
 	m_command_index = 0;
 	m_command_pending = 0;
+	m_mc_f9_pending = 0;
+	m_wait_for_ack = 0;
 	m_rx_data_index = 0;
 	m_rx_pending = 0;
 	m_tx_data_length = 0;
@@ -244,6 +248,15 @@ void threecom3c505_device::device_reset()
 	m_microcode_running = 0;
 	m_microcode_version = 0;
 	m_i82586_config = 0;
+
+	// FIXME: test data
+	m_netstat.tot_recv = 1;
+	m_netstat.tot_xmit = 2;
+	m_netstat.err_CRC = 3;
+	m_netstat.err_align = 4;
+	m_netstat.err_res = 5;
+	m_netstat.err_ovrrun = 6;
+
 	memset(m_station_address, 0 , sizeof(m_station_address));
 	memset(m_multicast_list, 0 , sizeof(m_multicast_list));
 	set_filter_list();
@@ -432,7 +445,7 @@ void threecom3c505_device::set_filter_list()
 	if (setfilter != NULL)
 	{
 		int node_id = (((m_station_address[3] << 8) + m_station_address[4]) << 8) + m_station_address[5];
-		LOG1(("set_filter_list node_id=%x",node_id));
+		LOG2(("set_filter_list node_id=%x",node_id));
 		(*setfilter)(this, node_id);
 	}
 
@@ -446,7 +459,7 @@ void threecom3c505_device::set_interrupt(enum line_state state)
 {
 	if (state != irq_state)
 	{
-		LOG1(("set_interrupt(%d)",state));
+		LOG2(("set_interrupt(%d)",state));
 		if (set_irq != NULL)
 		{
 			(*set_irq)(this, state);
@@ -476,6 +489,9 @@ void threecom3c505_device::log_command()
 		logerror("%s: Command ", cpu_context());
 		switch (m_command_buffer[0])
 		{
+		case CMD_RESET: // 0x00
+			logerror("CMD_RESET");
+			break;
 		case CMD_CONFIGURE_ADAPTER_MEMORY: // 0x01
 			logerror("CMD_CONFIGURE_ADAPTER_MEMORY");
 			break;
@@ -517,13 +533,13 @@ void threecom3c505_device::log_command()
 			break;
 
 		case CMD_MC_F8: // 0xf8
-			logerror("CMD_MC_F8");
+			logerror("!!! CMD_MC_F8");
 			break;
 		case CMD_MC_F9: // 0xf9
 			logerror("CMD_MC_F9");
 			break;
 		case CMD_MC_FA: // 0xfa
-			logerror("CMD_MC_FA");
+			logerror("!!! CMD_MC_FA");
 			break;
 
 		default:
@@ -533,7 +549,7 @@ void threecom3c505_device::log_command()
 		switch (m_command_buffer[0])
 		{
 		case CMD_MC_F9: // 0xf9
-//          logerror(" (%02x, length=00)", m_command_buffer[0]);
+           logerror(" (%02x, length=00)", m_command_buffer[0]);
 			break;
 
 		default:
@@ -557,6 +573,9 @@ void threecom3c505_device::log_response()
 		logerror("%s: Response ", cpu_context());
 		switch (m_response.command)
 		{
+		case CMD_RESET_RESPONSE: // 0x30
+			logerror("CMD_RESET_RESPONSE");
+			break;
 		case CMD_CONFIGURE_ADAPTER_RESPONSE: // 0x31
 			logerror("CMD_CONFIGURE_ADAPTER_RESPONSE");
 			break;
@@ -594,10 +613,10 @@ void threecom3c505_device::log_response()
 			logerror("CMD_TRANSMIT_PACKET_18_COMPLETE");
 			break;
 		case CMD_MC_E1_RESPONSE: // 0xe1
-			logerror("CMD_MC_E1_RESPONSE");
+			logerror("!!! CMD_MC_E1_RESPONSE");
 			break;
 		case CMD_MC_E2_RESPONSE: // 0xe2
-			logerror("CMD_MC_E2_RESPONSE");
+			logerror("!!! CMD_MC_E2_RESPONSE");
 			break;
 		default:
 			logerror("!!! Unexpected Response !!!");
@@ -658,19 +677,25 @@ void threecom3c505_device::do_receive_command()
 void threecom3c505_device::set_command_pending(int onoff)
 {
 	m_command_pending = onoff;
-	LOG1(("set_command_pending %d m_rx_pending=%d m_rx_data_buffer.get_length()=%x%s", m_command_pending, m_rx_pending, m_rx_data_buffer.get_length(), onoff ? "" :"\n"));
+	LOG2(("set_command_pending %d m_rx_pending=%d m_rx_data_buffer.get_length()=%x%s",
+			m_command_pending, m_rx_pending, m_rx_data_buffer.get_length(), onoff ? "" :"\n"));
+
+//-	verbose = onoff ? 1 : 2;
 
 	if (!m_command_pending)
 	{
 		// clear previous command byte
 		m_command_buffer[0] = 0;
 
+		m_mc_f9_pending = 0;
+		m_wait_for_ack = 0;
+
 		if (m_rx_pending > 0 && m_rx_data_buffer.get_length() > 0)
 		{
 			m_rx_pending--;
 			m_command_pending = 1;
 
-			LOG1(("set_command_pending %d m_rx_pending=%d", m_command_pending, m_rx_pending));
+			LOG2(("set_command_pending %d m_rx_pending=%d", m_command_pending, m_rx_pending));
 
 			do_receive_command();
 		}
@@ -690,14 +715,19 @@ void threecom3c505_device::do_command()
 
 	switch (m_command_buffer[0])
 	{
+	case CMD_RESET: // 0x00
+//		FIXME:
+//		device_reset();
+		break;
+
 	case CMD_CONFIGURE_ADAPTER_MEMORY: // 0x01
 		m_i82586_config = m_program_buffer.get_word(1);
 		break;
 
-//  case CMD_MC_F8:
 	case CMD_RECEIVE_PACKET: // 0x08
 		if (m_rx_data_buffer.get_length() == 0 && !m_rx_fifo.get(&m_rx_data_buffer))
 		{
+			// receive data not yet available
 			m_rx_pending++;
 			set_command_pending(0);
 		}
@@ -708,12 +738,9 @@ void threecom3c505_device::do_command()
 		return;
 		// break;
 
-//      case CMD_MC_F8:
-		case CMD_MC_F9:
-//      case CMD_MC_FA:
-		// FIXME:
+	case CMD_MC_F9:
 		m_response.command = CMD_TRANSMIT_PACKET_COMPLETE;
-//      break;
+		// fall through
 
 	case CMD_TRANSMIT_PACKET: // 0x09
 	case CMD_TRANSMIT_PACKET_18: // 0x18
@@ -732,13 +759,13 @@ void threecom3c505_device::do_command()
 
 	case CMD_NETWORK_STATISTICS: // 0x0a
 		m_response.length = sizeof(struct Netstat);
-		// FIXME: replace test data; must be LSB first!
-		m_response.data.netstat.tot_recv = 1;
-		m_response.data.netstat.tot_xmit = 2;
-		m_response.data.netstat.err_CRC = 3;
-		m_response.data.netstat.err_align = 4;
-		m_response.data.netstat.err_res = 5;
-		m_response.data.netstat.err_ovrrun = 6;
+		// response data must be LSB first!
+		m_response.data.netstat.tot_recv = lsb_first(m_netstat.tot_recv);
+		m_response.data.netstat.tot_xmit = lsb_first(m_netstat.tot_xmit);
+		m_response.data.netstat.err_CRC = lsb_first(m_netstat.err_CRC);
+		m_response.data.netstat.err_align = lsb_first(m_netstat.err_align);
+		m_response.data.netstat.err_res = lsb_first(m_netstat.err_res);
+		m_response.data.netstat.err_ovrrun = lsb_first(m_netstat.err_ovrrun);
 		break;
 
 	case CMD_ADAPTER_INFO: // 0x11
@@ -800,7 +827,7 @@ void threecom3c505_device::do_command()
 		case CMD_EXECUTE_PROGRAM: // 0x0e
 		case CMD_ADAPTER_INFO: // 0x11
 			// interrupt later
-			m_timer->adjust( attotime::from_msec(10));
+			m_timer->adjust( attotime::from_msec(5));
 			break;
 
 		default:
@@ -837,32 +864,28 @@ int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
 
 void threecom3c505_device::recv_cb(UINT8 *data, int length)
 {
+
 	if (length < ETHERNET_ADDR_SIZE || !ethernet_packet_is_for_me(data))
 	{
 		// skip packet
 	}
-//  else if (m_command_pending && m_command_buffer[0] == CMD_MC_F9)
-//  {
-//      LOG(("recv_cb: data_length=%x !!!! skipped data while CMD_MC_F9 is pending!", length));
-//  }
 	else if (!m_rx_fifo.put(data, length))
 	{
+		m_netstat.tot_recv++;
+		m_netstat.err_ovrrun++;
 		// fifo overrun
 		LOG1(("recv_cb: data_length=%x !!! RX FIFO OVERRUN !!!", length));
+
 	}
 	else
 	{
-		LOG1(("recv_cb: data_length=%x m_rx_pending=%d", length, m_rx_pending));
+		m_netstat.tot_recv++;
+		LOG2(("recv_cb: data_length=%x m_rx_pending=%d", length, m_rx_pending));
 
 		if (m_rx_data_buffer.get_length() == 0)
 		{
 			m_rx_fifo.get(&m_rx_data_buffer);
 		}
-
-//      if (m_command_pending && m_command_buffer[0] == CMD_MC_F9)
-//      {
-//          verbose = 2;
-//      }
 
 		if (!m_command_pending && m_rx_pending > 0
 				&& m_rx_data_buffer.get_length() > 0)
@@ -871,15 +894,6 @@ void threecom3c505_device::recv_cb(UINT8 *data, int length)
 			set_command_pending(1);
 			do_receive_command();
 		}
-
-//      guessing!
-//      else if (m_control & CMDE)
-//      {
-//          m_status |= ACRF; /* adapter command register full */
-//
-//          LOG(("recv_cb - set_interrupt(%d)",ASSERT_LINE));
-//          set_interrupt(ASSERT_LINE);
-//      }
 	}
 }
 
@@ -913,7 +927,6 @@ void threecom3c505_device::write_command_port( UINT8 data)
 				// spurious data; set command register empty
 				m_command_index = 0;
 				m_status |= HCRE;
-//              verbose = 2;
 				break;
 
 			case CMD_MC_F9:
@@ -997,6 +1010,11 @@ UINT8 threecom3c505_device::read_command_port()
 
 		LOG2(("FIXME: reading 3C505 Command Register at offset %02x with index %02x = %02x",
 				PORT_COMMAND, m_response_index, data));
+
+		if (m_mc_f9_pending == 1)
+		{
+			m_mc_f9_pending++;
+		}
 	}
 	else
 	{
@@ -1036,6 +1054,8 @@ UINT8 threecom3c505_device::read_command_port()
 
 			case CMD_TRANSMIT_PACKET_COMPLETE:
 			case CMD_TRANSMIT_PACKET_18_COMPLETE:
+				m_netstat.tot_xmit++;
+
 				if(!send(m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()))
 				{
 					// FIXME: failed to send the ethernet packet
@@ -1050,16 +1070,22 @@ UINT8 threecom3c505_device::read_command_port()
 				}
 
 				m_tx_data_buffer.reset();
-				set_command_pending(0);
+				if (m_command_buffer[0] != CMD_MC_F9)
+				{
+//					set_command_pending(0);
+					m_wait_for_ack = 1;
+				}
 				break;
 
 			case CMD_DOWNLOAD_PROGRAM_RESPONSE:
 				m_program_buffer.reset();
-				set_command_pending(0);
+//				set_command_pending(0);
+				m_wait_for_ack = 1;
 				break;
 
 			default:
-				set_command_pending(0);
+//				set_command_pending(0);
+				m_wait_for_ack = 1;
 				break;
 			}
 		}
@@ -1198,7 +1224,8 @@ UINT8 threecom3c505_device::read_data_port(){
 			m_status &= ~HRDY; /* data register no longer ready */
 			m_rx_data_buffer.log("Rx Data");
 			m_rx_data_buffer.reset();
-			set_command_pending(0);
+//			set_command_pending(0);
+			m_wait_for_ack = 1;
 		}
 	}
 
@@ -1239,6 +1266,10 @@ void threecom3c505_device::write_control_port( UINT8 data)
 	switch (data & HSF_PCB_MASK)
 	{
 	case HSF_PCB_ACK: // HSF1
+		if (m_wait_for_ack)
+		{
+			set_command_pending(0);
+		}
 		break;
 	case HSF_PCB_NAK: // HSF2
 		if (m_microcode_running)
@@ -1256,6 +1287,12 @@ void threecom3c505_device::write_control_port( UINT8 data)
 	default: // 0
 		m_command_index = 0;
 		m_status |= HCRE; /* command register empty */
+
+		if (m_command_buffer[0] == CMD_MC_F9)
+		{
+			m_mc_f9_pending = 1;
+//-			verbose = 2;
+		}
 
 		if (data == 0x00)
 		{
@@ -1292,6 +1329,12 @@ void threecom3c505_device::write_control_port( UINT8 data)
 	if ((m_control & (ATTN | FLSH)) == (ATTN | FLSH) && (data & (ATTN | FLSH)) == 0)
 	{
 		m_status |= ASF_PCB_END;
+	}
+
+	if (m_mc_f9_pending == 2)
+	{
+		m_mc_f9_pending = 0;
+		set_command_pending(0);
 	}
 
 	m_control = data;

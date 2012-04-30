@@ -256,6 +256,8 @@ private:
 	UINT8 m_command_buffer[CMD_BUFFER_SIZE];
 	int m_command_index;
 	int m_command_pending;
+	int m_mc_f9_pending;
+	int m_wait_for_ack;
 
 	data_buffer_fifo m_rx_fifo;
 
@@ -277,6 +279,8 @@ private:
 	UINT16 m_microcode_running;
 
 	UINT16 m_i82586_config;
+
+	struct Netstat m_netstat;
 
 	UINT8 m_station_address[ETHERNET_ADDR_SIZE];
 	UINT8 m_multicast_list[ETHERNET_ADDR_SIZE*2];
