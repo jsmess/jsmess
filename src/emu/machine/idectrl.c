@@ -12,7 +12,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE						1
+#define VERBOSE						0
 #define PRINTF_IDE_COMMANDS			0
 #define PRINTF_IDE_PASSWORD			0
 
