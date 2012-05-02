@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
 	AM_RANGE(0x59, 0x59) AM_READ(tvc_flipflop_r)
 	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_port59_r)
-	AM_RANGE(0x60, 0x64) AM_WRITE(tvc_palette_w)
+	AM_RANGE(0x60, 0x63) AM_WRITE(tvc_palette_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -291,14 +291,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = palette[state->m_col[(data >> 7)]];
-					*p++ = palette[state->m_col[(data >> 6)]];
-					*p++ = palette[state->m_col[(data >> 5)]];
-					*p++ = palette[state->m_col[(data >> 4)]];
-					*p++ = palette[state->m_col[(data >> 3)]];
-					*p++ = palette[state->m_col[(data >> 2)]];
-					*p++ = palette[state->m_col[(data >> 1)]];
-					*p++ = palette[state->m_col[(data >> 0)]];
+					*p++ = palette[state->m_col[BIT(data,7)]];
+					*p++ = palette[state->m_col[BIT(data,6)]];
+					*p++ = palette[state->m_col[BIT(data,5)]];
+					*p++ = palette[state->m_col[BIT(data,4)]];
+					*p++ = palette[state->m_col[BIT(data,3)]];
+					*p++ = palette[state->m_col[BIT(data,2)]];
+					*p++ = palette[state->m_col[BIT(data,1)]];
+					*p++ = palette[state->m_col[BIT(data,0)]];
 				}
 				break;
 		case 1 :
@@ -321,14 +321,16 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
-					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
+					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
+					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
+					*p++ = palette[col0];
+					*p++ = palette[col0];
+					*p++ = palette[col0];
+					*p++ = palette[col0];
+					*p++ = palette[col1];
+					*p++ = palette[col1];
+					*p++ = palette[col1];
+					*p++ = palette[col1];
 				}
 				break;
 
