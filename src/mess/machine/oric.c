@@ -17,28 +17,17 @@
 *********************************************************************/
 
 
-#include <stdio.h>
-#include "emu.h"
 #include "includes/oric.h"
-#include "machine/wd17xx.h"
-#include "machine/6522via.h"
-#include "machine/applefdc.h"
-#include "machine/6551acia.h"
-#include "machine/ctronics.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
-#include "imagedev/flopdrv.h"
 
 
-
-static const int enable_logging = 1;
 
 
 /* ==0 if oric1 or oric atmos, !=0 if telestrat */
 
 /* This does not exist in the real hardware. I have used it to
 know which sources are interrupting */
-/* bit 2 = telestrat 2nd via interrupt, 1 = microdisc interface,
+/* bit 2 = telestrat 2nd via interrupt,
+1 = microdisc interface,
 0 = oric 1st via interrupt */
 
 enum
@@ -70,20 +59,14 @@ static void oric_refresh_ints(running_machine &machine)
 
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
 		if ((input_port_read(machine, "FLOPPY") & 0x07) == ORIC_FLOPPY_INTERFACE_NONE)
-		{
 			state->m_irqs &=~(1<<1);
-		}
 	}
 
 	/* any irq set? */
-	if ((state->m_irqs & 0x0f)!=0)
-	{
+	if (state->m_irqs & 0x0f)
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-	}
 	else
-	{
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	}
 }
 
 
@@ -100,8 +83,7 @@ static void oric_refresh_ints(running_machine &machine)
 static void oric_keyboard_sense_refresh(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	/* The following assumes that if a 0 is written, it can be used to detect if any key
-    has been pressed.. */
+	/* The following assumes that if a 0 is written, it can be used to detect if any key has been pressed.. */
 	/* for each bit that is 0, it combines it's pressed state with the pressed state so far */
 
 	int i;
@@ -130,6 +112,7 @@ static void oric_keyboard_sense_refresh(running_machine &machine)
 
 	/* clear sense result */
 	state->m_key_sense_bit = 0;
+
 	/* any keys pressed on this line? */
 	if (key_bit!=0)
 	{
@@ -163,9 +146,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 	{
 		/* if psg is in read register state return reg data */
 		if (state->m_psg_control==0x01)
-		{
 			return ay8910_r(space->machine().device("ay8912"), 0);
-		}
 
 		/* return high-impedance */
 		return 0x0ff;
@@ -311,16 +292,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 
 	/* CASSETTE */
 	/* cassette motor control */
-	if ((state->m_previous_portb_data^data) & (1<<6))
-	{
-		if (data & (1<<6))
-		{
-			//enable_logging = 1;
-		}
-	}
-
-
-		cassette_device_image(device->machine())->change_state(
+	cassette_device_image(device->machine())->change_state(
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
@@ -353,9 +325,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 	state->m_psg_control &=~1;
 
 	if (data)
-	{
 		state->m_psg_control |=1;
-	}
 
 	oric_psg_connection_refresh(device->machine());
 }
@@ -366,9 +336,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 	state->m_psg_control &=~2;
 
 	if (data)
-	{
 		state->m_psg_control |=2;
-	}
 
 	oric_psg_connection_refresh(device->machine());
 }
@@ -380,14 +348,7 @@ static void oric_via_irq_func(device_t *device, int state)
 	drvstate->m_irqs &= ~(1<<0);
 
 	if (state)
-	{
-		if (enable_logging)
-		{
-			//logerror("oric via1 interrupt\r\n");
-		}
-
 		drvstate->m_irqs |=(1<<0);
-	}
 
 	oric_refresh_ints(device->machine());
 }
@@ -1076,7 +1037,18 @@ static void oric_common_init_machine(running_machine &machine)
 	/* clear all irqs */
 	state->m_irqs = 0;
 	state->m_ram_0x0c000 = NULL;
-
+	state->m_keyboard_line = 0;
+	state->m_key_sense_bit = 0;
+	state->m_keyboard_mask = 0;
+	state->m_via_port_a_data = 0;
+	state->m_psg_control = 0;
+	state->m_previous_portb_data = 0;
+	state->m_port_3fa_w = 0;
+	state->m_port_3fb_w = 0;
+	state->m_wd179x_int_state = 0;
+	state->m_port_314_r = 0;
+	state->m_port_318_r = 0;
+	state->m_port_314_w = 0;
 	machine.scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
 }
 
@@ -1087,7 +1059,7 @@ MACHINE_START( oric )
 
 	state->m_is_telestrat = 0;
 
-	state->m_ram_0x0c000 = auto_alloc_array(machine, char, 16384);
+	state->m_ram_0x0c000 = auto_alloc_array(machine, UINT8, 16384);
 }
 
 
@@ -1182,13 +1154,7 @@ READ8_MEMBER(oric_state::oric_IO_r)
 		}
 		break;
 	}
-	if (enable_logging)
-	{
-		if ((offset & 0x0f)!=0x0d)
-		{
-			//logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(machine().device("maincpu"), STATE_GENPC));
-		}
-	}
+
 	/* it is repeated */
 	return via_0->read(space, offset & 0x0f);
 }
@@ -1222,10 +1188,6 @@ WRITE8_MEMBER(oric_state::oric_IO_w)
 
 		}
 		break;
-	}
-	if (enable_logging)
-	{
-		//logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(machine().device("maincpu"), STATE_GENPC));
 	}
 
 	via_0->write(space, offset & 0x0f, data);
@@ -1426,35 +1388,38 @@ MACHINE_START( telestrat )
 
 	oric_common_init_machine(machine);
 
+	state->m_telestrat_via2_port_a_data = 0;
+	state->m_telestrat_via2_port_b_data = 0;
 	state->m_is_telestrat = 1;
 
 	/* initialise overlay ram */
 	state->m_telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[0].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[0].ptr = mem+0x020000; //auto_alloc_array(machine, UINT8, 16384);
 
 	state->m_telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[1].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[1].ptr = mem+0x024000; //auto_alloc_array(machine, UINT8, 16384);
+
 	state->m_telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[2].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[2].ptr = mem+0x028000; //auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	state->m_telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[3].ptr = mem+0x010000;
+	state->m_telestrat_blocks[3].ptr = mem+0x010000; // telmatic.rom
 
 	state->m_telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	state->m_telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
+	state->m_telestrat_blocks[4].ptr = mem+0x02c000; //auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	state->m_telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[5].ptr = mem+0x014000;
+	state->m_telestrat_blocks[5].ptr = mem+0x014000;  // teleass.rom
 
 	/* initialise default cartridge */
 	state->m_telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[6].ptr = mem+0x018000;
+	state->m_telestrat_blocks[6].ptr = mem+0x018000; // hyperbas.rom
 
 	/* initialise default cartridge */
 	state->m_telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->m_telestrat_blocks[7].ptr = mem+0x01c000;
+	state->m_telestrat_blocks[7].ptr = mem+0x01c000; // telmon24.rom
 
 	state->m_telestrat_bank_selection = 7;
 	telestrat_refresh_mem(machine);

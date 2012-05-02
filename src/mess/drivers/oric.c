@@ -16,20 +16,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/wave.h"
 #include "includes/oric.h"
-#include "machine/ctronics.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "formats/oric_dsk.h"
-#include "formats/ap2_dsk.h"
-#include "formats/oric_tap.h"
-#include "sound/ay8910.h"
-#include "machine/6522via.h"
-#include "machine/6551acia.h"
-#include "machine/wd17xx.h"
 
 /*
     Explanation of memory regions:
@@ -57,8 +44,8 @@
 
 
 static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8, oric_state )
-    AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
-    AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
+	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
 ADDRESS_MAP_END
@@ -70,7 +57,7 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, oric_state )
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x031b) AM_READWRITE(oric_microdisc_r, oric_microdisc_w )
-	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia",  acia6551_device, read, write)
+	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", acia6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
 	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
@@ -78,7 +65,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START(oric)
-    PORT_START("ROW0")
+	PORT_START("ROW0")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)			PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)			PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)			PORT_CHAR('1') PORT_CHAR('!')
@@ -184,7 +171,7 @@ static INPUT_PORTS_START(orica)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(prav8d)
-    PORT_START("ROW0")
+	PORT_START("ROW0")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)									PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X \xd0\xac") PORT_CODE(KEYCODE_X)			PORT_CHAR('X')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)									PORT_CHAR('1') PORT_CHAR('!')
@@ -395,7 +382,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_MACHINE_START( oric )
 	MCFG_MACHINE_RESET( oric )
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -512,7 +499,7 @@ ROM_START(orica)
 ROM_END
 
 ROM_START(telstrat)
-	ROM_REGION(0x20000, "maincpu", 0)	/* 0x10000 + (0x04000 * 4) */
+	ROM_REGION(0x30000, "maincpu", 0)	/* 0x10000 + (0x04000 * 4) */
 	ROM_LOAD ("telmatic.rom", 0x010000, 0x02000, CRC(94358dc6) SHA1(35f92a0477a88f5cf564971125047ffcfa02ec10) )
 	ROM_LOAD ("teleass.rom",  0x014000, 0x04000, CRC(68b0fde6) SHA1(9e9af51dae3199cccf49ab3f0d47e2b9be4ba97d) )
 	ROM_LOAD ("hyperbas.rom", 0x018000, 0x04000, CRC(1d96ab50) SHA1(f5f70a0eb59f8cd6c261e179ae78ef906f68ed63) )
@@ -521,9 +508,9 @@ ROM_END
 
 ROM_START(prav8d)
 	ROM_REGION(0x14300, "maincpu", 0)	/* 0x10000 + 0x04000 + 0x00100 + 0x00200 */
-    ROM_LOAD( "pravetzt.rom", 0x10000, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
+	ROM_LOAD( "pravetzt.rom", 0x10000, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
 	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-    ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+	ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 ROM_START(prav8dd)
@@ -532,14 +519,14 @@ ROM_START(prav8dd)
 	ROMX_LOAD( "8d.rom",       0x10000, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")
 	ROMX_LOAD( "pravetzd.rom", 0x10000, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(2) )
-    ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-    ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+	ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME */
-COMP( 1983, oric1,     0,		0,		oric,       oric,	    0,	    "Tangerine",    "Oric 1" , 0)
-COMP( 1984, orica,     oric1,	0,		oric,	    orica,	    0,	    "Tangerine",    "Oric Atmos" , 0)
-COMP( 1985, prav8d,    oric1,	0,		prav8d,     prav8d,     0,      "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,   oric1,	0,		prav8d,     prav8d,     0,      "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_UNOFFICIAL)
-COMP( 1986, telstrat,  oric1,	0,		telstrat,   telstrat,   0,      "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )
+COMP( 1983, oric1,      0,      0,      oric,       oric,       0,    "Tangerine",    "Oric 1" , 0)
+COMP( 1984, orica,      oric1,  0,      oric,       orica,      0,    "Tangerine",    "Oric Atmos" , 0)
+COMP( 1985, prav8d,     oric1,  0,      prav8d,     prav8d,     0,    "Pravetz",      "Pravetz 8D", 0)
+COMP( 1989, prav8dd,    oric1,  0,      prav8d,     prav8d,     0,    "Pravetz",      "Pravetz 8D (Disk ROM)", GAME_UNOFFICIAL)
+COMP( 1986, telstrat,   oric1,  0,      telstrat,   telstrat,   0,    "Tangerine",    "Oric Telestrat", GAME_NOT_WORKING )
