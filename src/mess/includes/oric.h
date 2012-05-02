@@ -7,8 +7,21 @@
 #ifndef ORIC_H_
 #define ORIC_H_
 
+#include "emu.h"
+#include "cpu/m6502/m6502.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
 #include "machine/6522via.h"
+#include "machine/6551acia.h"
+#include "machine/ctronics.h"
 #include "machine/wd17xx.h"
+//#include <stdio.h>
+#include "machine/applefdc.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
+#include "formats/oric_dsk.h"
+#include "formats/ap2_dsk.h"
+#include "formats/oric_tap.h"
 
 enum
 {
@@ -23,34 +36,33 @@ typedef struct
 	unsigned char *ptr;
 } telestrat_mem_block;
 
+
 /* current state of the display */
 /* some attributes persist until they are turned off.
 This structure holds this persistant information */
 typedef struct
 {
 	/* foreground and background colour used for rendering */
-	/* if flash attribute is set, these two will both be equal
-    to background colour */
-	int active_foreground_colour;
-	int active_background_colour;
+	/* if flash attribute is set, these two will both be equal to background colour */
+	UINT8 active_foreground_colour;
+	UINT8 active_background_colour;
 	/* current foreground and background colour */
-	int foreground_colour;
-	int background_colour;
-	int mode;
+	UINT8 foreground_colour;
+	UINT8 background_colour;
+	UINT8 mode;
 	/* text attributes */
-	int text_attributes;
+	UINT8 text_attributes;
 
-	unsigned long read_addr;
+	offs_t read_addr;
 
 	/* current addr to fetch data */
-	unsigned char *char_data;
+	UINT8 *char_data;
 	/* base of char data */
-	unsigned char *char_base;
+	UINT8 *char_base;
 
 	/* if (1<<3), display graphics, if 0, hide graphics */
-	int flash_state;
 	/* current count */
-	int flash_count;
+	UINT8 flash_count;
 } oric_vh_state;
 
 
@@ -62,24 +74,24 @@ public:
 		  m_ram(*this, "ram") { }
 
 	optional_shared_ptr<UINT8> m_ram;
-	int m_is_telestrat;
-	unsigned char m_irqs;
-	char *m_ram_0x0c000;
-	int m_keyboard_line;
-	char m_key_sense_bit;
-	char m_keyboard_mask;
-	unsigned char m_via_port_a_data;
-	char m_psg_control;
-	unsigned char m_previous_portb_data;
-	unsigned char m_port_3fa_w;
-	unsigned char m_port_3fb_w;
-	unsigned char m_wd179x_int_state;
-	unsigned char m_port_314_r;
-	unsigned char m_port_318_r;
-	unsigned char m_port_314_w;
-	unsigned char m_telestrat_bank_selection;
-	unsigned char m_telestrat_via2_port_a_data;
-	unsigned char m_telestrat_via2_port_b_data;
+	bool m_is_telestrat;
+	UINT8 m_irqs;
+	UINT8 *m_ram_0x0c000;
+	UINT8 m_keyboard_line;
+	UINT8 m_key_sense_bit;
+	UINT8 m_keyboard_mask;
+	UINT8 m_via_port_a_data;
+	UINT8 m_psg_control;
+	UINT8 m_previous_portb_data;
+	UINT8 m_port_3fa_w;
+	UINT8 m_port_3fb_w;
+	UINT8 m_wd179x_int_state;
+	UINT8 m_port_314_r;
+	UINT8 m_port_318_r;
+	UINT8 m_port_314_w;
+	UINT8 m_telestrat_bank_selection;
+	UINT8 m_telestrat_via2_port_a_data;
+	UINT8 m_telestrat_via2_port_b_data;
 	telestrat_mem_block m_telestrat_blocks[8];
 	oric_vh_state m_vh_state;
 	DECLARE_WRITE8_MEMBER(oric_psg_porta_write);
