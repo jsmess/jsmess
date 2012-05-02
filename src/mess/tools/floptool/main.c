@@ -53,6 +53,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_A216S_FORMAT,
+	FLOPPY_RWTS18_FORMAT,
 };
 
 void CLIB_DECL logerror(const char *format, ...)
