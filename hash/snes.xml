@@ -21990,7 +21990,8 @@ Alternate board (XL-1)
 			<!--
 			<dataarea name="sram" size="131072">
 			</dataarea>
-			--> <!-- remove this if the following doesn't work -->
+			-->
+      <!-- remove this if the following doesn't work -->
 			<dataarea name="sram" size="73728">
 				<!--rom name="u2" size="65536" offset="0x000000" /-->
 				<!--rom name="u3" size="8192"  offset="0x010000" /-->
