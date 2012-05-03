@@ -154,12 +154,12 @@ cartridge_pcb_minimem_device::cartridge_pcb_minimem_device(const machine_config 
 }
 
 cartridge_pcb_superspace_device::cartridge_pcb_superspace_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: cartridge_pcb_device(mconfig, TICARTPCBMIN, "SuperSpace II cartridge PCB", tag, owner, clock)
+: cartridge_pcb_device(mconfig, TICARTPCBSUP, "SuperSpace II cartridge PCB", tag, owner, clock)
 {
 }
 
 cartridge_pcb_mbx_device::cartridge_pcb_mbx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: cartridge_pcb_device(mconfig, TICARTPCBMIN, "MBX cartridge PCB", tag, owner, clock)
+: cartridge_pcb_device(mconfig, TICARTPCBMBX, "MBX cartridge PCB", tag, owner, clock)
 {
 }
 
@@ -469,12 +469,13 @@ READ8Z_MEMBER(cartridge_pcb_mbx_device::readz)
 		}
 		else
 		{
-			*value = m_rom_ptr[(offset & 0x1fff) | (m_rom_page<<13)];
+			if (m_rom_ptr!=NULL)
+				*value = m_rom_ptr[(offset & 0x1fff) | (m_rom_page<<13)];
 		}
 	}
 }
 
-/* Write function for the super cartridge. */
+/* Write function for the mbx cartridge. */
 WRITE8_MEMBER(cartridge_pcb_mbx_device::write)
 {
 	if ((offset & GROM_MASK)==GROM_AREA)
