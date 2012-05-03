@@ -1,0 +1,103 @@
+﻿<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tvc_cart" description="Videoton TVC 64 cartridges">
+	<software name="harcaf">
+		<description>Harc a föld körül</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="harc_a_fold_korul.crt" size="0x4000" crc="fd36749a" sha1="b12b3171e4ca970189cb22b35ca4e0d0393dc172" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marokko">
+		<description>Marokkó</description>
+		<year>198?</year>
+		<publisher>Videoton</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="marokko.crt" size="0x2000" crc="88fcfcc3" sha1="802051b0c68646715e1675f7811cb613619a9feb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="packman">
+		<description>Pack Man</description>
+		<year>198?</year>
+		<publisher>Videoton</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="pack_man.crt" size="0x4000" crc="6043c204" sha1="1b77340dc2d42cb860908bc4bf83578ab3f83710" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="tetris.crt" size="0x2000" crc="e7d3dcd5" sha1="f079d3ded9ee47cf89990d92111aa5dddbb80b07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trudi">
+		<description>Turbó Rudi</description>
+		<year>1987</year>
+		<publisher>a-Studio</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="turbo_rudi.crt" size="0x4000" crc="d7016608" sha1="e0b3c28fc4056a2232f499ce261fabc7098a3f51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Space Invaders</description>
+		<year>1986</year>
+		<publisher>Videoton</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="tvc_cartridge_49201_-_space_invaders.rom" size="0x2000" crc="ff117314" sha1="5054bd8c13290b9ab0841a4ad0d477caba699899" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="urhodito" cloneof="invaders">
+		<description>Űrhódító</description>
+		<year>1986</year>
+		<publisher>Videoton</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="drhodito.crt" size="0x2000" crc="fbbcf0ad" sha1="a0bc588632b0a4ffee4d55187d8f43d06e6e580f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="varazsgo">
+		<description>Varázsgömb</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="varazsgomb.crt" size="0x2000" crc="adf1f38b" sha1="a6f2c6afbc12ca5cf7b567414f5c820cb8bcf532" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volleyba">
+		<description>Volleyball</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="volleyball.crt" size="0x2000" crc="34da215d" sha1="073bbd13492b12627bdaaef6f8fa2c7f90cb64ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
+
