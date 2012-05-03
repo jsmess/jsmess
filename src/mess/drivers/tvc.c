@@ -5,7 +5,6 @@
         12/05/2009 Skeleton driver.
 
         TODO:
-        - colors are wrong in games that uses video mode 1
         - add sound
         - cassette load/save
         - floppy interface
@@ -109,9 +108,9 @@ WRITE8_MEMBER(tvc_state::tvc_video_mode_w)
 
 WRITE8_MEMBER(tvc_state::tvc_palette_w)
 {
-	//  0 I 0 R | 0 G 0 B
+	//  0 I 0 G | 0 R 0 B
 	//  0 0 0 0 | I R G B
-	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
+	int i = ((data&0x40)>>3) | ((data&0x10)>>3) | (data&0x04) | (data&0x01);
 
 	m_col[offset] = i;
 }
@@ -302,6 +301,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 
 	switch(state->m_video_mode) {
 		case 0 :
+				//  2 colors mode
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
@@ -317,27 +317,31 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				}
 				break;
 		case 1 :
+				// 4 colors mode
+				// a0 b0 c0 d0 a1 b1 c1 d1
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = palette[state->m_col[BIT(data,7)*2 + BIT(data,3)]];
-					*p++ = palette[state->m_col[BIT(data,7)*2 + BIT(data,3)]];
-					*p++ = palette[state->m_col[BIT(data,6)*2 + BIT(data,2)]];
-					*p++ = palette[state->m_col[BIT(data,6)*2 + BIT(data,2)]];
-					*p++ = palette[state->m_col[BIT(data,5)*2 + BIT(data,1)]];
-					*p++ = palette[state->m_col[BIT(data,5)*2 + BIT(data,1)]];
-					*p++ = palette[state->m_col[BIT(data,4)*2 + BIT(data,0)]];
-					*p++ = palette[state->m_col[BIT(data,4)*2 + BIT(data,0)]];
+					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
+					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
+					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
+					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
+					*p++ = palette[state->m_col[BIT(data,1)*2 + BIT(data,5)]];
+					*p++ = palette[state->m_col[BIT(data,1)*2 + BIT(data,5)]];
+					*p++ = palette[state->m_col[BIT(data,0)*2 + BIT(data,4)]];
+					*p++ = palette[state->m_col[BIT(data,0)*2 + BIT(data,4)]];
 				}
 				break;
 		default:
+				// 16 colors mode
+				// IGRB IGRB
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
-					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
+					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>4) | ((data & 0x08)>>1) | ((data & 0x02)>>1);
+					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>3) | (data & 0x04) | (data & 0x01);
 					*p++ = palette[col0];
 					*p++ = palette[col0];
 					*p++ = palette[col0];
