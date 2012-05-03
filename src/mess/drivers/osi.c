@@ -230,7 +230,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 
 	for (bit = 0; bit < 8; bit++)
 	{
-		if (!BIT(m_keylatch, bit)) data &= input_port_read(machine(), keynames[bit]);
+		if (!BIT(m_keylatch, bit)) data &= ioport(keynames[bit])->read();
 	}
 
 	return data;

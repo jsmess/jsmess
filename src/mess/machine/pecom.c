@@ -109,7 +109,7 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
 	UINT16 addr = cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
-	return input_port_read(machine(), keynames[addr - 0x7cca]) & 0x03;
+	return ioport(keynames[addr - 0x7cca])->read() & 0x03;
 }
 
 /* CDP1802 Interface */
@@ -123,7 +123,7 @@ static READ_LINE_DEVICE_HANDLER( clear_r )
 
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
-	int shift = BIT(input_port_read(device->machine(), "CNT"), 1);
+	int shift = BIT(device->machine().root_device().ioport("CNT")->read(), 1);
 	double cas = dynamic_cast<cassette_image_device *>(device)->input();
 
 	return (cas > 0.0) | shift;
@@ -134,7 +134,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
 {
     int flags = 0x0f;
     double valcas = (cassette_device_image(device->machine()));->input()
-    UINT8 val = input_port_read(device->machine(), "CNT");
+    UINT8 val = device->machine().root_device().ioport("CNT")->read();
 
     if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
     {

@@ -28,7 +28,7 @@ READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 	}
 	else
 	{
-		return input_port_read(machine(), keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return ioport(keynames[(offset>>3) & 0x07])->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
@@ -176,14 +176,14 @@ MACHINE_RESET( galaxy )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
-	if (input_port_read(machine, "ROM2")) {
+	if (machine.root_device().ioport("ROM2")->read()) {
 		space->install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
 		space->nop_read(0x1000, 0x1fff);
 	}
 	space->nop_write(0x1000, 0x1fff);
 
-	if (input_port_read(machine, "ROM2"))
+	if (machine.root_device().ioport("ROM2")->read())
 		state->membank("bank10")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
 	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);

@@ -93,7 +93,7 @@ QUICKLOAD_LOAD( super80 )
 	if (exec_addr != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;
+		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		if (autorun)
 			cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
@@ -119,7 +119,7 @@ QUICKLOAD_LOAD( mbee_z80bin )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;
+		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		device_t *cpu = image.device().machine().device("maincpu");
 		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -156,7 +156,7 @@ QUICKLOAD_LOAD( sorcerer )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;
+		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 

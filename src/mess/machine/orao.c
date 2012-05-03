@@ -36,26 +36,26 @@ READ8_MEMBER(orao_state::orao_io_r)
 
 	 switch(offset) {
 		/* Keyboard*/
-		case 0x07FC : return input_port_read(machine(), "LINE0");
-		case 0x07FD : return input_port_read(machine(), "LINE1");
-		case 0x07FA : return input_port_read(machine(), "LINE2");
-		case 0x07FB : return input_port_read(machine(), "LINE3");
-		case 0x07F6 : return input_port_read(machine(), "LINE4");
-		case 0x07F7 : return input_port_read(machine(), "LINE5");
-		case 0x07EE : return input_port_read(machine(), "LINE6");
-		case 0x07EF : return input_port_read(machine(), "LINE7");
-		case 0x07DE : return input_port_read(machine(), "LINE8");
-		case 0x07DF : return input_port_read(machine(), "LINE9");
-		case 0x07BE : return input_port_read(machine(), "LINE10");
-		case 0x07BF : return input_port_read(machine(), "LINE11");
-		case 0x077E : return input_port_read(machine(), "LINE12");
-		case 0x077F : return input_port_read(machine(), "LINE13");
-		case 0x06FE : return input_port_read(machine(), "LINE14");
-		case 0x06FF : return input_port_read(machine(), "LINE15");
-		case 0x05FE : return input_port_read(machine(), "LINE16");
-		case 0x05FF : return input_port_read(machine(), "LINE17");
-		case 0x03FE : return input_port_read(machine(), "LINE18");
-		case 0x03FF : return input_port_read(machine(), "LINE19");
+		case 0x07FC : return ioport("LINE0")->read();
+		case 0x07FD : return ioport("LINE1")->read();
+		case 0x07FA : return ioport("LINE2")->read();
+		case 0x07FB : return ioport("LINE3")->read();
+		case 0x07F6 : return ioport("LINE4")->read();
+		case 0x07F7 : return ioport("LINE5")->read();
+		case 0x07EE : return ioport("LINE6")->read();
+		case 0x07EF : return ioport("LINE7")->read();
+		case 0x07DE : return ioport("LINE8")->read();
+		case 0x07DF : return ioport("LINE9")->read();
+		case 0x07BE : return ioport("LINE10")->read();
+		case 0x07BF : return ioport("LINE11")->read();
+		case 0x077E : return ioport("LINE12")->read();
+		case 0x077F : return ioport("LINE13")->read();
+		case 0x06FE : return ioport("LINE14")->read();
+		case 0x06FF : return ioport("LINE15")->read();
+		case 0x05FE : return ioport("LINE16")->read();
+		case 0x05FF : return ioport("LINE17")->read();
+		case 0x03FE : return ioport("LINE18")->read();
+		case 0x03FF : return ioport("LINE19")->read();
 		/* Tape */
 		case 0x07FF :
 					level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());

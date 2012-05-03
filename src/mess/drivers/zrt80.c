@@ -200,7 +200,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
-	UINT8 polarity = input_port_read(device->machine(), "DIPSW1") & 4 ? 0xff : 0;
+	UINT8 polarity = state->ioport("DIPSW1")->read() & 4 ? 0xff : 0;
 
 	for (x = 0; x < x_count; x++)
 	{

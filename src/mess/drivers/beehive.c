@@ -50,7 +50,7 @@ READ8_MEMBER(beehive_state::beehive_60_r)
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%d", m_keyline&15);
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 	}
 	else
 		return 0xff;

@@ -586,7 +586,7 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			state->m_Keyboard[Idx] = input_port_read(device->machine(), keynames[Idx]);
+			state->m_Keyboard[Idx] = device->machine().root_device().ioport(keynames[Idx])->read();
 
 			if(state->m_Keyboard[Idx] != 0x7F)
 				state->m_KAny_next = 1;
@@ -1005,7 +1005,7 @@ static void ScanInKeyboard(void)
 	for(Idx=0; Idx<NoKeyrows; Idx++)
 	{
 		if (Idx < 10)
-			Row = input_port_read(machine, keynames[Idx]);
+			Row = machine.root_device().ioport(keynames[Idx])->read();
 
 		else
 			Row = 0x7f;

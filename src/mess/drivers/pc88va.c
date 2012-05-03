@@ -857,7 +857,7 @@ READ16_MEMBER(pc88va_state::sys_port4_r)
 	UINT8 vrtc,sw1;
 	vrtc = (machine().primary_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
 
-	sw1 = (input_port_read(machine(), "DSW") & 1) ? 2 : 0;
+	sw1 = (ioport("DSW")->read() & 1) ? 2 : 0;
 
 	return vrtc | sw1 | 0xc0;
 }
@@ -913,7 +913,7 @@ READ8_MEMBER(pc88va_state::key_r)
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
 	                                        "KEYC", "KEYD", "KEYE", "KEYF" };
 
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 WRITE16_MEMBER(pc88va_state::backupram_wp_1_w)
@@ -1015,7 +1015,7 @@ READ16_MEMBER(pc88va_state::sysop_r)
 {
 	UINT8 sys_op;
 
-	sys_op = input_port_read(machine(), "SYSOP_SW") & 3;
+	sys_op = ioport("SYSOP_SW")->read() & 3;
 
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
@@ -1440,11 +1440,11 @@ static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
 {
 	UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
-	speed_sw = (input_port_read(device->machine(), "SPEED_SW") & 1) ? 0x20 : 0x00;
-	sw5 = (input_port_read(device->machine(), "DSW") & 0x10);
-	sw4 = (input_port_read(device->machine(), "DSW") & 0x08);
-	sw3 = (input_port_read(device->machine(), "DSW") & 0x04);
-	sw2 = (input_port_read(device->machine(), "DSW") & 0x02);
+	speed_sw = (device->machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
+	sw5 = (device->machine().root_device().ioport("DSW")->read() & 0x10);
+	sw4 = (device->machine().root_device().ioport("DSW")->read() & 0x08);
+	sw3 = (device->machine().root_device().ioport("DSW")->read() & 0x04);
+	sw2 = (device->machine().root_device().ioport("DSW")->read() & 0x02);
 
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
@@ -1453,7 +1453,7 @@ static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
 {
 	UINT8 xsw1;
 
-	xsw1 = (input_port_read(device->machine(), "DSW") & 1) ? 0 : 8;
+	xsw1 = (device->machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
 
 	return 0xf7 | xsw1;
 }

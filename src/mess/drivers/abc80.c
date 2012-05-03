@@ -274,13 +274,13 @@ static void abc80_keyboard_scan(running_machine &machine)
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 	int table = 0, row, col;
 
-	if (input_port_read(machine, "ROW7") & 0x07)
+	if (machine.root_device().ioport("ROW7")->read() & 0x07)
 	{
 		/* shift, upper case */
 		table |= 0x01;
 	}
 
-	if (input_port_read(machine, "ROW7") & 0x08)
+	if (machine.root_device().ioport("ROW7")->read() & 0x08)
 	{
 		/* ctrl */
 		table |= 0x02;
@@ -292,7 +292,7 @@ static void abc80_keyboard_scan(running_machine &machine)
 	/* scan keyboard */
 	for (row = 0; row < 7; row++)
 	{
-		UINT8 data = input_port_read(machine, keynames[row]);
+		UINT8 data = machine.root_device().ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{

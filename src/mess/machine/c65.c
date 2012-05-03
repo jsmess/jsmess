@@ -45,11 +45,11 @@ static void c65_nmi( running_machine &machine )
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (state->m_nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
-		state->m_nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -412,7 +412,7 @@ static int c65_6511_port_r( running_machine &machine, int offset )
 
 	if (offset == 7)
 	{
-		if (input_port_read(machine, "SPECIAL") & 0x20)
+		if (machine.root_device().ioport("SPECIAL")->read() & 0x20)
 			data &= ~1;
 	}
 	DBG_LOG(machine, 2, "r6511 read", ("%.2x\n", offset));
@@ -1065,6 +1065,6 @@ INTERRUPT_GEN( c65_frame_interrupt )
 	/* c65 specific: function keys input ports */
 	value = 0xff;
 
-	value &= ~input_port_read(device->machine(), "FUNCT");
+	value &= ~state->ioport("FUNCT")->read();
 	state->m_keyline = value;
 }

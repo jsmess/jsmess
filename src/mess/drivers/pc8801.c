@@ -990,7 +990,7 @@ READ8_MEMBER(pc8801_state::pc8801_ctrl_r)
     ---- --x- monitor refresh rate DIP-SW
     ---- ---x (pbsy?)
     */
-	return input_port_read(machine(), "CTRL");
+	return ioport("CTRL")->read();
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
@@ -1823,7 +1823,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CFG")		/* EXSWITCH */
@@ -2168,7 +2168,7 @@ static MACHINE_RESET( pc8801_clock_speed )
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	MACHINE_RESET_CALL( pc8801 );
 	state->m_has_clock_speed = 1;
-	state->m_clock_setting = input_port_read(machine, "CFG") & 0x80;
+	state->m_clock_setting = machine.root_device().ioport("CFG")->read() & 0x80;
 
 	machine.device("maincpu")->set_unscaled_clock(state->m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
 	machine.device("fdccpu")->set_unscaled_clock(state->m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
@@ -2218,8 +2218,8 @@ static const struct upd765_interface pc8801_upd765_interface =
 /* YM2203 Interface */
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
-static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine(), "OPN_PA"); }
-static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine(), "OPN_PB"); }
+static READ8_DEVICE_HANDLER( opn_porta_r ) { return device->machine().root_device().ioport("OPN_PA")->read(); }
+static READ8_DEVICE_HANDLER( opn_portb_r ) { return device->machine().root_device().ioport("OPN_PB")->read(); }
 
 static const ym2203_interface pc88_ym2203_intf =
 {

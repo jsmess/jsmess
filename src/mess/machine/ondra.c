@@ -32,7 +32,7 @@ READ8_MEMBER(ondra_state::ondra_keyboard_r)
 	if (ondra_keyboard_line > 9) {
 		retVal |= 0x1f;
 	} else {
-		retVal |= input_port_read(machine(), keynames[ondra_keyboard_line]);
+		retVal |= ioport(keynames[ondra_keyboard_line])->read();
 	}
 	return retVal;
 }
@@ -77,7 +77,7 @@ WRITE8_MEMBER(ondra_state::ondra_port_0a_w)
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
-	if ((input_port_read(machine, "NMI") & 1) == 1)
+	if ((machine.root_device().ioport("NMI")->read() & 1) == 1)
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}

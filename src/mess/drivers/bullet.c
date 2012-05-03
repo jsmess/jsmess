@@ -297,7 +297,7 @@ READ8_MEMBER( bullet_state::info_r )
 	UINT8 data = 0x10;
 
 	// DIP switches
-	data |= input_port_read(machine(), "SW1") & 0x0f;
+	data |= ioport("SW1")->read() & 0x0f;
 
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 6;
@@ -530,7 +530,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 	data |= m_centronics->busy_r();
 
 	// DIP switches
-	data |= input_port_read(machine(), "SW1") & 0x06;
+	data |= ioport("SW1")->read() & 0x06;
 
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 6;

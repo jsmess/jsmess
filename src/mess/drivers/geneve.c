@@ -296,21 +296,21 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x01, GENEVE_098, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
+	PORT_CONFNAME( 0x01, GENEVE_098, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, EQUALS, 0x00 )
 		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
 		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
 
 	PORT_START( "SRAM" )
-	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
+	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, EQUALS, 0x00 )
 		PORT_CONFSETTING( 0x00, "32 KiB" )
 		PORT_CONFSETTING( 0x01, "64 KiB" )
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 1)
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 2)
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
@@ -440,7 +440,7 @@ READ8_MEMBER( geneve::read_by_9901 )
 		if (m_inta==CLEAR_LINE) answer |= 0x02;
 		if (m_int2==CLEAR_LINE) answer |= 0x04;
 
-		joy = input_port_read(machine(), "JOY");
+		joy = ioport("JOY")->read();
 		if (m_joystick_select==0) joy = joy & 0xff;
 		else joy = (joy>>8) & 0xff;
 		answer |= joy;
@@ -480,7 +480,7 @@ READ8_MEMBER( geneve::read_by_9901 )
 		if (m_keyint==CLEAR_LINE) answer |= 0x40;
 
 		// Joystick up (mirror of bit 7)
-		joy = input_port_read(machine(), "JOY");
+		joy = ioport("JOY")->read();
 		if (m_joystick_select==0) joy = joy & 0xff;
 		else joy = (joy>>8) & 0xff;
 		if ((joy & 0x80)==0x00) answer |= 0x80;
@@ -694,7 +694,7 @@ static MACHINE_RESET( geneve )
 	driver->m_int2 = CLEAR_LINE;	// flag reflecting the INT2 line
 	driver->m_keyint = CLEAR_LINE;
 
-	driver->m_peribox->set_genmod(input_port_read(machine, "MODE")==GENMOD);
+	driver->m_peribox->set_genmod(machine.root_device().ioport("MODE")->read()==GENMOD);
 }
 
 static MACHINE_CONFIG_START( geneve_60hz, geneve )

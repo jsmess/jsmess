@@ -340,16 +340,16 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	int lines = offset >> 8;
 	int data = 0xff;
 
-	int cs_extra1 = input_port_read_safe(machine(), "PLUS0", 0xff) & 0x1f;
-	int cs_extra2 = input_port_read_safe(machine(), "PLUS1", 0xff) & 0x1f;
-	int cs_extra3 = input_port_read_safe(machine(), "PLUS2", 0xff) & 0x1f;
-	int ss_extra1 = input_port_read_safe(machine(), "PLUS3", 0xff) & 0x1f;
-	int ss_extra2 = input_port_read_safe(machine(), "PLUS4", 0xff) & 0x1f;
+	int cs_extra1 = ioport("PLUS0")->read_safe(0xff) & 0x1f;
+	int cs_extra2 = ioport("PLUS1")->read_safe(0xff) & 0x1f;
+	int cs_extra3 = ioport("PLUS2")->read_safe(0xff) & 0x1f;
+	int ss_extra1 = ioport("PLUS3")->read_safe(0xff) & 0x1f;
+	int ss_extra2 = ioport("PLUS4")->read_safe(0xff) & 0x1f;
 
 	/* Caps - V */
 	if ((lines & 1) == 0)
 	{
-		data &= input_port_read(machine(), "LINE0");
+		data &= ioport("LINE0")->read();
 		/* CAPS for extra keys */
 		if (cs_extra1 != 0x1f || cs_extra2 != 0x1f || cs_extra3 != 0x1f)
 			data &= ~0x01;
@@ -357,32 +357,32 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 	/* A - G */
 	if ((lines & 2) == 0)
-		data &= input_port_read(machine(), "LINE1");
+		data &= ioport("LINE1")->read();
 
 	/* Q - T */
 	if ((lines & 4) == 0)
-		data &= input_port_read(machine(), "LINE2");
+		data &= ioport("LINE2")->read();
 
 	/* 1 - 5 */
 	if ((lines & 8) == 0)
-		data &= input_port_read(machine(), "LINE3") & cs_extra1;
+		data &= ioport("LINE3")->read() & cs_extra1;
 
 	/* 6 - 0 */
 	if ((lines & 16) == 0)
-		data &= input_port_read(machine(), "LINE4") & cs_extra2;
+		data &= ioport("LINE4")->read() & cs_extra2;
 
 	/* Y - P */
 	if ((lines & 32) == 0)
-		data &= input_port_read(machine(), "LINE5") & ss_extra1;
+		data &= ioport("LINE5")->read() & ss_extra1;
 
 	/* H - Enter */
 	if ((lines & 64) == 0)
-		data &= input_port_read(machine(), "LINE6");
+		data &= ioport("LINE6")->read();
 
 		/* B - Space */
 	if ((lines & 128) == 0)
 	{
-		data &= input_port_read(machine(), "LINE7") & cs_extra3 & ss_extra2;
+		data &= ioport("LINE7")->read() & cs_extra3 & ss_extra2;
 		/* SYMBOL SHIFT for extra keys */
 		if (ss_extra1 != 0x1f || ss_extra2 != 0x1f)
 			data &= ~0x02;
@@ -398,7 +398,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
     Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (input_port_read(machine(), "CONFIG") & 0x80)
+	if (ioport("CONFIG")->read() & 0x80)
 		data ^= (0x40);
 
 	return data;
@@ -407,19 +407,19 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 /* kempston joystick interface */
 READ8_MEMBER(spectrum_state::spectrum_port_1f_r)
 {
-	return input_port_read(machine(), "KEMPSTON") & 0x1f;
+	return ioport("KEMPSTON")->read() & 0x1f;
 }
 
 /* fuller joystick interface */
 READ8_MEMBER(spectrum_state::spectrum_port_7f_r)
 {
-	return input_port_read(machine(), "FULLER") | (0xff^0x8f);
+	return ioport("FULLER")->read() | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
 READ8_MEMBER(spectrum_state::spectrum_port_df_r)
 {
-	return input_port_read(machine(), "MIKROGEN") | (0xff^0x1f);
+	return ioport("MIKROGEN")->read() | (0xff^0x1f);
 }
 
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
@@ -461,25 +461,25 @@ static INPUT_PORTS_START( spec_joys )
 	PORT_CONFSETTING(  0x03, "Mikrogen" )
 
 	PORT_START("KEMPSTON") /* Kempston joystick interface */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Kempston)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Kempston)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Kempston)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Kempston)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Kempston)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x01)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Kempston)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x01)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Kempston)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x01)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Kempston)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x01)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Kempston)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x01)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Kempston)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x01)
 
 	PORT_START("FULLER") /* Fuller joystick interface */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Fuller)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Fuller)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Fuller)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Fuller)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Fuller)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x02)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Fuller)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x02)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Fuller)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x02)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Fuller)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x02)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Fuller)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x02)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Fuller)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x02)
 
 	PORT_START("MIKROGEN") /* Mikrogen joystick interface */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Mikrogen)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Mikrogen)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Mikrogen)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Mikrogen)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Mikrogen)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, PORTCOND_EQUALS, 0x03)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up (Mikrogen)") PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x03)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Down (Mikrogen)") PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x03)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Right (Mikrogen)") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x03)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Left (Mikrogen)") PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x03)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire (Mikrogen)") PORT_CODE(JOYCODE_BUTTON1) PORT_CONDITION("JOY_INTF", 0x0f, EQUALS, 0x03)
 INPUT_PORTS_END
 
 /*

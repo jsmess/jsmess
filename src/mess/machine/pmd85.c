@@ -251,7 +251,7 @@ static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portb_r )
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};
 
-	return input_port_read(device->machine(), keynames[(state->m_ppi_port_outputs[0][0] & 0x0f)]) & input_port_read(device->machine(), "KEY15");
+	return device->machine().root_device().ioport(keynames[(state->m_ppi_port_outputs[0][0] & 0x0f)])->read() & device->machine().root_device().ioport("KEY15")->read();
 }
 
 static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
@@ -297,14 +297,14 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portb_r )
 	for (i = 0; i < 8; i++)
 	{
 		if (!BIT(state->m_ppi_port_outputs[0][0], i))
-			data &= input_port_read(device->machine(), keynames[i]);
+			data &= device->machine().root_device().ioport(keynames[i])->read();
 	}
 	return data;
 }
 
 static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 {
-	return input_port_read(device->machine(), "KEY8") | 0x8f;
+	return device->machine().root_device().ioport("KEY8")->read() | 0x8f;
 }
 
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
@@ -459,7 +459,7 @@ const struct pit8253_config pmd85_pit8253_interface =
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
 	pmd85_state *state = device->machine().driver_data<pmd85_state>();
-	if (device->machine().root_device().memregion("user1")->base() != NULL)
+	if (state->memregion("user1")->base() != NULL)
 		return state->memregion("user1")->base()[state->m_ppi_port_outputs[3][1] | (state->m_ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
@@ -796,7 +796,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	int data;
 	int current_level;
 
-	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
+	if (!(machine.root_device().ioport("DSW0")->read() & 0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
 		if (machine.device<cassette_image_device>(CASSETTE_TAG)->get_state()&CASSETTE_PLAY)
@@ -864,7 +864,7 @@ static TIMER_CALLBACK( pmd_reset )
 
 DIRECT_UPDATE_MEMBER(pmd85_state::pmd85_opbaseoverride)
 {
-	if (input_port_read(machine(), "RESET") & 0x01)
+	if (ioport("RESET")->read() & 0x01)
 		machine().scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
 	return address;
 }
@@ -949,7 +949,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_2A:
 		case PMD85_3:
 		case C2717:
-			state->m_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
+			state->m_rom_module_present = (machine.root_device().ioport("DSW0")->read() & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:

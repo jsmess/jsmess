@@ -483,7 +483,7 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 	static const char *const bitnames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 											"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	return (m_matrix > 0x00) ? input_port_read(machine(), bitnames[m_matrix - 1]) : 0;
+	return (m_matrix > 0x00) ? ioport(bitnames[m_matrix - 1])->read() : 0;
 }
 
 
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( trigger_irq )
 {
 	nakajies_state *state = field.machine().driver_data<nakajies_state>();
-	UINT8 irqs = input_port_read( field.machine(), "debug" );
+	UINT8 irqs = field.machine().root_device().ioport( "debug" )->read();
 
 	state->m_irq_active |= irqs;
 	state->nakajies_update_irqs(field.machine());

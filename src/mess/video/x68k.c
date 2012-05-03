@@ -195,7 +195,7 @@ TIMER_CALLBACK(x68k_hsync)
 				state->m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((input_port_read(machine, "options") & 0x04))
+					if((machine.root_device().ioport("options")->read() & 0x04))
 					{
 						machine.primary_screen->update_partial(scan);
 					}
@@ -210,7 +210,7 @@ TIMER_CALLBACK(x68k_hsync)
 				state->m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((input_port_read(machine, "options") & 0x04))
+					if((machine.root_device().ioport("options")->read() & 0x04))
 					{
 						machine.primary_screen->update_partial(scan);
 					}
@@ -249,7 +249,7 @@ TIMER_CALLBACK(x68k_hsync)
 			state->m_scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
-				if((input_port_read(machine, "options") & 0x04))
+				if((machine.root_device().ioport("options")->read() & 0x04))
 				{
 					machine.primary_screen->update_partial(scan);
 				}

@@ -132,7 +132,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 	int i;
 
 	/* read current key state */
-	key_buf = (input_port_read(machine(), keynames[num]) | (input_port_read(machine(), keynames[num + 1]) << 16) ) >> (4*num);
+	key_buf = (ioport(keynames[num])->read() | (ioport(keynames[num + 1])->read() << 16) ) >> (4*num);
 
 	// If a key was previously pressed, this key was not shift, and this key is
 	// still down, then don't change the current key press.
@@ -203,8 +203,8 @@ bool ti99_handset_device::poll_joystick(int num)
 	int current_joy_x, current_joy_y;
 	int message;
 	/* read joystick position */
-	current_joy_x = input_port_read(machine(), joynames[0][num]);
-	current_joy_y = input_port_read(machine(), joynames[1][num]);
+	current_joy_x = ioport(joynames[0][num])->read();
+	current_joy_y = ioport(joynames[1][num])->read();
 
 	/* compare with last saved position */
 	current_joy = current_joy_x | (current_joy_y << 4);

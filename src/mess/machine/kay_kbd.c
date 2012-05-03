@@ -322,18 +322,18 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 	}
 
 	row = 9;
-	newval = input_port_read(device->machine(), "ROW9");
+	newval = device->machine().root_device().ioport("ROW9")->read();
 	chg = keyrows[row] ^ newval;
 
-	if (!chg) { newval = input_port_read(device->machine(), "ROW8"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW7"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW6"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW5"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW4"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW3"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW2"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW1"); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = input_port_read(device->machine(), "ROW0"); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW8")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW7")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW6")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW5")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW4")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW3")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW2")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW1")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = device->machine().root_device().ioport("ROW0")->read(); chg = keyrows[--row] ^ newval; }
 	if (!chg) --row;
 
 	if (row >= 0)

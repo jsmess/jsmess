@@ -1004,7 +1004,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 				value |= 0x01;
 			break;
 		case JOYSTICK:
-			input = input_port_read(machine(), "JOY");
+			input = ioport("JOY")->read();
 			switch (m_rotate)
 			{
 				case 1:
@@ -1036,7 +1036,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 				value = input;
 			break;
 		case SWITCHES:
-			value = input_port_read(machine(), "PAUSE");
+			value = ioport("PAUSE")->read();
 			break;
 		case RCART:
 			value = *(machine().root_device().memregion("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);

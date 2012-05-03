@@ -209,10 +209,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read( machine(), "Controls" );
+		data = ioport( "Controls" )->read();
 		break;
 	case 0x31:
-		data = input_port_read( machine(), "Power" ) & 0x01;
+		data = ioport( "Power" )->read() & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -558,7 +558,7 @@ static INPUT_CHANGED( power_callback )
 	if ( state->m_io_reg[0x33] & 0x04 )
 	{
 		device_set_input_line( state->m_tlcs900, TLCS900_NMI,
-			(input_port_read(field.machine(), "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+			(field.machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 

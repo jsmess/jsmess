@@ -143,7 +143,7 @@ static DEVICE_RESET(apollo_config)
 {
 	DLOG1(("reset apollo_config"));
 	// load configuration
-	config = input_port_read(device->machine(), "apollo_config");
+	config = device->machine().root_device().ioport("apollo_config")->read();
 }
 
 /*-------------------------------------------------

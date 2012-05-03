@@ -315,14 +315,14 @@ static void check_board_buttons ( running_machine &machine )
 
 /* check click on border pieces */
 	i=0;
-	port_input=input_port_read(machine, "B_BLACK");
+	port_input=machine.root_device().ioport("B_BLACK")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input)+6;
 		click_on_border_piece=TRUE;
 	}
 
-	port_input=input_port_read(machine, "B_WHITE");
+	port_input=machine.root_device().ioport("B_WHITE")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
@@ -359,7 +359,7 @@ static void check_board_buttons ( running_machine &machine )
 
 
 /* check click on board */
-	data = input_port_read_safe(machine, keynames[board_row], 0xff);
+	data = machine.root_device().ioport(keynames[board_row])->read_safe(0xff);
 
 	if ((data != 0xff) && (!mouse_down) )
 	{
@@ -406,7 +406,7 @@ static void check_board_buttons ( running_machine &machine )
 		mouse_down = 0;
 
 /* check click on border - remove selected piece*/
-	if (input_port_read_safe(machine, "LINE10", 0x01))
+	if (machine.root_device().ioport("LINE10")->read_safe(0x01))
 	{
 		if (mouse_hold.piece)
 		{
@@ -427,7 +427,7 @@ static void check_board_buttons ( running_machine &machine )
 	if (data == 0xff)
 	{
 
-		port_input=input_port_read(machine, "B_BUTTONS");
+		port_input=machine.root_device().ioport("B_BUTTONS")->read();
 		if (port_input==0x01)
 		{
 			clear_board();

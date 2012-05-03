@@ -126,9 +126,9 @@ READ8_MEMBER( amico2k_state::ppi_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 0:		return input_port_read(machine(), "Q0");
-	case 1:		return input_port_read(machine(), "Q1");
-	case 2:		return input_port_read(machine(), "Q2");
+	case 0:		return ioport("Q0")->read();
+	case 1:		return ioport("Q1")->read();
+	case 2:		return ioport("Q2")->read();
 	default:	return 0xff;
 	}
 }

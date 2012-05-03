@@ -234,7 +234,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	for (i = 0; i < 4; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		inp = input_port_read(timer.machine(), kbdrow);
+		inp = timer.machine().root_device().ioport(kbdrow)->read();
 
 		for (j = 0; j < 5; j++)
 			if (BIT(inp, j))

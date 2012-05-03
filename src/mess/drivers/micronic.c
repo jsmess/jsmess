@@ -123,7 +123,7 @@ READ8_MEMBER( micronic_state::keypad_r )
 	for (bit = 0; bit < 8; bit++)
 		if (m_kp_matrix & (1 << bit))
 			for (port = 0; port < 6; port++)
-				data |= input_port_read(machine(), bitnames[port]) & (0x01 << bit) ? 0x01 << port : 0x00;
+				data |= ioport(bitnames[port])->read() & (0x01 << bit) ? 0x01 << port : 0x00;
 	return data;
 }
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER( micronic_state::beep_w )
 
 READ8_MEMBER( micronic_state::irq_flag_r )
 {
-	return (input_port_read(machine(), "BACKBATTERY")<<4) | (input_port_read(machine(), "MAINBATTERY")<<3) | (keypad_r(space, offset) ? 0 : 1);
+	return (ioport("BACKBATTERY")->read()<<4) | (ioport("MAINBATTERY")->read()<<3) | (keypad_r(space, offset) ? 0 : 1);
 }
 
 WRITE8_MEMBER( micronic_state::bank_select_w )

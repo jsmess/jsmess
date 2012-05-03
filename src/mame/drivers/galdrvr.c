@@ -898,37 +898,37 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN2\0GLIN2")
 
 	PORT_START("GMIN0")      /* Ghost Muncher - IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )	                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_4WAY PORT_COCKTAIL     PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY                PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY               PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_DIPNAME( 0x20, 0x00, "Ghost Muncher - Cabinet" )                        PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )	                                 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_4WAY PORT_COCKTAIL     PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY                PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY               PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                                 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_DIPNAME( 0x20, 0x00, "Ghost Muncher - Cabinet" )                        PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY                PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY                  PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY                PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY                  PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 
 	PORT_START("GMIN1")      /* Ghost Muncher - IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	                             PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
-	PORT_DIPNAME( 0xc0, 0x40, "Ghost Muncher - Bonus Life" )                     PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )                                 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )                                 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	                             PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_DIPNAME( 0xc0, 0x40, "Ghost Muncher - Bonus Life" )                     PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_DIPSETTING(    0x40, "10000" )
 	PORT_DIPSETTING(    0x80, "15000" )
 	PORT_DIPSETTING(    0xc0, "20000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
 	PORT_START("GMIN2")      /* Ghost Muncher - IN2 */
-	PORT_DIPNAME( 0x03, 0x02, "Ghost Muncher - Coinage" )	                     PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
+	PORT_DIPNAME( 0x03, 0x02, "Ghost Muncher - Coinage" )	                     PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x04, "Ghost Muncher - Lives" )	                         PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
+	PORT_DIPNAME( 0x0c, 0x04, "Ghost Muncher - Lives" )	                         PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -936,37 +936,37 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GLIN0")      /* Galaxian - IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )                                  PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )                                  PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY                PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY               PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )                                PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_DIPNAME( 0x20, 0x00, "Galaxian - Cabinet" )                             PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )                                  PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )                                  PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY                PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY               PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )                                PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_DIPNAME( 0x20, 0x00, "Galaxian - Cabinet" )                             PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )                                         PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )                               PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )                                         PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )                               PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 
 	PORT_START("GLIN1")      /* Galaxian - IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL	                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	                             PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
-	PORT_DIPNAME( 0xc0, 0x00, "Galaxian - Coinage" )	                         PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )                                 PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )                                 PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL	 PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL	                 PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	                             PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_DIPNAME( 0xc0, 0x00, "Galaxian - Coinage" )	                         PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("GLIN2")      /* Galaxian - IN2 */
-	PORT_DIPNAME( 0x03, 0x01, "Galaxian - Bonus Life" )                          PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
+	PORT_DIPNAME( 0x03, 0x01, "Galaxian - Bonus Life" )                          PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x01, "4000" )
 	PORT_DIPSETTING(    0x02, "5000" )
 	PORT_DIPSETTING(    0x03, "7000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x00, "Galaxian - Lives" )                               PORT_CONDITION("GAMESEL",0x01,PORTCOND_EQUALS,0x01)
+	PORT_DIPNAME( 0x04, 0x00, "Galaxian - Lives" )                               PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPUNUSED( 0x08, 0x00 )
@@ -2489,7 +2489,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	signed char dialread = input_port_read(machine(), dialname[p]);
+	signed char dialread = ioport(dialname[p])->read();
 
 	UINT8 ret;
 
@@ -2521,8 +2521,8 @@ static INPUT_PORTS_START( moonwar )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )                  /* see notes */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: p2 thrust
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: p1&p2 hyperflip
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: p2 thrust
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: p1&p2 hyperflip
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) // both: p1(upright: &p2) shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // both: p1(upright: &p2) thrust
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) // both: p1(upright: &p2) fire
@@ -2543,8 +2543,8 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: dial is reversed
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: dial works normally
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("P2_DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
@@ -4192,6 +4192,27 @@ ROM_START( mooncrstuk )
 	ROM_LOAD( "mc6.8d",       0x2800, 0x0800, CRC(69bcafdb) SHA1(939c8c6ed1cd4660a3d99b8f17ed99cbd7e1352a) )
 	ROM_LOAD( "mc7.8e",       0x3000, 0x0800, CRC(b50dbc46) SHA1(4fa084fd1ba5f78e7703e684c57af15ca7a844e4) )
 	ROM_LOAD( "8_uk.bin",     0x3800, 0x0800, CRC(ce727ad4) SHA1(247fe0ea7dcc7cc50f19da0a54385b8545f03609) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mcs_b",        0x0000, 0x0800, CRC(fb0f1f81) SHA1(38a6679a8b69bc1870a0e67e692131c42f9535c8) )
+	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(13932a15) SHA1(b8885c555c6ad7021be55c6925a0a0872c1b6abd) )
+	ROM_LOAD( "mcs_a",        0x1000, 0x0800, CRC(631ebb5a) SHA1(5bc9493afa76c55858b8c8849524cbc77dc838fc) )
+	ROM_LOAD( "mcs_c",        0x1800, 0x0800, CRC(24cfd145) SHA1(08c6599db170dd6ee364c44f70a0f5c0f881b6ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
+ROM_START( mooncrstuku )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "smc1f",        0x0000, 0x0800, CRC(389ca0d6) SHA1(51cf6d190a0ebf23b70c2bcf1ccaa4705e29cd09) )
+	ROM_LOAD( "smc2f",        0x0800, 0x0800, CRC(410ab430) SHA1(d89abff6ac4afbf69377a1d63043d629a634aab7) )
+	ROM_LOAD( "smc3f",        0x1000, 0x0800, CRC(a6b4144b) SHA1(2b27ad54d716286c0dc9476d47df182ae01bcfd7) )
+	ROM_LOAD( "smc4f",        0x1800, 0x0800, CRC(4cc046fe) SHA1(465eaacd50967d768babadd09ab9cad35380f6bf) )
+	ROM_LOAD( "smc5f",     	  0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
+	ROM_LOAD( "smc6f",        0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
+	ROM_LOAD( "smc7f",        0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
+	ROM_LOAD( "smc8f_uk",     0x3800, 0x0800, CRC(b968b2ff) SHA1(40105423f48d2260e85597c3c1e4d8fe947db793) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "mcs_b",        0x0000, 0x0800, CRC(fb0f1f81) SHA1(38a6679a8b69bc1870a0e67e692131c42f9535c8) )
@@ -6421,11 +6442,12 @@ GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg",
  *************************************/
 
 /* based on Galaxian, but with altered address map for more ROM */
-GAME( 1980, mooncrst,  0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuk,mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsto, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrst,   0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuk, mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuku,mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstu,  mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsto,  mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
 
 /* straight Moon Cresta ripoffs on basic mooncrst hardware */
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )

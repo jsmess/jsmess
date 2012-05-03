@@ -153,7 +153,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 	case 0: case 1: case 2: {
 		int index;
 		for(index=0; index < 32; index++)
-			if(field.mask & (1 << index))
+			if(field.mask() & (1 << index))
 				break;
 		assert(index != 32);
 		index += bank*32;
@@ -174,15 +174,15 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 
 	case 3:
 		if(newval)
-			modifiers_state |= field.mask;
+			modifiers_state |= field.mask();
 		else
-			modifiers_state &= ~field.mask;
+			modifiers_state &= ~field.mask();
 		fifo_push(modifiers_state | (1<<28));
 		send();
 		break;
 
 	case 4:
-		if(field.mask & 1)
+		if(field.mask() & 1)
 			int_power_cb(newval & 1);
 		break;
 	}

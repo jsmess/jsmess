@@ -72,12 +72,12 @@ READ8_MEMBER( pro80_state::kp_r )
 {
 	UINT8 data = 0x0f;
 
-	if (!BIT(m_digit_sel, 0)) data &= input_port_read(machine(), "LINE0");
-	if (!BIT(m_digit_sel, 1)) data &= input_port_read(machine(), "LINE1");
-	if (!BIT(m_digit_sel, 2)) data &= input_port_read(machine(), "LINE2");
-	if (!BIT(m_digit_sel, 3)) data &= input_port_read(machine(), "LINE3");
-	if (!BIT(m_digit_sel, 4)) data &= input_port_read(machine(), "LINE4");
-	if (!BIT(m_digit_sel, 5)) data &= input_port_read(machine(), "LINE5");
+	if (!BIT(m_digit_sel, 0)) data &= ioport("LINE0")->read();
+	if (!BIT(m_digit_sel, 1)) data &= ioport("LINE1")->read();
+	if (!BIT(m_digit_sel, 2)) data &= ioport("LINE2")->read();
+	if (!BIT(m_digit_sel, 3)) data &= ioport("LINE3")->read();
+	if (!BIT(m_digit_sel, 4)) data &= ioport("LINE4")->read();
+	if (!BIT(m_digit_sel, 5)) data &= ioport("LINE5")->read();
 
 	// cassette-in bits go here - bit 4 = sync bit, bit 5 = data bit
 	return data;

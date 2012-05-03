@@ -438,7 +438,7 @@ WRITE8_MEMBER( vip_state::colorram_w )
 
 UINT32 vip_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	switch (input_port_read(machine(), "VIDEO"))
+	switch (ioport("VIDEO")->read())
 	{
 	case VIDEO_CDP1861:
 		m_vdc->screen_update(screen, bitmap, cliprect);
@@ -456,7 +456,7 @@ UINT32 vip_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 READ_LINE_MEMBER( vip_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( vip_state::ef2_r )
@@ -468,15 +468,15 @@ READ_LINE_MEMBER( vip_state::ef2_r )
 
 READ_LINE_MEMBER( vip_state::ef3_r )
 {
-	return BIT(input_port_read(machine(), "KEYPAD"), m_keylatch);
+	return BIT(ioport("KEYPAD")->read(), m_keylatch);
 }
 
 READ_LINE_MEMBER( vip_state::ef4_r )
 {
-	switch (input_port_read(machine(), "KEYBOARD"))
+	switch (ioport("KEYBOARD")->read())
 	{
 	case KEYBOARD_VP580:
-		return BIT(input_port_read(machine(), "VP-580"), m_keylatch);
+		return BIT(ioport("VP-580")->read(), m_keylatch);
 	}
 
 	return 0;
@@ -486,7 +486,7 @@ static COSMAC_SC_WRITE( vip_sc_w )
 {
 	vip_state *state = device->machine().driver_data<vip_state>();
 
-	switch (input_port_read(device->machine(), "SOUND"))
+	switch (state->ioport("SOUND")->read())
 	{
 	case SOUND_VP550:
 		state->m_vp550->sc1_w(BIT(sc, 1));
@@ -501,7 +501,7 @@ static COSMAC_SC_WRITE( vip_sc_w )
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
-	switch (input_port_read(machine(), "SOUND"))
+	switch (ioport("SOUND")->read())
 	{
 	case SOUND_SPEAKER:
 		discrete_sound_w(m_beeper, NODE_01, state);
@@ -532,7 +532,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 
 WRITE8_MEMBER( vip_state::dma_w )
 {
-	switch (input_port_read(machine(), "VIDEO"))
+	switch (ioport("VIDEO")->read())
 	{
 	case VIDEO_CDP1861:
 		m_vdc->dma_w(space, offset, data);
@@ -617,7 +617,7 @@ void vip_state::machine_reset()
 	m_vp551->reset();
 
 	/* configure video */
-	switch (input_port_read(machine(), "VIDEO"))
+	switch (ioport("VIDEO")->read())
 	{
 	case VIDEO_CDP1861:
 		io->unmap_write(0x05, 0x05);
@@ -631,7 +631,7 @@ void vip_state::machine_reset()
 	}
 
 	/* configure audio */
-	switch (input_port_read(machine(), "SOUND"))
+	switch (ioport("SOUND")->read())
 	{
 	case SOUND_SPEAKER:
 		m_vp595->install_write_handlers(io, false);

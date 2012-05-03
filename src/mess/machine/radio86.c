@@ -47,14 +47,14 @@ static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= state->ioport("LINE0")->read(); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= device->machine().root_device().ioport("LINE1")->read(); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= device->machine().root_device().ioport("LINE2")->read(); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= device->machine().root_device().ioport("LINE3")->read(); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= device->machine().root_device().ioport("LINE4")->read(); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= device->machine().root_device().ioport("LINE5")->read(); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= device->machine().root_device().ioport("LINE6")->read(); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= device->machine().root_device().ioport("LINE7")->read(); }
 	return key;
 }
 
@@ -62,7 +62,7 @@ static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	double level = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
-	UINT8 dat = input_port_read(device->machine(), "LINE8");
+	UINT8 dat = state->ioport("LINE8")->read();
 	if (level <  0) {
 		dat ^= state->m_tape_value;
 	}
@@ -108,14 +108,14 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	double level = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"CLINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"CLINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"CLINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"CLINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"CLINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"CLINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"CLINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"CLINE7"); }
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= state->ioport("CLINE0")->read(); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= device->machine().root_device().ioport("CLINE1")->read(); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= device->machine().root_device().ioport("CLINE2")->read(); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= device->machine().root_device().ioport("CLINE3")->read(); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= device->machine().root_device().ioport("CLINE4")->read(); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= device->machine().root_device().ioport("CLINE5")->read(); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= device->machine().root_device().ioport("CLINE6")->read(); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= device->machine().root_device().ioport("CLINE7")->read(); }
 	key &= 0xe0;
 	if (level <  0) {
 		key ^= state->m_tape_value;

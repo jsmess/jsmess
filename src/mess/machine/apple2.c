@@ -1565,10 +1565,10 @@ READ8_MEMBER ( apple2_state::apple2_c07x_r )
 
 		if (offset == 0)
 		{
-			m_joystick_x1_time = space.machine().time().as_double() + x_calibration * input_port_read(space.machine(), "joystick_1_x");
-			m_joystick_y1_time = space.machine().time().as_double() + y_calibration * input_port_read(space.machine(), "joystick_1_y");
-			m_joystick_x2_time = space.machine().time().as_double() + x_calibration * input_port_read(space.machine(), "joystick_2_x");
-			m_joystick_y2_time = space.machine().time().as_double() + y_calibration * input_port_read(space.machine(), "joystick_2_y");
+			m_joystick_x1_time = space.machine().time().as_double() + x_calibration * space.machine().root_device().ioport("joystick_1_x")->read();
+			m_joystick_y1_time = space.machine().time().as_double() + y_calibration * space.machine().root_device().ioport("joystick_1_y")->read();
+			m_joystick_x2_time = space.machine().time().as_double() + x_calibration * space.machine().root_device().ioport("joystick_2_x")->read();
+			m_joystick_y2_time = space.machine().time().as_double() + y_calibration * space.machine().root_device().ioport("joystick_2_y")->read();
 		}
 	}
 	return 0;
@@ -1832,6 +1832,6 @@ MACHINE_START( apple2orig )
 
 int apple2_pressed_specialkey(running_machine &machine, UINT8 key)
 {
-	return (input_port_read(machine, "keyb_special") & key)
-		|| (input_port_read_safe(machine, "joystick_buttons", 0x00) & key);
+	return (machine.root_device().ioport("keyb_special")->read() & key)
+		|| (machine.root_device().ioport("joystick_buttons")->read_safe(0x00) & key);
 }

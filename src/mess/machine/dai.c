@@ -57,7 +57,7 @@ static UINT8 dai_keyboard_read (device_t *device)
 	for (i = 0; i < 8; i++)
 	{
 		if (state->m_keyboard_scan_mask & (1 << i))
-			data |= input_port_read(device->machine(), keynames[i]);
+			data |= device->machine().root_device().ioport(keynames[i])->read();
 	}
 	return data;
 }
@@ -139,7 +139,7 @@ const struct pit8253_config dai_pit8253_intf =
 static TIMER_CALLBACK( dai_timer )
 {
 	dai_state *state = machine.driver_data<dai_state>();
-	tms5501_set_pio_bit_7 (state->m_tms5501, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
+	tms5501_set_pio_bit_7 (state->m_tms5501, (machine.root_device().ioport("IN8")->read() & 0x04) ? 1:0);
 }
 
 MACHINE_START( dai )
@@ -194,7 +194,7 @@ READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
 
 	switch(offset & 0x000f) {
 	case 0x00:
-		data = input_port_read(machine(), "IN8");
+		data = ioport("IN8")->read();
 		data |= 0x08;			// serial ready
 		if (machine().rand()&0x01)
 			data |= 0x40;		// random number generator

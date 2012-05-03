@@ -26,7 +26,7 @@ READ8_MEMBER(galeb_state::galeb_keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 /* Address maps */

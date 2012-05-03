@@ -19,12 +19,12 @@ READ8_HANDLER ( pc_JOY_r )
 	UINT8 data = 0xf;
 	int delta;
 	attotime new_time = space->machine().time();
-	const input_port_config *joystick_port = space->machine().root_device().ioport("pc_joy");
+	ioport_port *joystick_port = space->machine().root_device().ioport("pc_joy");
 	delta = ((new_time - JOY_time) * 256 * 1000).seconds;
 
 	if (joystick_port != NULL)
 	{
-		data = input_port_read_direct(joystick_port) ^ 0xf0;
+		data = joystick_port->read() ^ 0xf0;
 
 		/* timer overflow? Nope, otherwise some HWs can't verify the port properly */
 		//if ((new_time - JOY_time) > attotime::from_msec(10))
@@ -33,10 +33,10 @@ READ8_HANDLER ( pc_JOY_r )
 		//}
 		//else
 		{
-			if (input_port_read(space->machine(), "pc_joy_1") < delta) data &= ~0x01;
-			if (input_port_read(space->machine(), "pc_joy_2") < delta) data &= ~0x02;
-			if (input_port_read(space->machine(), "pc_joy_3") < delta) data &= ~0x04;
-			if (input_port_read(space->machine(), "pc_joy_4") < delta) data &= ~0x08;
+			if (space->machine().root_device().ioport("pc_joy_1")->read() < delta) data &= ~0x01;
+			if (space->machine().root_device().ioport("pc_joy_2")->read() < delta) data &= ~0x02;
+			if (space->machine().root_device().ioport("pc_joy_3")->read() < delta) data &= ~0x04;
+			if (space->machine().root_device().ioport("pc_joy_4")->read() < delta) data &= ~0x08;
 		}
 	}
 	else

@@ -310,7 +310,7 @@ READ8_MEMBER( tm990189_state::sys9901_r )
 
 		/* keyboard read */
 		if (m_digitsel < 9)
-			data |= input_port_read(machine(), keynames[m_digitsel]) << 1;
+			data |= ioport(keynames[m_digitsel])->read() << 1;
 
 		/* tape input */
 		if (m_cass->input() > 0.0)
@@ -606,7 +606,7 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 
 READ8_MEMBER( tm990189_state::video_joy_r )
 {
-	UINT8 data = input_port_read(machine(), "BUTTONS");
+	UINT8 data = ioport("BUTTONS")->read();
 
 	if (m_joy1x_timer->remaining() < attotime::zero)
 		data |= 0x01;
@@ -625,10 +625,10 @@ READ8_MEMBER( tm990189_state::video_joy_r )
 
 WRITE8_MEMBER( tm990189_state::video_joy_w )
 {
-	m_joy1x_timer->reset(attotime::from_usec(input_port_read(machine(), "JOY1_X")*28+28));
-	m_joy1y_timer->reset(attotime::from_usec(input_port_read(machine(), "JOY1_Y")*28+28));
-	m_joy2x_timer->reset(attotime::from_usec(input_port_read(machine(), "JOY2_X")*28+28));
-	m_joy2y_timer->reset(attotime::from_usec(input_port_read(machine(), "JOY2_Y")*28+28));
+	m_joy1x_timer->reset(attotime::from_usec(ioport("JOY1_X")->read()*28+28));
+	m_joy1y_timer->reset(attotime::from_usec(ioport("JOY1_Y")->read()*28+28));
+	m_joy2x_timer->reset(attotime::from_usec(ioport("JOY2_X")->read()*28+28));
+	m_joy2y_timer->reset(attotime::from_usec(ioport("JOY2_Y")->read()*28+28));
 }
 
 /* user tms9901 setup */

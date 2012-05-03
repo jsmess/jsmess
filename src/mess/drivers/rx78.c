@@ -174,13 +174,13 @@ READ8_MEMBER( rx78_state::key_r )
 
 		res = 0;
 		for(i=0;i<15;i++)
-			res |= input_port_read(machine(), keynames[i]);
+			res |= ioport(keynames[i])->read();
 
 		return res;
 	}
 
 	if(m_key_mux >= 1 && m_key_mux <= 15)
-		return input_port_read(machine(), keynames[m_key_mux - 1]);
+		return ioport(keynames[m_key_mux - 1])->read();
 
 	return 0;
 }

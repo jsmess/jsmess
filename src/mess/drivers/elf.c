@@ -16,16 +16,16 @@
 #include "elf2.lh"
 
 #define RUN	\
-	BIT(input_port_read(machine(), "SPECIAL"), 0)
+	BIT(ioport("SPECIAL")->read(), 0)
 
 #define LOAD \
-	BIT(input_port_read(machine(), "SPECIAL"), 1)
+	BIT(ioport("SPECIAL")->read(), 1)
 
 #define MEMORY_PROTECT \
-	BIT(input_port_read(machine(), "SPECIAL"), 2)
+	BIT(ioport("SPECIAL")->read(), 2)
 
 #define INPUT \
-	BIT(input_port_read(machine(), "SPECIAL"), 3)
+	BIT(ioport("SPECIAL")->read(), 3)
 
 /* Read/Write Handlers */
 

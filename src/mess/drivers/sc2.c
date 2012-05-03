@@ -156,22 +156,22 @@ READ8_MEMBER( sc2_state::pio_port_b_r )
 
 	if (BIT(m_kp_matrix, 0))
 	{
-		data |= input_port_read(machine(), "LINE1");
+		data |= ioport("LINE1")->read();
 	}
 
 	if (BIT(m_kp_matrix, 1))
 	{
-		data |= input_port_read(machine(), "LINE2");
+		data |= ioport("LINE2")->read();
 	}
 
 	if (BIT(m_kp_matrix, 2))
 	{
-		data |= input_port_read(machine(), "LINE3");
+		data |= ioport("LINE3")->read();
 	}
 
 	if (BIT(m_kp_matrix, 3))
 	{
-		data |= input_port_read(machine(), "LINE4");
+		data |= ioport("LINE4")->read();
 	}
 
 	return data;

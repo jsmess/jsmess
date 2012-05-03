@@ -121,13 +121,13 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 	switch( ( m_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 		break;
 	case 1:
-		data = input_port_read(machine(), "LINE1");
+		data = ioport("LINE1")->read();
 		break;
 	case 2:
-		data = input_port_read(machine(), "LINE2");
+		data = ioport("LINE2")->read();
 		break;
 	}
 	return data;

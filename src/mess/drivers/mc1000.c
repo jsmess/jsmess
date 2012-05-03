@@ -287,22 +287,22 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	if (!BIT(m_keylatch, 0))
 	{
-		data &= input_port_read(machine(), "ROW0");
-		if (input_port_read(machine(), "JOYBKEYMAP")) data &= input_port_read(machine(), "JOYB");
+		data &= ioport("ROW0")->read();
+		if (ioport("JOYBKEYMAP")->read()) data &= ioport("JOYB")->read();
 	}
 	if (!BIT(m_keylatch, 1))
 	{
-		data &= input_port_read(machine(), "ROW1");
-		if (input_port_read(machine(), "JOYAKEYMAP")) data &= input_port_read(machine(), "JOYA");
+		data &= ioport("ROW1")->read();
+		if (ioport("JOYAKEYMAP")->read()) data &= ioport("JOYA")->read();
 	}
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "ROW2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "ROW3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "ROW4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "ROW5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "ROW6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "ROW7");
+	if (!BIT(m_keylatch, 2)) data &= ioport("ROW2")->read();
+	if (!BIT(m_keylatch, 3)) data &= ioport("ROW3")->read();
+	if (!BIT(m_keylatch, 4)) data &= ioport("ROW4")->read();
+	if (!BIT(m_keylatch, 5)) data &= ioport("ROW5")->read();
+	if (!BIT(m_keylatch, 6)) data &= ioport("ROW6")->read();
+	if (!BIT(m_keylatch, 7)) data &= ioport("ROW7")->read();
 
-	data = (input_port_read(machine(), "MODIFIERS") & 0xc0) | (data & 0x3f);
+	data = (ioport("MODIFIERS")->read() & 0xc0) | (data & 0x3f);
 
 	if (m_cassette->input() < +0.0)	data &= 0x7f;
 

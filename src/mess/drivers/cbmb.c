@@ -346,17 +346,17 @@ static SCREEN_UPDATE_IND16( p500 )
 
 READ8_MEMBER( cbmb_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine(), "LIGHTX") & ~0x01;
+	return ioport("LIGHTX")->read() & ~0x01;
 }
 
 READ8_MEMBER( cbmb_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine(), "LIGHTY") & ~0x01;
+	return ioport("LIGHTY")->read() & ~0x01;
 }
 
 READ8_MEMBER( cbmb_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine(), "OTHER") & 0x04;
+	return ioport("OTHER")->read() & 0x04;
 }
 
 READ8_MEMBER( cbmb_state::vic_dma_read )
@@ -374,7 +374,7 @@ READ8_MEMBER( cbmb_state::vic_dma_read_color )
 
 READ8_MEMBER( cbmb_state::vic_rdy_cb )
 {
-	return input_port_read(machine(), "CTRLSEL") & 0x08;
+	return ioport("CTRLSEL")->read() & 0x08;
 }
 
 

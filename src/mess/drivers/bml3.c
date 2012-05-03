@@ -581,7 +581,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
+			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				{
 					state->m_keyb_press = scancode;

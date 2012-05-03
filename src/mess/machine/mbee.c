@@ -152,7 +152,7 @@ static TIMER_CALLBACK( mbee256_kbd )
 	for (i = 0; i < 15; i++)
 	{
 		sprintf(kbdrow,"X%d",i);
-		pressed[i] = (input_port_read(machine, kbdrow));
+		pressed[i] = (machine.root_device().ioport(kbdrow)->read());
 	}
 
 	/* find what has changed */
@@ -772,7 +772,7 @@ QUICKLOAD_LOAD( mbee )
 	device_t *cpu = image.device().machine().device("maincpu");
 	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 i, j;
-	UINT8 data, sw = input_port_read(image.device().machine(), "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;	/* reading the dipswitch: 1 = autorun */
 
 	if (!mame_stricmp(image.filetype(), "mwb"))
 	{

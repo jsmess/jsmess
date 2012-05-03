@@ -291,7 +291,7 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	}
 	m_selected = false;
 
-	m_cru_base = input_port_read(*this, "CRUUSBSM");
+	m_cru_base = ioport("CRUUSBSM")->read();
 }
 
 ROM_START( tn_usbsm )

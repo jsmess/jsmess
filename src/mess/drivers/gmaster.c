@@ -107,7 +107,7 @@ READ8_MEMBER(gmaster_state::gmaster_port_r)
     switch (offset)
 	{
 	case UPD7810_PORTA:
-		data = input_port_read(machine(), "JOY");
+		data = ioport("JOY")->read();
 		break;
 	default:
 		logerror("%.4x port %d read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), offset, data);

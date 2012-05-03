@@ -266,7 +266,7 @@ void ti_pcode_card_device::device_reset()
 	m_bank_select = 1;
 	m_selected = false;
 
-	m_switch = input_port_read(*this, ACTIVE_TAG);
+	m_switch = ioport(ACTIVE_TAG)->read();
 }
 
 void ti_pcode_card_device::device_config_complete()

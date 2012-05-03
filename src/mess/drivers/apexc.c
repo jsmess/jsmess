@@ -404,7 +404,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = input_port_read(device->machine(), "data");
+	edit_keys = device->machine().root_device().ioport("data")->read();
 
 	/* toggle data reg according to transitions */
 	state->m_panel_data_reg ^= edit_keys & (~state->m_old_edit_keys);
@@ -414,7 +414,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine(), "panel");
+	control_keys = state->ioport("panel")->read();
 
 	/* compute transitions */
 	control_transitions = control_keys & (~state->m_old_control_keys);

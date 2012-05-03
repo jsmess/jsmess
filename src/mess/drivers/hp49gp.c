@@ -192,13 +192,13 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data & ~0xFF00;
-			if ((data & 0x02) == 0) data |= (input_port_read( device->machine(), "ROW1") << 8);
-			if ((data & 0x04) == 0) data |= (input_port_read( device->machine(), "ROW2") << 8);
-			if ((data & 0x08) == 0) data |= (input_port_read( device->machine(), "ROW3") << 8);
-			if ((data & 0x10) == 0) data |= (input_port_read( device->machine(), "ROW4") << 8);
-			if ((data & 0x20) == 0) data |= (input_port_read( device->machine(), "ROW5") << 8);
-			if ((data & 0x40) == 0) data |= (input_port_read( device->machine(), "ROW6") << 8);
-			if ((data & 0x80) == 0) data |= (input_port_read( device->machine(), "ROW7") << 8);
+			if ((data & 0x02) == 0) data |= (device->machine().root_device().ioport( "ROW1")->read() << 8);
+			if ((data & 0x04) == 0) data |= (device->machine().root_device().ioport( "ROW2")->read() << 8);
+			if ((data & 0x08) == 0) data |= (device->machine().root_device().ioport( "ROW3")->read() << 8);
+			if ((data & 0x10) == 0) data |= (device->machine().root_device().ioport( "ROW4")->read() << 8);
+			if ((data & 0x20) == 0) data |= (device->machine().root_device().ioport( "ROW5")->read() << 8);
+			if ((data & 0x40) == 0) data |= (device->machine().root_device().ioport( "ROW6")->read() << 8);
+			if ((data & 0x80) == 0) data |= (device->machine().root_device().ioport( "ROW7")->read() << 8);
 		}
 		break;
 		case S3C2410_GPIO_PORT_H :

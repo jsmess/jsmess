@@ -242,8 +242,8 @@ void snug_enhanced_video_device::crureadz(offs_t offset, UINT8 *value)
 	{
 		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
 		{
-			*value = ~(input_port_read(*this, "EVPC-SW1") | (input_port_read(*this, "EVPC-SW3")<<2)
-				| (input_port_read(*this, "EVPC-SW4")<<3) | (input_port_read(*this, "EVPC-SW8")<<7));
+			*value = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
+				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
 		}
 	}
 }
@@ -334,17 +334,17 @@ ROM_END
 */
 INPUT_PORTS_START( ti99_evpc )
 	PORT_START( "EVPC-SW1" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, EQUALS, 0x00 )
 		PORT_DIPSETTING(    0x00, "PAL" )
 		PORT_DIPSETTING(    0x01, "NTSC" )
 
 	PORT_START( "EVPC-SW3" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, EQUALS, 0x00 )
 		PORT_DIPSETTING(    0x00, DEF_STR( International ))
 		PORT_DIPSETTING(    0x01, DEF_STR( German ))
 
 	PORT_START( "EVPC-SW4" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC VDP RAM" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC VDP RAM" ) PORT_CONDITION( "EVPC-SW8", 0x01, EQUALS, 0x00 )
 		PORT_DIPSETTING(    0x00, "shifted" )
 		PORT_DIPSETTING(    0x01, "not shifted" )
 

@@ -157,7 +157,7 @@ READ8_MEMBER( a5105_state::key_r )
 	                                        "KEY8", "KEY9", "KEYA", "UNUSED",
 	                                        "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	return input_port_read(machine(), keynames[m_key_mux & 0x0f]);
+	return ioport(keynames[m_key_mux & 0x0f])->read();
 }
 
 READ8_MEMBER( a5105_state::key_mux_r )

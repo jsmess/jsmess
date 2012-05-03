@@ -115,7 +115,7 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 			if (m_model != MODEL_MAC_CLASSIC_II)
 			{
 				// Color Classic has no MONTYPE so the safe read gets us 512x384, which is right
-				if (input_port_read_safe(space.machine(), "MONTYPE", 2) == 1)
+				if (space.machine().root_device().ioport("MONTYPE")->read_safe(2) == 1)
 				{
 					palette_set_color(space.machine(), m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
@@ -151,7 +151,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w )	// this is for the "Ariel" style RAM
 			if (m_model != MODEL_MAC_CLASSIC_II)
 			{
 				// Color Classic has no MONTYPE so the safe read gets us 512x384, which is right
-				if (input_port_read_safe(space.machine(), "MONTYPE", 2) == 1)
+				if (space.machine().root_device().ioport("MONTYPE")->read_safe(2) == 1)
 				{
 					palette_set_color(space.machine(), m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
@@ -239,7 +239,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		if (offset == 0x10)
 		{
 			data &= ~0x38;
-			data |= (input_port_read_safe(space.machine(), "MONTYPE", 2)<<3);
+			data |= (space.machine().root_device().ioport("MONTYPE")->read_safe(2)<<3);
 //            printf("rbv_r montype: %02x (PC %x)\n", data, cpu_get_pc(space.cpu));
 		}
 

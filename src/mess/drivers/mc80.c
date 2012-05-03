@@ -136,7 +136,7 @@ static TIMER_DEVICE_CALLBACK( mc8020_kbd )
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);
-		mem->write_word(0xd20+i, input_port_read(timer.machine(), kbdrow));
+		mem->write_word(0xd20+i, timer.machine().root_device().ioport(kbdrow)->read());
 	}
 }
 

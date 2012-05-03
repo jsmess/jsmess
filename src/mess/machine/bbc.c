@@ -751,7 +751,7 @@ INTERRUPT_GEN( bbcb_keyscan )
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
                  being pressed on the selected state->m_column */
-			if ((input_port_read(device->machine(), colnames[state->m_column]) | 0x01) != 0xff)
+			if ((device->machine().root_device().ioport(colnames[state->m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -792,7 +792,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
                  being pressed on the selected state->m_column */
-			if ((input_port_read(device->machine(), colnames[state->m_column]) | 0x01) != 0xff)
+			if ((device->machine().root_device().ioport(colnames[state->m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -830,7 +830,7 @@ static int bbc_keyboard(address_space *space, int data)
 
 	if (state->m_column < 10)
 	{
-		res = input_port_read(space->machine(), colnames[state->m_column]);
+		res = space->machine().root_device().ioport(colnames[state->m_column])->read();
 	}
 	else
 	{
@@ -1147,7 +1147,7 @@ void bbc_TMSint(int status)
 {
 	TMSint=(!status)&1;
 	TMSrdy=(!tms5220_readyq_r())&1;
-	via_0_portb_w(0,(0xf | input_port_read(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7)));
+	via_0_portb_w(0,(0xf | machine.root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
 }
 #endif
 
@@ -1159,7 +1159,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
-	return (0xf | input_port_read(device->machine(), "IN0")|(TMSint<<6)|(TMSrdy<<7));
+	return (0xf | device->machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7));
 }
 
 
@@ -1273,13 +1273,13 @@ static UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 	switch(channel_number)
 	{
 		case 0:
-			return ((0xff-input_port_read(device->machine(), "JOY0"))<<8);
+			return ((0xff-device->machine().root_device().ioport("JOY0")->read())<<8);
 		case 1:
-			return ((0xff-input_port_read(device->machine(), "JOY1"))<<8);
+			return ((0xff-device->machine().root_device().ioport("JOY1")->read())<<8);
 		case 2:
-			return ((0xff-input_port_read(device->machine(), "JOY2"))<<8);
+			return ((0xff-device->machine().root_device().ioport("JOY2")->read())<<8);
 		case 3:
-			return ((0xff-input_port_read(device->machine(), "JOY3"))<<8);
+			return ((0xff-device->machine().root_device().ioport("JOY3")->read())<<8);
 	}
 
 	return 0;
@@ -2020,9 +2020,9 @@ MACHINE_START( bbcb )
 	state->m_mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
-	//state->m_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
-	//state->m_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
-	//state->m_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
+	//state->m_DFSType=  (machine.root_device().ioport("BBCCONFIG")->read()>>0)&0x07;
+	//state->m_SWRAMtype=(machine.root_device().ioport("BBCCONFIG")->read()>>3)&0x03;
+	//state->m_RAMSize=  (machine.root_device().ioport("BBCCONFIG")->read()>>5)&0x01;
 
 	/*set up the required disc controller*/
 	//switch (state->m_DFSType) {
@@ -2039,9 +2039,9 @@ MACHINE_RESET( bbcb )
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
 	UINT8 *ram = state->memregion("maincpu")->base();
-	state->m_DFSType=    (input_port_read(machine, "BBCCONFIG") >> 0) & 0x07;
-	state->m_SWRAMtype = (input_port_read(machine, "BBCCONFIG") >> 3) & 0x03;
-	state->m_RAMSize=    (input_port_read(machine, "BBCCONFIG") >> 5) & 0x01;
+	state->m_DFSType=    (machine.root_device().ioport("BBCCONFIG")->read() >> 0) & 0x07;
+	state->m_SWRAMtype = (machine.root_device().ioport("BBCCONFIG")->read() >> 3) & 0x03;
+	state->m_RAMSize=    (machine.root_device().ioport("BBCCONFIG")->read() >> 5) & 0x01;
 
 	state->membank("bank1")->set_base(ram);
 	if (state->m_RAMSize)

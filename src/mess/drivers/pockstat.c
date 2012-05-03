@@ -769,7 +769,7 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 
 static INPUT_CHANGED( input_update )
 {
-	UINT32 buttons = input_port_read(field.machine(), "BUTTONS");
+	UINT32 buttons = field.machine().root_device().ioport("BUTTONS")->read();
 
 	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
 	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_RIGHT,	(buttons &  2) ? 1 : 0);

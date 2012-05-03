@@ -322,14 +322,14 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 
 READ8_MEMBER( rex6000_state::touchscreen_r )
 {
-	UINT16 x = input_port_read(machine(), "PENX");
-	UINT16 y = input_port_read(machine(), "PENY");
-	UINT16 battery = input_port_read(machine(), "BATTERY");
+	UINT16 x = ioport("PENX")->read();
+	UINT16 y = ioport("PENY")->read();
+	UINT16 battery = ioport("BATTERY")->read();
 
 	switch (offset)
 	{
 		case 0x08:
-			return ((input_port_read(machine(), "INPUT") & 0x40) ? 0x20 : 0x00) | 0X10;
+			return ((ioport("INPUT")->read() & 0x40) ? 0x20 : 0x00) | 0X10;
 		case 0x09:
 			if (m_touchscreen[4] & 0x80)
 				return (battery>>0) & 0xff;

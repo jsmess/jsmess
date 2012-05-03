@@ -452,16 +452,16 @@ UINT8 px8_state::krtn_read()
 
 	switch (m_ksc)
 	{
-	case 0: data = input_port_read(machine(), "KSC0"); break;
-	case 1: data = input_port_read(machine(), "KSC1"); break;
-	case 2: data = input_port_read(machine(), "KSC2"); break;
-	case 3: data = input_port_read(machine(), "KSC3"); break;
-	case 4: data = input_port_read(machine(), "KSC4"); break;
-	case 5: data = input_port_read(machine(), "KSC5"); break;
-	case 6: data = input_port_read(machine(), "KSC6"); break;
-	case 7: data = input_port_read(machine(), "KSC7"); break;
-	case 8: data = input_port_read(machine(), "KSC8"); break;
-	case 9: data = input_port_read(machine(), "SW4");  break;
+	case 0: data = ioport("KSC0")->read(); break;
+	case 1: data = ioport("KSC1")->read(); break;
+	case 2: data = ioport("KSC2")->read(); break;
+	case 3: data = ioport("KSC3")->read(); break;
+	case 4: data = ioport("KSC4")->read(); break;
+	case 5: data = ioport("KSC5")->read(); break;
+	case 6: data = ioport("KSC6")->read(); break;
+	case 7: data = ioport("KSC7")->read(); break;
+	case 8: data = ioport("KSC8")->read(); break;
+	case 9: data = ioport("SW4")->read();  break;
 	}
 
 	return data;

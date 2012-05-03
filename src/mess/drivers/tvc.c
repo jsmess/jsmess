@@ -120,7 +120,7 @@ READ8_MEMBER(tvc_state::tvc_keyboard_r)
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
-	return input_port_read(machine(), keynames[m_keyline & 0x0f]);
+	return ioport(keynames[m_keyline & 0x0f])->read();
 }
 
 READ8_MEMBER(tvc_state::tvc_flipflop_r)

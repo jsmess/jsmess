@@ -851,9 +851,9 @@ void geneve_mapper_device::device_reset()
 
 	m_genmod = false;
 
-	if (input_port_read(machine(), "MODE")==0)
+	if (ioport("MODE")->read()==0)
 	{
-		switch (input_port_read(machine(), "BOOTROM"))
+		switch (ioport("BOOTROM")->read())
 		{
 		case GENEVE_098:
 			if (VERBOSE>0) LOG("geneve: Using 0.98 boot eprom\n");
@@ -874,11 +874,11 @@ void geneve_mapper_device::device_reset()
 			fatalerror("genboard: GenMod boot rom missing.\n");
 		}
 		m_genmod = true;
-		m_turbo = ((input_port_read(machine(), "GENMODDIPS") & GM_TURBO)!=0);
-		m_timode = ((input_port_read(machine(), "GENMODDIPS") & GM_TIM)!=0);
+		m_turbo = ((ioport("GENMODDIPS")->read() & GM_TURBO)!=0);
+		m_timode = ((ioport("GENMODDIPS")->read() & GM_TIM)!=0);
 	}
 
-	switch (input_port_read(machine(), "SRAM"))
+	switch (ioport("SRAM")->read())
 	{
 /*  1 100. .... .... .... .... on-board sram (128K) -+
     1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
@@ -968,7 +968,7 @@ void geneve_keyboard_device::poll()
 	/* Poll keyboard */
 	for (i = 0; (i < 4) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
 	{
-		keystate = input_port_read(*this, KEYNAMES[2*i]) | (input_port_read(*this, KEYNAMES[2*i + 1]) << 16);
+		keystate = ioport(KEYNAMES[2*i])->read() | (ioport(KEYNAMES[2*i + 1])->read() << 16);
 		key_transitions = keystate ^ m_key_state_save[i];
 		if (key_transitions)
 		{
@@ -1401,7 +1401,7 @@ geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const ch
 
 line_state geneve_mouse_device::left_button()
 {
-	return ((input_port_read(*this, "MOUSE0") & 0x04)!=0)? ASSERT_LINE : CLEAR_LINE;
+	return ((ioport("MOUSE0")->read() & 0x04)!=0)? ASSERT_LINE : CLEAR_LINE;
 }
 
 void geneve_mouse_device::poll()
@@ -1409,9 +1409,9 @@ void geneve_mouse_device::poll()
 	int new_mx, new_my;
 	int delta_x, delta_y, buttons;
 
-	buttons = input_port_read(*this, "MOUSE0");
-	new_mx = input_port_read(*this, "MOUSEX");
-	new_my = input_port_read(*this, "MOUSEY");
+	buttons = ioport("MOUSE0")->read();
+	new_mx = ioport("MOUSEX")->read();
+	new_my = ioport("MOUSEY")->read();
 
 	/* compute x delta */
 	delta_x = new_mx - m_last_mx;

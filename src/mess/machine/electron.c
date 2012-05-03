@@ -127,7 +127,7 @@ READ8_MEMBER(electron_state::electron_read_keyboard)
 	for( i = 0; i < 14; i++ )
 	{
 		if( !(offset & 1) )
-			data |= input_port_read(machine(), keynames[i]) & 0x0f;
+			data |= ioport(keynames[i])->read() & 0x0f;
 
 		offset = offset >> 1;
 	}

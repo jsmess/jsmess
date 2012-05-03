@@ -63,7 +63,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x21:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		state->membank(page_num)->set_base(space->machine().root_device().memregion("exdos")->base() + ((index - 0x20) * 0x4000));
+		state->membank(page_num)->set_base(state->memregion("exdos")->base() + ((index - 0x20) * 0x4000));
 		break;
 
 	case 0xf8:
@@ -132,13 +132,13 @@ static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(device, 0x015, input_port_read(device->machine(), keynames[ep->keyboard_line]));
+			dave_set_reg(device, 0x015, device->machine().root_device().ioport(keynames[ep->keyboard_line])->read());
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = input_port_read(device->machine(), "JOY1");
+			int ExternalJoystickPortInput = device->machine().root_device().ioport("JOY1")->read();
 
 			if (ep->keyboard_line <= 4)
 			{

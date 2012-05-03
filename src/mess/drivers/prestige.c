@@ -154,7 +154,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 5:
-		if (input_port_read(machine(), "CART_TYPE") == 0x01)
+		if (ioport("CART_TYPE")->read() == 0x01)
 		{
 			//cartridge memory is writable
 			if (data & 0x08)
@@ -199,7 +199,7 @@ READ8_MEMBER( prestige_state::kb_r )
 
 	for (int line=0; line<8; line++)
 		if (!(m_kb_matrix & (1<<line)))
-			data &= input_port_read(machine(), bitnames[offset][line]);
+			data &= ioport(bitnames[offset][line])->read();
 
 	return data;
 }
@@ -216,10 +216,10 @@ READ8_MEMBER( prestige_state::mouse_r )
 	switch( offset )
 	{
 		case 0:		//x-axis
-			data = (input_port_read(machine(), "MOUSEX") - m_mousex);
+			data = (ioport("MOUSEX")->read() - m_mousex);
 			break;
 		case 1:		//y-axis
-			data = (input_port_read(machine(), "MOUSEY") - m_mousey);
+			data = (ioport("MOUSEY")->read() - m_mousey);
 			break;
 	}
 
@@ -231,10 +231,10 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	switch( offset )
 	{
 		case 0:		//x-axis
-			m_mousex = input_port_read(machine(), "MOUSEX");
+			m_mousex = ioport("MOUSEX")->read();
 			break;
 		case 1:		//y-axis
-			m_mousey = input_port_read(machine(), "MOUSEY");
+			m_mousey = ioport("MOUSEY")->read();
 			break;
 	}
 }

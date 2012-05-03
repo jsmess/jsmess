@@ -172,11 +172,11 @@ READ8_MEMBER( tk80bs_state::key_matrix_r )
 
 	UINT8 data = 0xff;
 	if (BIT(m_ppi_portc, 4))
-		data &= input_port_read(machine(), "X0");
+		data &= ioport("X0")->read();
 	if (BIT(m_ppi_portc, 5))
-		data &= input_port_read(machine(), "X1");
+		data &= ioport("X1")->read();
 	if (BIT(m_ppi_portc, 6))
-		data &= input_port_read(machine(), "X2");
+		data &= ioport("X2")->read();
 
 	return data;
 }

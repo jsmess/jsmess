@@ -34,7 +34,7 @@ void amu880_state::scan_keyboard()
 {
 	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
 
-	UINT8 data = input_port_read(machine(), keynames[m_key_a8 ? m_key_d6 : m_key_d7]);
+	UINT8 data = ioport(keynames[m_key_a8 ? m_key_d6 : m_key_d7])->read();
 
 	int a8 = (data & 0x0f) == 0x0f;
 
@@ -78,7 +78,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
     */
 
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);

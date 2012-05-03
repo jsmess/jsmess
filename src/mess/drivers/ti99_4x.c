@@ -180,7 +180,7 @@ static INPUT_PORTS_START(ti99_4a)
 /*
     // We do not want to show this setting; makes only sense for Geneve
     PORT_START( "MODE" )
-    PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0x0f, PORTCOND_EQUALS, GM_NEVER )
+    PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0x0f, EQUALS, GM_NEVER )
         PORT_CONFSETTING(    0x00, "Standard" )
         PORT_CONFSETTING(    GENMOD, "GenMod" )
 */
@@ -618,7 +618,7 @@ READ8_MEMBER( ti99_4x::read_by_9901 )
 				}
 				else
 				{
-					answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+					answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
 				}
 			}
 		}
@@ -630,12 +630,12 @@ READ8_MEMBER( ti99_4x::read_by_9901 )
 			}
 			else
 			{
-				answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+				answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
 			}
 
 			if ((m_mode != TI994) && (m_alphalock_line==false))
 			{
-				answer &= ~(input_port_read(machine(), "ALPHA") << 3);
+				answer &= ~(ioport("ALPHA")->read() << 3);
 			}
 		}
 
@@ -648,7 +648,7 @@ READ8_MEMBER( ti99_4x::read_by_9901 )
 		}
 		else
 		{
-			answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
+			answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
 		}
 		break;
 
@@ -948,12 +948,12 @@ MACHINE_START( ti99_4 )
 MACHINE_RESET( ti99_4 )
 {
 	ti99_4x *driver = machine.driver_data<ti99_4x>();
-	if (input_port_read(machine, "HANDSET")==0x01)
+	if (machine.root_device().ioport("HANDSET")->read()==0x01)
 		driver->m_handset = static_cast<ti99_handset_device*>(machine.device(HANDSET_TAG));
 	else
 		driver->m_handset = NULL;
 
-	if (input_port_read(machine, "MECMOUSE")==0x01)
+	if (machine.root_device().ioport("MECMOUSE")->read()==0x01)
 		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	else
 		driver->m_mecmouse = NULL;
@@ -1074,7 +1074,7 @@ MACHINE_START( ti99_4a )
 MACHINE_RESET( ti99_4a )
 {
 	ti99_4x *driver = machine.driver_data<ti99_4x>();
-	if (input_port_read(machine, "MECMOUSE")==0x01)
+	if (machine.root_device().ioport("MECMOUSE")->read()==0x01)
 		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	else
 		driver->m_mecmouse = NULL;

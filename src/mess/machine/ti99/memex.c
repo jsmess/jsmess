@@ -120,7 +120,7 @@ void geneve_memex_device::device_start()
 
 void geneve_memex_device::device_reset()
 {
-	UINT8 dips = input_port_read(*this, "MEMEXDIPS");
+	UINT8 dips = ioport("MEMEXDIPS")->read();
 	if (VERBOSE>5) LOG("geneve: memex dips = %02x\n", dips);
 	for (int i=0; i < 8; i++)
 	{

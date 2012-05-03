@@ -506,7 +506,7 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 		}
 		else
 		{
-			answer = (input_port_read(machine(), keynames8[m_keyboard_column]) << 6) & 0xC0;
+			answer = (ioport(keynames8[m_keyboard_column])->read() << 6) & 0xC0;
 		}
 		break;
 
@@ -523,7 +523,7 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 		}
 		else
 		{
-			answer = (input_port_read(machine(), keynames8[m_keyboard_column]) >> 2) & 0x07;
+			answer = (ioport(keynames8[m_keyboard_column])->read() >> 2) & 0x07;
 		}
 		break;
 
@@ -806,7 +806,7 @@ MACHINE_RESET( ti99_8 )
 {
 	ti99_8 *driver = machine.driver_data<ti99_8>();
 
-	if (input_port_read(machine, "MECMOUSE")==0x01)
+	if (machine.root_device().ioport("MECMOUSE")->read()==0x01)
 		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	else
 		driver->m_mecmouse = NULL;

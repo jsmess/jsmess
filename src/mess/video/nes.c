@@ -50,7 +50,7 @@ SCREEN_UPDATE_IND16( nes )
 	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((input_port_read(screen.machine(), "FLIPDISK") & 0x01) && (!state->m_last_frame_flip))
+		if ((screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01) && (!state->m_last_frame_flip))
 		{
 			state->m_last_frame_flip = 1;
 			state->m_fds_current_side++;
@@ -63,7 +63,7 @@ SCREEN_UPDATE_IND16( nes )
 				popmessage("Disk set to side %d", state->m_fds_current_side);
 		}
 
-		if (!(input_port_read(screen.machine(), "FLIPDISK") & 0x01))
+		if (!(screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01))
 			state->m_last_frame_flip = 0;
 	}
 	return 0;

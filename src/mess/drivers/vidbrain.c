@@ -85,17 +85,17 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
     */
 
-	UINT8 data = 0;//input_port_read(machine, "JOY-R");
+	UINT8 data = 0;//machine.root_device().ioport("JOY-R")->read();
 
-	if (BIT(m_keylatch, 0)) data |= input_port_read(machine(), "IO00");
-	if (BIT(m_keylatch, 1)) data |= input_port_read(machine(), "IO01");
-	if (BIT(m_keylatch, 2)) data |= input_port_read(machine(), "IO02");
-	if (BIT(m_keylatch, 3)) data |= input_port_read(machine(), "IO03");
-	if (BIT(m_keylatch, 4)) data |= input_port_read(machine(), "IO04");
-	if (BIT(m_keylatch, 5)) data |= input_port_read(machine(), "IO05");
-	if (BIT(m_keylatch, 6)) data |= input_port_read(machine(), "IO06");
-	if (BIT(m_keylatch, 7)) data |= input_port_read(machine(), "IO07");
-	if (!BIT(m_cmd, 4)) data |= input_port_read(machine(), "UV201-31");
+	if (BIT(m_keylatch, 0)) data |= ioport("IO00")->read();
+	if (BIT(m_keylatch, 1)) data |= ioport("IO01")->read();
+	if (BIT(m_keylatch, 2)) data |= ioport("IO02")->read();
+	if (BIT(m_keylatch, 3)) data |= ioport("IO03")->read();
+	if (BIT(m_keylatch, 4)) data |= ioport("IO04")->read();
+	if (BIT(m_keylatch, 5)) data |= ioport("IO05")->read();
+	if (BIT(m_keylatch, 6)) data |= ioport("IO06")->read();
+	if (BIT(m_keylatch, 7)) data |= ioport("IO07")->read();
+	if (!BIT(m_cmd, 4)) data |= ioport("UV201-31")->read();
 
 	return data;
 }

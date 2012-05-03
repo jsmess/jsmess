@@ -468,7 +468,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 	data |= m_int_pend << 1;
 
 	// boot address
-	data |= input_port_read(machine(), "16C") & 0xfc;
+	data |= ioport("16C")->read() & 0xfc;
 
 	return data;
 }
@@ -566,7 +566,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mpz80 )
 	PORT_START("16C")
-	PORT_DIPNAME( 0xf8, 0xf8, "Power-On-Jump Address" ) PORT_DIPLOCATION("16C:1,2,3,4,5") PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPNAME( 0xf8, 0xf8, "Power-On-Jump Address" ) PORT_DIPLOCATION("16C:1,2,3,4,5") PORT_CONDITION("12C", 0x02, EQUALS, 0x02)
 	PORT_DIPSETTING(    0xf8, "F800H" )
 	PORT_DIPSETTING(    0xf0, "F000H" )
 	PORT_DIPSETTING(    0xe8, "E800H" )
@@ -599,7 +599,7 @@ static INPUT_PORTS_START( mpz80 )
 	PORT_DIPSETTING(    0x10, "Boot DJ/DMA" )
 	PORT_DIPSETTING(    0x08, "Boot HD/DMA" )
 	PORT_DIPSETTING(    0x00, "Boot HDCA" )
-	PORT_DIPNAME( 0x70, 0x00, "Diagnostics" ) PORT_DIPLOCATION("16C:2,3,4") PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x70, 0x00, "Diagnostics" ) PORT_DIPLOCATION("16C:2,3,4") PORT_CONDITION("12C", 0x02, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "Read Registers" )
 	PORT_DIPSETTING(    0x10, "Write Registers" )
 	PORT_DIPSETTING(    0x20, "Write Map RAMs" )

@@ -520,7 +520,7 @@ MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
-	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	UINT8 ret = device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= device->machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }
@@ -528,7 +528,7 @@ static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
 {
-	return input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	return device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 }
 
 
@@ -563,35 +563,35 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 
 static UINT16 amiga_read_joy0dat(running_machine &machine)
 {
-	if ( input_port_read(machine, "input") & 0x20 ) {
+	if ( machine.root_device().ioport("input")->read() & 0x20 ) {
 		/* Joystick */
-		return input_port_read_safe(machine, "JOY0DAT", 0xffff);
+		return machine.root_device().ioport("JOY0DAT")->read_safe(0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( input_port_read(machine, "P0MOUSEX") & 0xff );
-		input |= ( input_port_read(machine, "P0MOUSEY") & 0xff ) << 8;
+		input  = ( machine.root_device().ioport("P0MOUSEX")->read() & 0xff );
+		input |= ( machine.root_device().ioport("P0MOUSEY")->read() & 0xff ) << 8;
 		return input;
 	}
 }
 
 static UINT16 amiga_read_joy1dat(running_machine &machine)
 {
-	if ( input_port_read(machine, "input") & 0x10 ) {
+	if ( machine.root_device().ioport("input")->read() & 0x10 ) {
 		/* Joystick */
-		return input_port_read_safe(machine, "JOY1DAT", 0xffff);
+		return machine.root_device().ioport("JOY1DAT")->read_safe(0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( input_port_read(machine, "P1MOUSEX") & 0xff );
-		input |= ( input_port_read(machine, "P1MOUSEY") & 0xff ) << 8;
+		input  = ( machine.root_device().ioport("P1MOUSEX")->read() & 0xff );
+		input |= ( machine.root_device().ioport("P1MOUSEY")->read() & 0xff ) << 8;
 		return input;
 	}
 }
 
 static void amiga_reset(running_machine &machine)
 {
-	if (input_port_read(machine, "hardware") & 0x08)
+	if (machine.root_device().ioport("hardware")->read() & 0x08)
 	{
 		/* Install RTC */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));

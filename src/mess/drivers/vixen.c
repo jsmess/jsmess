@@ -511,14 +511,14 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_col, 0)) data &= input_port_read(machine(), "ROW0");
-	if (!BIT(m_col, 1)) data &= input_port_read(machine(), "ROW1");
-	if (!BIT(m_col, 2)) data &= input_port_read(machine(), "ROW2");
-	if (!BIT(m_col, 3)) data &= input_port_read(machine(), "ROW3");
-	if (!BIT(m_col, 4)) data &= input_port_read(machine(), "ROW4");
-	if (!BIT(m_col, 5)) data &= input_port_read(machine(), "ROW5");
-	if (!BIT(m_col, 6)) data &= input_port_read(machine(), "ROW6");
-	if (!BIT(m_col, 7)) data &= input_port_read(machine(), "ROW7");
+	if (!BIT(m_col, 0)) data &= ioport("ROW0")->read();
+	if (!BIT(m_col, 1)) data &= ioport("ROW1")->read();
+	if (!BIT(m_col, 2)) data &= ioport("ROW2")->read();
+	if (!BIT(m_col, 3)) data &= ioport("ROW3")->read();
+	if (!BIT(m_col, 4)) data &= ioport("ROW4")->read();
+	if (!BIT(m_col, 5)) data &= ioport("ROW5")->read();
+	if (!BIT(m_col, 6)) data &= ioport("ROW6")->read();
+	if (!BIT(m_col, 7)) data &= ioport("ROW7")->read();
 
 	return data;
 }

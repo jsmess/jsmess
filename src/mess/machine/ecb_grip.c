@@ -787,7 +787,7 @@ void grip5_state::machine_start()
 
 void grip_device::device_reset()
 {
-	m_base = input_port_read(*this, "J7");
+	m_base = ioport("J7")->read();
 }
 
 
@@ -871,7 +871,7 @@ READ8_MEMBER( grip_device::stat_r )
 	int js0 = 0, js1 = 0;
 
 	// JS0
-	switch (input_port_read(*this, "J3A"))
+	switch (ioport("J3A")->read())
 	{
 	case 0: js0 = 0; break;
 	case 1: js0 = 1; break;
@@ -883,7 +883,7 @@ READ8_MEMBER( grip_device::stat_r )
 	data |= js0 << 4;
 
 	// JS1
-	switch (input_port_read(*this, "J3B"))
+	switch (ioport("J3B")->read())
 	{
 	case 0: js1 = 0; break;
 	case 1: js1 = 1; break;
@@ -1084,13 +1084,13 @@ void grip_device::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(*this, "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		// shift, upper case
 		table = 1;
 	}
 
-	if (input_port_read(*this, "ROW9") & 0x18)
+	if (ioport("ROW9")->read() & 0x18)
 	{
 		// ctrl
 		table = 2;
@@ -1099,7 +1099,7 @@ void grip_device::scan_keyboard()
 	// scan keyboard
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(*this, keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{

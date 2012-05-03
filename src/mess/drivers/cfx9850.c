@@ -72,7 +72,7 @@ READ8_MEMBER( cfx9850_state::cfx9850_ki_r )
 		if (BIT(m_ko, i))
 		{
 			sprintf(kbdrow,"KO%d", i+1);
-			data |= input_port_read(machine(), kbdrow);
+			data |= ioport(kbdrow)->read();
 		}
 	}
 

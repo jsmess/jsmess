@@ -517,7 +517,7 @@ void ti_rs232_pio_device::transmit_data(int uartind, UINT8 value)
 UINT8 ti_rs232_pio_device::map_lines_out(int uartind, UINT8 value)
 {
 	UINT8 ret = 0;
-	int mapping = input_port_read(*this, "SERIALMAP");
+	int mapping = ioport("SERIALMAP")->read();
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
@@ -589,7 +589,7 @@ UINT8 ti_rs232_pio_device::map_lines_out(int uartind, UINT8 value)
 UINT8 ti_rs232_pio_device::map_lines_in(int uartind, UINT8 value)
 {
 	UINT8 ret = 0;
-	int mapping = input_port_read(*this, "SERIALMAP");
+	int mapping = ioport("SERIALMAP")->read();
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
@@ -1062,7 +1062,7 @@ void ti_rs232_pio_device::device_reset()
 	m_space = machine().device("maincpu")->memory().space(AS_IO);
 	m_selected = false;
 
-	m_cru_base = (input_port_read(*this, "CRURS232")==0)? 0x1300 : 0x1500;
+	m_cru_base = (ioport("CRURS232")->read()==0)? 0x1300 : 0x1500;
 
 	m_time_hold[0] = m_time_hold[1] = 0.0;
 
@@ -1070,7 +1070,7 @@ void ti_rs232_pio_device::device_reset()
 		// All peripheral cards need to be manually modified to properly decode
 		// the wider address. The next lines perform this soldering job
 		// automagically.
-		/* if (input_port_read(device->machine(), "MODE")==GENMOD)
+		/* if (device->machine().root_device().ioport("MODE")->read()==GENMOD)
         {
             // GenMod card modification
             card->select_mask = 0x1fe000;

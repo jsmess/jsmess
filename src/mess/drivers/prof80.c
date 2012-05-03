@@ -306,7 +306,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= !m_motor;
 
 	// JS4
-	switch (input_port_read(machine(), "J4"))
+	switch (ioport("J4")->read())
 	{
 	case 0: js4 = 0; break;
 	case 1: js4 = 1; break;
@@ -318,7 +318,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= js4 << 4;
 
 	// JS5
-	switch (input_port_read(machine(), "J5"))
+	switch (ioport("J5")->read())
 	{
 	case 0: js5 = 0; break;
 	case 1: js5 = 1; break;

@@ -86,13 +86,13 @@ static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(state->m_riot_port_a & 0x80)) data &= input_port_read(device->machine(), "ROW-0");
-	if (!(state->m_riot_port_b & 0x01)) data &= input_port_read(device->machine(), "ROW-1");
-	if (!(state->m_riot_port_b & 0x02)) data &= input_port_read(device->machine(), "ROW-2");
-	if (!(state->m_riot_port_b & 0x04)) data &= input_port_read(device->machine(), "ROW-3");
+	if (!(state->m_riot_port_a & 0x80)) data &= device->machine().root_device().ioport("ROW-0")->read();
+	if (!(state->m_riot_port_b & 0x01)) data &= device->machine().root_device().ioport("ROW-1")->read();
+	if (!(state->m_riot_port_b & 0x02)) data &= device->machine().root_device().ioport("ROW-2")->read();
+	if (!(state->m_riot_port_b & 0x04)) data &= device->machine().root_device().ioport("ROW-3")->read();
 
 	/* determine column */
-	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-0") ^ 0xff)) & 0x7f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (state->ioport("ROW-0")->read() ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -105,13 +105,13 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-1") ^ 0xff)) & 0x7f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (device->machine().root_device().ioport("ROW-1")->read() ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-2") ^ 0xff)) & 0x3f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (device->machine().root_device().ioport("ROW-2")->read() ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((state->m_riot_port_a ^ 0xff) & (input_port_read(device->machine(), "ROW-3") ^ 0xff)) & 0x1f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (state->ioport("ROW-3")->read() ^ 0xff)) & 0x1f )
 		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
@@ -201,22 +201,22 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((input_port_read(device->machine(), "WP") & 0x01) && !(data & 0x01)) {
+	if ((device->machine().root_device().ioport("WP")->read() & 0x01) && !(data & 0x01)) {
 		cpu0space->nop_write(0xa600, 0xa67f);
 	} else {
 		cpu0space->install_write_bank(0xa600, 0xa67f, "bank5");
 	}
-	if ((input_port_read(device->machine(), "WP") & 0x02) && !(data & 0x02)) {
+	if ((device->machine().root_device().ioport("WP")->read() & 0x02) && !(data & 0x02)) {
 		cpu0space->nop_write(0x0400, 0x07ff);
 	} else {
 		cpu0space->install_write_bank(0x0400, 0x07ff, "bank2");
 	}
-	if ((input_port_read(device->machine(), "WP") & 0x04) && !(data & 0x04)) {
+	if ((device->machine().root_device().ioport("WP")->read() & 0x04) && !(data & 0x04)) {
 		cpu0space->nop_write(0x0800, 0x0bff);
 	} else {
 		cpu0space->install_write_bank(0x0800, 0x0bff, "bank3");
 	}
-	if ((input_port_read(device->machine(), "WP") & 0x08) && !(data & 0x08)) {
+	if ((device->machine().root_device().ioport("WP")->read() & 0x08) && !(data & 0x08)) {
 		cpu0space->nop_write(0x0c00, 0x0fff);
 	} else {
 		cpu0space->install_write_bank(0x0c00, 0x0fff, "bank4");

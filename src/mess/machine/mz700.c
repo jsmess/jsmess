@@ -127,7 +127,7 @@ READ8_MEMBER(mz_state::mz700_e008_r)
 	UINT8 data = 0;
 
 	data |= m_other_timer;
-	data |= input_port_read(machine(), "JOY");
+	data |= ioport("JOY")->read();
 	data |= machine().primary_screen->hblank() << 7;
 
 	LOG(1, "mz700_e008_r", ("%02X\n", data), machine());
@@ -443,16 +443,16 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 	switch (key_line)
 	{
-	case 1 << 0: return input_port_read(device->machine(), "ROW0");
-	case 1 << 1: return input_port_read(device->machine(), "ROW1");
-	case 1 << 2: return input_port_read(device->machine(), "ROW2");
-	case 1 << 3: return input_port_read(device->machine(), "ROW3");
-	case 1 << 4: return input_port_read(device->machine(), "ROW4");
-	case 1 << 5: return input_port_read(device->machine(), "ROW5");
-	case 1 << 6: return input_port_read(device->machine(), "ROW6");
-	case 1 << 7: return input_port_read(device->machine(), "ROW7");
-	case 1 << 8: return input_port_read(device->machine(), "ROW8");
-	case 1 << 9: return input_port_read(device->machine(), "ROW9");
+	case 1 << 0: return device->machine().root_device().ioport("ROW0")->read();
+	case 1 << 1: return device->machine().root_device().ioport("ROW1")->read();
+	case 1 << 2: return device->machine().root_device().ioport("ROW2")->read();
+	case 1 << 3: return device->machine().root_device().ioport("ROW3")->read();
+	case 1 << 4: return device->machine().root_device().ioport("ROW4")->read();
+	case 1 << 5: return device->machine().root_device().ioport("ROW5")->read();
+	case 1 << 6: return device->machine().root_device().ioport("ROW6")->read();
+	case 1 << 7: return device->machine().root_device().ioport("ROW7")->read();
+	case 1 << 8: return device->machine().root_device().ioport("ROW8")->read();
+	case 1 << 9: return device->machine().root_device().ioport("ROW9")->read();
 	}
 
 	/* should never reach this */

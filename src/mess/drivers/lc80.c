@@ -262,10 +262,10 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 	{
 		if (!BIT(m_digit, i))
 		{
-			if (!BIT(input_port_read(machine(), "ROW0"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(machine(), "ROW1"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(machine(), "ROW2"), i)) data &= ~0x40;
-			if (!BIT(input_port_read(machine(), "ROW3"), i)) data &= ~0x80;
+			if (!BIT(ioport("ROW0")->read(), i)) data &= ~0x10;
+			if (!BIT(ioport("ROW1")->read(), i)) data &= ~0x20;
+			if (!BIT(ioport("ROW2")->read(), i)) data &= ~0x40;
+			if (!BIT(ioport("ROW3")->read(), i)) data &= ~0x80;
 		}
 	}
 

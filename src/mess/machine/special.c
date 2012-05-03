@@ -25,14 +25,14 @@ DRIVER_INIT(special)
 
 READ8_MEMBER( special_state::specialist_8255_porta_r )
 {
-	if (input_port_read(machine(), "LINE0")!=0xff) return 0xfe;
-	if (input_port_read(machine(), "LINE1")!=0xff) return 0xfd;
-	if (input_port_read(machine(), "LINE2")!=0xff) return 0xfb;
-	if (input_port_read(machine(), "LINE3")!=0xff) return 0xf7;
-	if (input_port_read(machine(), "LINE4")!=0xff) return 0xef;
-	if (input_port_read(machine(), "LINE5")!=0xff) return 0xdf;
-	if (input_port_read(machine(), "LINE6")!=0xff) return 0xbf;
-	if (input_port_read(machine(), "LINE7")!=0xff) return 0x7f;
+	if (ioport("LINE0")->read()!=0xff) return 0xfe;
+	if (ioport("LINE1")->read()!=0xff) return 0xfd;
+	if (ioport("LINE2")->read()!=0xff) return 0xfb;
+	if (ioport("LINE3")->read()!=0xff) return 0xf7;
+	if (ioport("LINE4")->read()!=0xff) return 0xef;
+	if (ioport("LINE5")->read()!=0xff) return 0xdf;
+	if (ioport("LINE6")->read()!=0xff) return 0xbf;
+	if (ioport("LINE7")->read()!=0xff) return 0x7f;
 	return 0xff;
 }
 
@@ -41,21 +41,21 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	UINT8 dat = 0;
 	double level;
 
-	if ((m_specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(machine(), "LINE0") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(machine(), "LINE1") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(machine(), "LINE2") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(machine(), "LINE3") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(machine(), "LINE4") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(machine(), "LINE5") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(machine(), "LINE6") ^ 0xff);
-	if ((m_specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(machine(), "LINE7") ^ 0xff);
-	if ((m_specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(machine(), "LINE8") ^ 0xff);
-	if ((m_specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(machine(), "LINE9") ^ 0xff);
-	if ((m_specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(machine(), "LINE10") ^ 0xff);
-	if ((m_specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(machine(), "LINE11") ^ 0xff);
+	if ((m_specialist_8255_porta & 0x01)==0) dat ^= (ioport("LINE0")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x02)==0) dat ^= (ioport("LINE1")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x04)==0) dat ^= (ioport("LINE2")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x08)==0) dat ^= (ioport("LINE3")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x10)==0) dat ^= (ioport("LINE4")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x20)==0) dat ^= (ioport("LINE5")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x40)==0) dat ^= (ioport("LINE6")->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x80)==0) dat ^= (ioport("LINE7")->read() ^ 0xff);
+	if ((m_specialist_8255_portc & 0x01)==0) dat ^= (ioport("LINE8")->read() ^ 0xff);
+	if ((m_specialist_8255_portc & 0x02)==0) dat ^= (ioport("LINE9")->read() ^ 0xff);
+	if ((m_specialist_8255_portc & 0x04)==0) dat ^= (ioport("LINE10")->read() ^ 0xff);
+	if ((m_specialist_8255_portc & 0x08)==0) dat ^= (ioport("LINE11")->read() ^ 0xff);
 
 	dat = (dat  << 2) ^0xff;
-	if (input_port_read(machine(), "LINE12")!=0xff) dat ^= 0x02;
+	if (ioport("LINE12")->read()!=0xff) dat ^= 0x02;
 
 	level = m_cass->input();
 	if (level >=  0)
@@ -66,10 +66,10 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 
 READ8_MEMBER( special_state::specialist_8255_portc_r )
 {
-	if (input_port_read(machine(), "LINE8")!=0xff) return 0x0e;
-	if (input_port_read(machine(), "LINE9")!=0xff) return 0x0d;
-	if (input_port_read(machine(), "LINE10")!=0xff) return 0x0b;
-	if (input_port_read(machine(), "LINE11")!=0xff) return 0x07;
+	if (ioport("LINE8")->read()!=0xff) return 0x0e;
+	if (ioport("LINE9")->read()!=0xff) return 0x0d;
+	if (ioport("LINE10")->read()!=0xff) return 0x0b;
+	if (ioport("LINE11")->read()!=0xff) return 0x07;
 	return 0x0f;
 }
 

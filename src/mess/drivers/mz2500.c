@@ -1395,7 +1395,7 @@ READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 	UINT8 res,dir_en,in_r;
 
 	res = 0xff;
-	in_r = ~input_port_read(machine(), m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
+	in_r = ~ioport(m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P")->read();
 
 	if(m_joy_mode & 0x40)
 	{
@@ -1751,7 +1751,7 @@ static MACHINE_RESET(mz2500)
 	beep_set_frequency(machine.device(BEEPER_TAG),4096);
 	beep_set_state(machine.device(BEEPER_TAG),0);
 
-//  state->m_monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
+//  state->m_monitor_type = machine.root_device().ioport("DSW1")->read() & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1931,16 +1931,16 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= input_port_read(device->machine(), keynames[i]);
+			res &= device->machine().root_device().ioport(keynames[i])->read();
 
 		state->m_pio_latchb = res;
 
 		return res;
 	}
 
-	state->m_pio_latchb = input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
+	state->m_pio_latchb = device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 
-	return input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
+	return device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 }
 
 #if 0

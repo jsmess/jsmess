@@ -156,7 +156,7 @@ static void poll_keyboard(running_machine &machine)
 
 	for(i = 0; (i < /*4*/3) && (state->m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = input_port_read(machine, keynames[2*i]) | (input_port_read(machine, keynames[2*i + 1]) << 16);
+		keystate = machine.root_device().ioport(keynames[2*i])->read() | (machine.root_device().ioport(keynames[2*i + 1])->read() << 16);
 		key_transitions = keystate ^ state->m_KeyStateSave[i];
 		if(key_transitions)
 		{
@@ -229,7 +229,7 @@ static READ8_DEVICE_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((input_port_read(device->machine(), "DSW0") & 0x80) >> 1) | ((input_port_read(device->machine(), "DSW0") & 0x40) << 1);
+	status = ((device->machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((device->machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }

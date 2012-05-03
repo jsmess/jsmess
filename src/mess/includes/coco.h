@@ -191,11 +191,11 @@ private:
 
 	typedef struct
 	{
-		const input_port_config *m_input[2][2];
-		const input_port_config *m_buttons;
+		ioport_port *m_input[2][2];
+		ioport_port *m_buttons;
 
-		UINT8 input(int joystick, int axis) const { return m_input[joystick][axis] ? input_port_read_direct(m_input[joystick][axis]) : 0x00; }
-		UINT8 buttons(void) const { return m_buttons ? input_port_read_direct(m_buttons) : 0x00; }
+		UINT8 input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		UINT8 buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	} analog_input_t;
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
@@ -233,9 +233,9 @@ private:
 	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 	/* input ports */
-	const input_port_config *m_keyboard[7];
-	const input_port_config *m_joystick_type_control;
-	const input_port_config *m_joystick_hires_control;
+	ioport_port *m_keyboard[7];
+	ioport_port *m_joystick_type_control;
+	ioport_port *m_joystick_hires_control;
 	analog_input_t m_joystick;
 	analog_input_t m_rat_mouse;
 	analog_input_t m_diecom_lightgun;

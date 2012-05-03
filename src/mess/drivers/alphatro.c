@@ -142,7 +142,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
 	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
-	bool palette = BIT(input_port_read(device->machine(), "CONFIG"), 5);
+	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

@@ -509,7 +509,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 	{
 		space->install_read_bank(0x10000 - size, 0xdfff, "bank3");
 		space->nop_write(0x10000 - size, 0xdfff);
-		state->membank("bank3")->set_base(space->machine().root_device().memregion(region)->base());
+		state->membank("bank3")->set_base(state->memregion(region)->base());
 	}
 
 	/* ram, continued */
@@ -659,7 +659,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 
 		if (VERBOSE)
 			logerror("7508 cmd: DIP Switch Read\n");
-		m_sior = input_port_read(machine(), "dips");
+		m_sior = ioport("dips")->read();
 		break;
 
 	case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
@@ -928,7 +928,7 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 static INPUT_CHANGED( key_callback )
 {
 	px4_state *px4 = field.machine().driver_data<px4_state>();
-	UINT32 oldvalue = oldval * field.mask, newvalue = newval * field.mask;
+	UINT32 oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
 	UINT32 delta = oldvalue ^ newvalue;
 	int i, scancode = 0xff, down = 0;
 

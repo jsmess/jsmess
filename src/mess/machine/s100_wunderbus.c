@@ -329,7 +329,7 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 
 UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 {
-	UINT8 address = (input_port_read(*this, "7C") & 0x3e) << 2;
+	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0;
 
 	UINT8 data = 0;
@@ -374,7 +374,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 
                 */
 
-				data = BITSWAP8(input_port_read(*this, "10A"),0,1,2,3,4,5,6,7) & 0xfc;
+				data = BITSWAP8(ioport("10A")->read(),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
 
 			case 2: // R.T. Clock IN/RESET CLK. Int.
@@ -438,7 +438,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 
 void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 {
-	UINT8 address = (input_port_read(*this, "7C") & 0x3e) << 2;
+	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
 
 	if ((offset & 0x07) == 7)

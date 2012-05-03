@@ -43,13 +43,13 @@ UINT8 psion_state::kb_read(running_machine &machine)
 	{
 		for (line = 0; line < 7; line++)
 			if (m_kb_counter == (0x7f & ~(1 << line)))
-				data = input_port_read(machine, bitnames[line]);
+				data = machine.root_device().ioport(bitnames[line])->read();
 	}
 	else
 	{
 		//Read all the input lines
 		for (line = 0; line < 7; line++)
-			data &= input_port_read(machine, bitnames[line]);
+			data &= machine.root_device().ioport(bitnames[line])->read();
 	}
 
 	return data & 0x7c;
@@ -124,7 +124,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(machine()) | input_port_read(machine(), "BATTERY") | input_port_read(machine(), "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
+		return kb_read(machine()) | ioport("BATTERY")->read() | ioport("ON")->read() | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		return (m_pack1->control_r() | (m_pack2->control_r() & 0x8f)) | ((m_pack2->control_r() & 0x10)<<1);

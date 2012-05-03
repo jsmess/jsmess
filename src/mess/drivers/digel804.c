@@ -133,18 +133,18 @@ static TIMER_CALLBACK( ep804_kbd_callback )
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
     // 74C923 4 by 5 key encoder.
     // if previous key is still held, bail out
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
-		if (state->digel804_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row) == state->m_kbd)
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
+		if (state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row) == state->m_kbd)
 			return;
 
 	state->m_kbd_row++;
 	state->m_kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
 	{
 		fprintf(stderr,"DEBUG: key was pressed!\n");
-		state->m_kbd = state->digel804_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row);
+		state->m_kbd = state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row);
 		state->m_key_intq = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);//ASSERT_LINE);
 	}

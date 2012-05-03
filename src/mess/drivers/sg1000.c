@@ -111,14 +111,14 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 {
 	if (data & 0x01)
 	{
-		m_tvdraw_data = input_port_read(machine(), "TVDRAW_X");
+		m_tvdraw_data = ioport("TVDRAW_X")->read();
 
 		if (m_tvdraw_data < 4) m_tvdraw_data = 4;
 		if (m_tvdraw_data > 251) m_tvdraw_data = 251;
 	}
 	else
 	{
-		m_tvdraw_data = input_port_read(machine(), "TVDRAW_Y") + 32;
+		m_tvdraw_data = ioport("TVDRAW_Y")->read() + 32;
 	}
 }
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 
 READ8_MEMBER( sg1000_state::tvdraw_status_r )
 {
-	return input_port_read(machine(), "TVDRAW_PEN");
+	return ioport("TVDRAW_PEN")->read();
 }
 
 /*-------------------------------------------------
@@ -564,7 +564,7 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
-	return input_port_read(machine(), keynames[m_keylatch]);
+	return ioport(keynames[m_keylatch])->read();
 }
 
 READ8_MEMBER( sc3000_state::ppi_pb_r )
@@ -585,7 +585,7 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
 	/* keyboard */
-	UINT8 data = input_port_read(machine(), keynames[m_keylatch]);
+	UINT8 data = ioport(keynames[m_keylatch])->read();
 
 	/* cartridge contact */
 	data |= 0x10;

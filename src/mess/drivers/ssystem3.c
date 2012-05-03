@@ -60,7 +60,7 @@ static void ssystem3_playfield_reset(running_machine &machine)
 	ssystem3_state *state = machine.driver_data<ssystem3_state>();
   memset(&state->m_playfield, 0, sizeof(state->m_playfield));
   state->m_playfield.signal=FALSE;
-  //  state->m_playfield.on=TRUE; //input_port_read(machine, "Configuration")&1;
+  //  state->m_playfield.on=TRUE; //machine.root_device().ioport("Configuration")->read()&1;
 }
 
 static void ssystem3_playfield_write(running_machine &machine, int reset, int signal)
@@ -112,7 +112,7 @@ static void ssystem3_playfield_write(running_machine &machine, int reset, int si
 static void ssystem3_playfield_read(running_machine &machine, int *on, int *ready)
 {
 	//ssystem3_state *state = machine.driver_data<ssystem3_state>();
-	*on=!(input_port_read(machine, "Configuration")&1);
+	*on=!(machine.root_device().ioport("Configuration")->read()&1);
 	//  *on=!state->m_playfield.on;
 	*ready=FALSE;
 }
@@ -129,39 +129,39 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
 	ssystem3_state *state = device->machine().driver_data<ssystem3_state>();
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(state->m_porta&0x10)) data&=input_port_read(device->machine(), "matrix1")|0xf1;
-  if (!(state->m_porta&0x20)) data&=input_port_read(device->machine(), "matrix2")|0xf1;
-  if (!(state->m_porta&0x40)) data&=input_port_read(device->machine(), "matrix3")|0xf1;
-  if (!(state->m_porta&0x80)) data&=input_port_read(device->machine(), "matrix4")|0xf1;
+  if (!(state->m_porta&0x10)) data&=device->machine().root_device().ioport("matrix1")->read()|0xf1;
+  if (!(state->m_porta&0x20)) data&=device->machine().root_device().ioport("matrix2")->read()|0xf1;
+  if (!(state->m_porta&0x40)) data&=device->machine().root_device().ioport("matrix3")->read()|0xf1;
+  if (!(state->m_porta&0x80)) data&=device->machine().root_device().ioport("matrix4")->read()|0xf1;
 #else
-  if (!(state->m_porta&0x10)) data&=input_port_read(device->machine(), "matrix1")|0xf0;
-  if (!(state->m_porta&0x20)) data&=input_port_read(device->machine(), "matrix2")|0xf0;
-  if (!(state->m_porta&0x40)) data&=input_port_read(device->machine(), "matrix3")|0xf0;
-  if (!(state->m_porta&0x80)) data&=input_port_read(device->machine(), "matrix4")|0xf0;
+  if (!(state->m_porta&0x10)) data&=device->machine().root_device().ioport("matrix1")->read()|0xf0;
+  if (!(state->m_porta&0x20)) data&=device->machine().root_device().ioport("matrix2")->read()|0xf0;
+  if (!(state->m_porta&0x40)) data&=device->machine().root_device().ioport("matrix3")->read()|0xf0;
+  if (!(state->m_porta&0x80)) data&=device->machine().root_device().ioport("matrix4")->read()|0xf0;
 #endif
   if (!(state->m_porta&1)) {
-    if (!(input_port_read(device->machine(), "matrix1")&1)) data&=~0x10;
-    if (!(input_port_read(device->machine(), "matrix2")&1)) data&=~0x20;
-    if (!(input_port_read(device->machine(), "matrix3")&1)) data&=~0x40;
-    if (!(input_port_read(device->machine(), "matrix4")&1)) data&=~0x80;
+    if (!(device->machine().root_device().ioport("matrix1")->read()&1)) data&=~0x10;
+    if (!(device->machine().root_device().ioport("matrix2")->read()&1)) data&=~0x20;
+    if (!(device->machine().root_device().ioport("matrix3")->read()&1)) data&=~0x40;
+    if (!(state->ioport("matrix4")->read()&1)) data&=~0x80;
   }
   if (!(state->m_porta&2)) {
-    if (!(input_port_read(device->machine(), "matrix1")&2)) data&=~0x10;
-    if (!(input_port_read(device->machine(), "matrix2")&2)) data&=~0x20;
-    if (!(input_port_read(device->machine(), "matrix3")&2)) data&=~0x40;
-    if (!(input_port_read(device->machine(), "matrix4")&2)) data&=~0x80;
+    if (!(device->machine().root_device().ioport("matrix1")->read()&2)) data&=~0x10;
+    if (!(device->machine().root_device().ioport("matrix2")->read()&2)) data&=~0x20;
+    if (!(device->machine().root_device().ioport("matrix3")->read()&2)) data&=~0x40;
+    if (!(device->machine().root_device().ioport("matrix4")->read()&2)) data&=~0x80;
   }
   if (!(state->m_porta&4)) {
-    if (!(input_port_read(device->machine(), "matrix1")&4)) data&=~0x10;
-    if (!(input_port_read(device->machine(), "matrix2")&4)) data&=~0x20;
-    if (!(input_port_read(device->machine(), "matrix3")&4)) data&=~0x40;
-    if (!(input_port_read(device->machine(), "matrix4")&4)) data&=~0x80;
+    if (!(device->machine().root_device().ioport("matrix1")->read()&4)) data&=~0x10;
+    if (!(device->machine().root_device().ioport("matrix2")->read()&4)) data&=~0x20;
+    if (!(device->machine().root_device().ioport("matrix3")->read()&4)) data&=~0x40;
+    if (!(device->machine().root_device().ioport("matrix4")->read()&4)) data&=~0x80;
   }
   if (!(state->m_porta&8)) {
-    if (!(input_port_read(device->machine(), "matrix1")&8)) data&=~0x10;
-    if (!(input_port_read(device->machine(), "matrix2")&8)) data&=~0x20;
-    if (!(input_port_read(device->machine(), "matrix3")&8)) data&=~0x40;
-    if (!(input_port_read(device->machine(), "matrix4")&8)) data&=~0x80;
+    if (!(device->machine().root_device().ioport("matrix1")->read()&8)) data&=~0x10;
+    if (!(device->machine().root_device().ioport("matrix2")->read()&8)) data&=~0x20;
+    if (!(device->machine().root_device().ioport("matrix3")->read()&8)) data&=~0x40;
+    if (!(device->machine().root_device().ioport("matrix4")->read()&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;

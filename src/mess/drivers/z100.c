@@ -758,7 +758,7 @@ static MACHINE_RESET(z100)
 	//z100_state *state = machine.driver_data<z100_state>();
 	int i;
 
-	if(input_port_read(machine,"CONFIG") & 1)
+	if(machine.root_device().ioport("CONFIG")->read() & 1)
 	{
 		for(i=0;i<8;i++)
 			palette_set_color_rgb(machine, i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));

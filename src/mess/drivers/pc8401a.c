@@ -42,7 +42,7 @@ void pc8401a_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 10; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		if (data != 0xff)
 		{

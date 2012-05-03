@@ -333,7 +333,7 @@ void isa8_lpt_device::device_start()
 
 void isa8_lpt_device::device_reset()
 {
-	m_is_primary = (input_port_read(*this, "DSW") & 1) ? false : true;
+	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
 		m_isa->install_device(subdevice("lpt"), 0x0378, 0x037b, 0, 0, FUNC(pc_lpt_r), FUNC(pc_lpt_w) );
 	} else {

@@ -206,6 +206,7 @@ mooncrstu		// (c) 1980 Nichibutsu USA
 mooncrsto		// (c) 1980 Nichibutsu
 mooncrstg		// (c) 1980 Gremlin
 mooncrstuk		// (c) 1980 Nichibutsu UK
+mooncrstuku		// (c) 1980 Nichibutsu UK
 smooncrs		// Gremlin
 sstarcrs		// Taito (Brazil)
 mooncmw			// bootleg
@@ -603,6 +604,7 @@ sailorwr		// (c) 1993
 wcatcher		// (c) 1993
 jituroku		// (c) 1993 Windom
 yosimoto		// (c) 1994 Nichibutsu/Yoshimoto Kougyou
+yosimotm		// (c) 1994 Nichibutsu/Yoshimoto Kougyou
 psailor1		// (c) 1994 SPHINX
 psailor2		// (c) 1994 SPHINX
 otatidai		// (c) 1995 SPHINX
@@ -618,6 +620,7 @@ mscoutm			// (c) 1994 SPHINX/AV JAPAN
 mjegolf			// (c) 1994 FUJIC/AV JAPAN
 
 mhhonban		// (c) 199?
+zokumahj		// (c) 199?
 4psimasy		// (c) 1994
 musobana		// (c) 1995
 niyanpai		// (c) 1996
@@ -10036,9 +10039,9 @@ gtsers8			// (c) 1984 Greyhound Electronics
 gtsers9			// (c) 1984 Greyhound Electronics
 gtsers10		// (c) 1984 Greyhound Electronics
 gtsers11		// (c) 1984 Greyhound Electronics
+gtsers12		// (c) 1984 Greyhound Electronics
+gtsers14		// (c) 1984 Greyhound Electronics
 gt103a1			// (c) 1984 Greyhound Electronics
-gt103a2			// (c) 1984 Greyhound Electronics
-gt103a3			// (c) 1984 Greyhound Electronics
 gt103aa			// (c) 1984 Greyhound Electronics
 gt103asx		// (c) 1984 Greyhound Electronics
 reelfun			// (c) 1986 Grayhound Electronics
@@ -10567,6 +10570,7 @@ sb2003			// (c) 2003 Limenko
 sb2003a			// (c) 2003 Limenko
 spotty			// (c) 2001 Prince Co.
 carrera			// (c) 19?? BS Electronics
+chance32		// (c) 19?? PAL Company
 
 // Golden Poker / Potten's Poker / Witch Card hardware
 goldnpkr		// (c) 1981 Bonanza
@@ -10806,12 +10810,14 @@ paclandp		// (c) 1989 Namco
 ggconnie		// (c) ???? Capcom
 paranoia		// (c) 1990 Naxat Soft
 tourvis			// (c) ???? Tourvision
+tvlegaxe		// (c) 1988 Victor Musical Industries, Inc. (Tourvision bootleg)
 tvusapb			// (c) 1989 Aicom (Tourvision bootleg)
 tvdunexp		// (c) 1989 Hudson / Atlus (Tourvision bootleg)
 tvthbld			// (c) 1990 Sega / NEC Avenue (Tourvision bootleg)
 tvrs2			// (c) 1990 Taito (Tourvision bootleg)
 tvpwlg4			// (c) 1991 Hudson (Tourvision bootleg)
 tvsci			// (c) 1991 Taito (Tourvision bootleg)
+tvsvball		// (c) 1990 Video System (Tourvision bootleg)
 vcombat			// (c) 1993 VR8 Inc.
 shadfgtr		// (c) 1993 DUTECH Inc.
 skimaxx			// (c) 1996 Kyle Hodgetts/ICE
@@ -20076,6 +20082,7 @@ trucksp2
    Bally MPU AS-2518-133
 */
 babypac
+babypac2
 granny
 
 // by68701.c

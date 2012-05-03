@@ -197,7 +197,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
      * which makes this register read 0xFC
      * When s4-7 is turned on, it reads 0xBC
      */
-	data = input_port_read(machine(), "s4");
+	data = ioport("s4")->read();
 	return data;
 }
 

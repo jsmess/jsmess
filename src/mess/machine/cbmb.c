@@ -152,22 +152,22 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 	int data = 0;
 	if (!(state->m_keyline_c & 0x01))
-		data |= input_port_read(device->machine(), "ROW0");
+		data |= device->machine().root_device().ioport("ROW0")->read();
 
 	if (!(state->m_keyline_c & 0x02))
-		data |= input_port_read(device->machine(), "ROW2");
+		data |= device->machine().root_device().ioport("ROW2")->read();
 
 	if (!(state->m_keyline_c & 0x04))
-		data |= input_port_read(device->machine(), "ROW4");
+		data |= device->machine().root_device().ioport("ROW4")->read();
 
 	if (!(state->m_keyline_c & 0x08))
-		data |= input_port_read(device->machine(), "ROW6");
+		data |= device->machine().root_device().ioport("ROW6")->read();
 
 	if (!(state->m_keyline_c & 0x10))
-		data |= input_port_read(device->machine(), "ROW8");
+		data |= device->machine().root_device().ioport("ROW8")->read();
 
 	if (!(state->m_keyline_c & 0x20))
-		data |= input_port_read(device->machine(), "ROW10");
+		data |= state->ioport("ROW10")->read();
 
 	return data ^0xff;
 }
@@ -177,22 +177,22 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 	cbmb_state *state = device->machine().driver_data<cbmb_state>();
 	int data = 0;
 	if (!(state->m_keyline_c & 0x01))
-		data |= input_port_read(device->machine(), "ROW1");
+		data |= device->machine().root_device().ioport("ROW1")->read();
 
 	if (!(state->m_keyline_c & 0x02))
-		data |= input_port_read(device->machine(), "ROW3");
+		data |= device->machine().root_device().ioport("ROW3")->read();
 
 	if (!(state->m_keyline_c & 0x04))
-		data |= input_port_read(device->machine(), "ROW5");
+		data |= device->machine().root_device().ioport("ROW5")->read();
 
 	if (!(state->m_keyline_c & 0x08))
-		data |= input_port_read(device->machine(), "ROW7");
+		data |= device->machine().root_device().ioport("ROW7")->read();
 
 	if (!(state->m_keyline_c & 0x10))
-		data |= input_port_read(device->machine(), "ROW9") | ((input_port_read(device->machine(), "SPECIAL") & 0x04) ? 1 : 0 );
+		data |= device->machine().root_device().ioport("ROW9")->read() | ((device->machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0 );
 
 	if (!(state->m_keyline_c & 0x20))
-		data |= input_port_read(device->machine(), "ROW11");
+		data |= state->ioport("ROW11")->read();
 
 	return data ^0xff;
 }
@@ -201,28 +201,28 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 {
 	int data = 0;
 	cbmb_state *state = device->machine().driver_data<cbmb_state>();
-	if ((input_port_read(device->machine(), "ROW0") & ~state->m_keyline_a) ||
-				(input_port_read(device->machine(), "ROW1") & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW0")->read() & ~state->m_keyline_a) ||
+				(device->machine().root_device().ioport("ROW1")->read() & ~state->m_keyline_b))
 		 data |= 0x01;
 
-	if ((input_port_read(device->machine(), "ROW2") & ~state->m_keyline_a) ||
-				(input_port_read(device->machine(), "ROW3") & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW2")->read() & ~state->m_keyline_a) ||
+				(device->machine().root_device().ioport("ROW3")->read() & ~state->m_keyline_b))
 		 data |= 0x02;
 
-	if ((input_port_read(device->machine(), "ROW4") & ~state->m_keyline_a) ||
-				(input_port_read(device->machine(), "ROW5") & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW4")->read() & ~state->m_keyline_a) ||
+				(device->machine().root_device().ioport("ROW5")->read() & ~state->m_keyline_b))
 		 data |= 0x04;
 
-	if ((input_port_read(device->machine(), "ROW6") & ~state->m_keyline_a) ||
-				(input_port_read(device->machine(), "ROW7") & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW6")->read() & ~state->m_keyline_a) ||
+				(device->machine().root_device().ioport("ROW7")->read() & ~state->m_keyline_b))
 		 data |= 0x08;
 
-	if ((input_port_read(device->machine(), "ROW8") & ~state->m_keyline_a) ||
-				((input_port_read(device->machine(), "ROW9") | ((input_port_read(device->machine(), "SPECIAL") & 0x04) ? 1 : 0)) & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW8")->read() & ~state->m_keyline_a) ||
+				((device->machine().root_device().ioport("ROW9")->read() | ((device->machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0)) & ~state->m_keyline_b))
 		 data |= 0x10;
 
-	if ((input_port_read(device->machine(), "ROW10") & ~state->m_keyline_a) ||
-				(input_port_read(device->machine(), "ROW11") & ~state->m_keyline_b))
+	if ((device->machine().root_device().ioport("ROW10")->read() & ~state->m_keyline_a) ||
+				(state->ioport("ROW11")->read() & ~state->m_keyline_b))
 		 data |= 0x20;
 
 	if (!state->m_p500)
@@ -341,7 +341,7 @@ MACHINE_RESET( cbmb )
 
 static TIMER_CALLBACK( p500_lightpen_tick )
 {
-	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x07) == 0x04)
+	if ((machine.root_device().ioport("CTRLSEL")->read_safe(0x00) & 0x07) == 0x04)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
@@ -359,8 +359,8 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	device_t *tpi_0 = machine.device("tpi6525_0");
 
 #if 0
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 #endif
 
 	tpi6525_i0_w(tpi_0, state->m_irq_level);
@@ -372,30 +372,30 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	switch (controller1)
 	{
 		case 0x00:
-			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
+			value &= ~machine.root_device().ioport("JOY1_1B")->read();			/* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x01:
-			if (input_port_read(machine, "OTHER") & 0x40)			/* Paddle2 Button */
+			if (machine.root_device().ioport("OTHER")->read() & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "OTHER") & 0x80)			/* Paddle1 Button */
+			if (machine.root_device().ioport("OTHER")->read() & 0x80)			/* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x02:
-			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (machine.root_device().ioport("OTHER")->read() & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (machine.root_device().ioport("OTHER")->read() & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x03:
-			value &= ~(input_port_read(machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			value &= ~(machine.root_device().ioport("JOY1_2B")->read() & 0x1f);	/* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
-//          if (input_port_read(machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//          if (machine.root_device().ioport("OTHER")->read() & 0x04)           /* Lightpen Signal */
 //              value &= ?? ;
 			break;
 
@@ -414,30 +414,30 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	switch (controller2)
 	{
 		case 0x00:
-			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
+			value &= ~machine.root_device().ioport("JOY2_1B")->read();			/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x10:
-			if (input_port_read(machine, "OTHER") & 0x10)			/* Paddle4 Button */
+			if (machine.root_device().ioport("OTHER")->read() & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "OTHER") & 0x20)			/* Paddle3 Button */
+			if (machine.root_device().ioport("OTHER")->read() & 0x20)			/* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x20:
-			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (machine.root_device().ioport("OTHER")->read() & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (machine.root_device().ioport("OTHER")->read() & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x30:
-			value &= ~(input_port_read(machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			value &= ~(machine.root_device().ioport("JOY2_2B")->read() & 0x1f);	/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x40:
 /* was there any input on the lightpen? where is it mapped? */
-//          if (input_port_read(machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//          if (machine.root_device().ioport("OTHER")->read() & 0x04)           /* Lightpen Signal */
 //              value &= ?? ;
 			break;
 
@@ -458,7 +458,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	/* for p500, check if lightpen has been chosen as input: if so, enable crosshair (but c64-like inputs for p500 are not working atm) */
 	machine.scheduler().timer_set(attotime::zero, FUNC(p500_lightpen_tick));
 
-	set_led_status(machine, 1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
+	set_led_status(machine, 1, machine.root_device().ioport("SPECIAL")->read() & 0x04 ? 1 : 0);		/* Shift Lock */
 }
 
 

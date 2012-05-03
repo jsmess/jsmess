@@ -247,9 +247,9 @@ void apollo_kbd_device::mouse::read_mouse()
 	}
 	else
 	{
-		int b = input_port_read(m_device->machine(), "mouse1");
-		int x = input_port_read(m_device->machine(), "mouse2");
-		int y = input_port_read(m_device->machine(), "mouse3");
+		int b = m_device->machine().root_device().ioport("mouse1")->read();
+		int x = m_device->machine().root_device().ioport("mouse2")->read();
+		int y = m_device->machine().root_device().ioport("mouse3")->read();
 
 		if (m_last_b < 0)
 		{
@@ -686,10 +686,10 @@ int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
 {
 	int n_chars = 0;
 	UINT16 key_code = 0;
-	UINT8 caps = BIT(input_port_read(machine(), "keyboard4"),0);
-	UINT8 shift = BIT(input_port_read(machine(), "keyboard4"),1) | BIT(input_port_read(machine(), "keyboard4"),5);
-	UINT8 ctrl = BIT(input_port_read(machine(), "keyboard4"),2);
-	UINT8 numlock = BIT(input_port_read(machine(), "keyboard4"),6);
+	UINT8 caps = BIT(ioport("keyboard4")->read(),0);
+	UINT8 shift = BIT(ioport("keyboard4")->read(),1) | BIT(ioport("keyboard4")->read(),5);
+	UINT8 ctrl = BIT(ioport("keyboard4")->read(),2);
+	UINT8 numlock = BIT(ioport("keyboard4")->read(),6);
 	UINT16 index;
 
 	if (keyboard_is_german())
@@ -803,7 +803,7 @@ void apollo_kbd_device::scan_keyboard()
 
 	for (x = 0; x < 0x80; x++)
 	{
-		if (!(input_port_read(machine(), keynames[x / 32]) & (1 << (x % 32))))
+		if (!(ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			// no key pressed
 			if (m_keyon[x] != 0)

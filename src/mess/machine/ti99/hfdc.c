@@ -174,7 +174,7 @@ void myarc_hfdc_device::crureadz(offs_t offset, UINT8 *value)
 				// MZ: 00 should not be used since there is a bug in the
 				// DSR of the HFDC which causes problems with SD disks
 				// (controller tries DD and then fails to fall back to SD) */
-				reply = ~(input_port_read(*this, "HFDCDIP"));
+				reply = ~(ioport("HFDCDIP")->read());
 			}
 			else
 			{
@@ -520,7 +520,7 @@ void myarc_hfdc_device::device_reset()
 		m_select_value = 0x74000;
 	}
 
-	m_cru_base = input_port_read(*this, "CRUHFDC");
+	m_cru_base = ioport("CRUHFDC")->read();
 
 	// Resetting values
 	m_rom_page = 0;
@@ -545,12 +545,12 @@ void myarc_hfdc_device::device_reset()
 	m_harddisk_unit[1] = m_slot->get_drive(MFMHD_1);
 	m_harddisk_unit[2] = m_slot->get_drive(MFMHD_2);
 
-	if (input_port_read(*this, "HFDCDIP")&0x55)
+	if (ioport("HFDCDIP")->read()&0x55)
 		ti99_set_80_track_drives(TRUE);
 	else
 		ti99_set_80_track_drives(FALSE);
 
-	m_hdc9234->set_timing(input_port_read(*this, "DRVSPD")!=0);
+	m_hdc9234->set_timing(ioport("DRVSPD")->read()!=0);
 
 	floppy_type_t floptype = FLOPPY_STANDARD_5_25_DSHD;
 	// Again, need to re-adjust the floppy geometries

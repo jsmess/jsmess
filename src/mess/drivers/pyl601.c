@@ -155,13 +155,13 @@ READ8_MEMBER(pyl601_state::keycheck_r)
 {
 	UINT8 retVal = 0x3f;
 	UINT8 *keyboard = memregion("keyboard")->base();
-	UINT16 row1 = input_port_read(machine(), "ROW1");
-	UINT16 row2 = input_port_read(machine(), "ROW2");
-	UINT16 row3 = input_port_read(machine(), "ROW3");
-	UINT16 row4 = input_port_read(machine(), "ROW4");
-	UINT16 row5 = input_port_read(machine(), "ROW5");
+	UINT16 row1 = ioport("ROW1")->read();
+	UINT16 row2 = ioport("ROW2")->read();
+	UINT16 row3 = ioport("ROW3")->read();
+	UINT16 row4 = ioport("ROW4")->read();
+	UINT16 row5 = ioport("ROW5")->read();
 	UINT16 all = row1 | row2 | row3 | row4 | row5;
-	UINT16 addr = input_port_read(machine(), "MODIFIERS");
+	UINT16 addr = ioport("MODIFIERS")->read();
 	if (all)
 	{
 		addr |= selectedline(all) << 2;

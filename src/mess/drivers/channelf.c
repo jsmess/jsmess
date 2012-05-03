@@ -48,7 +48,7 @@ UINT8 channelf_state::port_read_with_latch(UINT8 ext, UINT8 latch_state)
 
 READ8_MEMBER( channelf_state::channelf_port_0_r )
 {
-	return port_read_with_latch(input_port_read(machine(), "PANEL"), m_latch[0]);
+	return port_read_with_latch(ioport("PANEL")->read(), m_latch[0]);
 }
 
 READ8_MEMBER( channelf_state::channelf_port_1_r )
@@ -56,9 +56,9 @@ READ8_MEMBER( channelf_state::channelf_port_1_r )
 	UINT8 ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
-		ext_value = input_port_read(machine(), "RIGHT_C");
+		ext_value = ioport("RIGHT_C")->read();
 	else
-		ext_value = 0xc0 | input_port_read(machine(), "RIGHT_C");
+		ext_value = 0xc0 | ioport("RIGHT_C")->read();
 
 	return port_read_with_latch(ext_value,m_latch[1]);
 }
@@ -68,7 +68,7 @@ READ8_MEMBER( channelf_state::channelf_port_4_r )
 	UINT8 ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
-		ext_value = input_port_read(machine(), "LEFT_C");
+		ext_value = ioport("LEFT_C")->read();
 	else
 		ext_value = 0xff;
 

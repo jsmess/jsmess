@@ -96,7 +96,7 @@ READ8_MEMBER( bmjr_state::key_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"KEY%X", m_key_mux);
-	return (input_port_read(machine(), kbdrow) & 15) | (input_port_read(machine(), "KEYMOD") << 4);
+	return (ioport(kbdrow)->read() & 15) | (ioport("KEYMOD")->read() << 4);
 }
 
 WRITE8_MEMBER( bmjr_state::key_w )

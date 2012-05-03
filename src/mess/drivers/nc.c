@@ -384,7 +384,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 				state->membank(bank1)->set_base(addr);
 
 				/* write enabled? */
-				if (input_port_read(machine, "EXTRA") & 0x02)
+				if (machine.root_device().ioport("EXTRA")->read() & 0x02)
 				{
 					/* yes */
 					state->membank(bank5)->set_base(addr);
@@ -499,7 +499,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 	int inputport_10_state;
 	int changed_bits;
 
-	inputport_10_state = input_port_read(timer.machine(), "EXTRA");
+	inputport_10_state = timer.machine().root_device().ioport("EXTRA")->read();
 
 	changed_bits = inputport_10_state^state->m_previous_inputport_10_state;
 
@@ -553,7 +553,7 @@ static void nc_common_init_machine(running_machine &machine)
 	state->m_memory_config[2] = 0;
 	state->m_memory_config[3] = 0;
 
-	state->m_previous_inputport_10_state = input_port_read(machine, "EXTRA");
+	state->m_previous_inputport_10_state = machine.root_device().ioport("EXTRA")->read();
 
 	/* setup reset state ints are masked */
 	state->m_irq_mask = 0;
@@ -670,7 +670,7 @@ READ8_MEMBER(nc_state::nc_key_data_in_r)
 		nc_update_interrupts(machine());
 	}
 
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 
@@ -987,7 +987,7 @@ READ8_MEMBER(nc_state::nc100_card_battery_status_r)
 		nc_card_battery_status &=~(1<<7);
 	}
 
-	if (input_port_read(machine(), "EXTRA") & 0x02)
+	if (ioport("EXTRA")->read() & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1386,7 +1386,7 @@ READ8_MEMBER(nc_state::nc200_card_battery_status_r)
 		nc_card_battery_status&=~(1<<7);
 	}
 
-	if (input_port_read(machine(), "EXTRA") & 0x02)
+	if (ioport("EXTRA")->read() & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);

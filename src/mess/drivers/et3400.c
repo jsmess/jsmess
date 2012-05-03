@@ -35,11 +35,11 @@ READ8_MEMBER( et3400_state::et3400_keypad_r )
 	UINT8 data = 0xff;
 
 	if (~offset & 4)
-		data &= input_port_read(machine(), "X2");
+		data &= ioport("X2")->read();
 	if (~offset & 2)
-		data &= input_port_read(machine(), "X1");
+		data &= ioport("X1")->read();
 	if (~offset & 1)
-		data &= input_port_read(machine(), "X0");
+		data &= ioport("X0")->read();
 
 	return data;
 }

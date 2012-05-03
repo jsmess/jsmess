@@ -281,13 +281,13 @@ READ8_MEMBER( tutor_state::key_r )
 	UINT8 value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
-	value = input_port_read(machine(), port);
+	value = ioport(port)->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset == 4 || offset == 5)
 	{
 		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
-		value |= input_port_read(machine(), port);
+		value |= ioport(port)->read();
 	}
 
 	return value;

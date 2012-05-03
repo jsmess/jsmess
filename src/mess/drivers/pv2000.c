@@ -103,7 +103,7 @@ READ8_MEMBER( pv2000_state::pv2000_keys_hi_r )
 	case 7:
 	case 8:
 		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = input_port_read( machine(), kbdrow ) >> 4;
+		data = ioport( kbdrow )->read() >> 4;
 	}
 
 	return data;
@@ -130,7 +130,7 @@ READ8_MEMBER( pv2000_state::pv2000_keys_lo_r )
 	case 8:
 	case 9:
 		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = input_port_read( machine(), kbdrow ) & 0x0f;
+		data = ioport( kbdrow )->read() & 0x0f;
 	}
 
 	return 0xf0 | data;
@@ -139,7 +139,7 @@ READ8_MEMBER( pv2000_state::pv2000_keys_lo_r )
 
 READ8_MEMBER( pv2000_state::pv2000_keys_mod_r )
 {
-	return 0xf0 | input_port_read( machine(), "MOD" );
+	return 0xf0 | ioport( "MOD" )->read();
 }
 
 READ8_MEMBER( pv2000_state::cass_in )
@@ -315,15 +315,15 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 		/* Check if a key is pressed */
 		UINT8 key_pressed;
 
-		key_pressed = input_port_read( machine(), "IN0" )
-			| input_port_read( machine(), "IN1" )
-			| input_port_read( machine(), "IN2" )
-			| input_port_read( machine(), "IN3" )
-			| input_port_read( machine(), "IN4" )
-			| input_port_read( machine(), "IN5" )
-			| input_port_read( machine(), "IN6" )
-			| input_port_read( machine(), "IN7" )
-			| input_port_read( machine(), "IN8" );
+		key_pressed = ioport( "IN0" )->read()
+			| ioport( "IN1" )->read()
+			| ioport( "IN2" )->read()
+			| ioport( "IN3" )->read()
+			| ioport( "IN4" )->read()
+			| ioport( "IN5" )->read()
+			| ioport( "IN6" )->read()
+			| ioport( "IN7" )->read()
+			| ioport( "IN8" )->read();
 
 		if ( key_pressed && m_key_pressed != key_pressed )
 			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);

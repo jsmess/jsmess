@@ -417,9 +417,9 @@ void snug_bwg_device::device_reset()
 	m_rtc_enabled = false;
 	m_selected = false;
 
-	m_dip1 = input_port_read(*this, "BWGDIP1");
-	m_dip2 = input_port_read(*this, "BWGDIP2");
-	m_dip34 = input_port_read(*this, "BWGDIP34");
+	m_dip1 = ioport("BWGDIP1")->read();
+	m_dip2 = ioport("BWGDIP2")->read();
+	m_dip34 = ioport("BWGDIP34")->read();
 
 	m_rom_page = 0;
 	m_ram_page = 0;

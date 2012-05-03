@@ -336,10 +336,10 @@ static void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
 
 UINT16 pb1000_state::read_touchscreen(running_machine &machine, UINT8 line)
 {
-	UINT8 x = input_port_read(machine, "POSX")/0x40;
-	UINT8 y = input_port_read(machine, "POSY")/0x40;
+	UINT8 x = machine.root_device().ioport("POSX")->read()/0x40;
+	UINT8 y = machine.root_device().ioport("POSY")->read()/0x40;
 
-	if (input_port_read(machine, "TOUCH"))
+	if (machine.root_device().ioport("TOUCH")->read())
 	{
 		if (x == line-7)
 			return (0x1000<<y);
@@ -359,14 +359,14 @@ UINT16 pb1000_state::pb1000_kb_r(running_machine &machine)
 		//Read all the input lines
 		for (int line = 1; line <= 12; line++)
 		{
-			data |= input_port_read(machine, bitnames[line]);
+			data |= machine.root_device().ioport(bitnames[line])->read();
 			data |= read_touchscreen(machine, line);
 		}
 
 	}
 	else
 	{
-		data = input_port_read(machine, bitnames[m_kb_matrix & 0x0f]);
+		data = machine.root_device().ioport(bitnames[m_kb_matrix & 0x0f])->read();
 		data |= read_touchscreen(machine, m_kb_matrix & 0x0f);
 	}
 
@@ -383,13 +383,13 @@ UINT16 pb1000_state::pb2000c_kb_r(running_machine &machine)
 		//Read all the input lines
 		for (int line = 1; line <= 12; line++)
 		{
-			data |= input_port_read(machine, bitnames[line]);
+			data |= machine.root_device().ioport(bitnames[line])->read();
 		}
 
 	}
 	else
 	{
-		data = input_port_read(machine, bitnames[m_kb_matrix & 0x0f]);
+		data = machine.root_device().ioport(bitnames[m_kb_matrix & 0x0f])->read();
 	}
 
 	return data;

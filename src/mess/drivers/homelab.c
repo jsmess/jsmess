@@ -59,7 +59,7 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 		if (!BIT(offset, i))
 		{
 			sprintf(kbdrow,"LINE%d", i);
-			data &= input_port_read(machine(), kbdrow);
+			data &= ioport(kbdrow)->read();
 		}
 	}
 

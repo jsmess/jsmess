@@ -207,7 +207,7 @@ void portfolio_state::scan_keyboard()
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		if (data != 0xff)
 		{
@@ -348,7 +348,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 	data |= (m_pid != PID_NONE) << 5;
 
 	/* battery status */
-	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 6;
+	data |= BIT(ioport("BATTERY")->read(), 0) << 6;
 
 	return data;
 }
@@ -804,7 +804,7 @@ void portfolio_state::machine_reset()
 	address_space *io = m_maincpu->memory().space(AS_IO);
 
 	// peripherals
-	m_pid = input_port_read(machine(), "PERIPHERAL");
+	m_pid = ioport("PERIPHERAL")->read();
 
 	io->unmap_readwrite(0x8070, 0x807b);
 	io->unmap_readwrite(0x807d, 0x807e);

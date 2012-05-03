@@ -51,21 +51,21 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
-			if ( offset & 0x01 )	data &= input_port_read(machine(), "ROW0");
+			if ( offset & 0x01 )	data &= ioport("ROW0")->read();
 			/* Row 1 */
-			if ( offset & 0x02 )	data &= input_port_read(machine(), "ROW1");
+			if ( offset & 0x02 )	data &= ioport("ROW1")->read();
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= input_port_read(machine(), "ROW3");
+			if ( offset & 0x04 )	data &= ioport("ROW3")->read();
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= input_port_read(machine(), "ROW4");
+			if ( offset & 0x08 )	data &= ioport("ROW4")->read();
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= input_port_read(machine(), "ROW5");
+			if ( offset & 0x10 )	data &= ioport("ROW5")->read();
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= input_port_read(machine(), "ROW2");
+			if ( offset & 0x20 )	data &= ioport("ROW2")->read();
 			/* Row 6 */
-			if ( offset & 0x40 )	data &= input_port_read(machine(), "ROW6");
+			if ( offset & 0x40 )	data &= ioport("ROW6")->read();
 			/* Row 7 */
-			if ( offset & 0x80 )	data &= input_port_read(machine(), "ROW7");
+			if ( offset & 0x80 )	data &= ioport("ROW7")->read();
 			break;
 		case 0x900:	/* IEEE488 PIA */
 			data = m_pia0->read(space, offset & 0x03 );

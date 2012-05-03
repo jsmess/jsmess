@@ -108,7 +108,7 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 	if(state->m_keyboard_line>9) {
 		return 0xff;
 	}
-	return input_port_read(device->machine(),keynames[state->m_keyboard_line]);
+	return device->machine().root_device().ioport(keynames[state->m_keyboard_line])->read();
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
@@ -161,13 +161,13 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
 	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(machine(), "JOY1") & 0x7f;
+	retVal |= ioport("JOY1")->read() & 0x7f;
 	return retVal;
 }
 READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
 {
 	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(machine(), "JOY2") & 0x7f;
+	retVal |= ioport("JOY2")->read() & 0x7f;
 	return retVal;
 }
 

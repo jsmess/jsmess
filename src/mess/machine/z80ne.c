@@ -149,9 +149,9 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 	if ( --state->m_lx383_downsampler == 0 )
 	{
 		state->m_lx383_downsampler = LX383_DOWNSAMPLING;
-		key_bits = (input_port_read(machine, "ROW1") << 8) | input_port_read(machine, "ROW0");
-//      rst = input_port_read(machine, "RST");
-		ctrl = input_port_read(machine, "CTRL");
+		key_bits = (machine.root_device().ioport("ROW1")->read() << 8) | machine.root_device().ioport("ROW0")->read();
+//      rst = machine.root_device().ioport("RST")->read();
+		ctrl = machine.root_device().ioport("CTRL")->read();
 
 		for ( i = 0; i<LX383_KEYS; i++)
 		{
@@ -232,7 +232,7 @@ static void reset_lx390_banking(running_machine &machine)
 	address_space *space = machine.device("z80ne")->memory().space(AS_PROGRAM);
 	state->m_reset_delay_counter = 0;
 
-	switch (input_port_read(machine, "CONFIG") & 0x07) {
+	switch (machine.root_device().ioport("CONFIG")->read() & 0x07) {
 	case 0x01: /* EP382 Hex Monitor */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep382\n");
@@ -301,7 +301,7 @@ static MACHINE_RESET(z80ne_base)
     state->m_lx383_downsampler = LX383_DOWNSAMPLING;
 
 	/* Initialize cassette interface */
-	switch(input_port_read(machine, "LX.385") & 0x07)
+	switch(machine.root_device().ioport("LX.385")->read() & 0x07)
 	{
 	case 0x01:
 		state->m_cass_data.speed = TAPE_300BPS;
@@ -333,7 +333,7 @@ static MACHINE_RESET(z80ne_base)
 	ay31015_set_input_pin( state->m_ay31015, AY31015_NB2, 1 );
 	ay31015_set_input_pin( state->m_ay31015, AY31015_TSB, 1 );
 	ay31015_set_input_pin( state->m_ay31015, AY31015_EPS, 1 );
-	ay31015_set_input_pin( state->m_ay31015, AY31015_NP, input_port_read(machine, "LX.385") & 0x80 ? 1 : 0 );
+	ay31015_set_input_pin( state->m_ay31015, AY31015_NP, machine.root_device().ioport("LX.385")->read() & 0x80 ? 1 : 0 );
 	ay31015_set_input_pin( state->m_ay31015, AY31015_CS, 1 );
 	ay31015_set_receiver_clock( state->m_ay31015, state->m_cass_data.speed * 16.0);
 	ay31015_set_transmitter_clock( state->m_ay31015, state->m_cass_data.speed * 16.0);
@@ -375,7 +375,7 @@ MACHINE_RESET(z80netf)
 INPUT_CHANGED( z80ne_reset )
 {
 	UINT8 rst;
-	rst = input_port_read(field.machine(), "RST");
+	rst = field.machine().root_device().ioport("RST")->read();
 
 	if ( ! BIT(rst, 0))
 	{
@@ -387,7 +387,7 @@ INPUT_CHANGED( z80ne_reset )
 INPUT_CHANGED( z80ne_nmi )
 {
 	UINT8 nmi;
-	nmi = input_port_read(field.machine(), "LX388_BRK");
+	nmi = field.machine().root_device().ioport("LX388_BRK")->read();
 
 	if ( ! BIT(nmi, 0))
 	{

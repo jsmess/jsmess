@@ -100,7 +100,7 @@ READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
 	for (i = 0; i < 11; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		j = input_port_read(machine(), kbdrow);
+		j = ioport(kbdrow)->read();
 		if (j)
 			return (machine().rand() & 0x10) | 2;
 	}
@@ -137,7 +137,7 @@ READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 		for (i = 0; i < 11; i++)
 		{
 			sprintf(kbdrow,"X%X",i);
-			j = input_port_read(machine(), kbdrow);
+			j = ioport(kbdrow)->read();
 			if (j)
 			{
 				if (j==m_j) return 0;
@@ -151,14 +151,14 @@ READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 	else
 	if (offset == 1) // port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
 	{
-		return (machine().rand() & 2) | input_port_read(machine(), "MODIFIERS");
+		return (machine().rand() & 2) | ioport("MODIFIERS")->read();
 	}
 	else // port 42 (get a row)
 	{
 		for (i = 0; i < 11; i++)
 		{
 			sprintf(kbdrow,"X%X",i);
-			if (input_port_read(machine(), kbdrow) )
+			if (ioport(kbdrow)->read() )
 				return i;
 		}
 	}

@@ -336,14 +336,14 @@ MACHINE_RESET( astrocde )
 
 void get_ram_expansion_settings(address_space *space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
 {
-    if (input_port_read(space->machine(), "PROTECT") == 0x01)
+    if (space->machine().root_device().ioport("PROTECT")->read() == 0x01)
         write_protect_on = 1;
     else
         write_protect_on = 0;
 
     ram_expansion_installed = 1;
 
-    switch(input_port_read(space->machine(), "CFG"))  // check RAM expansion configuration and set address ranges
+    switch(space->machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
     {
         case 0x00:  // No RAM Expansion
              ram_expansion_installed = 0;

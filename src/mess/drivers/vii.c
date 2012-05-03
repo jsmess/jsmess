@@ -583,7 +583,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 	{
 		if(index == 0)
 		{
-			UINT16 temp = input_port_read(machine(), "P1");
+			UINT16 temp = ioport("P1")->read();
 			what |= (temp & 0x0001) ? 0x8000 : 0;
 			what |= (temp & 0x0002) ? 0x4000 : 0;
 			what |= (temp & 0x0004) ? 0x2000 : 0;
@@ -1023,7 +1023,7 @@ static INTERRUPT_GEN( vii_vblank )
 	UINT32 z = device->machine().rand() & 0x3ff;
 
 
-	state->m_controller_input[0] = input_port_read(device->machine(), "P1");
+	state->m_controller_input[0] = state->ioport("P1")->read();
 	state->m_controller_input[1] = (UINT8)x;
 	state->m_controller_input[2] = (UINT8)y;
 	state->m_controller_input[3] = (UINT8)z;

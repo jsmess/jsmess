@@ -31,7 +31,7 @@ UINT8 ti68k_state::keypad_r (running_machine &machine)
 	for (bit = 0; bit < 10; bit++)
 		if (~m_kb_mask & (0x01 << bit))
 			for (port = 0; port < 8; port++)
-				data ^= input_port_read(machine, bitnames[port]) & (0x01 << bit) ? 0x01 << port : 0x00;
+				data ^= machine.root_device().ioport(bitnames[port])->read() & (0x01 << bit) ? 0x01 << port : 0x00;
 	return data;
 }
 

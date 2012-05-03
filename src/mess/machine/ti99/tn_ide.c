@@ -323,7 +323,7 @@ void nouspikel_ide_interface_device::device_reset()
 	}
 	m_selected = false;
 
-	m_cru_base = input_port_read(*this, "CRUIDE");
+	m_cru_base = ioport("CRUIDE")->read();
 	m_clk_irq = false;
 
 	m_tms9995_mode =  false; // (device->type()==TMS9995);

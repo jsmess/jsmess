@@ -519,7 +519,7 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_cp2_out )
 
 static READ8_DEVICE_HANDLER ( to7_timer_port_in )
 {
-	int lightpen = (input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0;
+	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
 	return lightpen | cass;
 }
@@ -626,7 +626,7 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 		for ( i = 0; i < 8; i++ )
 		{
 			if ( ! (keyline & (1 << i)) )
-				val &= input_port_read(device->machine(), keynames[i]);
+				val &= device->machine().root_device().ioport(keynames[i])->read();
 		}
 		return val;
 	}
@@ -932,7 +932,7 @@ const mea8000_interface to7_speech = { "speech", NULL };
 
 READ8_HANDLER ( to7_modem_mea8000_r )
 {
-	if ( input_port_read(space->machine(), "mconfig") & 1 )
+	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
 	{
 		device_t* device = space->machine().device("mea8000" );
 		return mea8000_r( device, offset );
@@ -952,7 +952,7 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 
 WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
-	if ( input_port_read(space->machine(), "mconfig") & 1 )
+	if ( space->machine().root_device().ioport("mconfig")->read() & 1 )
 	{
 		device_t* device = space->machine().device("mea8000" );
 		mea8000_w( device, offset, data );
@@ -1004,8 +1004,8 @@ static UINT8 to7_game_mute;
 static UINT8 to7_get_mouse_signal( running_machine &machine )
 {
 	UINT8 xa, xb, ya, yb;
-	UINT16 dx = input_port_read(machine, "mouse_x"); /* x axis */
-	UINT16 dy = input_port_read(machine, "mouse_y"); /* y axis */
+	UINT16 dx = machine.root_device().ioport("mouse_x")->read(); /* x axis */
+	UINT16 dy = machine.root_device().ioport("mouse_y")->read(); /* y axis */
 	xa = ((dx + 1) & 3) <= 1;
 	xb = (dx & 3) <= 1;
 	ya = ((dy + 1) & 3) <= 1;
@@ -1025,16 +1025,16 @@ static void to7_game_sound_update ( running_machine &machine )
 static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 {
 	UINT8 data;
-	if ( input_port_read(device->machine(), "config") & 1 )
+	if ( device->machine().root_device().ioport("config")->read() & 1 )
 	{
 		/* mouse */
 		data = to7_get_mouse_signal(device->machine()) & 0x0c;             /* XB, YB */
-		data |= input_port_read(device->machine(), "mouse_button") & 3; /* buttons */
+		data |= device->machine().root_device().ioport("mouse_button")->read() & 3; /* buttons */
 	}
 	else
 	{
 		/* joystick */
-		data = input_port_read(device->machine(), "game_port_directions");
+		data = device->machine().root_device().ioport("game_port_directions")->read();
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
            bit 1=0 => P1 down    bit 5=0 => P2 down
            bit 2=0 => P1 left    bit 6=0 => P2 left
@@ -1066,7 +1066,7 @@ static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 static READ8_DEVICE_HANDLER ( to7_game_portb_in )
 {
 	UINT8 data;
-	if ( input_port_read(device->machine(), "config") & 1 )
+	if ( device->machine().root_device().ioport("config")->read() & 1 )
 	{
 		/* mouse */
 		UINT8 mouse =  to7_get_mouse_signal(device->machine());
@@ -1083,7 +1083,7 @@ static READ8_DEVICE_HANDLER ( to7_game_portb_in )
 		/* bits 2-3: action buttons B (0=pressed) */
 		/* bits 4-5: unused (ouput) */
 		/* bits 0-1: unknown! */
-		data = input_port_read(device->machine(), "game_port_buttons");
+		data = device->machine().root_device().ioport("game_port_buttons")->read();
 	}
 	return data;
 }
@@ -1130,7 +1130,7 @@ static TIMER_CALLBACK(to7_game_update_cb)
 {
 	pia6821_device *game_pia = machine.device<pia6821_device>(THOM_PIA_GAME);
 
-	if ( input_port_read(machine, "config") & 1 )
+	if ( machine.root_device().ioport("config")->read() & 1 )
 	{
 		/* mouse */
 		UINT8 mouse = to7_get_mouse_signal(machine);
@@ -1140,7 +1140,7 @@ static TIMER_CALLBACK(to7_game_update_cb)
 	else
 	{
 		/* joystick */
-		UINT8 in = input_port_read(machine, "game_port_buttons");
+		UINT8 in = machine.root_device().ioport("game_port_buttons")->read();
 		game_pia->cb2_w( (in & 0x80) ? 1 : 0 ); /* P2 action A */
 		game_pia->ca2_w( (in & 0x40) ? 1 : 0 ); /* P1 action A */
 		game_pia->cb1_w( (in & 0x08) ? 1 : 0 ); /* P2 action B */
@@ -1545,7 +1545,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 	};
 	int keyline = downcast<pia6821_device *>(device)->b_output() & 7;
 
-	return input_port_read(device->machine(), keynames[7 - keyline]);
+	return device->machine().root_device().ioport(keynames[7 - keyline])->read();
 }
 
 
@@ -1835,7 +1835,7 @@ static READ8_DEVICE_HANDLER ( mo5_sys_porta_in )
 {
 	return
 		(mo5_get_cassette(device->machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
-		((input_port_read(device->machine(), "lightpen_button") & 1) ? 0x20 : 0)
+		((device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
 }
 
@@ -1858,7 +1858,7 @@ static READ8_DEVICE_HANDLER ( mo5_sys_portb_in )
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	return ( input_port_read(device->machine(), keynames[lin]) & (1 << col) ) ? 0x80 : 0;
+	return ( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
 }
 
 
@@ -2533,7 +2533,7 @@ static int to9_kbd_ktest ( running_machine &machine )
 
 	for ( line = 0; line < 10; line++ )
 	{
-		port = input_port_read(machine, keynames[line]);
+		port = machine.root_device().ioport(keynames[line])->read();
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2758,8 +2758,8 @@ static const int to9_kbd_code[80][2] =
 /* returns the ASCII code for the key, or 0 for no key */
 static int to9_kbd_get_key( running_machine &machine )
 {
-	int control = ! (input_port_read(machine, "keyboard_7") & 1);
-	int shift   = ! (input_port_read(machine, "keyboard_9") & 1);
+	int control = ! (machine.root_device().ioport("keyboard_7")->read() & 1);
+	int shift   = ! (machine.root_device().ioport("keyboard_9")->read() & 1);
 	int key = -1, line, bit;
 	UINT8 port;
 	static const char *const keynames[] = {
@@ -2769,7 +2769,7 @@ static int to9_kbd_get_key( running_machine &machine )
 
 	for ( line = 0; line < 10; line++ )
 	{
-		port = input_port_read(machine, keynames[line]);
+		port = machine.root_device().ioport(keynames[line])->read();
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -2860,7 +2860,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 1: /* x axis */
 		{
-			int newx = input_port_read(machine, "mouse_x");
+			int newx = machine.root_device().ioport("mouse_x")->read();
 			UINT8 data = ( (newx - to9_mouse_x) & 0xf ) - 8;
 			to9_kbd_send( machine, data, 1 );
 			to9_mouse_x = newx;
@@ -2869,7 +2869,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 2: /* y axis */
 		{
-			int newy = input_port_read(machine, "mouse_y");
+			int newy = machine.root_device().ioport("mouse_y")->read();
 			UINT8 data = ( (newy - to9_mouse_y) & 0xf ) - 8;
 			to9_kbd_send( machine, data, 1 );
 			to9_mouse_y = newy;
@@ -2878,7 +2878,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		case 3: /* axis overflow & buttons */
 		{
-			int b = input_port_read(machine, "mouse_button");
+			int b = machine.root_device().ioport("mouse_button")->read();
 			UINT8 data = 0;
 			if ( b & 1 ) data |= 1;
 			if ( b & 2 ) data |= 4;
@@ -3169,12 +3169,12 @@ static int to8_kbd_ktest ( running_machine &machine )
 		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
 	};
 
-	if ( input_port_read(machine, "config") & 2 )
+	if ( machine.root_device().ioport("config")->read() & 2 )
 		return 0; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
-		port = input_port_read(machine, keynames[line]);
+		port = machine.root_device().ioport(keynames[line])->read();
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -3194,8 +3194,8 @@ static int to8_kbd_ktest ( running_machine &machine )
 /* keyboard scan & return keycode (or -1) */
 static int to8_kbd_get_key( running_machine &machine )
 {
-	int control = (input_port_read(machine, "keyboard_7") & 1) ? 0 : 0x100;
-	int shift   = (input_port_read(machine, "keyboard_9") & 1) ? 0 : 0x080;
+	int control = (machine.root_device().ioport("keyboard_7")->read() & 1) ? 0 : 0x100;
+	int shift   = (machine.root_device().ioport("keyboard_9")->read() & 1) ? 0 : 0x080;
 	int key = -1, line, bit;
 	UINT8 port;
 	static const char *const keynames[] = {
@@ -3203,12 +3203,12 @@ static int to8_kbd_get_key( running_machine &machine )
 		"keyboard_5", "keyboard_6", "keyboard_7", "keyboard_8", "keyboard_9"
 	};
 
-	if ( input_port_read(machine, "config") & 2 )
+	if ( machine.root_device().ioport("config")->read() & 2 )
 		return -1; /* disabled */
 
 	for ( line = 0; line < 10; line++ )
 	{
-		port = input_port_read(machine, keynames[line]);
+		port = machine.root_device().ioport(keynames[line])->read();
 
 		if ( line == 7 || line == 9 )
 			port |= 1; /* shift & control */
@@ -3948,7 +3948,7 @@ const pia6821_interface to8_pia6821_sys =
 static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
 	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	int lightpen = (input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0;
+	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
 	int dtr = printer->busy_r() << 6;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
@@ -4148,7 +4148,7 @@ const pia6821_interface to9p_pia6821_sys =
 static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
 	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	int lightpen = (input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0;
+	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
 	int dtr = printer->busy_r() << 6;
 	return lightpen | cass | dtr;
@@ -4512,7 +4512,7 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 	pia6821_device *game_pia = machine.device<pia6821_device>(THOM_PIA_GAME);
 
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
-	if ( input_port_read(machine, "config") & 1 )
+	if ( machine.root_device().ioport("config")->read() & 1 )
 	{
 		UINT8 mouse = to7_get_mouse_signal(machine);
 		game_pia->ca1_w( BIT(mouse, 0) ); /* XA */
@@ -4521,7 +4521,7 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 	else
 	{
 		/* joystick */
-		UINT8 in = input_port_read(machine, "game_port_buttons");
+		UINT8 in = machine.root_device().ioport("game_port_buttons")->read();
 		game_pia->ca1_w( BIT(in, 2) ); /* P1 action B */
 		game_pia->ca2_w( BIT(in, 6) ); /* P1 action A */
 	}
@@ -4561,7 +4561,7 @@ static READ8_DEVICE_HANDLER ( mo6_sys_porta_in )
 	return
 		(mo5_get_cassette(device->machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
 		8 |                                   /* bit 3: kbd-line float up to 1 */
-		((input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0);
+		((device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0);
 	/* bit 1: lightpen button */;
 }
 
@@ -4583,7 +4583,7 @@ static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 		lin = 8;     /* A bit 3: 9-th kbd line select */
 
 	return
-		( input_port_read(device->machine(), keynames[lin]) & (1 << col) ) ?  0x80 : 0;
+		( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ?  0x80 : 0;
 	/* bit 7: key up */
 }
 
@@ -4982,7 +4982,7 @@ static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	return ( input_port_read(device->machine(), keynames[lin]) & (1 << col) ) ? 0x80 : 0;
+	return ( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
 	/* bit 7: key up */
 }
 

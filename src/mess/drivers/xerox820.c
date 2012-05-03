@@ -92,13 +92,13 @@ void xerox820_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(machine(), "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
 	}
 
-	if (input_port_read(machine(), "ROW9") & 0x18)
+	if (ioport("ROW9")->read() & 0x18)
 	{
 		/* ctrl */
 		table = 2;
@@ -107,7 +107,7 @@ void xerox820_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{

@@ -104,7 +104,7 @@ READ8_MEMBER(nascom1_state::nascom1_port_00_r)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (m_portstat.stat_count < 9)
-		return (input_port_read(machine(), keynames[m_portstat.stat_count]) | ~0x7f);
+		return (ioport(keynames[m_portstat.stat_count])->read() | ~0x7f);
 
 	return (0xff);
 }

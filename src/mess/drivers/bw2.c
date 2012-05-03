@@ -31,7 +31,7 @@
 
 int bw2_state::get_ramdisk_size()
 {
-	return input_port_read(machine(), "RAMCARD") * 256;
+	return ioport("RAMCARD")->read() * 256;
 }
 
 /* Memory */
@@ -455,7 +455,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 
 	if (m_kb_row <= 9)
 	{
-		data = input_port_read(machine(), rownames[m_kb_row]);
+		data = ioport(rownames[m_kb_row])->read();
 	}
 
 	return data;

@@ -323,7 +323,7 @@ INPUT_PORTS_START( abc77 )
 	PORT_DIPNAME( 0x04, 0x04, "External Encoding PROM" ) // @ Z14
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" ) PORT_CONDITION("DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" ) PORT_CONDITION("DSW", 0x04, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "Danish" )
 	PORT_DIPSETTING(    0x10, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( German ) )
@@ -438,7 +438,7 @@ void abc77_device::device_start()
 void abc77_device::device_reset()
 {
 	int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
-	int ea = BIT(input_port_read(*this, "DSW"), 7);
+	int ea = BIT(ioport("DSW")->read(), 7);
 
 	// trigger reset
 	device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -493,7 +493,7 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	if (m_stb && m_keylatch < 12)
 	{
-		data = input_port_read(*this, keynames[m_keylatch]);
+		data = ioport(keynames[m_keylatch])->read();
 	}
 
 	return data;

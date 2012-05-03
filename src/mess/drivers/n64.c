@@ -253,7 +253,7 @@ MACHINE_START( n64dd )
 static INTERRUPT_GEN( n64_reset_poll )
 {
 	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
-	periphs->poll_reset_button((input_port_read(device->machine(), "RESET") & 1) ? true : false);
+	periphs->poll_reset_button((device->machine().root_device().ioport("RESET")->read() & 1) ? true : false);
 }
 
 static MACHINE_CONFIG_START( n64, n64_state )

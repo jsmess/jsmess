@@ -61,29 +61,29 @@ int pc1403_ina(device_t *device)
     UINT8 data=state->m_outa;
 
     if (state->m_asic[3] & 0x01)
-		data |= input_port_read(device->machine(), "KEY0");
+		data |= device->machine().root_device().ioport("KEY0")->read();
 
     if (state->m_asic[3] & 0x02)
-		data |= input_port_read(device->machine(), "KEY1");
+		data |= device->machine().root_device().ioport("KEY1")->read();
 
     if (state->m_asic[3] & 0x04)
-		data |= input_port_read(device->machine(), "KEY2");
+		data |= device->machine().root_device().ioport("KEY2")->read();
 
     if (state->m_asic[3] & 0x08)
-		data |= input_port_read(device->machine(), "KEY3");
+		data |= device->machine().root_device().ioport("KEY3")->read();
 
     if (state->m_asic[3] & 0x10)
-		data |= input_port_read(device->machine(), "KEY4");
+		data |= device->machine().root_device().ioport("KEY4")->read();
 
     if (state->m_asic[3] & 0x20)
-		data |= input_port_read(device->machine(), "KEY5");
+		data |= device->machine().root_device().ioport("KEY5")->read();
 
     if (state->m_asic[3] & 0x40)
-		data |= input_port_read(device->machine(), "KEY6");
+		data |= device->machine().root_device().ioport("KEY6")->read();
 
     if (state->m_outa & 0x01)
 	{
-		data |= input_port_read(device->machine(), "KEY7");
+		data |= state->ioport("KEY7")->read();
 
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (state->m_power)
@@ -91,22 +91,22 @@ int pc1403_ina(device_t *device)
 	}
 
     if (state->m_outa & 0x02)
-		data |= input_port_read(device->machine(), "KEY8");
+		data |= device->machine().root_device().ioport("KEY8")->read();
 
     if (state->m_outa & 0x04)
-		data |= input_port_read(device->machine(), "KEY9");
+		data |= device->machine().root_device().ioport("KEY9")->read();
 
     if (state->m_outa & 0x08)
-		data |= input_port_read(device->machine(), "KEY10");
+		data |= device->machine().root_device().ioport("KEY10")->read();
 
     if (state->m_outa & 0x10)
-		data |= input_port_read(device->machine(), "KEY11");
+		data |= device->machine().root_device().ioport("KEY11")->read();
 
     if (state->m_outa & 0x20)
-		data |= input_port_read(device->machine(), "KEY12");
+		data |= device->machine().root_device().ioport("KEY12")->read();
 
     if (state->m_outa & 0x40)
-		data |= input_port_read(device->machine(), "KEY13");
+		data |= device->machine().root_device().ioport("KEY13")->read();
 
     return data;
 }
@@ -117,7 +117,7 @@ int pc1403_inb(void)
 	pc1403_state *state = machine.driver_data<pc140_state>();
 	int data = state->m_outb;
 
-	if (input_port_read(machine, "KEY13"))
+	if (machine.root_device().ioport("KEY13")->read())
 		data |= 1;
 
 	return data;
@@ -134,12 +134,12 @@ void pc1403_outc(device_t *device, int data)
 
 int pc1403_brk(device_t *device)
 {
-	return (input_port_read(device->machine(), "EXTRA") & 0x01);
+	return (device->machine().root_device().ioport("EXTRA")->read() & 0x01);
 }
 
 int pc1403_reset(device_t *device)
 {
-	return (input_port_read(device->machine(), "EXTRA") & 0x02);
+	return (device->machine().root_device().ioport("EXTRA")->read() & 0x02);
 }
 
 MACHINE_START( pc1403 )

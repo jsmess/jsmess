@@ -141,13 +141,13 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 		case 0x28:	// KCR (Keypad Control Reg)
 			if (data & 0x04 )
 			{
-				m_vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(machine(), "INPUT") & 0x00ff);
-				m_vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(machine(), "INPUT") & 0xff00) >> 8;
+				m_vboy_regs.klb = (data & 0x01) ? 0 : (ioport("INPUT")->read() & 0x00ff);
+				m_vboy_regs.khb = (data & 0x01) ? 0 : (ioport("INPUT")->read() & 0xff00) >> 8;
 			}
 			else if (data & 0x20)
 			{
-				m_vboy_regs.klb = input_port_read(machine(), "INPUT") & 0x00ff;
-				m_vboy_regs.khb = (input_port_read(machine(), "INPUT") & 0xff00) >> 8;
+				m_vboy_regs.klb = ioport("INPUT")->read() & 0x00ff;
+				m_vboy_regs.khb = (ioport("INPUT")->read() & 0xff00) >> 8;
 			}
 			m_vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;

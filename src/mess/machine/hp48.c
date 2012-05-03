@@ -261,18 +261,18 @@ static int hp48_get_in( running_machine &machine )
 	int in = 0;
 
 	/* regular keys */
-	if ( (state->m_out >> 0) & 1 ) in |= input_port_read( machine, "LINE0" );
-	if ( (state->m_out >> 1) & 1 ) in |= input_port_read( machine, "LINE1" );
-	if ( (state->m_out >> 2) & 1 ) in |= input_port_read( machine, "LINE2" );
-	if ( (state->m_out >> 3) & 1 ) in |= input_port_read( machine, "LINE3" );
-	if ( (state->m_out >> 4) & 1 ) in |= input_port_read( machine, "LINE4" );
-	if ( (state->m_out >> 5) & 1 ) in |= input_port_read( machine, "LINE5" );
-	if ( (state->m_out >> 6) & 1 ) in |= input_port_read( machine, "LINE6" );
-	if ( (state->m_out >> 7) & 1 ) in |= input_port_read( machine, "LINE7" );
-	if ( (state->m_out >> 8) & 1 ) in |= input_port_read( machine, "LINE8" );
+	if ( (state->m_out >> 0) & 1 ) in |= machine.root_device().ioport( "LINE0" )->read();
+	if ( (state->m_out >> 1) & 1 ) in |= machine.root_device().ioport( "LINE1" )->read();
+	if ( (state->m_out >> 2) & 1 ) in |= machine.root_device().ioport( "LINE2" )->read();
+	if ( (state->m_out >> 3) & 1 ) in |= machine.root_device().ioport( "LINE3" )->read();
+	if ( (state->m_out >> 4) & 1 ) in |= machine.root_device().ioport( "LINE4" )->read();
+	if ( (state->m_out >> 5) & 1 ) in |= machine.root_device().ioport( "LINE5" )->read();
+	if ( (state->m_out >> 6) & 1 ) in |= machine.root_device().ioport( "LINE6" )->read();
+	if ( (state->m_out >> 7) & 1 ) in |= machine.root_device().ioport( "LINE7" )->read();
+	if ( (state->m_out >> 8) & 1 ) in |= machine.root_device().ioport( "LINE8" )->read();
 
 	/* on key */
-	in |= input_port_read( machine, "ON" );
+	in |= machine.root_device().ioport( "ON" )->read();
 
 	return in;
 }
@@ -309,7 +309,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 {
 	hp48_state *state = machine.driver_data<hp48_state>();
 	/* NMI for ON key */
-	if ( input_port_read( machine, "ON" ) )
+	if ( machine.root_device().ioport( "ON" )->read() )
 	{
 		LOG(( "%f hp48_kbd_cb: keyboard interrupt, on key\n",
 		      machine.time().as_double() ));
@@ -504,7 +504,7 @@ static READ8_HANDLER ( hp48_io_r )
                bit 3: battery in port 2
                bit 2: battery in port 1
              */
-			switch ( input_port_read( space->machine(), "BATTERY" ) )
+			switch ( state->ioport( "BATTERY" )->read() )
 			{
 			case 1: data = 2; break; /* low */
 			case 2: data = 3; break; /* low | critical */

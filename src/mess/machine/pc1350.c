@@ -32,32 +32,32 @@ int pc1350_ina(device_t *device)
 	int t = pc1350_keyboard_line_r(machine);
 
 	if (t & 0x01)
-		data |= input_port_read(machine, "KEY0");
+		data |= machine.root_device().ioport("KEY0")->read();
 
 	if (t & 0x02)
-		data |= input_port_read(machine, "KEY1");
+		data |= machine.root_device().ioport("KEY1")->read();
 
 	if (t & 0x04)
-		data |= input_port_read(machine, "KEY2");
+		data |= machine.root_device().ioport("KEY2")->read();
 
 	if (t & 0x08)
-		data |= input_port_read(machine, "KEY3");
+		data |= machine.root_device().ioport("KEY3")->read();
 
 	if (t & 0x10)
-		data |= input_port_read(machine, "KEY4");
+		data |= machine.root_device().ioport("KEY4")->read();
 
 	if (t & 0x20)
-		data |= input_port_read(machine, "KEY5");
+		data |= machine.root_device().ioport("KEY5")->read();
 
 	if (state->m_outa & 0x01)
-		data |= input_port_read(machine, "KEY6");
+		data |= machine.root_device().ioport("KEY6")->read();
 
 	if (state->m_outa & 0x02)
-		data |= input_port_read(machine, "KEY7");
+		data |= machine.root_device().ioport("KEY7")->read();
 
 	if (state->m_outa & 0x04)
 	{
-		data |= input_port_read(machine, "KEY8");
+		data |= machine.root_device().ioport("KEY8")->read();
 
 		/* At Power Up we fake a 'CLS' pressure */
 		if (state->m_power)
@@ -65,13 +65,13 @@ int pc1350_ina(device_t *device)
 	}
 
 	if (state->m_outa & 0x08)
-		data |= input_port_read(machine, "KEY9");
+		data |= machine.root_device().ioport("KEY9")->read();
 
 	if (state->m_outa & 0x10)
-		data |= input_port_read(machine, "KEY10");
+		data |= machine.root_device().ioport("KEY10")->read();
 
 	if (state->m_outa & 0xc0)
-		data |= input_port_read(machine, "KEY11");
+		data |= machine.root_device().ioport("KEY11")->read();
 
 	// missing lshift
 
@@ -87,7 +87,7 @@ int pc1350_inb(device_t *device)
 
 int pc1350_brk(device_t *device)
 {
-	return (input_port_read(device->machine(), "EXTRA") & 0x01);
+	return (device->machine().root_device().ioport("EXTRA")->read() & 0x01);
 }
 
 static TIMER_CALLBACK(pc1350_power_up)

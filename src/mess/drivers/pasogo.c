@@ -141,7 +141,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 			case 0x09: break;
 			case 0x0a:
 				if (vg230->data[9]&1)
-					data=input_port_read(machine(), "JOY");
+					data=ioport("JOY")->read();
 				else
 					data=0xff;
 				break;

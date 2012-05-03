@@ -247,7 +247,7 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
-	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	UINT8 ret = device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= device->machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }

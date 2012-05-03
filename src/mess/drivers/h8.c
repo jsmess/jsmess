@@ -70,7 +70,7 @@ READ8_MEMBER( h8_state::h8_f0_r )
 
 	UINT8 i,keyin,data = 0xff;
 
-	keyin = input_port_read(machine(), "X0");
+	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 	{
 		for (i = 1; i < 8; i++)
@@ -79,7 +79,7 @@ READ8_MEMBER( h8_state::h8_f0_r )
 		data &= 0xfe;
 	}
 
-	keyin = input_port_read(machine(), "X1");
+	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 	{
 		for (i = 1; i < 8; i++)

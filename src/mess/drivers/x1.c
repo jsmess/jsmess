@@ -568,16 +568,16 @@ UINT16 x1_state::check_keyboard_press()
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(machine(),"key_modifiers") & 0x1f;
-	UINT32 pad = input_port_read(machine(),"tenkey");
-	UINT32 f_key = input_port_read(machine(), "f_keys");
+	UINT8 keymod = ioport("key_modifiers")->read() & 0x1f;
+	UINT32 pad = ioport("tenkey")->read();
+	UINT32 f_key = ioport("f_keys")->read();
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine(), portnames[port_i])>>i) & 1)
+			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
@@ -643,7 +643,7 @@ UINT8 x1_state::check_keyboard_shift()
     ---- ---x CTRL ON
     */
 
-	val |= input_port_read(machine(), "key_modifiers") & 0x1f;
+	val |= ioport("key_modifiers")->read() & 0x1f;
 
 	if(check_keyboard_press() != 0)
 		val &= ~0x40;
@@ -666,7 +666,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 
 	if (port == 0)
 	{
-		UINT32 key3 = input_port_read(machine(), "key3");
+		UINT32 key3 = ioport("key3")->read();
 		if(key3 & 0x00020000) ret |= 0x80;  // Q
 		if(key3 & 0x00800000) ret |= 0x40;  // W
 		if(key3 & 0x00000020) ret |= 0x20;  // E
@@ -679,7 +679,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 1)
 	{
-		UINT32 pad = input_port_read(machine(), "tenkey");
+		UINT32 pad = ioport("tenkey")->read();
 		if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
 		if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
 		if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
@@ -692,9 +692,9 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 2)
 	{
-		UINT32 key1 = input_port_read(machine(), "key1");
-		UINT32 key2 = input_port_read(machine(), "key2");
-		UINT32 pad = input_port_read(machine(), "tenkey");
+		UINT32 key1 = ioport("key1")->read();
+		UINT32 key2 = ioport("key2")->read();
+		UINT32 pad = ioport("tenkey")->read();
 		if(key1 & 0x08000000) ret |= 0x80;  // ESC
 		if(key2 & 0x00020000) ret |= 0x40;  // 1
 		if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
@@ -1685,7 +1685,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
 	// a * at the end states devices used on plain X1 too
-	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (input_port_read(machine(), "SOUND_SW") & 0x80); }
+	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(m_ctc, offset-0x0704); }
@@ -1715,7 +1715,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); } // Z only!
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1turboz_blackclip_r(space,0); }
-	else if(offset == 0x1ff0)						{ return input_port_read(machine(), "X1TURBO_DSW"); }
+	else if(offset == 0x1ff0)						{ return ioport("X1TURBO_DSW")->read(); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return m_avram[offset & 0x7ff]; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return m_tvram[offset & 0x7ff]; }
 	else if(offset >= 0x3800 && offset <= 0x3fff)	{ return m_kvram[offset & 0x7ff]; }
@@ -2410,11 +2410,11 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
 	address_space *space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = input_port_read(timer.machine(),"key1");
-	UINT32 key2 = input_port_read(timer.machine(),"key2");
-	UINT32 key3 = input_port_read(timer.machine(),"key3");
-	UINT32 key4 = input_port_read(timer.machine(),"tenkey");
-	UINT32 f_key = input_port_read(timer.machine(), "f_keys");
+	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
+	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
+	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
+	UINT32 key4 = timer.machine().root_device().ioport("tenkey")->read();
+	UINT32 f_key = timer.machine().root_device().ioport("f_keys")->read();
 
 	if(state->m_key_irq_vector)
 	{

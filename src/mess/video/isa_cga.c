@@ -144,10 +144,10 @@ INPUT_PORTS_END
 
 
 /* Dipswitch for font selection */
-#define CGA_FONT        (input_port_read(*this, "cga_config") & m_font_selection_mask)
+#define CGA_FONT        (ioport("cga_config")->read() & m_font_selection_mask)
 
 /* Dipswitch for monitor selection */
-#define CGA_MONITOR     (input_port_read(*this, "cga_config")&0x1C)
+#define CGA_MONITOR     (ioport("cga_config")->read()&0x1C)
 #define CGA_MONITOR_RGB         0x00    /* Colour RGB */
 #define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
@@ -157,7 +157,7 @@ INPUT_PORTS_END
 
 /* Dipswitch for chipset selection */
 /* TODO: Get rid of this; these should be handled by separate classes */
-#define CGA_CHIPSET     (input_port_read(*this, "cga_config") & 0xE0)
+#define CGA_CHIPSET     (ioport("cga_config")->read() & 0xE0)
 #define CGA_CHIPSET_IBM         0x00    /* Original IBM CGA */
 #define CGA_CHIPSET_PC1512      0x20    /* PC1512 CGA subset */
 #define CGA_CHIPSET_PC200       0x40    /* PC200 in CGA mode */

@@ -315,7 +315,7 @@ static void scan_keyboard(running_machine &machine)
 	if (! state->m_COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			keybuf = input_port_read(machine, keynames[i]);
+			keybuf = machine.root_device().ioport(keynames[i])->read();
 
 			if (keybuf != state->m_key_matrix[i])
 			{	/* if state has changed, find first bit which has changed */
@@ -361,8 +361,8 @@ static TIMER_CALLBACK(handle_mouse)
 		return;	/* ???? */
 #endif
 
-	new_mx = input_port_read(machine, "MOUSE_X");
-	new_my = input_port_read(machine, "MOUSE_Y");
+	new_mx = machine.root_device().ioport("MOUSE_X")->read();
+	new_my = machine.root_device().ioport("MOUSE_Y")->read();
 
 	/* see if it moved in the x coord */
 	if (new_mx != state->m_last_mx)

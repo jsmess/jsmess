@@ -148,7 +148,7 @@ READ8_MEMBER(einstein_state::einstein_80col_state_r)
 	UINT8 result = 0;
 
 	result |= m_de;
-	result |= input_port_read(machine(), "80column_dips") & 0x06;
+	result |= ioport("80column_dips")->read() & 0x06;
 
 	return result;
 }
@@ -176,14 +176,14 @@ static void einstein_scan_keyboard(running_machine &machine)
 	einstein_state *einstein = machine.driver_data<einstein_state>();
 	UINT8 data = 0xff;
 
-	if (!BIT(einstein->m_keyboard_line, 0)) data &= input_port_read(machine, "LINE0");
-	if (!BIT(einstein->m_keyboard_line, 1)) data &= input_port_read(machine, "LINE1");
-	if (!BIT(einstein->m_keyboard_line, 2)) data &= input_port_read(machine, "LINE2");
-	if (!BIT(einstein->m_keyboard_line, 3)) data &= input_port_read(machine, "LINE3");
-	if (!BIT(einstein->m_keyboard_line, 4)) data &= input_port_read(machine, "LINE4");
-	if (!BIT(einstein->m_keyboard_line, 5)) data &= input_port_read(machine, "LINE5");
-	if (!BIT(einstein->m_keyboard_line, 6)) data &= input_port_read(machine, "LINE6");
-	if (!BIT(einstein->m_keyboard_line, 7)) data &= input_port_read(machine, "LINE7");
+	if (!BIT(einstein->m_keyboard_line, 0)) data &= machine.root_device().ioport("LINE0")->read();
+	if (!BIT(einstein->m_keyboard_line, 1)) data &= machine.root_device().ioport("LINE1")->read();
+	if (!BIT(einstein->m_keyboard_line, 2)) data &= machine.root_device().ioport("LINE2")->read();
+	if (!BIT(einstein->m_keyboard_line, 3)) data &= machine.root_device().ioport("LINE3")->read();
+	if (!BIT(einstein->m_keyboard_line, 4)) data &= machine.root_device().ioport("LINE4")->read();
+	if (!BIT(einstein->m_keyboard_line, 5)) data &= machine.root_device().ioport("LINE5")->read();
+	if (!BIT(einstein->m_keyboard_line, 6)) data &= machine.root_device().ioport("LINE6")->read();
+	if (!BIT(einstein->m_keyboard_line, 7)) data &= machine.root_device().ioport("LINE7")->read();
 
 	einstein->m_keyboard_data = data;
 }
@@ -196,7 +196,7 @@ static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
 	einstein_scan_keyboard(timer.machine());
 
 	/* if /fire1 or /fire2 is 0, signal a fire interrupt */
-	if ((input_port_read(timer.machine(), "BUTTONS") & 0x03) != 0)
+	if ((timer.machine().root_device().ioport("BUTTONS")->read() & 0x03) != 0)
 	{
 		einstein->m_interrupt |= EINSTEIN_FIRE_INT;
 	}
@@ -256,7 +256,7 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 	}
 
 	/* double sided drive connected? */
-	if (input_port_read(device->machine(), "config") & data)
+	if (device->machine().root_device().ioport("config")->read() & data)
 	{
 		/* bit 4 selects the side then */
 		//floppy->ss_w(BIT(data, 4));
@@ -331,7 +331,7 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 	m_interrupt &= ~EINSTEIN_KEY_INT;
 
 	/* bit 0 and 1: fire buttons on the joysticks */
-	data |= input_port_read(machine(), "BUTTONS");
+	data |= ioport("BUTTONS")->read();
 
 	/* bit 2 to 4: printer status */
 	data |= centronics->busy_r() << 2;
@@ -339,7 +339,7 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 	data |= centronics->fault_r() << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
-	data |= input_port_read(machine(), "EXTRA");
+	data |= ioport("EXTRA")->read();
 
 	if(VERBOSE_KEYBOARD)
 		logerror("%s: einstein_kybintmsk_r %02x\n", machine().describe_context(), data);
@@ -423,7 +423,7 @@ static MACHINE_RESET( einstein )
 {
 	einstein_state *state = machine.driver_data<einstein_state>();
 	//device_t *floppy;
-	//UINT8 config = input_port_read(machine, "config");
+	//UINT8 config = machine.root_device().ioport("config")->read();
 
 	/* save pointers to our devices */
 	state->m_color_screen = machine.device("screen");

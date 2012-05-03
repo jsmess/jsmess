@@ -1073,7 +1073,7 @@ READ32_MEMBER(gp32_state::s3c240x_gpio_r)
 			// smartmedia
 			data = (data & ~0x000000FF) | (m_smc.datarx & 0xFF);
 			// buttons
-			data = (data & ~0x0000FF00) | (input_port_read( machine(), "IN0") & 0x0000FF00);
+			data = (data & ~0x0000FF00) | (ioport( "IN0")->read() & 0x0000FF00);
 		}
 		break;
 		// PDDAT
@@ -1099,7 +1099,7 @@ READ32_MEMBER(gp32_state::s3c240x_gpio_r)
 			if (!m_smc.do_write) data = data | 0x00000008;
 			if (!smartmedia->is_present()) data = data | 0x00000004;
 			// buttons
-			data = (data & ~0x000000C0) | (input_port_read( machine(), "IN1") & 0x000000C0);
+			data = (data & ~0x000000C0) | (ioport( "IN1")->read() & 0x000000C0);
 		}
 		break;
 	}

@@ -242,7 +242,7 @@ READ8_MEMBER( z1013_state::z1013_port_b_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
-	UINT8 data = input_port_read(machine(), kbdrow);
+	UINT8 data = ioport(kbdrow)->read();
 
 	if (m_keyboard_part)
 		data >>= 4;
