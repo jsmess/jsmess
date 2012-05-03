@@ -4,6 +4,13 @@
 
         12/05/2009 Skeleton driver.
 
+        TODO:
+        - colors are wrong in games that uses video mode 1
+        - add sound
+        - cassette load/save
+        - floppy interface
+        - expansion ports
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -427,6 +434,9 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("tvc_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */
