@@ -391,18 +391,18 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_kb_y, 0)) data &= input_port_read(*this, "Y1");
-	if (!BIT(m_kb_y, 1)) data &= input_port_read(*this, "Y2");
-	if (!BIT(m_kb_y, 2)) data &= input_port_read(*this, "Y3");
-	if (!BIT(m_kb_y, 3)) data &= input_port_read(*this, "Y4");
-	if (!BIT(m_kb_y, 4)) data &= input_port_read(*this, "Y5");
-	if (!BIT(m_kb_y, 5)) data &= input_port_read(*this, "Y6");
-	if (!BIT(m_kb_y, 6)) data &= input_port_read(*this, "Y7");
-	if (!BIT(m_kb_y, 7)) data &= input_port_read(*this, "Y8");
-	if (!BIT(m_kb_y, 8)) data &= input_port_read(*this, "Y9");
-	if (!BIT(m_kb_y, 9)) data &= input_port_read(*this, "Y10");
-	if (!BIT(m_kb_y, 10)) data &= input_port_read(*this, "Y11");
-	if (!m_joy_com) data &= input_port_read(*this, "COM");
+	if (!BIT(m_kb_y, 0)) data &= ioport("Y1")->read();
+	if (!BIT(m_kb_y, 1)) data &= ioport("Y2")->read();
+	if (!BIT(m_kb_y, 2)) data &= ioport("Y3")->read();
+	if (!BIT(m_kb_y, 3)) data &= ioport("Y4")->read();
+	if (!BIT(m_kb_y, 4)) data &= ioport("Y5")->read();
+	if (!BIT(m_kb_y, 5)) data &= ioport("Y6")->read();
+	if (!BIT(m_kb_y, 6)) data &= ioport("Y7")->read();
+	if (!BIT(m_kb_y, 7)) data &= ioport("Y8")->read();
+	if (!BIT(m_kb_y, 8)) data &= ioport("Y9")->read();
+	if (!BIT(m_kb_y, 9)) data &= ioport("Y10")->read();
+	if (!BIT(m_kb_y, 10)) data &= ioport("Y11")->read();
+	if (!m_joy_com) data &= ioport("COM")->read();
 
 	return data;
 }

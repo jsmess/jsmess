@@ -961,11 +961,11 @@ void cartridge_device::device_reset()
 	if (m_type==PCB_GKRACKER)
 	{
 		cartridge_pcb_gramkracker_device* pcb = static_cast<cartridge_pcb_gramkracker_device*>(m_pcb);
-		pcb->m_gk_switch[1] = input_port_read(*owner(), GKSWITCH1_TAG);
-		pcb->m_gk_switch[2] = input_port_read(*owner(), GKSWITCH2_TAG);
-		pcb->m_gk_switch[3] = input_port_read(*owner(), GKSWITCH3_TAG);
-		pcb->m_gk_switch[4] = input_port_read(*owner(), GKSWITCH4_TAG);
-		pcb->m_gk_switch[5] = input_port_read(*owner(), GKSWITCH5_TAG);
+		pcb->m_gk_switch[1] = owner()->ioport(GKSWITCH1_TAG)->read();
+		pcb->m_gk_switch[2] = owner()->ioport(GKSWITCH2_TAG)->read();
+		pcb->m_gk_switch[3] = owner()->ioport(GKSWITCH3_TAG)->read();
+		pcb->m_gk_switch[4] = owner()->ioport(GKSWITCH4_TAG)->read();
+		pcb->m_gk_switch[5] = owner()->ioport(GKSWITCH5_TAG)->read();
 	}
 }
 
@@ -1430,7 +1430,7 @@ READ8Z_MEMBER(gromport_device::readz)
 	// source of confusion when the GRAMKracker is plugged in, but the switch
 	// is not set.
 	// The check for the presence of the GK using the index is safer.
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK) */)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK) */)
 	{
 		m_cartridge[m_gk_slot]->readz(space, offset, value, mem_mask);
 		return;
@@ -1468,7 +1468,7 @@ READ8Z_MEMBER(gromport_device::readz)
 WRITE8_MEMBER(gromport_device::write)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->write(space, offset, data, mem_mask);
 		return;
@@ -1512,7 +1512,7 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 void gromport_device::crureadz(offs_t offset, UINT8 *value)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /* && (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /* && (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->crureadz(offset, value);
 		return;
@@ -1533,7 +1533,7 @@ void gromport_device::crureadz(offs_t offset, UINT8 *value)
 void gromport_device::cruwrite(offs_t offset, UINT8 data)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->cruwrite(offset, data);
 		return;
@@ -1586,7 +1586,7 @@ void gromport_device::device_stop(void)
 void gromport_device::device_reset(void)
 {
 	m_active_slot = 0;
-	m_fixed_slot = input_port_read(*this, "CARTSLOT") - 1;
+	m_fixed_slot = ioport("CARTSLOT")->read() - 1;
 }
 
 INPUT_CHANGED_MEMBER( gromport_device::gk_changed )
@@ -1609,28 +1609,28 @@ INPUT_PORTS_START(gromport_device)
 		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
 
 	PORT_START( GKSWITCH1_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 1)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 1)
 		PORT_DIPSETTING(    0x00, "GK Off" )
 		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START( GKSWITCH2_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 2)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 2)
 		PORT_DIPSETTING(    0x00, "GRAM 0" )
 		PORT_DIPSETTING(    0x01, "Op Sys" )
 
 	PORT_START( GKSWITCH3_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 3)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 3)
 		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
 		PORT_DIPSETTING(    0x01, "TI BASIC" )
 
 	PORT_START( GKSWITCH4_TAG )
-	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 4)
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 4)
 		PORT_DIPSETTING(    0x00, "Bank 1" )
 		PORT_DIPSETTING(    0x01, "W/P" )
 		PORT_DIPSETTING(    0x02, "Bank 2" )
 
 	PORT_START( GKSWITCH5_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 5)
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 5)
 		PORT_DIPSETTING(    0x00, "Loader On" )
 		PORT_DIPSETTING(    0x01, "Loader Off" )
 INPUT_PORTS_END

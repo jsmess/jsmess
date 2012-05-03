@@ -196,8 +196,8 @@ UINT8 samcoupe_mouse_r(running_machine &machine)
 	if (state->m_mouse_index == 2)
 	{
 		/* update values */
-		int mouse_x = input_port_read(machine, "mouse_x");
-		int mouse_y = input_port_read(machine, "mouse_y");
+		int mouse_x = machine.root_device().ioport("mouse_x")->read();
+		int mouse_y = machine.root_device().ioport("mouse_y")->read();
 
 		int mouse_dx = state->m_mouse_x - mouse_x;
 		int mouse_dy = state->m_mouse_y - mouse_y;
@@ -206,7 +206,7 @@ UINT8 samcoupe_mouse_r(running_machine &machine)
 		state->m_mouse_y = mouse_y;
 
 		/* button state */
-		state->m_mouse_data[2] = input_port_read(machine, "mouse_buttons");
+		state->m_mouse_data[2] = machine.root_device().ioport("mouse_buttons")->read();
 
 		/* y-axis */
 		state->m_mouse_data[3] = (mouse_dy & 0xf00) >> 8;
@@ -261,7 +261,7 @@ MACHINE_RESET( samcoupe )
 	state->m_mouse_data[0] = 0xff;
 	state->m_mouse_data[1] = 0xff;
 
-	if (input_port_read(machine, "config") & 0x01)
+	if (machine.root_device().ioport("config")->read() & 0x01)
 	{
 		/* install RTC */
 		device_t *rtc = machine.device("sambus_clock");

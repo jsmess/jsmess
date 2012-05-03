@@ -915,7 +915,7 @@ void qx10_state::machine_reset()
 		int i;
 
 		/* TODO: is there a bit that sets this up? */
-		m_color_mode = input_port_read(machine(), "CONFIG") & 1;
+		m_color_mode = ioport("CONFIG")->read() & 1;
 
 		if(m_color_mode) //color
 		{

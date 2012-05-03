@@ -980,7 +980,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 	/* Feature Read */
 	case 2:
 		{
-			UINT8 dips = input_port_read(*this, "config" );
+			UINT8 dips = ioport("config")->read();
 
 			data = ( data & 0x0f );
 			data |= ( ( m_feature_control & 0x03 ) << 5 );

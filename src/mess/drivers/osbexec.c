@@ -156,28 +156,28 @@ READ8_MEMBER(osbexec_state::osbexec_kbd_r)
 	UINT8 data = 0xFF;
 
 	if ( offset & 0x0100 )
-		data &= input_port_read( machine(), "ROW0" );
+		data &= ioport( "ROW0" )->read();
 
 	if ( offset & 0x0200 )
-		data &= input_port_read( machine(), "ROW1" );
+		data &= ioport( "ROW1" )->read();
 
 	if ( offset & 0x0400 )
-		data &= input_port_read( machine(), "ROW2" );
+		data &= ioport( "ROW2" )->read();
 
 	if ( offset & 0x0800 )
-		data &= input_port_read( machine(), "ROW3" );
+		data &= ioport( "ROW3" )->read();
 
 	if ( offset & 0x1000 )
-		data &= input_port_read( machine(), "ROW4" );
+		data &= ioport( "ROW4" )->read();
 
 	if ( offset & 0x2000 )
-		data &= input_port_read( machine(), "ROW5" );
+		data &= ioport( "ROW5" )->read();
 
 	if ( offset & 0x4000 )
-		data &= input_port_read( machine(), "ROW6" );
+		data &= ioport( "ROW6" )->read();
 
 	if ( offset & 0x8000 )
-		data &= input_port_read( machine(), "ROW7" );
+		data &= ioport( "ROW7" )->read();
 
 	return data;
 }

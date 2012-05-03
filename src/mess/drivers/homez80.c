@@ -49,7 +49,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);
-	return input_port_read(machine(), kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)

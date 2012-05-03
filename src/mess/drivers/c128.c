@@ -681,22 +681,22 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 READ8_MEMBER( c128_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine(), "LIGHTX") & ~0x01;
+	return ioport("LIGHTX")->read() & ~0x01;
 }
 
 READ8_MEMBER( c128_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine(), "LIGHTY") & ~0x01;
+	return ioport("LIGHTY")->read() & ~0x01;
 }
 
 READ8_MEMBER( c128_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine(), "OTHER") & 0x04;
+	return ioport("OTHER")->read() & 0x04;
 }
 
 READ8_MEMBER( c128_state::vic_rdy_cb )
 {
-	return input_port_read(machine(), "CTRLSEL") & 0x08;
+	return ioport("CTRLSEL")->read() & 0x08;
 }
 
 static const vic2_interface c128_vic2_ntsc_intf = {

@@ -140,14 +140,14 @@ READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(machine(), "keyboard_row_fe") & 0xe0;
-	if (!BIT(offset,  9)) data &= input_port_read(machine(), "keyboard_row_fd") & 0xe0;
-	if (!BIT(offset, 10)) data &= input_port_read(machine(), "keyboard_row_fb") & 0xe0;
-	if (!BIT(offset, 11)) data &= input_port_read(machine(), "keyboard_row_f7") & 0xe0;
-	if (!BIT(offset, 12)) data &= input_port_read(machine(), "keyboard_row_ef") & 0xe0;
-	if (!BIT(offset, 13)) data &= input_port_read(machine(), "keyboard_row_df") & 0xe0;
-	if (!BIT(offset, 14)) data &= input_port_read(machine(), "keyboard_row_bf") & 0xe0;
-	if (!BIT(offset, 15)) data &= input_port_read(machine(), "keyboard_row_7f") & 0xe0;
+	if (!BIT(offset,  8)) data &= ioport("keyboard_row_fe")->read() & 0xe0;
+	if (!BIT(offset,  9)) data &= ioport("keyboard_row_fd")->read() & 0xe0;
+	if (!BIT(offset, 10)) data &= ioport("keyboard_row_fb")->read() & 0xe0;
+	if (!BIT(offset, 11)) data &= ioport("keyboard_row_f7")->read() & 0xe0;
+	if (!BIT(offset, 12)) data &= ioport("keyboard_row_ef")->read() & 0xe0;
+	if (!BIT(offset, 13)) data &= ioport("keyboard_row_df")->read() & 0xe0;
+	if (!BIT(offset, 14)) data &= ioport("keyboard_row_bf")->read() & 0xe0;
+	if (!BIT(offset, 15)) data &= ioport("keyboard_row_7f")->read() & 0xe0;
 
 	/* bit 0-4, interrupt source */
 	data |= m_status;
@@ -216,18 +216,18 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
-	if (!BIT(offset,  8)) data &= input_port_read(machine(), "keyboard_row_fe") & 0x1f;
-	if (!BIT(offset,  9)) data &= input_port_read(machine(), "keyboard_row_fd") & 0x1f;
-	if (!BIT(offset, 10)) data &= input_port_read(machine(), "keyboard_row_fb") & 0x1f;
-	if (!BIT(offset, 11)) data &= input_port_read(machine(), "keyboard_row_f7") & 0x1f;
-	if (!BIT(offset, 12)) data &= input_port_read(machine(), "keyboard_row_ef") & 0x1f;
-	if (!BIT(offset, 13)) data &= input_port_read(machine(), "keyboard_row_df") & 0x1f;
-	if (!BIT(offset, 14)) data &= input_port_read(machine(), "keyboard_row_bf") & 0x1f;
-	if (!BIT(offset, 15)) data &= input_port_read(machine(), "keyboard_row_7f") & 0x1f;
+	if (!BIT(offset,  8)) data &= ioport("keyboard_row_fe")->read() & 0x1f;
+	if (!BIT(offset,  9)) data &= ioport("keyboard_row_fd")->read() & 0x1f;
+	if (!BIT(offset, 10)) data &= ioport("keyboard_row_fb")->read() & 0x1f;
+	if (!BIT(offset, 11)) data &= ioport("keyboard_row_f7")->read() & 0x1f;
+	if (!BIT(offset, 12)) data &= ioport("keyboard_row_ef")->read() & 0x1f;
+	if (!BIT(offset, 13)) data &= ioport("keyboard_row_df")->read() & 0x1f;
+	if (!BIT(offset, 14)) data &= ioport("keyboard_row_bf")->read() & 0x1f;
+	if (!BIT(offset, 15)) data &= ioport("keyboard_row_7f")->read() & 0x1f;
 
 	if (offset == 0xff00)
 	{
-		data &= input_port_read(machine(), "keyboard_row_ff") & 0x1f;
+		data &= ioport("keyboard_row_ff")->read() & 0x1f;
 
 		/* if no key has been pressed, return the mouse state */
 		if (data == 0x1f)

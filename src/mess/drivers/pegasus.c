@@ -103,7 +103,7 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 	UINT8 bit,data = 0xff;
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(m_kbd_row, bit)) data &= input_port_read(machine(), keynames[bit]);
+		if (!BIT(m_kbd_row, bit)) data &= ioport(keynames[bit])->read();
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
 	if (m_control_bits & 8) data<<=4;

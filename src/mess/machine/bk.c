@@ -24,7 +24,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 	for(i = 1; i < 12; i++)
 	{
-		code =	input_port_read(machine, keynames[i-1]);
+		code =	machine.root_device().ioport(keynames[i-1])->read();
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -35,7 +35,7 @@ static TIMER_CALLBACK(keyboard_callback)
 					break;
 				}
 			}
-			if ((input_port_read(machine, "LINE0") & 4) == 4)
+			if ((machine.root_device().ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i==6 || i==7)
 				{
@@ -43,7 +43,7 @@ static TIMER_CALLBACK(keyboard_callback)
 				}
 
 			}
-			if ((input_port_read(machine, "LINE0") & 4) == 4)
+			if ((machine.root_device().ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i>=8 && i<=11)
 				{
@@ -51,7 +51,7 @@ static TIMER_CALLBACK(keyboard_callback)
 				}
 			}
 			state->m_key_pressed = 0x40;
-			if ((input_port_read(machine, "LINE0") & 2) == 0)
+			if ((machine.root_device().ioport("LINE0")->read() & 2) == 0)
 			{
 				state->m_key_irq_vector = 0x30;
 			}

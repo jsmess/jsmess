@@ -134,7 +134,7 @@ static UINT8 read_dsw(running_machine &machine)
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
-			result = input_port_read(machine, "DSW");
+			result = machine.root_device().ioport("DSW")->read();
 			break;
 
 		default:
@@ -163,7 +163,7 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
  **************************************************************/
 static READ8_DEVICE_HANDLER (via_0_in_a )
 {
-    int data = input_port_read(device->machine(), "JOY");
+    int data = device->machine().root_device().ioport("JOY")->read();
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -439,12 +439,12 @@ INTERRUPT_GEN( microtan_interrupt )
 
 
     row = 9;
-    newvar = input_port_read(device->machine(), "ROW8");
+    newvar = device->machine().root_device().ioport("ROW8")->read();
     chg = state->m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = input_port_read(device->machine(), keynames[row - 1]);
+		newvar = device->machine().root_device().ioport(keynames[row - 1])->read();
 		chg = state->m_keyrows[--row] ^ newvar;
 	}
     if (!chg)
@@ -579,7 +579,7 @@ MACHINE_RESET( microtan )
 
 	for (i = 1; i < 10;  i++)
 	{
-		state->m_keyrows[i] = input_port_read(machine, keynames[i-1]);
+		state->m_keyrows[i] = machine.root_device().ioport(keynames[i-1])->read();
 	}
 	set_led_status(machine, 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
 }

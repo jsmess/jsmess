@@ -530,8 +530,8 @@ DRIVER_INIT( msx )
 TIMER_DEVICE_CALLBACK( msx2_interrupt )
 {
 	msx_state *state = timer.machine().driver_data<msx_state>();
-	state->m_v9938->set_sprite_limit(input_port_read(timer.machine(), "DSW") & 0x20);
-	state->m_v9938->set_resolution(input_port_read(timer.machine(), "DSW") & 0x03);
+	state->m_v9938->set_sprite_limit(timer.machine().root_device().ioport("DSW")->read() & 0x20);
+	state->m_v9938->set_resolution(timer.machine().root_device().ioport("DSW")->read() & 0x03);
 	state->m_v9938->interrupt();
 }
 
@@ -542,7 +542,7 @@ INTERRUPT_GEN( msx_interrupt )
 
 	for (i=0; i<2; i++)
 	{
-		state->m_mouse[i] = input_port_read(device->machine(), i ? "MOUSE1" : "MOUSE0");
+		state->m_mouse[i] = state->ioport(i ? "MOUSE1" : "MOUSE0")->read();
 		state->m_mouse_stat[i] = -1;
 	}
 }
@@ -558,10 +558,10 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 
 	data = (m_cass->input() > 0.0038 ? 0x80 : 0);
 
-	if ( (m_psg_b ^ input_port_read(machine(), "DSW") ) & 0x40)
+	if ( (m_psg_b ^ ioport("DSW")->read() ) & 0x40)
 	{
 		/* game port 2 */
-		UINT8 inp = input_port_read(machine(), "JOY1");
+		UINT8 inp = ioport("JOY1")->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -580,7 +580,7 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	else
 	{
 		/* game port 1 */
-		UINT8 inp = input_port_read(machine(), "JOY0");
+		UINT8 inp = ioport("JOY0")->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -634,7 +634,7 @@ WRITE8_DEVICE_HANDLER( msx_printer_strobe_w )
 
 WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 {
-	if (input_port_read(device->machine(), "DSW") & 0x80)
+	if (device->machine().root_device().ioport("DSW")->read() & 0x80)
 		/* SIMPL emulation */
 		dac_signed_data_w(device->machine().device("dac"), data);
 	else
@@ -645,7 +645,7 @@ READ8_DEVICE_HANDLER( msx_printer_status_r )
 {
 	UINT8 result = 0xfd;
 
-	if (input_port_read(device->machine(), "DSW") & 0x80)
+	if (device->machine().root_device().ioport("DSW")->read() & 0x80)
 		return 0xff;
 
 	result |= device->machine().device<centronics_device>("centronics")->busy_r() << 1;
@@ -798,7 +798,7 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
 	row = keylatch;
 	if (row <= 10)
 	{
-		data = input_port_read(machine(), keynames[row / 2]);
+		data = ioport(keynames[row / 2])->read();
 
 		if (BIT(row, 0))
 			data >>= 8;

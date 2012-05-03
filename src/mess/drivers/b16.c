@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( b16_state::vblank_r )
 {
-	return input_port_read(machine(), "SYSTEM");
+	return ioport("SYSTEM")->read();
 }
 
 WRITE8_MEMBER( b16_state::b16_6845_address_w )
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( b16 )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

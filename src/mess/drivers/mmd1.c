@@ -210,8 +210,8 @@ WRITE8_MEMBER( mmd1_state::mmd1_port2_w )
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
 READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 {
-	UINT8 line1 = input_port_read(machine(),"LINE1");
-	UINT8 line2 = input_port_read(machine(),"LINE2");
+	UINT8 line1 = ioport("LINE1")->read();
+	UINT8 line2 = ioport("LINE2")->read();
 	UINT8 i, data = 0xff;
 
 
@@ -375,7 +375,7 @@ READ8_MEMBER( mmd1_state::mmd2_01_r )
 {
 	// need to add cassin, ttyin bits
 	UINT8 data = 0x87;
-	data |= input_port_read(machine(),"DSW");
+	data |= ioport("DSW")->read();
 	return data;
 }
 
@@ -398,7 +398,7 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",m_digit);
-		data = input_port_read(machine(), kbdrow);
+		data = ioport(kbdrow)->read();
 	}
 	return data;
 }

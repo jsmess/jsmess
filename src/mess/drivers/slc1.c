@@ -131,24 +131,24 @@ READ8_MEMBER( slc1_state::io_r )
 	if (m_kbd_type)
 	{ // Trainer
 		if (upper == 3)
-			data &= input_port_read(machine(), "Y0");
+			data &= ioport("Y0")->read();
 		else
 		if (upper == 4)
-			data &= input_port_read(machine(), "Y1");
+			data &= ioport("Y1")->read();
 		else
 		if (upper == 5)
-			data &= input_port_read(machine(), "Y2");
+			data &= ioport("Y2")->read();
 	}
 	else
 	{ // Chess
 		if (upper == 3)
-			data &= input_port_read(machine(), "X0");
+			data &= ioport("X0")->read();
 		else
 		if (upper == 4)
-			data &= input_port_read(machine(), "X1");
+			data &= ioport("X1")->read();
 		else
 		if (upper == 5)
-			data &= input_port_read(machine(), "X2");
+			data &= ioport("X2")->read();
 	}
 
 	return data;

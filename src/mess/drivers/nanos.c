@@ -367,13 +367,13 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
-	UINT8 shift = input_port_read(timer.machine(), "LINEC") & 0x02 ? 1 : 0;
-	UINT8 ctrl =  input_port_read(timer.machine(), "LINEC") & 0x01 ? 1 : 0;
+	UINT8 shift = timer.machine().root_device().ioport("LINEC")->read() & 0x02 ? 1 : 0;
+	UINT8 ctrl =  timer.machine().root_device().ioport("LINEC")->read() & 0x01 ? 1 : 0;
 	state->m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	input_port_read(timer.machine(), keynames[i]);
+		code =	timer.machine().root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

@@ -251,7 +251,7 @@ VIDEO_RESET(macrbv)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	view = 0;
-	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
+	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
 	switch (mac->m_rbv_montype)
 	{
 		case 1:	// 15" portrait display
@@ -308,7 +308,7 @@ VIDEO_RESET(macsonora)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 
-	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
+	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
 	switch (mac->m_rbv_montype)
 	{
 		case 1:	// 15" portrait display

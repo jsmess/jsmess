@@ -31,7 +31,7 @@ READ8_MEMBER( mz80_state::mz80k_8255_portb_r )
 	if (m_mz80k_keyboard_line > 9)
 		return 0xff;
 	else
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 }
 
 READ8_MEMBER( mz80_state::mz80k_8255_portc_r )

@@ -152,7 +152,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 
 READ_LINE_MEMBER( tmc2000e_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc2000e_state::ef2_r )
@@ -163,7 +163,7 @@ READ_LINE_MEMBER( tmc2000e_state::ef2_r )
 READ_LINE_MEMBER( tmc2000e_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }

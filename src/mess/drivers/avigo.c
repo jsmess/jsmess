@@ -322,17 +322,17 @@ READ8_MEMBER(avigo_state::key_data_read_r)
 
 	if (!(m_key_line & 0x01))
 	{
-		data &= input_port_read(machine(), "LINE0");
+		data &= ioport("LINE0")->read();
 	}
 
 	if (!(m_key_line & 0x02))
 	{
-		data &= input_port_read(machine(), "LINE1");
+		data &= ioport("LINE1")->read();
 	}
 
 	if (!(m_key_line & 0x04))
 	{
-		data &= input_port_read(machine(), "LINE2");
+		data &= ioport("LINE2")->read();
 	}
 
 	/* bit 3 is cold/warm start */
@@ -455,14 +455,14 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 				if ((data & 0x08)!=0)
 				{
 					LOG(("a/d select x coordinate\n"));
-					LOG(("x coord: %d\n", input_port_read(machine(), "POSX")));
+					LOG(("x coord: %d\n", ioport("POSX")->read()));
 
 					/* on screen range 0x060->0x03a0 */
-					if (input_port_read(machine(), "LINE3") & 0x01)
+					if (ioport("LINE3")->read() & 0x01)
 					{
 						/* this might not be totally accurate because hitable screen
                         area may include the border around the screen! */
-						m_ad_value = input_port_read(machine(), "POSX");
+						m_ad_value = ioport("POSX")->read();
 					}
 					else
 					{
@@ -485,11 +485,11 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
                     0x0350->0x03a6 is panel at bottom */
 
 					LOG(("a/d select y coordinate\n"));
-					LOG(("y coord: %d\n", input_port_read(machine(), "POSY")));
+					LOG(("y coord: %d\n", ioport("POSY")->read()));
 
-					if (input_port_read(machine(), "LINE3") & 0x01)
+					if (ioport("LINE3")->read() & 0x01)
 					{
-						m_ad_value = input_port_read(machine(), "POSY");
+						m_ad_value = ioport("POSY")->read();
 					}
 					else
 					{
@@ -659,7 +659,7 @@ INPUT_CHANGED_MEMBER( avigo_state::pen_irq )
 INPUT_CHANGED_MEMBER( avigo_state::pen_move_irq )
 {
 	// an irq is generated when the pen is down on the screen and is being moved
-	if (input_port_read(machine(), "LINE3") & 0x01)
+	if (ioport("LINE3")->read() & 0x01)
 	{
 		LOG(("pen move interrupt\n"));
 		m_irq |= (1<<6);

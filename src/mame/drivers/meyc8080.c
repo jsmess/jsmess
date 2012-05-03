@@ -44,8 +44,8 @@
 
 ***********************************************************
 
-  To initialize battery RAM, go into testmode (F1 -> F2),
-  and then press the Reset Counters button.
+  To initialize battery RAM, go into Meter Read mode (F1 -> 9),
+  and then press the Meter Read + Reset buttons (9 + 0).
 
   If a game is not turned off properly, eg. exiting MAME
   in mid-game, it may run faulty on the next boot.
@@ -83,33 +83,16 @@ public:
 };
 
 
-#define NUM_PENS	(8)
-
-
 /*************************************
  *
  *  Video system
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i < NUM_PENS; i++)
-	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-	}
-}
-
-
 static SCREEN_UPDATE_RGB32( meyc8080 )
 {
 	meyc8080_state *state = screen.machine().driver_data<meyc8080_state>();
-	pen_t pens[NUM_PENS];
 	offs_t offs;
-
-	get_pens(pens);
 
 	for (offs = 0; offs < state->m_videoram_0.bytes(); offs++)
 	{
@@ -130,11 +113,7 @@ static SCREEN_UPDATE_RGB32( meyc8080 )
 
 		for (i = 0; i < 8; i++)
 		{
-			UINT8 color = ((data_r >> 5) & 0x04) |
-						  ((data_g >> 6) & 0x02) |
-						  ((data_b >> 7) & 0x01);
-
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = MAKE_RGB(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
 
 			data_r = data_r << 1;
 			data_g = data_g << 1;
@@ -344,7 +323,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wldarrow )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_DIPNAME( 0x04, 0x00, "Monitor" )
 	PORT_DIPSETTING(    0x00, "Color" )
@@ -377,18 +356,16 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop Reel 3")	/* Skill Stop only? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop Reel 2")	/* Skill Stop only? */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop Reel 1")	/* Skill Stop only? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_M) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_N) PORT_NAME("Bet")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Counters")
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
 	PORT_DIPNAME( 0x80, 0x80, "Night Switch" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -407,7 +384,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mdrawpkr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -429,7 +406,7 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5") // no coinage sw
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
@@ -438,9 +415,7 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
@@ -448,8 +423,8 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Reset Counters")
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
 	PORT_DIPNAME( 0x80, 0x80, "Night Switch" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -468,7 +443,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mdrawpkra )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -490,18 +465,16 @@ static INPUT_PORTS_START( mdrawpkra )
 	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
@@ -509,8 +482,8 @@ static INPUT_PORTS_START( mdrawpkra )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Reset Counters")
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
 	PORT_DIPNAME( 0x80, 0x80, "Night Switch" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -529,7 +502,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( casbjack )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -551,18 +524,16 @@ static INPUT_PORTS_START( casbjack )
 	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("Split")
@@ -570,8 +541,8 @@ static INPUT_PORTS_START( casbjack )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Hit")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Counters")
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
 	PORT_DIPNAME( 0x80, 0x80, "Night Switch" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -637,11 +608,7 @@ ROM_END
 
 /*
 
-  Meyco Games, unknown PCB, 1981
-
-  NOTE TO WHOEVER IS MAME DEVELOPER FOR THIS DRIVER:  This is obviously part of a multiple board set.
-  The other PCB board(s) were unfound.  If/when the game is identified,
-  could you please let me know what it is?
+  Meyco Games, 1981
 
   Dumper notes:
 
@@ -675,7 +642,7 @@ ROM_END
     |------------------------------------------------------------------------------|
 
   * = 8 pin connector
-  & = 50 pin connector (assuming to other half of PCB)
+  & = 50 pin connector (meant for edge connector or to another pcb?)
 
 */
 
@@ -688,6 +655,7 @@ ROM_START( mdrawpkr )
 	ROM_LOAD( "tms2516.k4", 0x2000, 0x0800, CRC(bb1bd38a) SHA1(90256991eb1d030dd72e7e6f8d1a7cce22340b42) )
 	ROM_LOAD( "tms2516.k3", 0x2800, 0x0800, CRC(30904dc8) SHA1(c82276aa0eb8f48d136ad8c15dd309c9b880c294) )
 ROM_END
+
 
 /*
 
@@ -750,8 +718,8 @@ ROM_END
  *
  *************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                    FLAGS                                      LAYOUT  */
-GAMEL( 1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  ) // B&W version not dumped yet
-GAMEL( 1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
-GAMEL( 1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
-GAMEL( 1983, casbjack,  0,        meyc8080, casbjack,  0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  ) // B&W version not dumped yet
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                    FLAGS                                      LAYOUT  */
+GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
+GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
+GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr )
+GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet

@@ -30,7 +30,7 @@ static TIMER_CALLBACK(svision_pet_timer)
 	switch (state->m_pet.state)
 	{
 		case 0:
-			state->m_pet.input = input_port_read(machine, "JOY2");
+			state->m_pet.input = machine.root_device().ioport("JOY2")->read();
 			/* fall through */
 
 		case 2: case 4: case 6: case 8:
@@ -79,7 +79,7 @@ READ8_MEMBER(svision_state::svision_r)
 	switch (offset)
 	{
 		case 0x20:
-			data = input_port_read(machine(), "JOY");
+			data = ioport("JOY")->read();
 			break;
 		case 0x21:
 			data &= ~0xf;

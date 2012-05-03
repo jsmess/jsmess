@@ -789,9 +789,9 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 	case 0x00:						/* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (input_port_read(machine(), "INPUTS") >> 4) | 0xF0;
+			JOYPAD &= (ioport("INPUTS")->read() >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= input_port_read(machine(), "INPUTS") | 0xF0;
+			JOYPAD &= ioport("INPUTS")->read() | 0xF0;
 		return;
 	case 0x01:						/* SB - Serial transfer data */
 		break;
@@ -914,7 +914,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				m_sgb_bitcount = 0;
 				m_sgb_start = 1;
 				m_sgb_rest = 0;
-				JOYPAD = 0x0F & ((input_port_read(machine(), "INPUTS") >> 4) | input_port_read(machine(), "INPUTS") | 0xF0);
+				JOYPAD = 0x0F & ((ioport("INPUTS")->read() >> 4) | ioport("INPUTS")->read() | 0xF0);
 				break;
 			case 0x10:				   /* data true */
 				if (m_sgb_rest)
@@ -938,7 +938,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 					}
 					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((input_port_read(machine(), "INPUTS") >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((ioport("INPUTS")->read() >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
 				if (m_sgb_rest)
@@ -1365,7 +1365,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 					}
 					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (input_port_read(machine(), "INPUTS") | 0xF0);
+				JOYPAD = 0x2F & (ioport("INPUTS")->read() | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
 				if (m_sgb_start)

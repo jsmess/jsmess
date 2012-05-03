@@ -472,7 +472,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 			m_keylatch = 0;
 		}
 
-		m_keydata = input_port_read(machine(), keynames[m_keylatch]);
+		m_keydata = ioport(keynames[m_keylatch])->read();
 
 		output_set_digit_value(m_keylatch, m_segment_data[m_keylatch]);
 	}

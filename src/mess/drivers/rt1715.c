@@ -79,19 +79,19 @@ READ8_MEMBER(rt1715_state::k7658_data_r)
 {
 	UINT8 result = 0xff;
 
-	if (BIT(offset,  0)) result &= input_port_read(machine(), "row_00");
-	if (BIT(offset,  1)) result &= input_port_read(machine(), "row_10");
-	if (BIT(offset,  2)) result &= input_port_read(machine(), "row_20");
-	if (BIT(offset,  3)) result &= input_port_read(machine(), "row_30");
-	if (BIT(offset,  4)) result &= input_port_read(machine(), "row_40");
-	if (BIT(offset,  5)) result &= input_port_read(machine(), "row_50");
-	if (BIT(offset,  6)) result &= input_port_read(machine(), "row_60");
-	if (BIT(offset,  7)) result &= input_port_read(machine(), "row_70");
-	if (BIT(offset,  8)) result &= input_port_read(machine(), "row_08");
-	if (BIT(offset,  9)) result &= input_port_read(machine(), "row_18");
-	if (BIT(offset, 10)) result &= input_port_read(machine(), "row_28");
-	if (BIT(offset, 11)) result &= input_port_read(machine(), "row_38");
-	if (BIT(offset, 12)) result &= input_port_read(machine(), "row_48");
+	if (BIT(offset,  0)) result &= ioport("row_00")->read();
+	if (BIT(offset,  1)) result &= ioport("row_10")->read();
+	if (BIT(offset,  2)) result &= ioport("row_20")->read();
+	if (BIT(offset,  3)) result &= ioport("row_30")->read();
+	if (BIT(offset,  4)) result &= ioport("row_40")->read();
+	if (BIT(offset,  5)) result &= ioport("row_50")->read();
+	if (BIT(offset,  6)) result &= ioport("row_60")->read();
+	if (BIT(offset,  7)) result &= ioport("row_70")->read();
+	if (BIT(offset,  8)) result &= ioport("row_08")->read();
+	if (BIT(offset,  9)) result &= ioport("row_18")->read();
+	if (BIT(offset, 10)) result &= ioport("row_28")->read();
+	if (BIT(offset, 11)) result &= ioport("row_38")->read();
+	if (BIT(offset, 12)) result &= ioport("row_48")->read();
 
 	return result;
 }

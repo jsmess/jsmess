@@ -205,7 +205,7 @@ static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (input_port_read(device->machine(),keynames[state->m_key_line]) & 0x3F) | (input_port_read(device->machine(),"LINEALL") & 0xC0);
+	return (device->machine().root_device().ioport(keynames[state->m_key_line])->read() & 0x3F) | (device->machine().root_device().ioport("LINEALL")->read() & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 {

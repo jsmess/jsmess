@@ -170,7 +170,7 @@ READ8_MEMBER(odyssey2_state::odyssey2_getp2)
 	{
 		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
-			h &= input_port_read(machine(), keynames[m_p2 & P2_KEYBOARD_SELECT_MASK]);
+			h &= ioport(keynames[m_p2 & P2_KEYBOARD_SELECT_MASK])->read();
 		}
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
@@ -207,10 +207,10 @@ READ8_MEMBER(odyssey2_state::odyssey2_getbus)
     UINT8 data = 0xff;
 
     if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
-		data &= input_port_read(machine(), "JOY0");       /* read joystick 1 */
+		data &= ioport("JOY0")->read();       /* read joystick 1 */
 
     if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
-		data &= input_port_read(machine(), "JOY1");       /* read joystick 2 */
+		data &= ioport("JOY1")->read();       /* read joystick 2 */
 
     logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
     return data;

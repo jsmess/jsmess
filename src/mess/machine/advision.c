@@ -163,7 +163,7 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = input_port_read(machine(), "joystick");
+	UINT8 in = ioport("joystick")->read();
 	UINT8 data = in | 0x0f;
 
 	// Get buttons

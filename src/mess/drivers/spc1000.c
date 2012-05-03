@@ -94,7 +94,7 @@ READ8_MEMBER(spc1000_state::spc1000_keyboard_r){
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)

@@ -26,13 +26,13 @@ static READ8_DEVICE_HANDLER (ac1_port_b_r)
 
 static READ8_DEVICE_HANDLER (ac1_port_a_r)
 {
-	UINT8 line0 = input_port_read(device->machine(), "LINE0");
-	UINT8 line1 = input_port_read(device->machine(), "LINE1");
-	UINT8 line2 = input_port_read(device->machine(), "LINE2");
-	UINT8 line3 = input_port_read(device->machine(), "LINE3");
-	UINT8 line4 = input_port_read(device->machine(), "LINE4");
-	UINT8 line5 = input_port_read(device->machine(), "LINE5");
-	UINT8 line6 = input_port_read(device->machine(), "LINE6");
+	UINT8 line0 = device->machine().root_device().ioport("LINE0")->read();
+	UINT8 line1 = device->machine().root_device().ioport("LINE1")->read();
+	UINT8 line2 = device->machine().root_device().ioport("LINE2")->read();
+	UINT8 line3 = device->machine().root_device().ioport("LINE3")->read();
+	UINT8 line4 = device->machine().root_device().ioport("LINE4")->read();
+	UINT8 line5 = device->machine().root_device().ioport("LINE5")->read();
+	UINT8 line6 = device->machine().root_device().ioport("LINE6")->read();
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));

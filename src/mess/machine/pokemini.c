@@ -1354,7 +1354,7 @@ READ8_DEVICE_HANDLER( pokemini_hwreg_r )
 
 	switch( offset )
 	{
-	case 0x52:	return input_port_read(device->machine(), "INPUTS");
+	case 0x52:	return state->ioport("INPUTS")->read();
 	case 0x61:
 		if ( ! ( state->m_pm_reg[0x60] & 0x04 ) )
 		{
@@ -1551,7 +1551,7 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 		}
 
 		/* Set possible input irqs */
-		state->m_pm_reg[0x29] |= ~ input_port_read( machine, "INPUTS" );
+		state->m_pm_reg[0x29] |= ~ machine.root_device().ioport( "INPUTS" )->read();
 	}
 }
 

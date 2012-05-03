@@ -76,7 +76,7 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 
 int horizon_ramdisk_device::get_size()
 {
-	int size = 8192 + 2097152*(1 << input_port_read(*this, "HORIZONSIZE"));
+	int size = 8192 + 2097152*(1 << ioport("HORIZONSIZE")->read());
 	if (VERBOSE>2) LOG("horizon: size = %d\n", size);
 	return size;
 }
@@ -263,7 +263,7 @@ void horizon_ramdisk_device::setbit(int& page, int pattern, bool set)
 
 void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 {
-	int size = input_port_read(*this, "HORIZONSIZE");
+	int size = ioport("HORIZONSIZE")->read();
 	int split_bit = size + 10;
 	int splitpagebit = 0x0200 << size;
 
@@ -356,18 +356,18 @@ void horizon_ramdisk_device::device_reset(void)
 	}
 
 	m_ros = m_nvram + get_size()-8192;
-	m_cru_horizon = input_port_read(*this, "CRUHOR");
-	m_cru_phoenix = input_port_read(*this, "CRUPHOE");
+	m_cru_horizon = ioport("CRUHOR")->read();
+	m_cru_phoenix = ioport("CRUPHOE")->read();
 
-	m_32k_installed = (input_port_read(*this, "HORIZON32")!=0);
+	m_32k_installed = (ioport("HORIZON32")->read()!=0);
 
-	m_split_mode = (input_port_read(*this, "HORIZONDUAL")!=0);
-	m_timode = (input_port_read(*this, "HORIZONDUAL")==1);
+	m_split_mode = (ioport("HORIZONDUAL")->read()!=0);
+	m_timode = (ioport("HORIZONDUAL")->read()==1);
 
 	m_rambo_mode = false;
-	m_killswitch = (input_port_read(*this, "HORIZONACT")!=0);
+	m_killswitch = (ioport("HORIZONACT")->read()!=0);
 
-	m_use_rambo = (input_port_read(*this, "RAMBO")!=0);
+	m_use_rambo = (ioport("RAMBO")->read()!=0);
 
 	m_page = 0;
 }

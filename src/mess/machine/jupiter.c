@@ -35,7 +35,7 @@ SNAPSHOT_LOAD(jupiter)
 	unsigned char jupiter_repeat, jupiter_byte, loop;
 	int done=0, jupiter_index=0x2000;
 
-	if (input_port_read(space->machine(), "CFG")==0)
+	if (space->machine().root_device().ioport("CFG")->read()==0)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");

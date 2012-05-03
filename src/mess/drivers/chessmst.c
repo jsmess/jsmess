@@ -225,7 +225,7 @@ READ8_MEMBER( chessmst_state::pio2_port_a_r )
 	}
 
 	if (m_matrix & 0x100)
-		data |= input_port_read(machine(), "BUTTONS");
+		data |= ioport("BUTTONS")->read();
 
 	return data;
 }

@@ -229,7 +229,7 @@ static READ8_DEVICE_HANDLER(jr100_via_read_b)
 	jr100_state *state = device->machine().driver_data<jr100_state>();
 	UINT8 val = 0x1f;
 	if (keynames[state->m_keyboard_line]) {
-		val = input_port_read(device->machine(), keynames[state->m_keyboard_line]);
+		val = state->ioport(keynames[state->m_keyboard_line])->read();
 	}
 	return val;
 }

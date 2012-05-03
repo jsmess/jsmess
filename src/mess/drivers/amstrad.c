@@ -318,7 +318,7 @@ static INPUT_CHANGED( cpc_monitor_changed )
 {
 	running_machine &machine = field.machine();
 
-	if ( (input_port_read(machine, "green_display")) & 0x01 )
+	if ( (machine.root_device().ioport("green_display")->read()) & 0x01 )
 	{
 		PALETTE_INIT_CALL( amstrad_cpc_green );
 	}

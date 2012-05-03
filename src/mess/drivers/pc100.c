@@ -152,7 +152,7 @@ WRITE16_MEMBER( pc100_state::pc100_kanji_w )
 READ8_MEMBER( pc100_state::pc100_key_r )
 {
 	if(offset)
-		return input_port_read(machine(), "DSW"); // bit 5: horizontal/vertical monitor dsw
+		return ioport("DSW")->read(); // bit 5: horizontal/vertical monitor dsw
 
 	return 0;
 }

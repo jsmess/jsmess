@@ -109,9 +109,9 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 	{
 		if (!BIT(m_keylatch, i))
 		{
-			if (!BIT(input_port_read(machine(), "ROW0"), i)) data &= ~0x01;
-			if (!BIT(input_port_read(machine(), "ROW1"), i)) data &= ~0x02;
-			if (!BIT(input_port_read(machine(), "ROW2"), i)) data &= ~0x04;
+			if (!BIT(ioport("ROW0")->read(), i)) data &= ~0x01;
+			if (!BIT(ioport("ROW1")->read(), i)) data &= ~0x02;
+			if (!BIT(ioport("ROW2")->read(), i)) data &= ~0x04;
 		}
 	}
 

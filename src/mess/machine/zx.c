@@ -111,23 +111,23 @@ READ8_MEMBER( zx_state::zx80_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
-		if (!input_port_read(machine(), "CONFIG"))
+		if (!ioport("CONFIG")->read())
 			data &= ~0x40;
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
@@ -168,23 +168,23 @@ READ8_MEMBER( zx_state::zx81_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
-		if (!input_port_read(machine(), "CONFIG"))
+		if (!ioport("CONFIG")->read())
 			data &= ~0x40;
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
@@ -235,21 +235,21 @@ READ8_MEMBER( zx_state::pc8300_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
@@ -292,7 +292,7 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 
 	if (offs == 0x7e)
 	{
-		data = (input_port_read(machine(), "CONFIG"));
+		data = (ioport("CONFIG")->read());
 	}
 	else
 	if (offs == 0xf5)
@@ -304,21 +304,21 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 

@@ -206,7 +206,7 @@ static void mouse_update(running_machine &machine)
 
 /* border pieces and moving piece */
 
-	port_input=input_port_read(machine, "B_WHITE");
+	port_input=machine.root_device().ioport("B_WHITE")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
@@ -216,7 +216,7 @@ static void mouse_update(running_machine &machine)
 	}
 
 
-	port_input=input_port_read(machine, "B_BLACK");
+	port_input=machine.root_device().ioport("B_BLACK")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
@@ -226,7 +226,7 @@ static void mouse_update(running_machine &machine)
 	}
 
 
-	port_input=input_port_read(machine, "B_CLR");
+	port_input=machine.root_device().ioport("B_CLR")->read();
 	if (port_input)
 	{
 		if (state->m_moving_piece)
@@ -329,7 +329,7 @@ READ8_MEMBER( supercon_state::supercon_port3_r )
 	if (i==NOT_VALID)
 		return 0xff;
 
-	key_data=input_port_read(machine(), status_lines[i]);
+	key_data=ioport(status_lines[i])->read();
 
 	if (key_data != 0xc0)
 	{
@@ -385,7 +385,7 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 		output_set_value("MOVING",m_moving_piece);
 	}
 
-	key_data=input_port_read(machine(), board_lines[i_18]);
+	key_data=ioport(board_lines[i_18])->read();
 
 	if (key_data != 0xff)
 	{
@@ -393,7 +393,7 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 
 /* Only if valid data and mouse button is pressed */
 
-		if (key_data && input_port_read(machine(), "BUTTON_L"))
+		if (key_data && ioport("BUTTON_L")->read())
 		{
 
 /* Set or remove pieces */
@@ -507,7 +507,7 @@ static TIMER_CALLBACK( mouse_click )
 {
 	supercon_state *state = machine.driver_data<supercon_state>();
 
-	if (input_port_read_safe(machine, "BUTTON_L",0) )				/* wait for mouse release */
+	if (state->ioport("BUTTON_L")->read_safe(0) )				/* wait for mouse release */
 		state->m_timer_mouse_click->adjust(state->m_wait_time, 0);
 	else
 		state->m_selecting=FALSE;

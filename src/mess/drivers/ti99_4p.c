@@ -566,9 +566,9 @@ READ8_MEMBER( ti99_4p::read_by_9901 )
 		// (bit 1: INT1 status)
 		// (bit 2: INT2 status)
 		// bit 3-7: keyboard status bits 0 to 4
-		answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+		answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
 		if (m_alphalock_line==false)
-			answer &= ~(input_port_read(*this, "ALPHA") << 3);
+			answer &= ~(ioport("ALPHA")->read() << 3);
 		break;
 
 	case TMS9901_INT8_INT15:
@@ -577,7 +577,7 @@ READ8_MEMBER( ti99_4p::read_by_9901 )
 		// bit 3: tape input mirror
 		// bit 5-7: weird, not emulated
 		if (m_keyboard_column == 7)	answer = 0x07;
-		else				answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
+		else				answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
 		break;
 
 	case TMS9901_P0_P7:

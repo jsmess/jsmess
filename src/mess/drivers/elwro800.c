@@ -250,13 +250,13 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 					{
 						port_name[4] = '0' + (7 - i);
 					}
-					data &= (input_port_read(machine(), port_name));
+					data &= (ioport(port_name)->read());
 				}
 			}
 
 			if ((offset & 0xff) == 0xfb)
 			{
-				data &= input_port_read(machine(), "LINE9");
+				data &= ioport("LINE9")->read();
 			}
 
 			/* cassette input from wav */
@@ -267,7 +267,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		}
 		else
 		{
-			data = input_port_read(machine(), "NETWORK ID");
+			data = ioport("NETWORK ID")->read();
 		}
 
 		return data;

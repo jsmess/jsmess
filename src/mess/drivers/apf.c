@@ -149,13 +149,13 @@ READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
 	UINT8 data=~0;
 
 	if (!BIT(m_pad_data, 3))
-		data &= input_port_read(machine(), "joy3");
+		data &= ioport("joy3")->read();
 	if (!BIT(m_pad_data, 2))
-		data &= input_port_read(machine(), "joy2");
+		data &= ioport("joy2")->read();
 	if (!BIT(m_pad_data, 1))
-		data &= input_port_read(machine(), "joy1");
+		data &= ioport("joy1")->read();
 	if (!BIT(m_pad_data, 0))
-		data &= input_port_read(machine(), "joy0");
+		data &= ioport("joy0")->read();
 
 	return data;
 }
@@ -311,7 +311,7 @@ WRITE8_MEMBER( apf_state::apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	m_keyboard_data = input_port_read(machine(), keynames[keyboard_line]);
+	m_keyboard_data = ioport(keynames[keyboard_line])->read();
 
 	/* bit 4: cassette motor control */
 	m_cass->change_state(BIT(data, 4) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);

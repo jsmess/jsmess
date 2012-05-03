@@ -106,7 +106,7 @@ READ8_MEMBER(iq151_state::keyboard_row_r)
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		data &= input_port_read(machine(), kbdrow);
+		data &= ioport(kbdrow)->read();
 	}
 
 	return data;
@@ -120,7 +120,7 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		if (input_port_read(machine(), kbdrow) == 0xff)
+		if (ioport(kbdrow)->read() == 0xff)
 			data |= (1 << i);
 	}
 
@@ -140,7 +140,7 @@ READ8_MEMBER(iq151_state::ppi_portc_r)
 	else
 	{
 		// kb read
-		data = input_port_read(machine(), "X8");
+		data = ioport("X8")->read();
 	}
 
 	return (data & 0xf0) | (m_cassette_data & 0x0f);

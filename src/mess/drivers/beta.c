@@ -115,10 +115,10 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= input_port_read(machine(), "Q6"); break;
-	case 7: data &= input_port_read(machine(), "Q7"); break;
-	case 8: data &= input_port_read(machine(), "Q8"); break;
-	case 9: data &= input_port_read(machine(), "Q9"); break;
+	case 6: data &= ioport("Q6")->read(); break;
+	case 7: data &= ioport("Q7")->read(); break;
+	case 8: data &= ioport("Q8")->read(); break;
+	case 9: data &= ioport("Q9")->read(); break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{

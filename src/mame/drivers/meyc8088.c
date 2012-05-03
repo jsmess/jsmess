@@ -10,9 +10,15 @@
   also thanks to Darrell Hal Smith, Kevin Mullins
 
 
+  To initialize battery RAM, go into Meter Read mode (F1 -> 9),
+  and then press the Meter Read + Reset buttons (9 + 0).
+
+  If a game is not turned off properly, eg. exiting MAME
+  in mid-game, it may run faulty on the next boot.
+  Enable the Night Switch to prevent this.
+
+
   TODO:
-  - fix vblank failure
-    * dox note: to boot it in debugger, set bp ff5ec, and then ip=f5fe
   - coincounters/hopper
 
 ****************************************************************/
@@ -24,17 +30,22 @@
 #include "sound/dac.h"
 #include "video/resnet.h"
 
+#include "gldarrow.lh"
+
+
 class meyc8088_state : public driver_device
 {
 public:
 	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this,"maincpu"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_heartbeat(*this, "heartbeat")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
+	required_device<timer_device> m_heartbeat;
 
 	UINT8 m_status;
 	UINT8 m_common;
@@ -148,9 +159,17 @@ static SCREEN_VBLANK( meyc8088 )
 
 ***************************************************************************/
 
+TIMER_DEVICE_CALLBACK( heartbeat_callback )
+{
+	meyc8088_state *state = timer.machine().driver_data<meyc8088_state>();
+	state->m_status |= 0x20;
+}
+
 WRITE8_MEMBER(meyc8088_state::drive_w)
 {
+	// drivers go into high-impedance state ~100ms after write (LS374 /OC)
 	m_status &= ~0x20;
+	m_heartbeat->adjust(attotime::from_msec(100));
 
 	// d0-d3: DC counter drivers
 	// d4-d7: AC motor drivers
@@ -203,10 +222,10 @@ static READ8_DEVICE_HANDLER(meyc8088_input_r)
 	UINT8 ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~state->m_common & 1) ret &= input_port_read_safe(device->machine(), "C0", 0); // bit switches
-	if (~state->m_common & 2) ret &= input_port_read_safe(device->machine(), "C1", 0); // control switches
-	if (~state->m_common & 4) ret &= input_port_read_safe(device->machine(), "C2", 0); // light switches
-	if (~state->m_common & 8) ret &= input_port_read_safe(device->machine(), "C3", 0); // light switches
+	if (~state->m_common & 1) ret &= state->ioport("C0")->read_safe(0); // bit switches
+	if (~state->m_common & 2) ret &= state->ioport("C1")->read_safe(0); // control switches
+	if (~state->m_common & 4) ret &= state->ioport("C2")->read_safe(0); // light switches
+	if (~state->m_common & 8) ret &= state->ioport("C3")->read_safe(0); // light switches
 
 	return ret;
 }
@@ -221,7 +240,7 @@ static READ8_DEVICE_HANDLER(meyc8088_status_r)
 	// d3: N/C
 	// d4: battery ok
 	// d5: /drive on
-	return (state->m_status & 7) | 0x18;
+	return (state->m_status & 0x27) | 0x18;
 }
 
 
@@ -229,14 +248,14 @@ static WRITE8_DEVICE_HANDLER(meyc8088_lights1_w)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output_set_lamp_value(i, ~data >> i & 1);
 }
 
 static WRITE8_DEVICE_HANDLER(meyc8088_lights2_w)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i + 8, data >> i & 1);
+		output_set_lamp_value(i + 8, ~data >> i & 1);
 }
 
 static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
@@ -292,7 +311,7 @@ static const i8155_interface i8155_intf[2] =
 
 static INPUT_PORTS_START( gldarrow )
 	PORT_START("SW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) // coin4
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -351,13 +370,15 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
 
 	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / (3*1), i8155_intf[0])
 	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / (3*32), i8155_intf[1])
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TIMER_ADD("heartbeat", heartbeat_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -387,4 +408,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", GAME_NOT_WORKING )
+GAMEL(1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0, layout_gldarrow )

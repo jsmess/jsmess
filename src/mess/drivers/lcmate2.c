@@ -75,7 +75,7 @@ READ8_MEMBER( lcmate2_state::key_r )
 		if (BIT(offset, i)==0)
 		{
 			sprintf(kbdrow,"LINE%d", i);
-			data &= input_port_read(machine(), kbdrow);
+			data &= ioport(kbdrow)->read();
 		}
 	}
 

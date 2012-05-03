@@ -18,7 +18,7 @@
 static TIMER_CALLBACK(ti85_timer_callback)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
-	if (input_port_read(machine, "ON") & 0x01)
+	if (machine.root_device().ioport("ON")->read() & 0x01)
 	{
 		if (state->m_ON_interrupt_mask && !state->m_ON_pressed)
 		{
@@ -246,7 +246,7 @@ READ8_MEMBER(ti85_state::ti8x_keypad_r)
 		{
 			for (port = 0; port < 8; port++)
 			{
-				data ^= input_port_read(machine(), bitnames[port]) & (0x01<<bit) ? 0x01<<port : 0x00;
+				data ^= ioport(bitnames[port])->read() & (0x01<<bit) ? 0x01<<port : 0x00;
 			}
 		}
 	}

@@ -108,7 +108,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 	UINT16 retVal = 0;
 	// Read country code
 	if (m_pr_cont == 0x0900)
-		retVal = input_port_read(machine(), "DIPSW1");
+		retVal = ioport("DIPSW1")->read();
 
 	// Regular keyboard read
 	if (m_pr_cont == 0x0800 || m_pr_cont == 0x0a00)
@@ -116,14 +116,14 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 		retVal=0xff00;
 		switch(m_keyboard_line)
 		{
-			case 0x01: retVal = input_port_read(machine(), "LINE0") << 8; break;
-			case 0x02: retVal = input_port_read(machine(), "LINE1") << 8; break;
-			case 0x04: retVal = input_port_read(machine(), "LINE2") << 8; break;
-			case 0x08: retVal = input_port_read(machine(), "LINE3") << 8; break;
-			case 0x10: retVal = input_port_read(machine(), "LINE4") << 8; break;
-			case 0x20: retVal = input_port_read(machine(), "LINE5") << 8; break;
-			case 0x40: retVal = input_port_read(machine(), "LINE6") << 8; break;
-			case 0x80: retVal = input_port_read(machine(), "LINE7") << 8; break;
+			case 0x01: retVal = ioport("LINE0")->read() << 8; break;
+			case 0x02: retVal = ioport("LINE1")->read() << 8; break;
+			case 0x04: retVal = ioport("LINE2")->read() << 8; break;
+			case 0x08: retVal = ioport("LINE3")->read() << 8; break;
+			case 0x10: retVal = ioport("LINE4")->read() << 8; break;
+			case 0x20: retVal = ioport("LINE5")->read() << 8; break;
+			case 0x40: retVal = ioport("LINE6")->read() << 8; break;
+			case 0x80: retVal = ioport("LINE7")->read() << 8; break;
 		}
 	}
 	return retVal;

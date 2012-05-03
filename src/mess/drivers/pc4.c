@@ -36,7 +36,7 @@ READ8_MEMBER( pc4_state::kb_r )
 
 	for (int line=0; line<8; line++)
 		if (!(offset & (1<<line)))
-			data &= input_port_read(machine(), bitnames[line]);
+			data &= ioport(bitnames[line])->read();
 
 	return data;
 }

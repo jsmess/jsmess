@@ -721,7 +721,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 {
 	assert((index == 0) || (index == 1));
 	return (m_joystick_type_control != NULL)
-		? (joystick_type_t) ((input_port_read_direct(m_joystick_type_control) >> (index * 4)) & 0x0F)
+		? (joystick_type_t) ((m_joystick_type_control->read() >> (index * 4)) & 0x0F)
 		: JOYSTICK_NONE;
 }
 
@@ -734,7 +734,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 coco_state::hires_type_t coco_state::hires_interface_type(void)
 {
 	return (m_joystick_hires_control != NULL)
-		? (hires_type_t) input_port_read_direct(m_joystick_hires_control)
+		? (hires_type_t) m_joystick_hires_control->read()
 		: HIRES_NONE;
 }
 
@@ -865,7 +865,7 @@ void coco_state::poll_keyboard(void)
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (int i = 0; i < sizeof(m_keyboard) / sizeof(m_keyboard[0]); i++)
 	{
-		input_port_value value = input_port_read_direct(m_keyboard[i]);
+		int value = m_keyboard[i]->read();
 		if ((value | pia0_pb) != 0xFF)
 		{
 			pia0_pa &= ~(0x01 << i);

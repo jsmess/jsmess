@@ -581,21 +581,21 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 		case 0:  // key press
 			m_towns_kb_output = 0x80;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(input_port_read(machine(),"key3") & 0x00080000)
+			if(ioport("key3")->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(input_port_read(machine(),"key3") & 0x00040000)
+			if(ioport("key3")->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(input_port_read(machine(),"key3") & 0x06400000)
+			if(ioport("key3")->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 1:  // key release
 			m_towns_kb_output = 0x90;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(input_port_read(machine(),"key3") & 0x00080000)
+			if(ioport("key3")->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(input_port_read(machine(),"key3") & 0x00040000)
+			if(ioport("key3")->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(input_port_read(machine(),"key3") & 0x06400000)
+			if(ioport("key3")->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 2:  // extended byte
@@ -622,7 +622,7 @@ void towns_state::poll_keyboard()
 	scan = 0;
 	for(port=0;port<4;port++)
 	{
-		portval = input_port_read(machine(),kb_ports[port]);
+		portval = ioport(kb_ports[port])->read();
 		for(bit=0;bit<32;bit++)
 		{
 			if(((portval & (1<<bit))) != ((m_kb_prev[port] & (1<<bit))))
@@ -840,7 +840,7 @@ void towns_state::mouse_timeout()
 READ32_MEMBER(towns_state::towns_padport_r)
 {
 	UINT32 ret = 0;
-	UINT32 porttype = input_port_read(space.machine(),"ctrltype");
+	UINT32 porttype = space.machine().root_device().ioport("ctrltype")->read();
 	UINT8 extra1;
 	UINT8 extra2;
 	UINT32 state;
@@ -851,12 +851,12 @@ READ32_MEMBER(towns_state::towns_padport_r)
 		ret |= 0x00ff0000;
 	if((porttype & 0x0f) == 0x01)
 	{
-		extra1 = input_port_read(space.machine(),"joy1_ex");
+		extra1 = space.machine().root_device().ioport("joy1_ex")->read();
 
 		if(m_towns_pad_mask & 0x10)
-			ret |= (input_port_read(space.machine(),"joy1") & 0x3f) | 0x00000040;
+			ret |= (space.machine().root_device().ioport("joy1")->read() & 0x3f) | 0x00000040;
 		else
-			ret |= (input_port_read(space.machine(),"joy1") & 0x0f) | 0x00000030;
+			ret |= (space.machine().root_device().ioport("joy1")->read() & 0x0f) | 0x00000030;
 
 		if(extra1 & 0x01) // Run button = left+right
 			ret &= ~0x0000000c;
@@ -870,12 +870,12 @@ READ32_MEMBER(towns_state::towns_padport_r)
 	}
 	if((porttype & 0xf0) == 0x10)
 	{
-		extra2 = input_port_read(space.machine(),"joy2_ex");
+		extra2 = space.machine().root_device().ioport("joy2_ex")->read();
 
 		if(m_towns_pad_mask & 0x20)
-			ret |= ((input_port_read(space.machine(),"joy2") & 0x3f) << 16) | 0x00400000;
+			ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x3f) << 16) | 0x00400000;
 		else
-			ret |= ((input_port_read(space.machine(),"joy2") & 0x0f) << 16) | 0x00300000;
+			ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x0f) << 16) | 0x00300000;
 
 		if(extra2 & 0x01)
 			ret &= ~0x000c0000;
@@ -889,12 +889,12 @@ READ32_MEMBER(towns_state::towns_padport_r)
 	}
 	if((porttype & 0x0f) == 0x04)  // 6-button joystick
 	{
-		extra1 = input_port_read(space.machine(),"6b_joy1_ex");
+		extra1 = space.machine().root_device().ioport("6b_joy1_ex")->read();
 
 		if(m_towns_pad_mask & 0x10)
 			ret |= 0x0000007f;
 		else
-			ret |= (input_port_read(space.machine(),"6b_joy1") & 0x0f) | 0x00000070;
+			ret |= (space.machine().root_device().ioport("6b_joy1")->read() & 0x0f) | 0x00000070;
 
 		if(!(m_towns_pad_mask & 0x10))
 		{
@@ -921,12 +921,12 @@ READ32_MEMBER(towns_state::towns_padport_r)
 	}
 	if((porttype & 0xf0) == 0x40)  // 6-button joystick
 	{
-		extra2 = input_port_read(space.machine(),"6b_joy2_ex");
+		extra2 = space.machine().root_device().ioport("6b_joy2_ex")->read();
 
 		if(m_towns_pad_mask & 0x20)
 			ret |= 0x007f0000;
 		else
-			ret |= ((input_port_read(space.machine(),"6b_joy2") & 0x0f) << 16) | 0x00700000;
+			ret |= ((space.machine().root_device().ioport("6b_joy2")->read() & 0x0f) << 16) | 0x00700000;
 
 		if(!(m_towns_pad_mask & 0x10))
 		{
@@ -975,7 +975,7 @@ READ32_MEMBER(towns_state::towns_padport_r)
 		}
 
 		// button states are always visible
-		state = input_port_read(space.machine(),"mouse1");
+		state = space.machine().root_device().ioport("mouse1")->read();
 		if(!(state & 0x01))
 			ret |= 0x00000010;
 		if(!(state & 0x02))
@@ -1007,7 +1007,7 @@ READ32_MEMBER(towns_state::towns_padport_r)
 		}
 
 		// button states are always visible
-		state = input_port_read(space.machine(),"mouse1");
+		state = space.machine().root_device().ioport("mouse1")->read();
 		if(!(state & 0x01))
 			ret |= 0x00100000;
 		if(!(state & 0x02))
@@ -1022,7 +1022,7 @@ READ32_MEMBER(towns_state::towns_padport_r)
 WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 {
 	UINT8 current_x,current_y;
-	UINT32 type = input_port_read(space.machine(),"ctrltype");
+	UINT32 type = space.machine().root_device().ioport("ctrltype")->read();
 
 	if(ACCESSING_BITS_16_23)
 	{
@@ -1034,8 +1034,8 @@ WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 				if(m_towns_mouse_output == MOUSE_START)
 				{
 					m_towns_mouse_output = MOUSE_X_HIGH;
-					current_x = input_port_read(space.machine(),"mouse2");
-					current_y = input_port_read(space.machine(),"mouse3");
+					current_x = space.machine().root_device().ioport("mouse2")->read();
+					current_y = space.machine().root_device().ioport("mouse3")->read();
 					m_towns_mouse_x = m_prev_x - current_x;
 					m_towns_mouse_y = m_prev_y - current_y;
 					m_prev_x = current_x;
@@ -1050,8 +1050,8 @@ WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 				if(m_towns_mouse_output == MOUSE_START)
 				{
 					m_towns_mouse_output = MOUSE_SYNC;
-					current_x = input_port_read(space.machine(),"mouse2");
-					current_y = input_port_read(space.machine(),"mouse3");
+					current_x = space.machine().root_device().ioport("mouse2")->read();
+					current_y = space.machine().root_device().ioport("mouse3")->read();
 					m_towns_mouse_x = m_prev_x - current_x;
 					m_towns_mouse_y = m_prev_y - current_y;
 					m_prev_x = current_x;
@@ -1070,8 +1070,8 @@ WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 				if(m_towns_mouse_output == MOUSE_START)
 				{
 					m_towns_mouse_output = MOUSE_X_HIGH;
-					current_x = input_port_read(space.machine(),"mouse2");
-					current_y = input_port_read(space.machine(),"mouse3");
+					current_x = space.machine().root_device().ioport("mouse2")->read();
+					current_y = space.machine().root_device().ioport("mouse3")->read();
 					m_towns_mouse_x = m_prev_x - current_x;
 					m_towns_mouse_y = m_prev_y - current_y;
 					m_prev_x = current_x;
@@ -1086,8 +1086,8 @@ WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 				if(m_towns_mouse_output == MOUSE_START)
 				{
 					m_towns_mouse_output = MOUSE_SYNC;
-					current_x = input_port_read(space.machine(),"mouse2");
-					current_y = input_port_read(space.machine(),"mouse3");
+					current_x = space.machine().root_device().ioport("mouse2")->read();
+					current_y = space.machine().root_device().ioport("mouse3")->read();
 					m_towns_mouse_x = m_prev_x - current_x;
 					m_towns_mouse_y = m_prev_y - current_y;
 					m_prev_x = current_x;
@@ -2331,84 +2331,84 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("COPY")
 
   PORT_START("joy1")
-    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
+    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
 
   PORT_START("joy1_ex")
-    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
 
   PORT_START("joy2")
-    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
+    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
 
   PORT_START("joy2_ex")
-    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
 
     PORT_START("6b_joy1")
-      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
 
     PORT_START("6b_joy1_ex")
-      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
-      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x04)
 
     PORT_START("6b_joy2")
-      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
 
     PORT_START("6b_joy2_ex")
-      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
-      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x40)
 
   PORT_START("mouse1")  // buttons
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)

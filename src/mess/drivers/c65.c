@@ -221,17 +221,17 @@ static SCREEN_UPDATE_IND16( c65 )
 
 static UINT8 c65_lightpen_x_cb( running_machine &machine )
 {
-	return input_port_read(machine, "LIGHTX") & ~0x01;
+	return machine.root_device().ioport("LIGHTX")->read() & ~0x01;
 }
 
 static UINT8 c65_lightpen_y_cb( running_machine &machine )
 {
-	return input_port_read(machine, "LIGHTY") & ~0x01;
+	return machine.root_device().ioport("LIGHTY")->read() & ~0x01;
 }
 
 static UINT8 c65_lightpen_button_cb( running_machine &machine )
 {
-	return input_port_read(machine, "OTHER") & 0x04;
+	return machine.root_device().ioport("OTHER")->read() & 0x04;
 }
 
 static UINT8 c65_c64_mem_r( running_machine &machine, int offset )

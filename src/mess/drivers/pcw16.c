@@ -785,7 +785,7 @@ static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
 		}
 	}
 	// TODO: fix
-	state->subdevice<ns16550_device>("ns16550_2")->ri_w(input_port_read(timer.machine(), "EXTRA") & 0x040);
+	state->subdevice<ns16550_device>("ns16550_2")->ri_w(timer.machine().root_device().ioport("EXTRA")->read() & 0x040);
 }
 
 
@@ -1019,7 +1019,7 @@ READ8_MEMBER(pcw16_state::pcw16_system_status_r)
 {
 //  logerror("system status r: \n");
 
-	return m_system_status | (input_port_read(machine(), "EXTRA") & 0x04);
+	return m_system_status | (ioport("EXTRA")->read() & 0x04);
 }
 
 READ8_MEMBER(pcw16_state::pcw16_timer_interrupt_counter_r)
@@ -1331,7 +1331,7 @@ static MACHINE_START( pcw16 )
 static INPUT_PORTS_START(pcw16)
 	PORT_START("EXTRA")
 	/* vblank */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* power switch - default is on */
 	PORT_DIPNAME(0x40, 0x40, "Power Switch/Suspend")
 	PORT_DIPSETTING(0x0, DEF_STR( Off) )

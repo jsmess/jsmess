@@ -664,7 +664,7 @@ void asr733_keyboard(device_t *device)
 	/* for (i = 0; i < 6; i++) */
 	for (i = 0; i < 4; i++)
 	{
-		key_buf[i] = input_port_read(device->machine(), keynames[i]);
+		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
 	}
 
 	/* process key modifiers */

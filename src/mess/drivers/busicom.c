@@ -22,14 +22,14 @@ static UINT8 get_bit_selected(UINT32 val,int num)
 READ8_MEMBER(busicom_state::keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
-	return input_port_read(machine(),keynames[get_bit_selected(m_keyboard_shifter & 0x3ff,10)]);
+	return ioport(keynames[get_bit_selected(m_keyboard_shifter & 0x3ff,10)])->read();
 }
 
 READ8_MEMBER(busicom_state::printer_r)
 {
 	UINT8 retVal = 0;
 	if (m_drum_index==0) retVal |= 1;
-	retVal |= input_port_read(machine(),"PAPERADV") & 1 ? 8 : 0;
+	retVal |= ioport("PAPERADV")->read() & 1 ? 8 : 0;
 	return retVal;
 }
 

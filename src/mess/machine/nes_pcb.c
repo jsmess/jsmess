@@ -10927,7 +10927,7 @@ static READ8_HANDLER( bmc_vt5201_r )
 {
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("bmc_vt5201_r, offset: %04x\n", offset));
-	//  state->m_mmc_dipsetting = input_port_read(space->machine(), "CARTDIPS");
+	//  state->m_mmc_dipsetting = state->ioport("CARTDIPS")->read();
 
 	if (state->m_mmc_latch1)
 		return state->m_mmc_dipsetting; // cart mode, depending on the Dip Switches (always zero atm, given we have no way to add cart-based DIPs)
@@ -10962,7 +10962,7 @@ static WRITE8_HANDLER( bmc_bs5_w )
 	nes_state *state = space->machine().driver_data<nes_state>();
 	UINT8 bs5_helper = (offset & 0xc00) >> 10;
 	LOG_MMC(("bmc_bs5_w, offset: %04x, data: %02x\n", offset, data));
-//  state->m_mmc_dipsetting = input_port_read(space->machine(), "CARTDIPS");
+//  state->m_mmc_dipsetting = state->ioport("CARTDIPS")->read();
 
 	switch (offset & 0x7000)
 	{
@@ -11072,7 +11072,7 @@ static READ8_HANDLER( bmc_gb63_r )
 {
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("bmc_gb63_r, offset: %04x\n", offset));
-	//  state->m_mmc_dipsetting = input_port_read(space->machine(), "CARTDIPS");
+	//  state->m_mmc_dipsetting = state->ioport("CARTDIPS")->read();
 
 	if (state->m_mmc_latch1 == 1)
 		return 0xff;	// open bus

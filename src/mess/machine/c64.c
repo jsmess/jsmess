@@ -53,11 +53,11 @@ static void c64_nmi( running_machine &machine )
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (state->m_nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
-		state->m_nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -309,9 +309,9 @@ READ8_HANDLER( c64_read_io )
 	else if (offset < 0xd00)
 		{
 			if (offset & 1)
-				cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+				cia_set_port_mask_value(cia_0, 1, space->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			else
-				cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+				cia_set_port_mask_value(cia_0, 0, state->ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 
 			return mos6526_r(cia_0, offset);
 		}
@@ -620,39 +620,39 @@ int c64_paddle_read( device_t *device, int which )
 	running_machine &machine = device->machine();
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(machine.device("cia_0"), 0);
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = input_port_read(machine, "PADDLE2");
+				pot2 = machine.root_device().ioport("PADDLE2")->read();
 			else
-				pot1 = input_port_read(machine, "PADDLE1");
+				pot1 = machine.root_device().ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = input_port_read(machine, "TRACKY");
+				pot2 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot1 = input_port_read(machine, "TRACKX");
+				pot1 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (input_port_read(machine, "JOY1_2B") & 0x20))	/* Joy1 Button 2 */
+			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	/* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = input_port_read(machine, "LIGHTY");
+				pot2 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot1 = input_port_read(machine, "LIGHTX");
+				pot1 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
 				pot2 = 0x00;
 			break;
 
@@ -669,32 +669,32 @@ int c64_paddle_read( device_t *device, int which )
 	{
 		case 0x10:
 			if (which)
-				pot4 = input_port_read(machine, "PADDLE4");
+				pot4 = machine.root_device().ioport("PADDLE4")->read();
 			else
-				pot3 = input_port_read(machine, "PADDLE3");
+				pot3 = machine.root_device().ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = input_port_read(machine, "TRACKY");
+				pot4 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot3 = input_port_read(machine, "TRACKX");
+				pot3 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (input_port_read(machine, "JOY2_2B") & 0x20))	/* Joy2 Button 2 */
+			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	/* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = input_port_read(machine, "LIGHTY");
+				pot4 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot3 = input_port_read(machine, "LIGHTX");
+				pot3 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
 				pot4 = 0x00;
 			break;
 
@@ -707,7 +707,7 @@ int c64_paddle_read( device_t *device, int which )
 			break;
 	}
 
-	if (input_port_read(machine, "CTRLSEL") & 0x80)		/* Swap */
+	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		/* Swap */
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;

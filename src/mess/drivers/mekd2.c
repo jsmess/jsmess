@@ -196,7 +196,7 @@ READ8_MEMBER( mekd2_state::mekd2_key_r )
 		if (BIT(m_digit, i))
 		{
 			sprintf(kbdrow,"X%d",i);
-			m_keydata &= input_port_read(machine(), kbdrow);
+			m_keydata &= ioport(kbdrow)->read();
 		}
 	}
 

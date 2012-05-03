@@ -39,8 +39,8 @@
 static TIMER_CALLBACK(AY3600_poll);
 
 static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
-static int AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch);
-
+static bool AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch);
+static bool AY3600_keyboard_charqueue_empty(running_machine &machine);
 static const unsigned char ay3600_key_remap_2[9*8][4] =
 {
 /*        norm ctrl shft both */
@@ -303,7 +303,7 @@ INLINE int a2_has_capslock(running_machine &machine)
 INLINE int a2_no_ctrl_reset(running_machine &machine)
 {
 	return ((a2_has_repeat(machine) && !a2_has_reset_dip(machine)) ||
-			(a2_has_reset_dip(machine) && !input_port_read(machine, "reset_dip")));
+			(a2_has_reset_dip(machine) && !machine.root_device().ioport("reset_dip")->read()));
 }
 
 
@@ -333,10 +333,10 @@ int AY3600_init(running_machine &machine)
 	state->m_last_key_unmodified = 0xff;	/* necessary for special repeat key behaviour */
 	state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
 
-	inputx_setup_natural_keyboard(machine,
-		AY3600_keyboard_queue_chars,
-		AY3600_keyboard_accept_char,
-		NULL);
+	machine.ioport().natkeyboard().configure(
+		ioport_queue_chars_delegate(FUNC(AY3600_keyboard_queue_chars), &machine),
+		ioport_accept_char_delegate(FUNC(AY3600_keyboard_accept_char), &machine),
+		ioport_charqueue_empty_delegate(FUNC(AY3600_keyboard_charqueue_empty), &machine));
 
 	return 0;
 }
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
 	if (a2_has_repeat(machine))
-		state->m_time_until_repeat = input_port_read(machine, "keyb_repeat") & 0x01 ? 0 : ~0;
+		state->m_time_until_repeat = machine.root_device().ioport("keyb_repeat")->read() & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_CAPSLOCK))
@@ -453,7 +453,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	for (port = 0; port < num_ports; port++)
 	{
-		data = input_port_read(machine, portnames[port]);
+		data = machine.root_device().ioport(portnames[port])->read();
 
 		for (bit = 0; bit < 8; bit++)
 		{
@@ -615,8 +615,15 @@ static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_c
 
 
 
-static int AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch)
+static bool AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch)
 {
 	return AY3600_get_keycode(ch) != 0;
 }
+
+static bool AY3600_keyboard_charqueue_empty(running_machine &machine)
+{
+	return true;
+}
+
+ 
 

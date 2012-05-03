@@ -278,7 +278,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 {
 	UINT8 data;
-	data = input_port_read(machine(),  "BUTTONS_SFOR1");
+	data = ioport("BUTTONS_SFOR1")->read();
 	logerror("1ff0 data %02x\n",data);
 	return 0;
 //  return data;
@@ -287,7 +287,7 @@ READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 READ8_MEMBER(polgar_state::read_1ff0_sfortea)
 {
 	UINT8 data;
-	data = input_port_read(machine(),  "BUTTONS_SFOR2");
+	data = ioport("BUTTONS_SFOR2")->read();
 	logerror("1ff0 data %02x\n",data);
 	return 0;
 //  return data;
@@ -655,7 +655,7 @@ READ8_MEMBER(polgar_state::milano_read_board)
 	if (latch_data)
 	{
 		line = get_first_cleared_bit(latch_data);
-		tmp = input_port_read(machine(),  board_lines[line]);
+		tmp = ioport(board_lines[line])->read();
 
 		if (tmp != 0xff)
 			data = convert_imputmask(tmp);
@@ -674,7 +674,7 @@ READ8_MEMBER(polgar_state::read_keys)
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
 	};
 
-	data = input_port_read(machine(), keynames[0][offset]);
+	data = ioport(keynames[0][offset])->read();
 	// logerror("Keyboard Port = %s Data = %d\n  ", ((led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
@@ -687,7 +687,7 @@ READ8_MEMBER(polgar_state::read_keys_megaiv)
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
 	};
 
-	data = input_port_read(machine(), keynames[0][offset]);
+	data = ioport(keynames[0][offset])->read();
 	logerror("Keyboard Port = %s Data = %d\n  ", keynames[0][offset] , data);
 	return data | 0x7f;
 }
@@ -701,7 +701,7 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	if (BPL32latch_data == 0xff) {
-		tmp = input_port_read(machine(),  "BUTTONS_BPL");
+		tmp = ioport("BUTTONS_BPL")->read();
 		logerror("Keyboard Port Offset = %d tmp %d\n", offset,tmp);
 
 		data = tmp << 24;
@@ -709,7 +709,7 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 		if (BPL32latch_data & 0x7f) {
 			logerror("ReadingBoard %02x\n",BPL32latch_data);
 			line = get_first_cleared_bit(BPL32latch_data);
-			tmp = input_port_read(machine(),  board_lines[line]);
+			tmp = ioport(board_lines[line])->read();
 
 			if (tmp != 0xff)
 				data = convert_imputmask(tmp) << 24;
@@ -747,7 +747,7 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 			data = mboard_read_board_8(&space,0);
 	} else {
 		if (monteciv_select[0] == 0x0) {
-			data = input_port_read(machine(),  "BUTTONS_MONTE2");
+			data = ioport("BUTTONS_MONTE2")->read();
 #if 0
 			if (data) {
 				output_set_digit_value(0,64);
@@ -762,7 +762,7 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 			}
 #endif
 		} else {
-			data = input_port_read(machine(),  "BUTTONS_MONTE1");
+			data = ioport("BUTTONS_MONTE1")->read();
 		}
 	}
 	return data;
@@ -779,7 +779,7 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 //          { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	if (latch_data == 0xff) {
-		data = input_port_read(machine(),  "BUTTONS_ACAD");
+		data = ioport("BUTTONS_ACAD")->read();
 	} else {
 //      if (latch_data & 0x7f) {
 		data = mboard_read_board_8(&space,0);
@@ -787,7 +787,7 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 
 //          logerror("ReadingBoard %02x\n",latch_data);
 //          line = get_first_cleared_bit(latch_data);
-//          tmp = input_port_read(machine,  board_lines[line]);
+//          tmp = machine.root_device().ioport(board_lines[line])->read();
 //          mboard_write_board_8(&space,0, latch_data);
 //          data = mboard_read_board_8(&space,0);
 //          logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,latch_data);
@@ -826,7 +826,7 @@ READ32_MEMBER(polgar_state::read_buttons_gen32)
 	UINT32 data;
 	static const char *const keynames[4] = { "BUTTON_1", "BUTTON_2", "", "BUTTON_3" };
 
-	data = input_port_read(machine(), keynames[offset]);
+	data = ioport(keynames[offset])->read();
 
 	data = data|data<<8|data<<16|data<<24;  // this might not be needed if MAME does handle odd alignment over 32bit boundaries right
 	logerror("Read from Buttons: %08x %08x\n",offset,data);
@@ -839,7 +839,7 @@ READ32_MEMBER(polgar_state::read_buttons_van32)
 	static const char *const keynames[4] = { "BUTTON_1", "", "BUTTON_2", "BUTTON_3" };
 
 
-	data = input_port_read(machine(), keynames[offset]);
+	data = ioport(keynames[offset])->read();
 
 	data = data << 8;
 	logerror("Read from Buttons: %08x %08x\n",offset,data);
@@ -852,7 +852,7 @@ READ16_MEMBER(polgar_state::read_buttons_van16)
 	static const char *const keynames[3] = { "BUTTON_1", "BUTTON_2", "BUTTON_3" };
 
 
-	data = input_port_read(machine(), keynames[offset>>1]) << 8;
+	data = ioport(keynames[offset>>1])->read() << 8;
 
 	logerror("Read from %06x offset: %x %04x\n",0xf00000,offset,data);
 	return data;

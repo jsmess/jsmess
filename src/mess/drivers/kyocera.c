@@ -69,15 +69,15 @@ static UINT8 read_keyboard(running_machine &machine, UINT16 keylatch)
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(keylatch, 0)) data &= input_port_read(machine, "KEY0");
-	if (!BIT(keylatch, 1)) data &= input_port_read(machine, "KEY1");
-	if (!BIT(keylatch, 2)) data &= input_port_read(machine, "KEY2");
-	if (!BIT(keylatch, 3)) data &= input_port_read(machine, "KEY3");
-	if (!BIT(keylatch, 4)) data &= input_port_read(machine, "KEY4");
-	if (!BIT(keylatch, 5)) data &= input_port_read(machine, "KEY5");
-	if (!BIT(keylatch, 6)) data &= input_port_read(machine, "KEY6");
-	if (!BIT(keylatch, 7)) data &= input_port_read(machine, "KEY7");
-	if (!BIT(keylatch, 8)) data &= input_port_read(machine, "KEY8");
+	if (!BIT(keylatch, 0)) data &= machine.root_device().ioport("KEY0")->read();
+	if (!BIT(keylatch, 1)) data &= machine.root_device().ioport("KEY1")->read();
+	if (!BIT(keylatch, 2)) data &= machine.root_device().ioport("KEY2")->read();
+	if (!BIT(keylatch, 3)) data &= machine.root_device().ioport("KEY3")->read();
+	if (!BIT(keylatch, 4)) data &= machine.root_device().ioport("KEY4")->read();
+	if (!BIT(keylatch, 5)) data &= machine.root_device().ioport("KEY5")->read();
+	if (!BIT(keylatch, 6)) data &= machine.root_device().ioport("KEY6")->read();
+	if (!BIT(keylatch, 7)) data &= machine.root_device().ioport("KEY7")->read();
+	if (!BIT(keylatch, 8)) data &= machine.root_device().ioport("KEY8")->read();
 
 	return data;
 }
@@ -274,7 +274,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 7;
+	data |= BIT(ioport("BATTERY")->read(), 0) << 7;
 
 	return data;
 }
@@ -316,7 +316,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 7;
+	data |= BIT(ioport("BATTERY")->read(), 0) << 7;
 
 	return data;
 }

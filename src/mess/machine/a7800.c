@@ -40,12 +40,12 @@
 
 static READ8_DEVICE_HANDLER( riot_joystick_r )
 {
-	return input_port_read(device->machine(), "joysticks");
+	return device->machine().root_device().ioport("joysticks")->read();
 }
 
 static READ8_DEVICE_HANDLER( riot_console_button_r )
 {
-	return input_port_read(device->machine(), "console_buttons");
+	return device->machine().root_device().ioport("console_buttons")->read();
 }
 
 static WRITE8_DEVICE_HANDLER( riot_button_pullup_w )
@@ -482,20 +482,20 @@ READ8_MEMBER(a7800_state::a7800_TIA_r)
            still return a reasonable value */
 			return 0x00;
 		case 0x08:
-			  return((input_port_read(machine(), "buttons") & 0x02) << 6);
+			  return((ioport("buttons")->read() & 0x02) << 6);
 		case 0x09:
-			  return((input_port_read(machine(), "buttons") & 0x08) << 4);
+			  return((ioport("buttons")->read() & 0x08) << 4);
 		case 0x0A:
-			  return((input_port_read(machine(), "buttons") & 0x01) << 7);
+			  return((ioport("buttons")->read() & 0x01) << 7);
 		case 0x0B:
-			  return((input_port_read(machine(), "buttons") & 0x04) << 5);
+			  return((ioport("buttons")->read() & 0x04) << 5);
 		case 0x0c:
-			if(((input_port_read(machine(), "buttons") & 0x08) ||(input_port_read(machine(), "buttons") & 0x02)) && m_p1_one_button)
+			if(((ioport("buttons")->read() & 0x08) ||(ioport("buttons")->read() & 0x02)) && m_p1_one_button)
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if(((input_port_read(machine(), "buttons") & 0x01) ||(input_port_read(machine(), "buttons") & 0x04)) && m_p2_one_button)
+			if(((ioport("buttons")->read() & 0x01) ||(ioport("buttons")->read() & 0x04)) && m_p2_one_button)
 				return 0x00;
 			else
 				return 0x80;

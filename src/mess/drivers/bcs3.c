@@ -41,23 +41,23 @@ READ8_MEMBER( bcs3_state::bcs3_keyboard_r )
 	UINT8 data = 0;
 
 	if (~offset & 0x01)
-		data |= input_port_read(machine(), "LINE0");
+		data |= ioport("LINE0")->read();
 	if (~offset & 0x02)
-		data |= input_port_read(machine(), "LINE1");
+		data |= ioport("LINE1")->read();
 	if (~offset & 0x04)
-		data |= input_port_read(machine(), "LINE2");
+		data |= ioport("LINE2")->read();
 	if (~offset & 0x08)
-		data |= input_port_read(machine(), "LINE3");
+		data |= ioport("LINE3")->read();
 	if (~offset & 0x10)
-		data |= input_port_read(machine(), "LINE4");
+		data |= ioport("LINE4")->read();
 	if (~offset & 0x20)
-		data |= input_port_read(machine(), "LINE5");
+		data |= ioport("LINE5")->read();
 	if (~offset & 0x40)
-		data |= input_port_read(machine(), "LINE6");
+		data |= ioport("LINE6")->read();
 	if (~offset & 0x80)
-		data |= input_port_read(machine(), "LINE7");
+		data |= ioport("LINE7")->read();
 	if (~offset & 0x100)
-		data |= input_port_read(machine(), "LINE8");
+		data |= ioport("LINE8")->read();
 
 	return data;
 }

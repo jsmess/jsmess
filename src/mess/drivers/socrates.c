@@ -146,7 +146,7 @@ static void socrates_update_kb( running_machine &machine )
 	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
 	if ((state->m_kb_latch_low[1] != 0) || (state->m_kb_latch_high[1] != 1)) return;
 	// next check for joypad buttons
-	keyvalue = input_port_read(machine, "keyboard_jp");
+	keyvalue = machine.root_device().ioport("keyboard_jp")->read();
 	if (keyvalue != 0)
 	{
 		state->m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
@@ -156,11 +156,11 @@ static void socrates_update_kb( running_machine &machine )
 	// next check for mouse movement.
 	// this isn't written yet, so write me please!
 	// next check if shift is down
-	shift = input_port_read(machine, "keyboard_50");
+	shift = machine.root_device().ioport("keyboard_50")->read();
 	// find key low and high byte ok keyboard section
 	for (row = 4; row>=0; row--)
 	{
-		keyvalue = input_port_read(machine, rownames[row]);
+		keyvalue = machine.root_device().ioport(rownames[row])->read();
 		if (keyvalue != 0)
 		{
 			for (powerof2 = 9; powerof2 >= 0; powerof2--)

@@ -75,7 +75,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 	for(i = 0; i < 12; i++)
 	{
-		c = input_port_read(machine, keynames[i]);
+		c = machine.root_device().ioport(keynames[i])->read();
 		if (c != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -181,18 +181,18 @@ static READ8_DEVICE_HANDLER (llc2_port_a_r)
 {
 	UINT8 *k7659 = device->machine().root_device().memregion("k7659")->base();
 	UINT8 retVal = 0;
-	UINT8 a1 = input_port_read(device->machine(), "A1");
-	UINT8 a2 = input_port_read(device->machine(), "A2");
-	UINT8 a3 = input_port_read(device->machine(), "A3");
-	UINT8 a4 = input_port_read(device->machine(), "A4");
-	UINT8 a5 = input_port_read(device->machine(), "A5");
-	UINT8 a6 = input_port_read(device->machine(), "A6");
-	UINT8 a7 = input_port_read(device->machine(), "A7");
-	UINT8 a8 = input_port_read(device->machine(), "A8");
-	UINT8 a9 = input_port_read(device->machine(), "A9");
-	UINT8 a10 = input_port_read(device->machine(), "A10");
-	UINT8 a11 = input_port_read(device->machine(), "A11");
-	UINT8 a12 = input_port_read(device->machine(), "A12");
+	UINT8 a1 = device->machine().root_device().ioport("A1")->read();
+	UINT8 a2 = device->machine().root_device().ioport("A2")->read();
+	UINT8 a3 = device->machine().root_device().ioport("A3")->read();
+	UINT8 a4 = device->machine().root_device().ioport("A4")->read();
+	UINT8 a5 = device->machine().root_device().ioport("A5")->read();
+	UINT8 a6 = device->machine().root_device().ioport("A6")->read();
+	UINT8 a7 = device->machine().root_device().ioport("A7")->read();
+	UINT8 a8 = device->machine().root_device().ioport("A8")->read();
+	UINT8 a9 = device->machine().root_device().ioport("A9")->read();
+	UINT8 a10 = device->machine().root_device().ioport("A10")->read();
+	UINT8 a11 = device->machine().root_device().ioport("A11")->read();
+	UINT8 a12 = device->machine().root_device().ioport("A12")->read();
 	UINT16 code = 0;
 	if (a1!=0) {
 		code = 0x10 + key_pos(a1);

@@ -261,11 +261,11 @@ static void scan_keyboard(running_machine &machine)
 
 	// First read shift, control and graph
 
-	state->m_keyboard.key_special = input_port_read(machine, KEY_SPECIAL_TAG);
+	state->m_keyboard.key_special = machine.root_device().ioport(KEY_SPECIAL_TAG)->read();
 
 	for(row=0; row<MBC55X_KEYROWS; row++)
 	{
-		keyrow = input_port_read(machine, keynames[row]);
+		keyrow = machine.root_device().ioport(keynames[row])->read();
 
 		for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
 		{

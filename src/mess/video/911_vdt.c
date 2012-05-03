@@ -591,7 +591,7 @@ void vdt911_keyboard(device_t *device)
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = input_port_read(device->machine(), keynames[i]);
+		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
 	}
 
 	/* parse modifier keys */

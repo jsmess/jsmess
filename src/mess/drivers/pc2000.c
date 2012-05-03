@@ -62,7 +62,7 @@ READ8_MEMBER( pc2000_state::key_matrix_r )
 
 	for (int line=0; line<8; line++)
 		if (m_mux_data & (1<<line))
-			data &= input_port_read(machine(), bitnames[offset][line]);
+			data &= ioport(bitnames[offset][line])->read();
 
 	return data;
 }

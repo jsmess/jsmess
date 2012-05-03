@@ -132,9 +132,9 @@ static READ8_DEVICE_HANDLER( kin_r )
 
 	if (state->m_keyline_select < 10)
 	{
-		data = input_port_read(device->machine(), keynames[state->m_keyline_select]);
+		data = device->machine().root_device().ioport(keynames[state->m_keyline_select])->read();
 		/* Check for left-shift lock */
-		if ((state->m_keyline_select == 8) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
+		if ((state->m_keyline_select == 8) && (device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
 			data &= 0xfe;
 	}
 	return data;
@@ -152,18 +152,18 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 
 	if (state->m_keyline_select < 10)
 	{
-		data = input_port_read(device->machine(), keynames[state->m_keyline_select]);
+		data = device->machine().root_device().ioport(keynames[state->m_keyline_select])->read();
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (state->m_superpet)
 		{
-			if ((state->m_keyline_select == 6) && !(input_port_read(device->machine(), "SPECIAL") & 0x80))
+			if ((state->m_keyline_select == 6) && !(device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 		else
 		{
-			if ((state->m_keyline_select == 6) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
+			if ((state->m_keyline_select == 6) && (device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 	}
@@ -730,7 +730,7 @@ MACHINE_RESET( pet )
 	if (state->m_superpet)
 	{
 		state->m_spet.rom = 0;
-		if (input_port_read(machine, "CFG") & 0x04)
+		if (machine.root_device().ioport("CFG")->read() & 0x04)
 		{
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
@@ -746,7 +746,7 @@ MACHINE_RESET( pet )
 
 	if (state->m_cbm8096)
 	{
-		if (input_port_read(machine, "CFG") & 0x08)
+		if (machine.root_device().ioport("CFG")->read() & 0x08)
 		{
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
 		}
@@ -757,8 +757,8 @@ MACHINE_RESET( pet )
 		cbm8096_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}
 
-//removed   cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
-//removed   cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
+//removed   cbm_drive_0_config (machine.root_device().ioport("CFG")->read() & 2 ? IEEE : 0, 8);
+//removed   cbm_drive_1_config (machine.root_device().ioport("CFG")->read() & 1 ? IEEE : 0, 9);
 	machine.device("maincpu")->reset();
 
 	state->m_ieee->ren_w(0);
@@ -772,7 +772,7 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	pet_state *state = device->machine().driver_data<pet_state>();
 	if (state->m_superpet)
 	{
-		if (input_port_read(device->machine(), "CFG") & 0x04)
+		if (state->ioport("CFG")->read() & 0x04)
 		{
 			device_set_input_line(device, INPUT_LINE_HALT, 1);
 			device_set_input_line(device, INPUT_LINE_HALT, 0);
@@ -786,7 +786,7 @@ INTERRUPT_GEN( pet_frame_interrupt )
 		}
 	}
 
-	set_led_status (device->machine(),1, input_port_read(device->machine(), "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (device->machine(),1, device->machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);		/* Shift Lock */
 }
 
 

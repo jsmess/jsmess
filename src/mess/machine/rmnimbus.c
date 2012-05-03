@@ -2162,7 +2162,7 @@ static void scan_keyboard(running_machine &machine)
 
     for(row=0;row<NIMBUS_KEYROWS;row++)
     {
-        keyrow=input_port_read(machine, keynames[row]);
+        keyrow=machine.root_device().ioport(keynames[row])->read();
 
         for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
         {
@@ -2846,9 +2846,9 @@ static TIMER_CALLBACK(mouse_callback)
     _mouse_joy_state *state = &drvstate->m_nimbus_mouse;
 
 
-	state->m_reg0a4 = input_port_read(machine, MOUSE_BUTTON_TAG) | 0xC0;
-	x = input_port_read(machine, MOUSEX_TAG);
-    y = input_port_read(machine, MOUSEY_TAG);
+	state->m_reg0a4 = machine.root_device().ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
+	x = machine.root_device().ioport(MOUSEX_TAG)->read();
+    y = machine.root_device().ioport(MOUSEY_TAG)->read();
 
     UINT8   mxa;
     UINT8   mxb;
@@ -2985,14 +2985,14 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	//int pc=cpu_get_pc(machine().device(MAINCPU_TAG));
 	_mouse_joy_state *state = &m_nimbus_mouse;
 
-	if (input_port_read(machine(), "config") & 0x01)
+	if (ioport("config")->read() & 0x01)
 	{
 		result=state->m_reg0a4;
 		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
 	}
 	else
 	{
-		result=input_port_read_safe(machine(), JOYSTICK0_TAG, 0xff);
+		result=ioport(JOYSTICK0_TAG)->read_safe(0xff);
 	}
 
 	return result;

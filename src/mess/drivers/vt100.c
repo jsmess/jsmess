@@ -116,7 +116,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 		for(i = 0; i < 16; i++)
 		{
 			sprintf(kbdrow,"LINE%X", i);
-			code =	input_port_read(timer.machine(), kbdrow);
+			code =	timer.machine().root_device().ioport(kbdrow)->read();
 			if (code < 0xff)
 			{
 				state->m_keyboard_int = 1;

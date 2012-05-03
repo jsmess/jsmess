@@ -265,7 +265,7 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_ind16 &bitmap,const 
 		{ 0, 5, 2, 7 }, //Pink / Green
 		{ 0, 2, 5, 7 }, //Green / Pink
 	};
-	col_setting = input_port_read(machine,"MODE4_DSW") & 7;
+	col_setting = machine.root_device().ioport("MODE4_DSW")->read() & 7;
 
 	for(y=0;y<192;y++)
 	{
@@ -1908,14 +1908,14 @@ static UINT8 check_keyboard_press(running_machine &machine)
 	UINT8 shift_pressed,caps_lock;
 	scancode = 0;
 
-	shift_pressed = (input_port_read(machine,"key_modifiers") & 2)>>1;
-	caps_lock = (input_port_read(machine,"key_modifiers") & 8)>>3;
+	shift_pressed = (machine.root_device().ioport("key_modifiers")->read() & 2)>>1;
+	caps_lock = (machine.root_device().ioport("key_modifiers")->read() & 8)>>3;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			if((machine.root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				if((shift_pressed != caps_lock) && scancode >= 0x41 && scancode <= 0x5f)
 					scancode+=0x20;
@@ -1943,9 +1943,9 @@ static UINT8 check_keyboard_press(running_machine &machine)
 
 static UINT8 check_joy_press(running_machine &machine)
 {
-	UINT8 p1_key = input_port_read(machine,"P1") ^ 0xff;
-	UINT8 shift_key = input_port_read(machine,"key_modifiers") & 0x02;
-	UINT8 space_key = input_port_read(machine,"key2") & 0x01;
+	UINT8 p1_key = machine.root_device().ioport("P1")->read() ^ 0xff;
+	UINT8 shift_key = machine.root_device().ioport("key_modifiers")->read() & 0x02;
+	UINT8 space_key = machine.root_device().ioport("key2")->read() & 0x01;
 	UINT8 joy_press;
 
 		/*
@@ -2028,10 +2028,10 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	pc6001_state *state = timer.machine().driver_data<pc6001_state>();
 	address_space *space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = input_port_read(timer.machine(),"key1");
-	UINT32 key2 = input_port_read(timer.machine(),"key2");
-	UINT32 key3 = input_port_read(timer.machine(),"key3");
-//  UINT8 p1_key = input_port_read(timer.machine(), "P1");
+	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
+	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
+	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
+//  UINT8 p1_key = timer.machine().root_device().ioport("P1")->read();
 
 	if(state->m_cas_switch == 0)
 	{

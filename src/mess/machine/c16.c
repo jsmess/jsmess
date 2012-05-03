@@ -515,7 +515,7 @@ static TIMER_CALLBACK( c16_sidhack_tick )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	c16_state *state = space->machine().driver_data<c16_state>();
 
-	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
+	if (machine.root_device().ioport("SID")->read_safe(0x00) & 0x02)
 	{
 		if (state->m_pal)
 			space->install_legacy_write_handler(0xd400, 0xd41f, FUNC(c16_sidcart_16k));
@@ -534,7 +534,7 @@ static TIMER_CALLBACK( c16_sidcard_tick )
 	c16_state *state = machine.driver_data<c16_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
+	if (machine.root_device().ioport("SID")->read_safe(0x00) & 0x01)
 		space->install_legacy_readwrite_handler(*state->m_sid, 0xfe80, 0xfe9f, FUNC(sid6581_r), FUNC(sid6581_w));
 	else
 		space->install_legacy_readwrite_handler(*state->m_sid, 0xfd40, 0xfd5f, FUNC(sid6581_r), FUNC(sid6581_w));
@@ -550,48 +550,48 @@ INTERRUPT_GEN( c16_frame_interrupt )
 	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		value &= ~input_port_read(device->machine(), c16ports[i]);
+		value &= ~device->machine().root_device().ioport(c16ports[i])->read();
 
 		/* Shift Lock is mapped on Left/Right Shift */
-		if ((i == 1) && (input_port_read(device->machine(), "SPECIAL") & 0x80))
+		if ((i == 1) && (device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
 			value &= ~0x80;
 
 		state->m_keyline[i] = value;
 	}
 
-	if (input_port_read(device->machine(), "CTRLSEL") & 0x01)
+	if (device->machine().root_device().ioport("CTRLSEL")->read() & 0x01)
 	{
 		value = 0xff;
-		if (input_port_read(device->machine(), "JOY0") & 0x10)			/* Joypad1_Button */
+		if (device->machine().root_device().ioport("JOY0")->read() & 0x10)			/* Joypad1_Button */
 			{
-				if (input_port_read(device->machine(), "SPECIAL") & 0x40)
+				if (device->machine().root_device().ioport("SPECIAL")->read() & 0x40)
 					value &= ~0x80;
 				else
 					value &= ~0x40;
 			}
 
-		value &= ~(input_port_read(device->machine(), "JOY0") & 0x0f);	/* Other Inputs Joypad1 */
+		value &= ~(device->machine().root_device().ioport("JOY0")->read() & 0x0f);	/* Other Inputs Joypad1 */
 
-		if (input_port_read(device->machine(), "SPECIAL") & 0x40)
+		if (device->machine().root_device().ioport("SPECIAL")->read() & 0x40)
 			state->m_keyline[9] = value;
 		else
 			state->m_keyline[8] = value;
 	}
 
-	if (input_port_read(device->machine(), "CTRLSEL") & 0x10)
+	if (device->machine().root_device().ioport("CTRLSEL")->read() & 0x10)
 	{
 		value = 0xff;
-		if (input_port_read(device->machine(), "JOY1") & 0x10)			/* Joypad2_Button */
+		if (device->machine().root_device().ioport("JOY1")->read() & 0x10)			/* Joypad2_Button */
 			{
-				if (input_port_read(device->machine(), "SPECIAL") & 0x40)
+				if (device->machine().root_device().ioport("SPECIAL")->read() & 0x40)
 					value &= ~0x40;
 				else
 					value &= ~0x80;
 			}
 
-		value &= ~(input_port_read(device->machine(), "JOY1") & 0x0f);	/* Other Inputs Joypad2 */
+		value &= ~(device->machine().root_device().ioport("JOY1")->read() & 0x0f);	/* Other Inputs Joypad2 */
 
-		if (input_port_read(device->machine(), "SPECIAL") & 0x40)
+		if (device->machine().root_device().ioport("SPECIAL")->read() & 0x40)
 			state->m_keyline[8] = value;
 		else
 			state->m_keyline[9] = value;
@@ -609,8 +609,8 @@ INTERRUPT_GEN( c16_frame_interrupt )
 #endif
 	}
 
-	set_led_status(device->machine(), 1, input_port_read(device->machine(), "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
-	set_led_status(device->machine(), 0, input_port_read(device->machine(), "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
+	set_led_status(device->machine(), 1, device->machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status(device->machine(), 0, device->machine().root_device().ioport("SPECIAL")->read() & 0x40 ? 1 : 0);		/* Joystick Swap */
 }
 
 

@@ -73,7 +73,7 @@ READ8_MEMBER( m5_state::sts_r )
 	data |= m_centronics->busy_r() << 1;
 
 	// RESET key
-	data |= input_port_read(machine(), "RESET");
+	data |= ioport("RESET")->read();
 
 	return data;
 }

@@ -189,7 +189,7 @@ READ8_MEMBER( tec1_state::latch_r )
 READ8_MEMBER( tec1_state::tec1_kbd_r )
 {
 	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return m_kbd | input_port_read(machine(), "SHIFT");
+	return m_kbd | ioport("SHIFT")->read();
 }
 
 UINT8 tec1_state::tec1_convert_col_to_bin( UINT8 col, UINT8 row )
@@ -239,17 +239,17 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
     // 74C923 4 by 5 key encoder.
     // if previous key is still held, bail out
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
-		if (state->tec1_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row) == state->m_kbd)
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
+		if (state->tec1_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row) == state->m_kbd)
 			return;
 
 	state->m_kbd_row++;
 	state->m_kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
 	{
-		state->m_kbd = state->tec1_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row);
+		state->m_kbd = state->tec1_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row);
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 		state->m_key_pressed = TRUE;
 	}

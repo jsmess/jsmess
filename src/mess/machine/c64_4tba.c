@@ -85,7 +85,7 @@ void c64_4tba_device::device_start()
 
 UINT8 c64_4tba_device::c64_pb_r(address_space &space, offs_t offset)
 {
-	return input_port_read(*this, "PB");
+	return ioport("PB")->read();
 }
 
 
@@ -95,7 +95,7 @@ UINT8 c64_4tba_device::c64_pb_r(address_space &space, offs_t offset)
 
 int c64_4tba_device::c64_pa2_r()
 {
-	return BIT(input_port_read(*this, "PA2"), 0);
+	return BIT(ioport("PA2")->read(), 0);
 }
 
 

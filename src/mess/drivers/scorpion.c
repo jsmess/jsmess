@@ -273,7 +273,7 @@ static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 {
 	spectrum_state *state = timer.machine().driver_data<spectrum_state>();
 
-	if ((input_port_read(timer.machine(), "NMI") & 1)==1)
+	if ((timer.machine().root_device().ioport("NMI")->read() & 1)==1)
 	{
 		state->m_port_1ffd_data |= 0x02;
 		scorpion_update_memory(timer.machine());

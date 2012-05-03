@@ -507,9 +507,9 @@ static MACHINE_RESET(mz2000)
 	beep_set_frequency(machine.device(BEEPER_TAG),4096);
 	beep_set_state(machine.device(BEEPER_TAG),0);
 
-	state->m_color_mode = input_port_read(machine,"CONFIG") & 1;
-	state->m_has_fdc = (input_port_read(machine,"CONFIG") & 2) >> 1;
-	state->m_hi_mode = (input_port_read(machine,"CONFIG") & 4) >> 2;
+	state->m_color_mode = machine.root_device().ioport("CONFIG")->read() & 1;
+	state->m_has_fdc = (machine.root_device().ioport("CONFIG")->read() & 2) >> 1;
+	state->m_hi_mode = (machine.root_device().ioport("CONFIG")->read() & 4) >> 2;
 
 	{
 		int i;
@@ -672,16 +672,16 @@ static READ8_DEVICE_HANDLER( mz2000_pio1_porta_r )
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= input_port_read(device->machine(), keynames[i]);
+			res &= device->machine().root_device().ioport(keynames[i])->read();
 
 		state->m_pio_latchb = res;
 
 		return res;
 	}
 
-	state->m_pio_latchb = input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
+	state->m_pio_latchb = device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 
-	return input_port_read(device->machine(), keynames[state->m_key_mux & 0xf]);
+	return device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 }
 
 static Z80PIO_INTERFACE( mz2000_pio1_intf )

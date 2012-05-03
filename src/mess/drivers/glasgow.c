@@ -119,10 +119,10 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 	/* See if any keys pressed */
 	data = 3;
 
-	if (mboard_key_select == input_port_read(machine(), "LINE0"))
+	if (mboard_key_select == ioport("LINE0")->read())
 		data &= 1;
 
-	if (mboard_key_select == input_port_read(machine(), "LINE1"))
+	if (mboard_key_select == ioport("LINE1")->read())
 		data &= 2;
 
 	return data << 8;
@@ -181,9 +181,9 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 	UINT16 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 	else
-		data = input_port_read(machine(), "LINE1");
+		data = ioport("LINE1")->read();
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
 	data <<= 8;
@@ -244,10 +244,10 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 	UINT32 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 	else
-		data = input_port_read(machine(), "LINE1");
-	//if (mboard_key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
+		data = ioport("LINE1")->read();
+	//if (mboard_key_selector == 1) data = machine.root_device().ioport("LINE0")->read(); else data = 0;
 	if(data)
 		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data <<= 24;

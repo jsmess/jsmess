@@ -166,8 +166,8 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_w)
 
 READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 {
-	verboselog(machine(), 0, "sgi_ip2_swtch_r: %04x\n", input_port_read(machine(), "SWTCH"));
-	return input_port_read(machine(), "SWTCH");
+	verboselog(machine(), 0, "sgi_ip2_swtch_r: %04x\n", ioport("SWTCH")->read());
+	return ioport("SWTCH")->read();
 }
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)

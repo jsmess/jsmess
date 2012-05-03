@@ -641,7 +641,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
     */
 
 	UINT8 data = 0;
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	// keyboard column
 	data = m_kc;
@@ -670,7 +670,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
     */
 
 	UINT8 data = 0;
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	// shift
 	data |= (BIT(special, 0) & BIT(special, 1));

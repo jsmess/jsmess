@@ -113,7 +113,7 @@ READ8_MEMBER( sdk86_state::kbd_r )
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",m_digit);
-		data = input_port_read(machine(), kbdrow);
+		data = ioport(kbdrow)->read();
 	}
 	return data;
 }

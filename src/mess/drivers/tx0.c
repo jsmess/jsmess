@@ -1471,7 +1471,7 @@ static void tx0_keyboard(running_machine &machine)
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = input_port_read(machine, twrnames[i]);
+		typewriter_keys[i] = machine.root_device().ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
@@ -1511,7 +1511,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine(), "CSW");
+	control_keys = state->ioport("CSW")->read();
 
 	if (control_keys & tx0_control)
 	{
@@ -1580,7 +1580,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 		/* handle toggle switch register keys */
-		tsr_keys = (input_port_read(device->machine(), "MSW") << 16) | input_port_read(device->machine(), "LSW");
+		tsr_keys = (device->machine().root_device().ioport("MSW")->read() << 16) | device->machine().root_device().ioport("LSW")->read();
 
 		/* compute transitions */
 		tsr_transitions = tsr_keys & (~ state->m_old_tsr_keys);

@@ -219,7 +219,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_r)
 		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
 	};
 
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
@@ -354,7 +354,7 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 static int pcw_get_sys_status(running_machine &machine)
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	return state->m_interrupt_counter | (input_port_read(machine, "EXTRA") & (0x040 | 0x010)) | (state->m_system_status & 0x20);
+	return state->m_interrupt_counter | (machine.root_device().ioport("EXTRA")->read() & (0x040 | 0x010)) | (state->m_system_status & 0x20);
 }
 
 READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
@@ -588,9 +588,9 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 		case 0x0e0:
 		{
 			/* spectravideo joystick */
-			if (input_port_read(machine(), "EXTRA") & 0x020)
+			if (ioport("EXTRA")->read() & 0x020)
 			{
-				return input_port_read(machine(), "SPECTRAVIDEO");
+				return ioport("SPECTRAVIDEO")->read();
 			}
 			else
 			{
@@ -602,7 +602,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 		{
 
 			/* kempston joystick */
-			return input_port_read(machine(), "KEMPSTON");
+			return ioport("KEMPSTON")->read();
 		}
 
 		case 0x0e1:
@@ -1262,7 +1262,7 @@ static INPUT_PORTS_START(pcw)
 	/* from here on are the pretend dipswitches for machine config etc */
 	PORT_START("EXTRA")
 	/* vblank */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* frame rate option */
 	PORT_DIPNAME( 0x10, 0x010, "50/60Hz Frame Rate Option")
 	PORT_DIPSETTING(	0x00, "60Hz")

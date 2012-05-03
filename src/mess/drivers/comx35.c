@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )
 {
-	if (newval && BIT(input_port_read(machine(), "D6"), 7))
+	if (newval && BIT(ioport("D6")->read(), 7))
 	{
 		machine_reset();
 	}
@@ -361,12 +361,12 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 READ_LINE_MEMBER( comx35_state::shift_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 0);
+	return BIT(ioport("MODIFIERS")->read(), 0);
 }
 
 READ_LINE_MEMBER( comx35_state::control_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
+	return BIT(ioport("MODIFIERS")->read(), 1);
 }
 
 static CDP1871_INTERFACE( kbc_intf )

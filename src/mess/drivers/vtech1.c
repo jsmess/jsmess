@@ -523,10 +523,10 @@ READ8_MEMBER(vtech1_state::vtech1_joystick_r)
 {
 	int result = 0xff;
 
-	if (!BIT(offset, 0)) result &= input_port_read(machine(), "joystick_0");
-	if (!BIT(offset, 1)) result &= input_port_read(machine(), "joystick_0_arm");
-	if (!BIT(offset, 2)) result &= input_port_read(machine(), "joystick_1");
-	if (!BIT(offset, 3)) result &= input_port_read(machine(), "joystick_1_arm");
+	if (!BIT(offset, 0)) result &= ioport("joystick_0")->read();
+	if (!BIT(offset, 1)) result &= ioport("joystick_0_arm")->read();
+	if (!BIT(offset, 2)) result &= ioport("joystick_1")->read();
+	if (!BIT(offset, 3)) result &= ioport("joystick_1_arm")->read();
 
 	return result;
 }
@@ -536,14 +536,14 @@ READ8_MEMBER(vtech1_state::vtech1_keyboard_r)
 	UINT8 result = 0x3f;
 
 	/* bit 0 to 5, keyboard input */
-	if (!BIT(offset, 0)) result &= input_port_read(machine(), "keyboard_0");
-	if (!BIT(offset, 1)) result &= input_port_read(machine(), "keyboard_1");
-	if (!BIT(offset, 2)) result &= input_port_read(machine(), "keyboard_2");
-	if (!BIT(offset, 3)) result &= input_port_read(machine(), "keyboard_3");
-	if (!BIT(offset, 4)) result &= input_port_read(machine(), "keyboard_4");
-	if (!BIT(offset, 5)) result &= input_port_read(machine(), "keyboard_5");
-	if (!BIT(offset, 6)) result &= input_port_read(machine(), "keyboard_6");
-	if (!BIT(offset, 7)) result &= input_port_read(machine(), "keyboard_7");
+	if (!BIT(offset, 0)) result &= ioport("keyboard_0")->read();
+	if (!BIT(offset, 1)) result &= ioport("keyboard_1")->read();
+	if (!BIT(offset, 2)) result &= ioport("keyboard_2")->read();
+	if (!BIT(offset, 3)) result &= ioport("keyboard_3")->read();
+	if (!BIT(offset, 4)) result &= ioport("keyboard_4")->read();
+	if (!BIT(offset, 5)) result &= ioport("keyboard_5")->read();
+	if (!BIT(offset, 6)) result &= ioport("keyboard_6")->read();
+	if (!BIT(offset, 7)) result &= ioport("keyboard_7")->read();
 
 	/* bit 6, cassette input */
 	result |= ((m_cassette->input()) > 0 ? 1 : 0) << 6;

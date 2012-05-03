@@ -48,27 +48,27 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 		switch (offset)
 		{
 			case 0x000:
-				rv = input_port_read(machine(), "TEST") & 0x80;
+				rv = ioport("TEST")->read() & 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
-				rv = (input_port_read(machine(), "TEST") & 0x40) << 1;
+				rv = (ioport("TEST")->read() & 0x40) << 1;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
-				rv = (input_port_read(machine(), "TEST") & 0x20) << 2;
+				rv = (ioport("TEST")->read() & 0x20) << 2;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
-				rv = (input_port_read(machine(), "TEST") & 0x10) << 3;
+				rv = (ioport("TEST")->read() & 0x10) << 3;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
-				rv = (input_port_read(machine(), "TEST") & 0x08) << 4;
+				rv = (ioport("TEST")->read() & 0x08) << 4;
 				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
-				rv = (input_port_read(machine(), "TEST") & 0x04) << 5;
+				rv = (ioport("TEST")->read() & 0x04) << 5;
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
@@ -88,25 +88,25 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
 				if (m_intvkbd_keyboard_col == 0)
-					rv = input_port_read(machine(), "ROW0");
+					rv = ioport("ROW0")->read();
 				if (m_intvkbd_keyboard_col == 1)
-					rv = input_port_read(machine(), "ROW1");
+					rv = ioport("ROW1")->read();
 				if (m_intvkbd_keyboard_col == 2)
-					rv = input_port_read(machine(), "ROW2");
+					rv = ioport("ROW2")->read();
 				if (m_intvkbd_keyboard_col == 3)
-					rv = input_port_read(machine(), "ROW3");
+					rv = ioport("ROW3")->read();
 				if (m_intvkbd_keyboard_col == 4)
-					rv = input_port_read(machine(), "ROW4");
+					rv = ioport("ROW4")->read();
 				if (m_intvkbd_keyboard_col == 5)
-					rv = input_port_read(machine(), "ROW5");
+					rv = ioport("ROW5")->read();
 				if (m_intvkbd_keyboard_col == 6)
-					rv = input_port_read(machine(), "ROW6");
+					rv = ioport("ROW6")->read();
 				if (m_intvkbd_keyboard_col == 7)
-					rv = input_port_read(machine(), "ROW7");
+					rv = ioport("ROW7")->read();
 				if (m_intvkbd_keyboard_col == 8)
-					rv = input_port_read(machine(), "ROW8");
+					rv = ioport("ROW8")->read();
 				if (m_intvkbd_keyboard_col == 9)
-					rv = input_port_read(machine(), "ROW9");
+					rv = ioport("ROW9")->read();
 				break;
 			case 0x80:
 				rv = 0x00;
@@ -729,7 +729,7 @@ UINT8 intv_control_r(address_space *space, int hand)
 	UINT8 rv = 0xFF;
 
 	/* keypad */
-	x = input_port_read(space->machine(), keypad_name[hand]);
+	x = space->machine().root_device().ioport(keypad_name[hand])->read();
 	for (y = 0; y < 16; y++)
 	{
 		if (x & (1 << y))
@@ -738,12 +738,12 @@ UINT8 intv_control_r(address_space *space, int hand)
 		}
 	}
 
-	switch ((input_port_read(space->machine(), "OPTIONS") >> hand) & 1)
+	switch ((space->machine().root_device().ioport("OPTIONS")->read() >> hand) & 1)
 	{
 		case 0: /* disc == digital */
 		default:
 
-			x = input_port_read(space->machine(), disc_name[hand]);
+			x = space->machine().root_device().ioport(disc_name[hand])->read();
 			for (y = 0; y < 16; y++)
 			{
 				if (x & (1 << y))
@@ -755,8 +755,8 @@ UINT8 intv_control_r(address_space *space, int hand)
 
 		case 1: /* disc == _fake_ analog */
 
-			x = input_port_read(space->machine(), discx_name[hand]);
-			y = input_port_read(space->machine(), discy_name[hand]);
+			x = space->machine().root_device().ioport(discx_name[hand])->read();
+			y = space->machine().root_device().ioport(discy_name[hand])->read();
 			rv &= discyx_table[y / 32][x / 32];
 	}
 
@@ -775,7 +775,7 @@ READ8_MEMBER( intv_state::intv_right_control_r )
 
 READ8_MEMBER( intv_state::intv_ecs_porta_r )
 {
-	if (input_port_read(machine(), "ECS_CNTRLSEL") == 0)
+	if (ioport("ECS_CNTRLSEL")->read() == 0)
 		return intv_control_r(&space, 2);
 	else
 		return 0xff; // not sure what to return here, maybe it should be last output?
@@ -783,7 +783,7 @@ READ8_MEMBER( intv_state::intv_ecs_porta_r )
 
 READ8_MEMBER( intv_state::intv_ecs_portb_r )
 {
-	switch (input_port_read(machine(), "ECS_CNTRLSEL"))
+	switch (ioport("ECS_CNTRLSEL")->read())
 	{
 		case 0x00: // hand controller
 		{
@@ -797,7 +797,7 @@ READ8_MEMBER( intv_state::intv_ecs_portb_r )
 			for (int i=0; i<7; i++)
 			{
 			if (m_ecs_psg_porta & (1<<i))
-				rv &= input_port_read(machine(), ecs_synth_rows[i]);
+				rv &= ioport(ecs_synth_rows[i])->read();
 			}
 			return rv;
 		}
@@ -809,7 +809,7 @@ READ8_MEMBER( intv_state::intv_ecs_portb_r )
 			for (int i=0; i<7; i++)
 			{
 			if (m_ecs_psg_porta & (1<<i))
-				rv &= input_port_read(machine(), ecs_keyboard_rows[i]);
+				rv &= ioport(ecs_keyboard_rows[i])->read();
 			}
 			return rv;
 		}

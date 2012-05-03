@@ -444,7 +444,7 @@ READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
 
     if (m_stb && m_row < 12)
     {
-        data = input_port_read(*this, ABC800_KEY_ROW[m_row]);
+        data = ioport(ABC800_KEY_ROW[m_row])->read();
     }
 
     return data;

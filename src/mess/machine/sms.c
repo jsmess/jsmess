@@ -239,7 +239,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 	switch (offset)
 	{
 	case 0:
-		switch (input_port_read_safe(machine(), "CTRLSEL", 0x00) & 0x0f)
+		switch (ioport("CTRLSEL")->read_safe(0x00) & 0x0f)
 		{
 		case 0x04:	/* Sports Pad */
 			if (data != m_sports_pad_last_data_1)
@@ -250,8 +250,8 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 				if (cpu_cycles - m_last_sports_pad_time_1 > 512)
 				{
 					m_sports_pad_state_1 = 3;
-					m_sports_pad_1_x = input_port_read(machine(), "SPORT0");
-					m_sports_pad_1_y = input_port_read(machine(), "SPORT1");
+					m_sports_pad_1_x = ioport("SPORT0")->read();
+					m_sports_pad_1_y = ioport("SPORT1")->read();
 				}
 				m_last_sports_pad_time_1 = cpu_cycles;
 				m_sports_pad_state_1 = (m_sports_pad_state_1 + 1) & 3;
@@ -261,7 +261,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 		break;
 
 	case 1:
-		switch (input_port_read_safe(machine(), "CTRLSEL", 0x00) & 0xf0)
+		switch (ioport("CTRLSEL")->read_safe(0x00) & 0xf0)
 		{
 		case 0x40:	/* Sports Pad */
 			if (data != m_sports_pad_last_data_2)
@@ -272,8 +272,8 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 				if (cpu_cycles - m_last_sports_pad_time_2 > 2048)
 				{
 					m_sports_pad_state_2 = 3;
-					m_sports_pad_2_x = input_port_read(machine(), "SPORT2");
-					m_sports_pad_2_y = input_port_read(machine(), "SPORT3");
+					m_sports_pad_2_x = ioport("SPORT2")->read();
+					m_sports_pad_2_y = ioport("SPORT3")->read();
 				}
 				m_last_sports_pad_time_2 = cpu_cycles;
 				m_sports_pad_state_2 = (m_sports_pad_state_2 + 1) & 3;
@@ -455,8 +455,8 @@ static UINT16 screen_vpos_nonscaled( screen_device &screen, int scaled_vpos )
 static void lphaser1_sensor_check( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER0"));
-	const int y = screen_vpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER1"));
+	const int x = screen_hpos_nonscaled(*machine.first_screen(), machine.root_device().ioport("LPHASER0")->read());
+	const int y = screen_vpos_nonscaled(*machine.first_screen(), machine.root_device().ioport("LPHASER1")->read());
 
 	if (lgun_bright_aim_area(machine, state->m_lphaser_1_timer, x, y))
 	{
@@ -471,8 +471,8 @@ static void lphaser1_sensor_check( running_machine &machine )
 static void lphaser2_sensor_check( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER2"));
-	const int y = screen_vpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER3"));
+	const int x = screen_hpos_nonscaled(*machine.first_screen(), machine.root_device().ioport("LPHASER2")->read());
+	const int y = screen_vpos_nonscaled(*machine.first_screen(), machine.root_device().ioport("LPHASER3")->read());
 
 	if (lgun_bright_aim_area(machine, state->m_lphaser_2_timer, x, y))
 	{
@@ -491,7 +491,7 @@ static TIMER_CALLBACK( lightgun_tick )
 {
 	sms_state *state = machine.driver_data<sms_state>();
 
-	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f) == 0x01)
+	if ((state->ioport("CTRLSEL")->read_safe(0x00) & 0x0f) == 0x01)
 	{
 		/* enable crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
@@ -505,7 +505,7 @@ static TIMER_CALLBACK( lightgun_tick )
 		state->m_lphaser_1_timer->enable(0);
 	}
 
-	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
+	if ((state->ioport("CTRLSEL")->read_safe(0x00) & 0xf0) == 0x10)
 	{
 		/* enable crosshair */
 		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
@@ -537,7 +537,7 @@ INPUT_CHANGED( lgun1_changed )
 {
 	sms_state *state = field.machine().driver_data<sms_state>();
 	if (!state->m_lphaser_1_timer ||
-		(input_port_read_safe(field.machine(), "CTRLSEL", 0x00) & 0x0f) != 0x01)
+		(field.machine().root_device().ioport("CTRLSEL")->read_safe(0x00) & 0x0f) != 0x01)
 		return;
 
 	if (newval != oldval)
@@ -548,7 +548,7 @@ INPUT_CHANGED( lgun2_changed )
 {
 	sms_state *state = field.machine().driver_data<sms_state>();
 	if (!state->m_lphaser_2_timer ||
-		(input_port_read_safe(field.machine(), "CTRLSEL", 0x00) & 0xf0) != 0x10)
+		(field.machine().root_device().ioport("CTRLSEL")->read_safe(0x00) & 0xf0) != 0x10)
 		return;
 
 	if (newval != oldval)
@@ -576,26 +576,26 @@ static void sms_get_inputs( address_space *space )
 	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* Player 1 */
-	switch (input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f)
+	switch (machine.root_device().ioport("CTRLSEL")->read_safe(0x00) & 0x0f)
 	{
 	case 0x00:  /* Joystick */
-		data = input_port_read(machine, "PORT_DC");
+		data = machine.root_device().ioport("PORT_DC")->read();
 		/* Check Rapid Fire setting for Button A */
-		if (!(data & 0x10) && (input_port_read(machine, "RFU") & 0x01))
+		if (!(data & 0x10) && (machine.root_device().ioport("RFU")->read() & 0x01))
 			data |= state->m_rapid_fire_state_1 & 0x10;
 
 		/* Check Rapid Fire setting for Button B */
-		if (!(data & 0x20) && (input_port_read(machine, "RFU") & 0x02))
+		if (!(data & 0x20) && (machine.root_device().ioport("RFU")->read() & 0x02))
 			data |= state->m_rapid_fire_state_1 & 0x20;
 
 		state->m_input_port0 = (state->m_input_port0 & 0xc0) | (data & 0x3f);
 		break;
 
 	case 0x01:  /* Light Phaser */
-		data = (input_port_read(machine, "CTRLIPT") & 0x01) << 4;
+		data = (machine.root_device().ioport("CTRLIPT")->read() & 0x01) << 4;
 		if (!(data & 0x10))
 		{
-			if (input_port_read(machine, "RFU") & 0x01)
+			if (machine.root_device().ioport("RFU")->read() & 0x01)
 				data |= state->m_rapid_fire_state_1 & 0x10;
 		}
 		/* just consider the button (trigger) bit */
@@ -605,13 +605,13 @@ static void sms_get_inputs( address_space *space )
 
 	case 0x02:  /* Paddle Control */
 		/* Get button A state */
-		data = input_port_read(machine, "PADDLE0");
+		data = machine.root_device().ioport("PADDLE0")->read();
 
 		if (state->m_paddle_read_state)
 			data = data >> 4;
 
 		state->m_input_port0 = (state->m_input_port0 & 0xc0) | (data & 0x0f) | (state->m_paddle_read_state & 0x20)
-		                | ((input_port_read(machine, "CTRLIPT") & 0x02) << 3);
+		                | ((machine.root_device().ioport("CTRLIPT")->read() & 0x02) << 3);
 		break;
 
 	case 0x04:	/* Sega Sports Pad */
@@ -630,34 +630,34 @@ static void sms_get_inputs( address_space *space )
 			data = state->m_sports_pad_1_y & 0x0f;
 			break;
 		}
-		state->m_input_port0 = (state->m_input_port0 & 0xc0) | data | ((input_port_read(machine, "CTRLIPT") & 0x0c) << 2);
+		state->m_input_port0 = (state->m_input_port0 & 0xc0) | data | ((machine.root_device().ioport("CTRLIPT")->read() & 0x0c) << 2);
 		break;
 	}
 
 	/* Player 2 */
-	switch (input_port_read_safe(machine, "CTRLSEL", 0x00)  & 0xf0)
+	switch (machine.root_device().ioport("CTRLSEL")->read_safe(0x00)  & 0xf0)
 	{
 	case 0x00:	/* Joystick */
-		data = input_port_read(machine, "PORT_DC");
+		data = machine.root_device().ioport("PORT_DC")->read();
 		state->m_input_port0 = (state->m_input_port0 & 0x3f) | (data & 0xc0);
 
-		data = input_port_read(machine, "PORT_DD");
+		data = machine.root_device().ioport("PORT_DD")->read();
 		/* Check Rapid Fire setting for Button A */
-		if (!(data & 0x04) && (input_port_read(machine, "RFU") & 0x04))
+		if (!(data & 0x04) && (machine.root_device().ioport("RFU")->read() & 0x04))
 			data |= state->m_rapid_fire_state_2 & 0x04;
 
 		/* Check Rapid Fire setting for Button B */
-		if (!(data & 0x08) && (input_port_read(machine, "RFU") & 0x08))
+		if (!(data & 0x08) && (machine.root_device().ioport("RFU")->read() & 0x08))
 			data |= state->m_rapid_fire_state_2 & 0x08;
 
 		state->m_input_port1 = (state->m_input_port1 & 0xf0) | (data & 0x0f);
 		break;
 
 	case 0x10:	/* Light Phaser */
-		data = (input_port_read(machine, "CTRLIPT") & 0x10) >> 2;
+		data = (machine.root_device().ioport("CTRLIPT")->read() & 0x10) >> 2;
 		if (!(data & 0x04))
 		{
-			if (input_port_read(machine, "RFU") & 0x04)
+			if (machine.root_device().ioport("RFU")->read() & 0x04)
 				data |= state->m_rapid_fire_state_2 & 0x04;
 		}
 		/* just consider the button (trigger) bit */
@@ -667,13 +667,13 @@ static void sms_get_inputs( address_space *space )
 
 	case 0x20:	/* Paddle Control */
 		/* Get button A state */
-		data = input_port_read(machine, "PADDLE1");
+		data = machine.root_device().ioport("PADDLE1")->read();
 		if (state->m_paddle_read_state)
 			data = data >> 4;
 
 		state->m_input_port0 = (state->m_input_port0 & 0x3f) | ((data & 0x03) << 6);
 		state->m_input_port1 = (state->m_input_port1 & 0xf0) | ((data & 0x0c) >> 2) | (state->m_paddle_read_state & 0x08)
-		                | ((input_port_read(machine, "CTRLIPT") & 0x20) >> 3);
+		                | ((machine.root_device().ioport("CTRLIPT")->read() & 0x20) >> 3);
 		break;
 
 	case 0x40:	/* Sega Sports Pad */
@@ -693,7 +693,7 @@ static void sms_get_inputs( address_space *space )
 			break;
 		}
 		state->m_input_port0 = (state->m_input_port0 & 0x3f) | ((data & 0x03) << 6);
-		state->m_input_port1 = (state->m_input_port1 & 0xf0) | (data >> 2) | ((input_port_read(machine, "CTRLIPT") & 0xc0) >> 4);
+		state->m_input_port1 = (state->m_input_port1 & 0xf0) | (data >> 2) | ((machine.root_device().ioport("CTRLIPT")->read() & 0xc0) >> 4);
 		break;
 	}
 }
@@ -781,7 +781,7 @@ WRITE_LINE_DEVICE_HANDLER( sms_pause_callback )
 	if (driver_state->m_is_gamegear && !(driver_state->m_cartridge[driver_state->m_current_cartridge].features & CF_GG_SMS_MODE))
 		return;
 
-	if (!(input_port_read(device->machine(), driver_state->m_is_gamegear ? "START" : "PAUSE") & 0x80))
+	if (!(driver_state->ioport(driver_state->m_is_gamegear ? "START" : "PAUSE")->read() & 0x80))
 	{
 		if (!driver_state->m_paused)
 		{
@@ -823,7 +823,7 @@ READ8_MEMBER(sms_state::sms_input_port_1_r)
 	sms_get_inputs(&space);
 
 	/* Reset Button */
-	m_input_port1 = (m_input_port1 & 0xef) | (input_port_read_safe(machine(), "RESET", 0x01) & 0x01) << 4;
+	m_input_port1 = (m_input_port1 & 0xef) | (ioport("RESET")->read_safe(0x01) & 0x01) << 4;
 
 	/* Do region detection if TH of ports A and B are set to output (0) */
 	if (!(m_ctrl_reg & 0x0a))
@@ -877,8 +877,8 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_0_w)
 READ8_MEMBER(sms_state::gg_input_port_2_r)
 {
 
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((m_is_region_japan ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
-	return ((m_is_region_japan ? 0x00 : 0x40) | (input_port_read(machine(), "START") & 0x80));
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((m_is_region_japan ? 0x00 : 0x40) | (machine.root_device().ioport("START")->read() & 0x80)), activecpu_get_pc());
+	return ((m_is_region_japan ? 0x00 : 0x40) | (ioport("START")->read() & 0x80));
 }
 
 
@@ -903,25 +903,25 @@ READ8_MEMBER(sms_state::sms_mapper_r)
 /* The following code comes from sg1000.c. We should eventually merge these TV Draw implementations */
 WRITE8_MEMBER(sms_state::sms_tvdraw_axis_w)
 {
-	UINT8 tvboard_on = input_port_read_safe(machine(), "TVDRAW", 0x00);
+	UINT8 tvboard_on = ioport("TVDRAW")->read_safe(0x00);
 
 	if (data & 0x01)
 	{
-		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(machine(), "TVDRAW_X") : 0x80;
+		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? ioport("TVDRAW_X")->read() : 0x80;
 
 		if (m_cartridge[m_current_cartridge].m_tvdraw_data < 4) m_cartridge[m_current_cartridge].m_tvdraw_data = 4;
 		if (m_cartridge[m_current_cartridge].m_tvdraw_data > 251) m_cartridge[m_current_cartridge].m_tvdraw_data = 251;
 	}
 	else
 	{
-		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? input_port_read(machine(), "TVDRAW_Y") + 0x20 : 0x80;
+		m_cartridge[m_current_cartridge].m_tvdraw_data = tvboard_on ? ioport("TVDRAW_Y")->read() + 0x20 : 0x80;
 	}
 }
 
 READ8_MEMBER(sms_state::sms_tvdraw_status_r)
 {
-	UINT8 tvboard_on = input_port_read_safe(machine(), "TVDRAW", 0x00);
-	return tvboard_on ? input_port_read(machine(), "TVDRAW_PEN") : 0x01;
+	UINT8 tvboard_on = ioport("TVDRAW")->read_safe(0x00);
+	return tvboard_on ? ioport("TVDRAW_PEN")->read() : 0x01;
 }
 
 READ8_MEMBER(sms_state::sms_tvdraw_data_r)
@@ -2202,7 +2202,7 @@ SCREEN_UPDATE_RGB32( sms1 )
 
 	if (&screen != state->m_main_scr)
 	{
-		sscope = input_port_read_safe(screen.machine(), "SEGASCOPE", 0x00);
+		sscope = screen.machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
 		if (!sscope)
 		{
 			occluded_view = 1;
@@ -2229,7 +2229,7 @@ SCREEN_UPDATE_RGB32( sms1 )
 		// save a copy of current bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
+			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == state->m_left_lcd)
 			{
@@ -2249,7 +2249,7 @@ SCREEN_UPDATE_RGB32( sms1 )
 		// use the copied bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
+			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == state->m_left_lcd)
 			{

@@ -97,7 +97,7 @@ void tiki100_state::bankswitch()
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
 	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11", "ROW12" };
-	UINT8 data = input_port_read(machine(), keynames[m_keylatch]);
+	UINT8 data = ioport(keynames[m_keylatch])->read();
 
 	m_keylatch++;
 

@@ -263,31 +263,31 @@ static void load9312prom(UINT8 *desc, UINT8 *src, int size)
 static MACHINE_RESET(pdp11ub2)
 {
 	// Load M9312
-	UINT8* user1 = machine.root_device().memregion("consproms")->base() + input_port_read(machine,"CONSPROM") * 0x0400;
+	UINT8* user1 = machine.root_device().memregion("consproms")->base() + machine.root_device().ioport("CONSPROM")->read() * 0x0400;
 	UINT8* maincpu = machine.root_device().memregion("maincpu")->base();
 
 	//0165000
 	load9312prom(maincpu + 0165000,user1,0x100);
 
-	UINT8 s1 = input_port_read(machine,"S1");
+	UINT8 s1 = machine.root_device().ioport("S1")->read();
 
 	if (s1 & 0x02) { // if boot enabled
 		UINT16 addr = 0173000;
 		if (s1 & 1) {
 			addr = 0165000;
 		}
-		addr += input_port_read(machine,"S1_2") * 2;
+		addr += machine.root_device().ioport("S1_2")->read() * 2;
 		cpu_set_reg(machine.device("maincpu"), T11_PC, addr);
 	}
 
 	//0173000
-	load9312prom(maincpu + 0173000,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM1") * 0x0200,0x080);
+	load9312prom(maincpu + 0173000,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM1")->read() * 0x0200,0x080);
 	//0173200
-	load9312prom(maincpu + 0173200,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM2") * 0x0200,0x080);
+	load9312prom(maincpu + 0173200,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM2")->read() * 0x0200,0x080);
 	//0173400
-	load9312prom(maincpu + 0173400,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM3") * 0x0200,0x080);
+	load9312prom(maincpu + 0173400,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM3")->read() * 0x0200,0x080);
 	//0173600
-	load9312prom(maincpu + 0173600,machine.root_device().memregion("devproms")->base() + input_port_read(machine,"DEVPROM4") * 0x0200,0x080);
+	load9312prom(maincpu + 0173600,machine.root_device().memregion("devproms")->base() + machine.root_device().ioport("DEVPROM4")->read() * 0x0200,0x080);
 
 }
 

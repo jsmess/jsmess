@@ -87,14 +87,14 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
+	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
+	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
+	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
+	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
+	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 
 	return result;
 }
@@ -103,21 +103,21 @@ READ8_MEMBER( mc10_state::alice90_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
+	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
+	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
+	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
+	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
+	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
 
 	return result;
 }
@@ -164,9 +164,9 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	UINT8 result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0") >> 5;
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2") >> 5;
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7") >> 5;
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read() >> 5;
 
 	/* bit 2, printer ots input */
 	result |= (m_printer->is_ready() ? 0 : 4);

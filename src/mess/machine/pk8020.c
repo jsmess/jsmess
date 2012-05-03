@@ -28,21 +28,21 @@ READ8_MEMBER(pk8020_state::keyboard_r)
 	UINT8 line = 0;
 	if (offset & 0x100)  line=8;
 
-	if (offset & 0x0001) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0001) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0002) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0002) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0004) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0004) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0008) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0008) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0010) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0010) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0020) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0020) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0040) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0040) retVal|=ioport(keynames[line])->read();
 	line++;
-	if (offset & 0x0080) retVal|=input_port_read(machine(),keynames[line]);
+	if (offset & 0x0080) retVal|=ioport(keynames[line])->read();
 	line++;
 
 	return retVal;

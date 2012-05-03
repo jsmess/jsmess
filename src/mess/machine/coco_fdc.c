@@ -116,7 +116,7 @@ static const floppy_interface coco_floppy_interface =
 
 coco_rtc_type_t coco_fdc_device::real_time_clock()
 {
-	coco_rtc_type_t result = (coco_rtc_type_t) input_port_read_safe(machine(), "real_time_clock", RTC_NONE);
+	coco_rtc_type_t result = (coco_rtc_type_t) ioport("real_time_clock")->read_safe(RTC_NONE);
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (m_disto_msm6242 == NULL))

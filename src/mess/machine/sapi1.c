@@ -27,11 +27,11 @@ MACHINE_START(sapi1)
 READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
 {
 	UINT8 key = 0xff;
-	if (BIT(m_keyboard_mask, 0)) { key &= input_port_read(machine(),"LINE0"); }
-	if (BIT(m_keyboard_mask, 1)) { key &= input_port_read(machine(),"LINE1"); }
-	if (BIT(m_keyboard_mask, 2)) { key &= input_port_read(machine(),"LINE2"); }
-	if (BIT(m_keyboard_mask, 3)) { key &= input_port_read(machine(),"LINE3"); }
-	if (BIT(m_keyboard_mask, 4)) { key &= input_port_read(machine(),"LINE4"); }
+	if (BIT(m_keyboard_mask, 0)) { key &= ioport("LINE0")->read(); }
+	if (BIT(m_keyboard_mask, 1)) { key &= ioport("LINE1")->read(); }
+	if (BIT(m_keyboard_mask, 2)) { key &= ioport("LINE2")->read(); }
+	if (BIT(m_keyboard_mask, 3)) { key &= ioport("LINE3")->read(); }
+	if (BIT(m_keyboard_mask, 4)) { key &= ioport("LINE4")->read(); }
 	return key;
 }
 

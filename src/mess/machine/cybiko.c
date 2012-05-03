@@ -387,7 +387,7 @@ int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)
 	for (UINT8 i = 0; i < 15; i++)
 	{
 		if (!BIT(offset, i))
-			data &= ~input_port_read_safe(machine(), keynames[i], 0);
+			data &= ~ioport(keynames[i])->read_safe(0);
 	}
 	if (data != 0xFFFF)
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!BIT(input_port_read(machine(), "A1"), 1))
+			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;
@@ -469,7 +469,7 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!BIT(input_port_read(machine(), "A1"), 1))
+			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;

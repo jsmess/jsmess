@@ -107,8 +107,8 @@ void mecmouse_device::poll()
 	int new_mx, new_my;
 	int delta_x, delta_y;
 
-	new_mx = input_port_read(machine(), "MOUSEX");
-	new_my = input_port_read(machine(), "MOUSEY");
+	new_mx = ioport("MOUSEX")->read();
+	new_my = ioport("MOUSEY")->read();
 
 	/* compute x delta */
 	delta_x = new_mx - m_last_mx;
@@ -145,7 +145,7 @@ void mecmouse_device::poll()
 int mecmouse_device::get_values()
 {
 	int answer;
-	int buttons = input_port_read(machine(), "MOUSE0") & 3;
+	int buttons = ioport("MOUSE0")->read() & 3;
 	answer = (m_read_y ? m_y_buf : m_x_buf) << 4;
 
 	if ((buttons & 1)==0)
@@ -163,7 +163,7 @@ int mecmouse_device::get_values()
 int mecmouse_device::get_values8(int mode)
 {
 	int answer;
-	int buttons = input_port_read(machine(), "MOUSE0") & 3;
+	int buttons = ioport("MOUSE0")->read() & 3;
 
 	if (mode == 0)
 	{

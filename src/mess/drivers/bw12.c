@@ -579,12 +579,12 @@ static const struct pit8253_config pit_intf =
 
 READ_LINE_MEMBER( bw12_state::ay3600_shift_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 0);
+	return BIT(ioport("MODIFIERS")->read(), 0);
 }
 
 READ_LINE_MEMBER( bw12_state::ay3600_control_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
+	return BIT(ioport("MODIFIERS")->read(), 1);
 }
 
 WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )

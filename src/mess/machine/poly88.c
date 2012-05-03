@@ -47,13 +47,13 @@ static TIMER_CALLBACK(keyboard_callback)
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
-	UINT8 shift = input_port_read(machine, "LINEC") & 0x02 ? 1 : 0;
-	UINT8 ctrl =  input_port_read(machine, "LINEC") & 0x01 ? 1 : 0;
+	UINT8 shift = machine.root_device().ioport("LINEC")->read() & 0x02 ? 1 : 0;
+	UINT8 ctrl =  machine.root_device().ioport("LINEC")->read() & 0x01 ? 1 : 0;
 
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	input_port_read(machine, keynames[i]);
+		code =	machine.root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -139,7 +139,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 	i8251_device *uart = machine.device<i8251_device>("uart");
 	serial_source_device *ser = machine.device<serial_source_device>("sercas");
 
-//  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
+//  if (!(machine.root_device().ioport("DSW0")->read() & 0x02)) /* V.24 / Tape Switch */
 	//{
 		/* tape reading */
 		if (machine.device<cassette_image_device>(CASSETTE_TAG)->get_state()&CASSETTE_PLAY)

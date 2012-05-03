@@ -22,7 +22,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super
 	for (i = 0; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%d",i);
-		if (!BIT(state->m_keylatch, i)) data &= input_port_read(device->machine(), kbdrow);
+		if (!BIT(state->m_keylatch, i)) data &= state->ioport(kbdrow)->read();
 	}
 
 	return data;
@@ -51,7 +51,7 @@ static void super80_cassette_motor( running_machine &machine, UINT8 data )
 		state->m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
-	if BIT(input_port_read(machine, "CONFIG"), 3)
+	if BIT(machine.root_device().ioport("CONFIG")->read(), 3)
 		state->m_cass->change_state(CASSETTE_SPEAKER_ENABLED,CASSETTE_MASK_SPEAKER);
 	else
 		state->m_cass->change_state(CASSETTE_SPEAKER_MUTED,CASSETTE_MASK_SPEAKER);
@@ -108,7 +108,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 {
 	UINT8 go_fast = 0;
 	super80_state *state = machine.driver_data<super80_state>();
-	if ( (!BIT(state->m_shared, 2)) | (!BIT(input_port_read(machine, "CONFIG"), 1)) )	/* bit 2 of port F0 is low, OR user turned on config switch */
+	if ( (!BIT(state->m_shared, 2)) | (!BIT(machine.root_device().ioport("CONFIG")->read(), 1)) )	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
@@ -160,7 +160,7 @@ READ8_MEMBER( super80_state::super80_dc_r )
 
 READ8_MEMBER( super80_state::super80_f2_r )
 {
-	UINT8 data = input_port_read(machine(), "DSW") & 0xf0;	// dip switches on pcb
+	UINT8 data = ioport("DSW")->read() & 0xf0;	// dip switches on pcb
 	data |= m_cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;

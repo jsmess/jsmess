@@ -67,21 +67,21 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 	if (!device->started()) return 0;
 
     if (!(state->m_kb_matrix & 0x01))
-		data &= input_port_read(device->machine(), "KEY0");
+		data &= device->machine().root_device().ioport("KEY0")->read();
     if (!(state->m_kb_matrix & 0x02))
-		data &= input_port_read(device->machine(), "KEY1");
+		data &= device->machine().root_device().ioport("KEY1")->read();
     if (!(state->m_kb_matrix & 0x04))
-		data &= input_port_read(device->machine(), "KEY2");
+		data &= device->machine().root_device().ioport("KEY2")->read();
     if (!(state->m_kb_matrix & 0x08))
-		data &= input_port_read(device->machine(), "KEY3");
+		data &= device->machine().root_device().ioport("KEY3")->read();
     if (!(state->m_kb_matrix & 0x10))
-		data &= input_port_read(device->machine(), "KEY4");
+		data &= device->machine().root_device().ioport("KEY4")->read();
     if (!(state->m_kb_matrix & 0x20))
-		data &= input_port_read(device->machine(), "KEY5");
+		data &= device->machine().root_device().ioport("KEY5")->read();
     if (!(state->m_kb_matrix & 0x40))
-		data &= input_port_read(device->machine(), "KEY6");
+		data &= device->machine().root_device().ioport("KEY6")->read();
     if (!(state->m_kb_matrix & 0x80))
-		data &= input_port_read(device->machine(), "KEY7");
+		data &= state->ioport("KEY7")->read();
 
 	return data;
 }
@@ -246,7 +246,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 
 	data |= (m_rtc->tp_r()<<5);
 	data |= (m_rtc->data_out_r()<<6);
-	data |= (input_port_read(machine(), "ON")<<7);
+	data |= (ioport("ON")->read()<<7);
 
 	return data;
 }

@@ -446,7 +446,7 @@ READ8_MEMBER( vic20_state::via0_pa_r )
 	data |= m_iec->data_r() << 1;
 
 	// joystick
-	data &= ~(input_port_read(machine(), "JOY") & 0x3c);
+	data &= ~(ioport("JOY")->read() & 0x3c);
 
 	// cassette switch
 	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -571,14 +571,14 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_key_col, 0)) data &= input_port_read(machine(), "ROW0");
-	if (!BIT(m_key_col, 1)) data &= input_port_read(machine(), "ROW1");
-	if (!BIT(m_key_col, 2)) data &= input_port_read(machine(), "ROW2");
-	if (!BIT(m_key_col, 3)) data &= input_port_read(machine(), "ROW3");
-	if (!BIT(m_key_col, 4)) data &= input_port_read(machine(), "ROW4");
-	if (!BIT(m_key_col, 5)) data &= input_port_read(machine(), "ROW5");
-	if (!BIT(m_key_col, 6)) data &= input_port_read(machine(), "ROW6");
-	if (!BIT(m_key_col, 7)) data &= input_port_read(machine(), "ROW7");
+	if (!BIT(m_key_col, 0)) data &= ioport("ROW0")->read();
+	if (!BIT(m_key_col, 1)) data &= ioport("ROW1")->read();
+	if (!BIT(m_key_col, 2)) data &= ioport("ROW2")->read();
+	if (!BIT(m_key_col, 3)) data &= ioport("ROW3")->read();
+	if (!BIT(m_key_col, 4)) data &= ioport("ROW4")->read();
+	if (!BIT(m_key_col, 5)) data &= ioport("ROW5")->read();
+	if (!BIT(m_key_col, 6)) data &= ioport("ROW6")->read();
+	if (!BIT(m_key_col, 7)) data &= ioport("ROW7")->read();
 
 	return data;
 }
@@ -603,7 +603,7 @@ READ8_MEMBER( vic20_state::via1_pb_r )
 	UINT8 data = 0xff;
 
 	// joystick
-	data &= ~(input_port_read(machine(), "JOY") & 0x80);
+	data &= ~(ioport("JOY")->read() & 0x80);
 
 	return data;
 }
@@ -714,27 +714,27 @@ static int vic20_dma_read( running_machine &machine, int offset )
 
 static UINT8 vic20_lightx_cb( running_machine &machine )
 {
-	return (input_port_read_safe(machine, "LIGHTX", 0) & ~0x01);
+	return (machine.root_device().ioport("LIGHTX")->read_safe(0) & ~0x01);
 }
 
 static UINT8 vic20_lighty_cb( running_machine &machine )
 {
-	return (input_port_read_safe(machine, "LIGHTY", 0) & ~0x01);
+	return (machine.root_device().ioport("LIGHTY")->read_safe(0) & ~0x01);
 }
 
 static UINT8 vic20_lightbut_cb( running_machine &machine )
 {
-	return (((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40));
+	return (((machine.root_device().ioport("CTRLSEL")->read() & 0xf0) == 0x20) && (machine.root_device().ioport("JOY")->read() & 0x40));
 }
 
 static UINT8 vic20_paddle0_cb( running_machine &machine )
 {
-	return input_port_read(machine, "PADDLE0");
+	return machine.root_device().ioport("PADDLE0")->read();
 }
 
 static UINT8 vic20_paddle1_cb( running_machine &machine )
 {
-	return input_port_read(machine, "PADDLE1");
+	return machine.root_device().ioport("PADDLE1")->read();
 }
 
 static const mos6560_interface vic_ntsc_intf =

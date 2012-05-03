@@ -242,7 +242,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 	if (offset ==7) /* Only when joy reading*/
 	{
 		/* Read special key for analog joystick emulation only (button and pot are analog signal!) and the reset */
-		data=input_port_read(machine(), keynames[8]);
+		data=ioport(keynames[8])->read();
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
@@ -301,7 +301,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 	}
 
 	/* in all case return the request value*/
-	return input_port_read(machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 WRITE8_MEMBER(hec2hrp_state::hector_sn_2000_w)

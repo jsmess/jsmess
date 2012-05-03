@@ -206,7 +206,7 @@ SCREEN_UPDATE_IND16( ssystem3 )
 	ssystem3_draw_led(bitmap, state->m_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, state->m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (input_port_read(screen.machine(), "Configuration")&1) { // playfield(optional device)
+	if (screen.machine().root_device().ioport("Configuration")->read()&1) { // playfield(optional device)
 		static const int lcd_signs_on[]={
 			0, // empty
 			1, // bauer

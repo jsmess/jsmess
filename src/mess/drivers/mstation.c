@@ -302,7 +302,7 @@ READ8_MEMBER( mstation_state::kb_r )
 	for (int i=0; i<10; i++)
 	{
 		if (!(m_kb_matrix & (1<<i)))
-			data &= input_port_read(machine(), bitnames[i]);
+			data &= ioport(bitnames[i])->read();
 	}
 
 	return data;

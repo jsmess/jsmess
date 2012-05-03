@@ -69,7 +69,7 @@ READ8_MEMBER( cvicny_state::key_r )
 	UINT8 data;
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d",m_digit);
-	data = input_port_read(machine(), kbdrow);
+	data = ioport(kbdrow)->read();
 	return ((data << 4) ^ 0xf0) | data;
 }
 

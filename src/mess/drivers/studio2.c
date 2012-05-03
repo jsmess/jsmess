@@ -350,17 +350,17 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 READ_LINE_MEMBER( studio2_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "CLEAR"), 0);
+	return BIT(ioport("CLEAR")->read(), 0);
 }
 
 READ_LINE_MEMBER( studio2_state::ef3_r )
 {
-	return BIT(input_port_read(machine(), "A"), m_keylatch);
+	return BIT(ioport("A")->read(), m_keylatch);
 }
 
 READ_LINE_MEMBER( studio2_state::ef4_r )
 {
-	return BIT(input_port_read(machine(), "B"), m_keylatch);
+	return BIT(ioport("B")->read(), m_keylatch);
 }
 
 WRITE_LINE_MEMBER( studio2_state::q_w )

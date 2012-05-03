@@ -679,7 +679,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(device->machine(), "DSW0");
+		data = device->machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -704,13 +704,13 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 	if (st->m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(device->machine(), "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((device->machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(device->machine(), "DSW0") & 0x0f);
+		data = (data & 0xf0) | (device->machine().root_device().ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -779,7 +779,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(device->machine(), "DSW0");
+		data = device->machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -1089,7 +1089,7 @@ DRIVER_INIT( pcjr )
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); }
+static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
 
 DRIVER_INIT( pc1640 )
 {

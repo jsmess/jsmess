@@ -117,9 +117,9 @@ READ8_MEMBER( mephisto_state::read_keys )
 
 	data = 0xff;
 	if (((m_led_status & 0x80) == 0x00))
-		data=input_port_read(machine(), keynames[0][offset]);
+		data=ioport(keynames[0][offset])->read();
 	else
-		data=input_port_read(machine(), keynames[1][offset]);
+		data=ioport(keynames[1][offset])->read();
 
 	logerror("Keyboard Port = %s Data = %d\n  ", ((m_led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;

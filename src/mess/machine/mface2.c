@@ -83,7 +83,7 @@ int cpc_multiface2_device::multiface_hardware_enabled()
 	t.cat(":multiface");
 	if (m_multiface_ram!=NULL)
 	{
-		if ((input_port_read(machine(), t) & 0x01)!=0)
+		if ((ioport(t)->read() & 0x01)!=0)
 		{
 			return 1;
 		}
@@ -135,7 +135,7 @@ void cpc_multiface2_device::check_button_state()
 		return;
 	t.cat(":multiface");
 	// TODO: reset button
-	if (input_port_read(machine(), t) & 0x02)
+	if (ioport(t)->read() & 0x02)
 	{
 		multiface_stop();
 	}

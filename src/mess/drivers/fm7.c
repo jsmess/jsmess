@@ -745,14 +745,14 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 
 	ret |= 0x70;
 
-	if(input_port_read(machine(),"config") & 0x01)
+	if(ioport("config")->read() & 0x01)
 	{
 		ret |= 0x0f;
 		pdata = centronics->read(space, 0);
 		for(x=0;x<6;x++)
 		{
 			if(~pdata & (1<<x))
-				if(input_port_read(machine(),"lptjoy") & (1 << x))
+				if(ioport("lptjoy")->read() & (1 << x))
 					ret &= ~0x08;
 		}
 	}
@@ -808,7 +808,7 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 {
 	UINT8 ret = 0xff;
 
-	if(input_port_read(machine(),"DSW") & 0x02)
+	if(ioport("DSW")->read() & 0x02)
 		ret &= ~0x01;
 
 	return 0xff;
@@ -874,7 +874,7 @@ static void fm7_update_psg(running_machine &machine)
 				break;
 			case 0x09:
 				// Joystick port read
-				state->m_psg_data = input_port_read(space->machine(),"joy1");
+				state->m_psg_data = space->machine().root_device().ioport("joy1")->read();
 				break;
 		}
 	}
@@ -943,12 +943,12 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 
 static READ8_DEVICE_HANDLER( fm77av_joy_1_r )
 {
-	return input_port_read(device->machine(),"joy1");
+	return device->machine().root_device().ioport("joy1")->read();
 }
 
 static READ8_DEVICE_HANDLER( fm77av_joy_2_r )
 {
-	return input_port_read(device->machine(),"joy2");
+	return device->machine().root_device().ioport("joy2")->read();
 }
 
 READ8_MEMBER(fm7_state::fm7_unknown_r)
@@ -1249,12 +1249,12 @@ static void fm7_keyboard_poll_scan(running_machine &machine)
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
-	UINT32 modifiers = input_port_read(machine,"key_modifiers");
+	UINT32 modifiers = machine.root_device().ioport("key_modifiers")->read();
 	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
-		keys = input_port_read(machine,portnames[x]);
+		keys = machine.root_device().ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1296,9 +1296,9 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 	int bit = 0;
 	int mod = 0;
 	UINT32 keys;
-	UINT32 modifiers = input_port_read(machine,"key_modifiers");
+	UINT32 modifiers = machine.root_device().ioport("key_modifiers")->read();
 
-	if(input_port_read(machine,"key3") & 0x40000)
+	if(machine.root_device().ioport("key3")->read() & 0x40000)
 	{
 		state->m_break_flag = 1;
 		cputag_set_input_line(machine,"maincpu",M6809_FIRQ_LINE,ASSERT_LINE);
@@ -1327,7 +1327,7 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 
 	for(x=0;x<3;x++)
 	{
-		keys = input_port_read(machine,portnames[x]);
+		keys = machine.root_device().ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1956,7 +1956,7 @@ static MACHINE_RESET(fm7)
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(state->m_type == SYS_FM7)
 	{
-		if(!(input_port_read(machine,"DSW") & 0x02))
+		if(!(machine.root_device().ioport("DSW")->read() & 0x02))
 		{  // DOS mode
 			state->membank("bank17")->set_base(machine.root_device().memregion("dos")->base());
 		}

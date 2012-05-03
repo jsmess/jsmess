@@ -197,13 +197,13 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 	switch( ( m_u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 		break;
 	case 1:
-		data = input_port_read(machine(), "LINE1");
+		data = ioport("LINE1")->read();
 		break;
 	case 2:
-		data = input_port_read(machine(), "LINE2");
+		data = ioport("LINE2")->read();
 		break;
 	}
 	return data;

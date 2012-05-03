@@ -48,7 +48,7 @@ static TIMER_CALLBACK( lviv_reset )
 
 DIRECT_UPDATE_MEMBER(lviv_state::lviv_directoverride)
 {
-	if (input_port_read(machine(), "RESET") & 0x01)
+	if (ioport("RESET")->read() & 0x01)
 		machine().scheduler().timer_set(attotime::from_usec(10), FUNC(lviv_reset));
 	return address;
 }
@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_0_portc_r )
 	UINT8 data = state->m_ppi_port_outputs[0][2] & 0x0f;
 	if (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input() > 0.038)
 		data |= 0x10;
-	if (state->m_ppi_port_outputs[0][0] & input_port_read(device->machine(), "JOY"))
+	if (state->m_ppi_port_outputs[0][0] & state->ioport("JOY")->read())
 		data |= 0x80;
 	return data;
 }
@@ -106,23 +106,23 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_1_porta_r )
 static READ8_DEVICE_HANDLER ( lviv_ppi_1_portb_r )	/* keyboard reading */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	return	((state->m_ppi_port_outputs[1][0] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY0")) &
-		((state->m_ppi_port_outputs[1][0] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY1")) &
-		((state->m_ppi_port_outputs[1][0] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY2")) &
-		((state->m_ppi_port_outputs[1][0] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY3")) &
-		((state->m_ppi_port_outputs[1][0] & 0x10) ? 0xff : input_port_read(device->machine(), "KEY4")) &
-		((state->m_ppi_port_outputs[1][0] & 0x20) ? 0xff : input_port_read(device->machine(), "KEY5")) &
-		((state->m_ppi_port_outputs[1][0] & 0x40) ? 0xff : input_port_read(device->machine(), "KEY6")) &
-		((state->m_ppi_port_outputs[1][0] & 0x80) ? 0xff : input_port_read(device->machine(), "KEY7"));
+	return	((state->m_ppi_port_outputs[1][0] & 0x01) ? 0xff : device->machine().root_device().ioport("KEY0")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x02) ? 0xff : device->machine().root_device().ioport("KEY1")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x04) ? 0xff : device->machine().root_device().ioport("KEY2")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x08) ? 0xff : device->machine().root_device().ioport("KEY3")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x10) ? 0xff : device->machine().root_device().ioport("KEY4")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x20) ? 0xff : device->machine().root_device().ioport("KEY5")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x40) ? 0xff : device->machine().root_device().ioport("KEY6")->read()) &
+		((state->m_ppi_port_outputs[1][0] & 0x80) ? 0xff : state->ioport("KEY7")->read());
 }
 
 static READ8_DEVICE_HANDLER ( lviv_ppi_1_portc_r )     /* keyboard reading */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	return	((state->m_ppi_port_outputs[1][2] & 0x01) ? 0xff : input_port_read(device->machine(), "KEY8")) &
-		((state->m_ppi_port_outputs[1][2] & 0x02) ? 0xff : input_port_read(device->machine(), "KEY9" )) &
-		((state->m_ppi_port_outputs[1][2] & 0x04) ? 0xff : input_port_read(device->machine(), "KEY10")) &
-		((state->m_ppi_port_outputs[1][2] & 0x08) ? 0xff : input_port_read(device->machine(), "KEY11"));
+	return	((state->m_ppi_port_outputs[1][2] & 0x01) ? 0xff : device->machine().root_device().ioport("KEY8")->read()) &
+		((state->m_ppi_port_outputs[1][2] & 0x02) ? 0xff : device->machine().root_device().ioport("KEY9" )->read()) &
+		((state->m_ppi_port_outputs[1][2] & 0x04) ? 0xff : device->machine().root_device().ioport("KEY10")->read()) &
+		((state->m_ppi_port_outputs[1][2] & 0x08) ? 0xff : state->ioport("KEY11")->read());
 }
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_porta_w )	/* kayboard scaning */

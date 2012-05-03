@@ -585,7 +585,7 @@ static int scan_keyboard(running_machine &machine)
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = input_port_read(machine, keynames[i]);
+		keybuf = machine.root_device().ioport(keynames[i])->read();
 
 		if (keybuf != mac->m_key_matrix[i])
 		{
@@ -856,8 +856,8 @@ void mac_state::mouse_callback()
 	int		x_needs_update = 0, y_needs_update = 0;
 	mac_state *mac = machine().driver_data<mac_state>();
 
-	new_mx = input_port_read(machine(), "MOUSE1");
-	new_my = input_port_read(machine(), "MOUSE2");
+	new_mx = ioport("MOUSE1")->read();
+	new_my = ioport("MOUSE2")->read();
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1380,7 +1380,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 				val |= 0x20;
 			if (mac->m_mouse_bit_x)	/* Mouse X2 */
 				val |= 0x10;
-			if ((input_port_read(device->machine(), "MOUSE0") & 0x01) == 0)
+			if ((device->machine().root_device().ioport("MOUSE0")->read() & 0x01) == 0)
 				val |= 0x08;
 		}
 		if (mac->m_rtc_data_out)

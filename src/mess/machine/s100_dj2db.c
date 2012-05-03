@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
 	if (state) m_s100->rdy_w(CLEAR_LINE);
 
-	switch (input_port_read(*this, "J1A"))
+	switch (ioport("J1A")->read())
 	{
 	case 0: m_s100->vi0_w(state); break;
 	case 1: m_s100->vi1_w(state); break;
@@ -137,7 +137,7 @@ machine_config_constructor s100_dj2db_device::device_mconfig_additions() const
 
 static INPUT_PORTS_START( dj2db )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0xf8, 0xf8, "Power-On Jump Address" ) PORT_DIPLOCATION("SW1:1,2,3,4,5") PORT_CONDITION("SW1", 0x01, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0xf8, 0xf8, "Power-On Jump Address" ) PORT_DIPLOCATION("SW1:1,2,3,4,5") PORT_CONDITION("SW1", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0xf8, "F800H" )
 	PORT_DIPSETTING(    0xf0, "F000H" )
 	PORT_DIPSETTING(    0xe8, "E800H" )
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( dj2db )
 	PORT_DIPNAME( 0x20, 0x20, "Stop Bit Count" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "2 Stop Bits" )
 	PORT_DIPSETTING(    0x00, "1 Stop Bit" )
-	PORT_DIPNAME( 0x40, 0x40, "Parity" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("SW2", 0x80, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x40, 0x40, "Parity" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("SW2", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x40, "Even Parity" )
 	PORT_DIPSETTING(    0x00, "Odd Parity" )
 	PORT_DIPNAME( 0x80, 0x80, "Parity" ) PORT_DIPLOCATION("SW2:8")
@@ -296,7 +296,7 @@ void s100_dj2db_device::device_start()
 
 void s100_dj2db_device::device_reset()
 {
-	m_board_enbl = input_port_read(*this, "J4");
+	m_board_enbl = ioport("J4")->read();
 }
 
 
@@ -486,7 +486,7 @@ void s100_dj2db_device::s100_sout_w(offs_t offset, UINT8 data)
 {
 	if (offset == 0x41)
 	{
-		m_board_enbl = (data & input_port_read(*this, "J3A")) ? 1 : 0;
+		m_board_enbl = (data & ioport("J3A")->read()) ? 1 : 0;
 	}
 }
 
@@ -497,7 +497,7 @@ void s100_dj2db_device::s100_sout_w(offs_t offset, UINT8 data)
 
 void s100_dj2db_device::s100_phantom_w(int state)
 {
-	if (!BIT(input_port_read(*this, "SW1"), 2))
+	if (!BIT(ioport("SW1")->read(), 2))
 	{
 		m_phantom = state;
 	}

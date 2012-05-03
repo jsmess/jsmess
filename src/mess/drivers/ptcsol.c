@@ -312,7 +312,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
 	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
 
-	bool arrowkey = input_port_read(machine(), "ARROWS") ? 0 : 1;
+	bool arrowkey = ioport("ARROWS")->read() ? 0 : 1;
 	bool keydown = m_sol20_fa & 1;
 
 	return data | (arrowkey & keydown);
@@ -328,7 +328,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	UINT8 data = input_port_read(machine(), "ARROWS");
+	UINT8 data = ioport("ARROWS")->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -556,7 +556,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
 
 	// set switched uart pins
-	data = input_port_read(machine(), "S4");
+	data = ioport("S4")->read();
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
 	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
 	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
@@ -566,7 +566,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
 
 	// set rs232 baud rate
-	data = input_port_read(machine(), "S3");
+	data = ioport("S3")->read();
 
 	if (data > 1)
 		do
@@ -576,7 +576,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (input_port_read(machine(), "CONFIG")&1)) // if highest, look at jumper
+	if ((s_count == 7) && (ioport("CONFIG")->read()&1)) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
@@ -608,8 +608,8 @@ SCREEN_UPDATE16_MEMBER( sol20_state )
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = input_port_read(machine(), "S1");
-	UINT16 which = (input_port_read(machine(), "CONFIG") & 2) << 10;
+	UINT8 s1 = ioport("S1")->read();
+	UINT16 which = (ioport("CONFIG")->read() & 2) << 10;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;

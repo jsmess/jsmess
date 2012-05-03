@@ -48,10 +48,10 @@ void gamecom_state::handle_stylus_press( int column )
 
 	if ( column == 0 )
 	{
-		if ( !BIT( input_port_read(machine(), "IN2"), 2) )
+		if ( !BIT( ioport("IN2")->read(), 2) )
 		{
-			m_stylus_x = input_port_read(machine(), "STYX") >> 4;
-			m_stylus_y = input_port_read(machine(), "STYY") >> 4;
+			m_stylus_x = ioport("STYX")->read() >> 4;
+			m_stylus_y = ioport("STYY")->read() >> 4;
 		}
 		else
 		{
@@ -140,8 +140,8 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 						/* P0 bit 7 cleared => 8B (button A) */
 						/* P1 bit 0 cleared => 8C (button B) */
 						/* P1 bit 1 cleared => 8D (button C) */
-					m_p_ram[SM8521_P0] = input_port_read(machine(), "IN0");
-					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( input_port_read(machine(), "IN1") & 3 );
+					m_p_ram[SM8521_P0] = ioport("IN0")->read();
+					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( ioport("IN1")->read() & 3 );
 					break;
 				case 0xFFFF:	/* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
@@ -154,7 +154,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 						/* P0 bit 7 cleared => A0 */
 						/* P1 bit 0 cleared => A0 */
 						/* P1 bit 1 cleared => A0 */
-					m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( input_port_read(machine(), "IN2") & 3 );
+					m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( ioport("IN2")->read() & 3 );
 					m_p_ram[SM8521_P1] = 0xFF;
 					break;
 				}
@@ -345,7 +345,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 void gamecom_handle_dma( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = device->machine().root_device().memregion("maincpu")->base();
+	UINT8 * RAM = state->memregion("maincpu")->base();
 	UINT8 data = RAM[SM8521_DMC];
 	state->m_dma.overwrite_mode = data & 0x01;
 	state->m_dma.transfer_mode = data & 0x06;

@@ -251,7 +251,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 		floppy_drive_set_ready_state(m_floppy0, d, 1);
 		floppy_drive_set_ready_state(m_floppy1, d, 1);
 
-		if (input_port_read(machine(), "T5")) upd765_ready_w(m_fdc, d);
+		if (ioport("T5")->read()) upd765_ready_w(m_fdc, d);
 		break;
 	}
 }
@@ -270,8 +270,8 @@ void mm1_state::scan_keyboard()
 {
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	UINT8 data = input_port_read(machine(), keynames[m_drive]);
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 data = ioport(keynames[m_drive])->read();
+	UINT8 special = ioport("SPECIAL")->read();
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	UINT8 keydata = 0xff;
@@ -764,7 +764,7 @@ void mm1_state::machine_reset()
 	for (i = 0; i < 8; i++) ls259_w(*program, i, 0);
 
 	// set FDC ready
-	if (!input_port_read(machine(), "T5")) upd765_ready_w(m_fdc, 1);
+	if (!ioport("T5")->read()) upd765_ready_w(m_fdc, 1);
 
 	// reset FDC
 	upd765_reset_w(m_fdc, 1);

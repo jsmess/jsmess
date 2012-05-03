@@ -204,14 +204,14 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
 
 	UINT8 data = 0xff;
 
-	if (!(m_key_sense & 0x01)) data &= input_port_read(machine(), "ROW0");
-	if (!(m_key_sense & 0x02)) data &= input_port_read(machine(), "ROW1");
-	if (!(m_key_sense & 0x04)) data &= input_port_read(machine(), "ROW2");
-	if (!(m_key_sense & 0x08)) data &= input_port_read(machine(), "ROW3");
-	if (!(m_key_sense & 0x10)) data &= input_port_read(machine(), "ROW4");
-	if (!(m_key_sense & 0x20)) data &= input_port_read(machine(), "ROW5");
-	if (!(m_key_sense & 0x40)) data &= input_port_read(machine(), "ROW6");
-	if (!(m_key_sense & 0x80)) data &= input_port_read(machine(), "ROW7");
+	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read();
+	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read();
+	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read();
+	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read();
+	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read();
+	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read();
+	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read();
+	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read();
 
 	return data;
 }
@@ -223,16 +223,16 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
 READ8_MEMBER(mtx_state::mtx_key_hi_r)
 {
 
-	UINT8 data = input_port_read(machine(), "country_code");
+	UINT8 data = ioport("country_code")->read();
 
-	if (!(m_key_sense & 0x01)) data &= input_port_read(machine(), "ROW0") >> 8;
-	if (!(m_key_sense & 0x02)) data &= input_port_read(machine(), "ROW1") >> 8;
-	if (!(m_key_sense & 0x04)) data &= input_port_read(machine(), "ROW2") >> 8;
-	if (!(m_key_sense & 0x08)) data &= input_port_read(machine(), "ROW3") >> 8;
-	if (!(m_key_sense & 0x10)) data &= input_port_read(machine(), "ROW4") >> 8;
-	if (!(m_key_sense & 0x20)) data &= input_port_read(machine(), "ROW5") >> 8;
-	if (!(m_key_sense & 0x40)) data &= input_port_read(machine(), "ROW6") >> 8;
-	if (!(m_key_sense & 0x80)) data &= input_port_read(machine(), "ROW7") >> 8;
+	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read() >> 8;
+	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read() >> 8;
+	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read() >> 8;
+	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read() >> 8;
+	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read() >> 8;
+	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read() >> 8;
+	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read() >> 8;
+	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read() >> 8;
 
 	return data;
 }

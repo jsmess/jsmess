@@ -134,7 +134,7 @@ static MACHINE_START( mk2 )
 READ8_MEMBER( mk2_state::mk2_read_a )
 {
 	int data=0xff;
-	int help=input_port_read(machine(), "BLACK") | input_port_read(machine(), "WHITE"); // looks like white and black keys are the same!
+	int help=ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
 
 	switch (mos6530_portb_out_get(m_miot)&0x7)
 	{
@@ -147,8 +147,8 @@ READ8_MEMBER( mk2_state::mk2_read_a )
 		if (BIT(help, 0)) data&=~0x20; // A
 		break;
 	case 5:
-		if (BIT(input_port_read(machine(), "EXTRA"), 2)) data&=~0x8; // Enter
-		if (BIT(input_port_read(machine(), "EXTRA"), 1)) data&=~0x10; // Clear
+		if (BIT(ioport("EXTRA")->read(), 2)) data&=~0x8; // Enter
+		if (BIT(ioport("EXTRA")->read(), 1)) data&=~0x10; // Clear
 		if (BIT(help, 7)) data&=~0x20; // H
 		if (BIT(help, 6)) data&=~0x40; // G
 		break;

@@ -633,7 +633,7 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 		{
 			if( pad->n_byte < PAD_BYTES_STANDARD )
 			{
-				pad->n_shiftout = input_port_read(machine, portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )]);
+				pad->n_shiftout = machine.root_device().ioport(portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )])->read();
 				pad->n_byte++;
 				b_ack = 1;
 			}

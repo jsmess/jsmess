@@ -67,19 +67,19 @@ READ8_MEMBER( mk1_state::mk1_f8_r )
 
 	if ( offset == 0 )
 	{
-		if (BIT(data, 0)) data |= input_port_read(machine(), "LINE1");
-		if (BIT(data, 1)) data |= input_port_read(machine(), "LINE2");
-		if (BIT(data, 2)) data |= input_port_read(machine(), "LINE3");
-		if (BIT(data, 3)) data |= input_port_read(machine(), "LINE4");
+		if (BIT(data, 0)) data |= ioport("LINE1")->read();
+		if (BIT(data, 1)) data |= ioport("LINE2")->read();
+		if (BIT(data, 2)) data |= ioport("LINE3")->read();
+		if (BIT(data, 3)) data |= ioport("LINE4")->read();
 
 		for (i = 4; i < 8; i++)
 		{
 			if (BIT(data, i))
 			{
-				if (BIT(input_port_read(machine(), "LINE1"), i)) data |= 1;
-				if (BIT(input_port_read(machine(), "LINE2"), i)) data |= 2;
-				if (BIT(input_port_read(machine(), "LINE3"), i)) data |= 4;
-				if (BIT(input_port_read(machine(), "LINE4"), i)) data |= 8;
+				if (BIT(ioport("LINE1")->read(), i)) data |= 1;
+				if (BIT(ioport("LINE2")->read(), i)) data |= 2;
+				if (BIT(ioport("LINE3")->read(), i)) data |= 4;
+				if (BIT(ioport("LINE4")->read(), i)) data |= 8;
 			}
 		}
 	}

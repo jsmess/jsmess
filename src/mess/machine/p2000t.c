@@ -49,16 +49,16 @@ READ8_MEMBER( p2000t_state::p2000t_port_000f_r )
 	if (m_port_101f & P2000M_101F_KEYINT)
 	{
 		return (
-		input_port_read(machine(), "KEY0") & input_port_read(machine(), "KEY1") &
-		input_port_read(machine(), "KEY2") & input_port_read(machine(), "KEY3") &
-		input_port_read(machine(), "KEY4") & input_port_read(machine(), "KEY5") &
-		input_port_read(machine(), "KEY6") & input_port_read(machine(), "KEY7") &
-		input_port_read(machine(), "KEY8") & input_port_read(machine(), "KEY9"));
+		ioport("KEY0")->read() & ioport("KEY1")->read() &
+		ioport("KEY2")->read() & ioport("KEY3")->read() &
+		ioport("KEY4")->read() & ioport("KEY5")->read() &
+		ioport("KEY6")->read() & ioport("KEY7")->read() &
+		ioport("KEY8")->read() & ioport("KEY9")->read());
 	}
 	else
 	if (offset < 10)
 	{
-		return (input_port_read(machine(), keynames[offset]));
+		return (ioport(keynames[offset])->read());
 	}
 	else
 		return 0xff;

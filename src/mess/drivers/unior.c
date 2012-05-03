@@ -67,7 +67,7 @@ READ8_MEMBER( unior_state::unior_4d_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%X", m_4c&15);
-	return input_port_read(machine(), kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( unior_state::unior_4c_w )

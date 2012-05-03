@@ -2204,9 +2204,9 @@ static I8237_INTERFACE( dma8237_config )
 *
 ****************************************/
 
-static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return input_port_read(device->machine(),"DSW2"); }
-static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return input_port_read(device->machine(),"DSW1") & 0xff; }
-static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return input_port_read(device->machine(),"DSW1") >> 8; }
+static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return device->machine().root_device().ioport("DSW2")->read(); }
+static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return device->machine().root_device().ioport("DSW1")->read() & 0xff; }
+static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return device->machine().root_device().ioport("DSW1")->read() >> 8; }
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
@@ -2440,13 +2440,13 @@ static MACHINE_RESET(pc9801f)
 		int i;
 
 		ROM = machine.root_device().memregion("fdc_bios_2dd")->base();
-		op_mode = (input_port_read(machine, "ROM_LOAD") & 2) >> 1;
+		op_mode = (machine.root_device().ioport("ROM_LOAD")->read() & 2) >> 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000];
 
 		ROM = machine.root_device().memregion("fdc_bios_2hd")->base();
-		op_mode = input_port_read(machine, "ROM_LOAD") & 1;
+		op_mode = machine.root_device().ioport("ROM_LOAD")->read() & 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000+0x10000];

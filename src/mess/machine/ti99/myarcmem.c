@@ -189,7 +189,7 @@ void myarc_memory_expansion_device::device_start()
 void myarc_memory_expansion_device::device_reset()
 {
 	if (VERBOSE>5) LOG("myarc memexp: reset\n");
-	m_size = input_port_read(*this, "SIZE");
+	m_size = ioport("SIZE")->read();
 
 	// Resetting values
 	m_bank = 0;

@@ -180,28 +180,28 @@ READ8_MEMBER( scv_state::scv_portb_r )
 	UINT8 data = 0xff;
 
 	if ( ! ( m_porta & 0x01 ) )
-		data &= input_port_read( machine(), "PA0" );
+		data &= ioport( "PA0" )->read();
 
 	if ( ! ( m_porta & 0x02 ) )
-		data &= input_port_read( machine(), "PA1" );
+		data &= ioport( "PA1" )->read();
 
 	if ( ! ( m_porta & 0x04 ) )
-		data &= input_port_read( machine(), "PA2" );
+		data &= ioport( "PA2" )->read();
 
 	if ( ! ( m_porta & 0x08 ) )
-		data &= input_port_read( machine(), "PA3" );
+		data &= ioport( "PA3" )->read();
 
 	if ( ! ( m_porta & 0x10 ) )
-		data &= input_port_read( machine(), "PA4" );
+		data &= ioport( "PA4" )->read();
 
 	if ( ! ( m_porta & 0x20 ) )
-		data &= input_port_read( machine(), "PA5" );
+		data &= ioport( "PA5" )->read();
 
 	if ( ! ( m_porta & 0x40 ) )
-		data &= input_port_read( machine(), "PA6" );
+		data &= ioport( "PA6" )->read();
 
 	if ( ! ( m_porta & 0x80 ) )
-		data &= input_port_read( machine(), "PA7" );
+		data &= ioport( "PA7" )->read();
 
 	return data;
 }
@@ -211,7 +211,7 @@ READ8_MEMBER( scv_state::scv_portc_r )
 {
 	UINT8 data = m_portc;
 
-	data = ( data & 0xfe ) | ( input_port_read( machine(), "PC0" ) & 0x01 );
+	data = ( data & 0xfe ) | ( ioport( "PC0" )->read() & 0x01 );
 
 	return data;
 }

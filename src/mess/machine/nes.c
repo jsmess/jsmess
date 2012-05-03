@@ -333,7 +333,7 @@ static void nes_machine_stop( running_machine &machine )
 
 READ8_MEMBER(nes_state::nes_IN0_r)
 {
-	int cfg = input_port_read(machine(), "CTRLSEL");
+	int cfg = ioport("CTRLSEL")->read();
 	int ret;
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
@@ -388,19 +388,19 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 static UINT8 nes_read_fc_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const fc_keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
-	return ((input_port_read(machine, fc_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
+	return ((machine.root_device().ioport(fc_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
 }
 
 static UINT8 nes_read_subor_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4",
 		"SUBKEY5", "SUBKEY6", "SUBKEY7", "SUBKEY8", "SUBKEY9", "SUBKEY10", "SUBKEY11", "SUBKEY12" };
-	return ((input_port_read(machine, sub_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
+	return ((machine.root_device().ioport(sub_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
 }
 
 READ8_MEMBER(nes_state::nes_IN1_r)
 {
-	int cfg = input_port_read(machine(), "CTRLSEL");
+	int cfg = ioport("CTRLSEL")->read();
 	int ret;
 
 	if ((cfg & 0x000f) == 0x07)	// for now we treat the FC keyboard separately from other inputs!
@@ -489,37 +489,37 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
-				vals->i0 = input_port_read(machine, padnames[pad_port]);
+				vals->i0 = machine.root_device().ioport(padnames[pad_port])->read();
 			break;
 
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
-				vals->i0 = input_port_read(machine, "ZAPPER1_T");
-				vals->i1 = input_port_read(machine, "ZAPPER1_X");
-				vals->i2 = input_port_read(machine, "ZAPPER1_Y");
+				vals->i0 = machine.root_device().ioport("ZAPPER1_T")->read();
+				vals->i1 = machine.root_device().ioport("ZAPPER1_X")->read();
+				vals->i2 = machine.root_device().ioport("ZAPPER1_Y")->read();
 			}
 			break;
 
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
-				vals->i0 = input_port_read(machine, "ZAPPER2_T");
-				vals->i1 = input_port_read(machine, "ZAPPER2_X");
-				vals->i2 = input_port_read(machine, "ZAPPER2_Y");
+				vals->i0 = machine.root_device().ioport("ZAPPER2_T")->read();
+				vals->i1 = machine.root_device().ioport("ZAPPER2_X")->read();
+				vals->i2 = machine.root_device().ioport("ZAPPER2_Y")->read();
 			}
 			break;
 
 		case 0x04:	/* arkanoid paddle */
 			if (pad_port == 1)
-				vals->i0 = (UINT8) ((UINT8) input_port_read(machine, "PADDLE") + (UINT8)0x52) ^ 0xff;
+				vals->i0 = (UINT8) ((UINT8) machine.root_device().ioport("PADDLE")->read() + (UINT8)0x52) ^ 0xff;
 			break;
 
 		case 0x06:	/* crazy climber controller */
 			if (pad_port == 0)
 			{
-				state->m_in_0.i0 = input_port_read(machine, padnames[4]);
-				state->m_in_1.i0 = input_port_read(machine, padnames[5]);
+				state->m_in_0.i0 = machine.root_device().ioport(padnames[4])->read();
+				state->m_in_1.i0 = machine.root_device().ioport(padnames[5])->read();
 			}
 			break;
 	}
@@ -528,7 +528,7 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	if ((input_port_read(machine, "CTRLSEL") & 0x000f) == 0x0002)
+	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x000f) == 0x0002)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
@@ -539,7 +539,7 @@ static TIMER_CALLBACK( lightgun_tick )
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
 	}
 
-	if ((input_port_read(machine, "CTRLSEL") & 0x00f0) == 0x0030)
+	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x00f0) == 0x0030)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
@@ -553,7 +553,7 @@ static TIMER_CALLBACK( lightgun_tick )
 
 WRITE8_MEMBER(nes_state::nes_IN0_w)
 {
-	int cfg = input_port_read(machine(), "CTRLSEL");
+	int cfg = ioport("CTRLSEL")->read();
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));

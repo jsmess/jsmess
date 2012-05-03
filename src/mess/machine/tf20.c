@@ -85,7 +85,7 @@ static READ8_HANDLER( tf20_dip_r )
 {
 	logerror("%s: tf20_dip_r\n", space->machine().describe_context());
 
-	return input_port_read(space->machine(), "tf20_dip");
+	return space->machine().root_device().ioport("tf20_dip")->read();
 }
 
 static TIMER_CALLBACK( tf20_upd765_tc_reset )

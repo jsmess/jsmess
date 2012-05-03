@@ -147,14 +147,14 @@ READ8_MEMBER(aquarius_state::keyboard_r)
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(offset,  8)) result &= input_port_read(machine(), "ROW0");
-	if (!BIT(offset,  9)) result &= input_port_read(machine(), "ROW1");
-	if (!BIT(offset, 10)) result &= input_port_read(machine(), "ROW2");
-	if (!BIT(offset, 11)) result &= input_port_read(machine(), "ROW3");
-	if (!BIT(offset, 12)) result &= input_port_read(machine(), "ROW4");
-	if (!BIT(offset, 13)) result &= input_port_read(machine(), "ROW5");
-	if (!BIT(offset, 14)) result &= input_port_read(machine(), "ROW6");
-	if (!BIT(offset, 15)) result &= input_port_read(machine(), "ROW7");
+	if (!BIT(offset,  8)) result &= ioport("ROW0")->read();
+	if (!BIT(offset,  9)) result &= ioport("ROW1")->read();
+	if (!BIT(offset, 10)) result &= ioport("ROW2")->read();
+	if (!BIT(offset, 11)) result &= ioport("ROW3")->read();
+	if (!BIT(offset, 12)) result &= ioport("ROW4")->read();
+	if (!BIT(offset, 13)) result &= ioport("ROW5")->read();
+	if (!BIT(offset, 14)) result &= ioport("ROW6")->read();
+	if (!BIT(offset, 15)) result &= ioport("ROW7")->read();
 
 	return result;
 }

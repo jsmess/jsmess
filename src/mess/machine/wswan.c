@@ -957,7 +957,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			switch( data )
 			{
 				case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-					input = input_port_read(machine(), "CURSY");
+					input = ioport("CURSY")->read();
 					if (state->m_rotate) // reorient controls if the console is rotated
 					{
 						if (input & 0x01) data |= 0x02;
@@ -969,7 +969,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 						data = data | input;
 				break;
 				case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-					input = input_port_read(machine(), "CURSX");
+					input = ioport("CURSX")->read();
 					if (state->m_rotate) // reorient controls if the console is rotated
 					{
 						if (input & 0x01) data |= 0x02;
@@ -981,7 +981,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 						data = data | input;
 				break;
 				case 0x40:	/* Read buttons: START - A - B */
-					data = data | input_port_read(machine(), "BUTTONS");
+					data = data | ioport("BUTTONS")->read();
 				break;
 			}
 			break;

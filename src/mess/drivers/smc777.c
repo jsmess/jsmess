@@ -508,7 +508,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 READ8_MEMBER(smc777_state::smc777_joystick_r)
 {
 
-	return input_port_read(machine(), "JOY_1P");
+	return ioport("JOY_1P")->read();
 }
 
 WRITE8_MEMBER(smc777_state::smc777_color_mode_w)
@@ -927,15 +927,15 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	smc777_state *state = timer.machine().driver_data<smc777_state>();
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
 	int i,port_i,scancode;
-	UINT8 shift_mod = input_port_read(timer.machine(),"key_mod") & 1;
-	UINT8 kana_mod = input_port_read(timer.machine(),"key_mod") & 0x10;
+	UINT8 shift_mod = timer.machine().root_device().ioport("key_mod")->read() & 1;
+	UINT8 kana_mod = timer.machine().root_device().ioport("key_mod")->read() & 0x10;
 	scancode = 0;
 
 	for(port_i=0;port_i<11;port_i++)
 	{
 		for(i=0;i<8;i++)
 		{
-			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
+			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				state->m_keyb_press = smc777_keytable[shift_mod & 1][scancode];
 				if(kana_mod) { state->m_keyb_press|=0x80; }

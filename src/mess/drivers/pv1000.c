@@ -106,19 +106,19 @@ READ8_MEMBER( pv1000_state::pv1000_io_r )
 		data = 0;
 		if ( m_io_regs[5] & 0x08 )
 		{
-			data = input_port_read( machine(), "IN3" );
+			data = ioport( "IN3" )->read();
 		}
 		if ( m_io_regs[5] & 0x04 )
 		{
-			data = input_port_read( machine(), "IN2" );
+			data = ioport( "IN2" )->read();
 		}
 		if ( m_io_regs[5] & 0x02 )
 		{
-			data = input_port_read( machine(), "IN1" );
+			data = ioport( "IN1" )->read();
 		}
 		if ( m_io_regs[5] & 0x01 )
 		{
-			data = input_port_read( machine(), "IN0" );
+			data = ioport( "IN0" )->read();
 		}
 		m_fd_data = 0;
 		break;

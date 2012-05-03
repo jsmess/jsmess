@@ -77,21 +77,21 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
 	if (m_head==m_tail)
 	{
-		nx = input_port_read(*this, "ser_mouse_x");
+		nx = ioport("ser_mouse_x")->read();
 
 		dx = nx - ox;
 		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
 		if (dx>=0x800) dx = nx - 0x1000 - ox;
 		ox = nx;
 
-		ny = input_port_read(*this, "ser_mouse_y");
+		ny = ioport("ser_mouse_y")->read();
 
 		dy = ny - oy;
 		if (dy<=-0x800) dy = ny + 0x1000 - oy;
 		if (dy>=0x800) dy = ny - 0x1000 - oy;
 		oy = ny;
 
-		nb = input_port_read(*this, "ser_mouse_btn");
+		nb = ioport("ser_mouse_btn")->read();
 		mbc = nb^m_mb;
 		m_mb = nb;
 

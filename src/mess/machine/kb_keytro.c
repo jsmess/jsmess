@@ -472,43 +472,43 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
 		case 0x0e:
 			break;
 		case 0x0f:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_0f");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_0f")->read();
 			break;
 		case 0x30:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_30_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_30_0")->read();
 			break;
 		case 0x31:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_31_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_31_0")->read();
 			break;
 		case 0x32:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_32_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_32_0")->read();
 			break;
 		case 0x33:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_33_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_33_0")->read();
 			break;
 		case 0x34:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_34_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_34_0")->read();
 			break;
 		case 0x35:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_35_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_35_0")->read();
 			break;
 		case 0x36:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_36_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_36_0")->read();
 			break;
 		case 0x37:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_37_0") | (input_port_read(space->machine(), "kb_keytronic_36_0") & 0x01);
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_37_0")->read() | (space->machine().root_device().ioport("kb_keytronic_36_0")->read() & 0x01);
 			break;
 		case 0x38:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_38_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_38_0")->read();
 			break;
 		case 0x39:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_39_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_39_0")->read();
 			break;
 		case 0x3a:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_3a_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_3a_0")->read();
 			break;
 		case 0x3b:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_3b_0");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_3b_0")->read();
 			break;
 		}
 	}
@@ -519,31 +519,31 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
 		switch (keytronic->p1)
 		{
 		case 0x0b:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_0b");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_0b")->read();
 			break;
 		case 0x30:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_30_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_30_1")->read();
 			break;
 		case 0x31:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_31_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_31_1")->read();
 			break;
 		case 0x32:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_32_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_32_1")->read();
 			break;
 		case 0x33:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_33_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_33_1")->read();
 			break;
 		case 0x34:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_34_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_34_1")->read();
 			break;
 		case 0x35:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_35_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_35_1")->read();
 			break;
 		case 0x36:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_36_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_36_1")->read();
 			break;
 		case 0x37:
-			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_37_1");
+			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_37_1")->read();
 			break;
 		case 0x38:
 			keytronic->p1_data = 0xff;

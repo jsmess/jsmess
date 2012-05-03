@@ -146,9 +146,9 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 	data |= m_keylatch;
 
 	/* keyboard rows */
-	data |= BIT(input_port_read(machine(), "ROW0"), m_keylatch) << 4;
-	data |= BIT(input_port_read(machine(), "ROW1"), m_keylatch) << 5;
-	data |= BIT(input_port_read(machine(), "ROW2"), m_keylatch) << 6;
+	data |= BIT(ioport("ROW0")->read(), m_keylatch) << 4;
+	data |= BIT(ioport("ROW1")->read(), m_keylatch) << 5;
+	data |= BIT(ioport("ROW2")->read(), m_keylatch) << 6;
 
 	/* demultiplexer clock */
 	data |= (m_keyclk << 7);

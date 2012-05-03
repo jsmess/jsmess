@@ -120,7 +120,7 @@ READ8_MEMBER( aim65_state::aim65_riot_b_r )
 	for (row = 0; row < 8; row++)
 	{
 		if (!BIT(m_riot_port_a, row))
-			data &= input_port_read(machine(), keynames[row]);
+			data &= ioport(keynames[row])->read();
 	}
 
 	return data;
@@ -212,7 +212,7 @@ READ8_MEMBER( aim65_state::aim65_pb_r )
     d3 = kb/tty switch
 */
 
-	UINT8 data = input_port_read(machine(), "switches");
+	UINT8 data = ioport("switches")->read();
 	data |= (m_cass1->input() > +0.03) ? 0x80 : 0;
 	data |= 0x40; // TTY must be H if not used.
 	data |= m_pb_save & 0x37;

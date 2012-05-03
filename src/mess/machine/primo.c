@@ -94,10 +94,10 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	data |= ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
-	data |= (input_port_read(machine(), "RESET")) ? 0x02 : 0x00;
+	data |= (ioport("RESET")->read()) ? 0x02 : 0x00;
 
 	// bit 0 - keyboard
-	data |= (input_port_read(machine(), portnames[(offset & 0x0030) >> 4]) >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
+	data |= (ioport(portnames[(offset & 0x0030) >> 4])->read() >> (offset&0x000f)) & 0x0001 ? 0x01 : 0x00;
 
 	return data;
 }
@@ -195,7 +195,7 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 
 WRITE8_MEMBER(primo_state::primo_FD_w)
 {
-	if (!input_port_read(machine(), "MEMORY_EXPANSION"))
+	if (!ioport("MEMORY_EXPANSION")->read())
 	{
 		m_port_FD = data;
 		primo_update_memory(machine());
@@ -243,10 +243,10 @@ DRIVER_INIT( primo64 )
 static void primo_common_machine_init (running_machine &machine)
 {
 	primo_state *state = machine.driver_data<primo_state>();
-	if (input_port_read(machine, "MEMORY_EXPANSION"))
+	if (machine.root_device().ioport("MEMORY_EXPANSION")->read())
 		state->m_port_FD = 0x00;
 	primo_update_memory(machine);
-	machine.device("maincpu")->set_clock_scale(input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
+	machine.device("maincpu")->set_clock_scale(machine.root_device().ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
 MACHINE_RESET( primoa )

@@ -94,19 +94,19 @@ static void c128_nmi( running_machine &machine )
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (state->m_nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
 		if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
 		{
 			/* z80 */
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 		}
 		else
 		{
-			cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+			cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 		}
 
-		state->m_nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -460,12 +460,12 @@ static READ8_HANDLER( c128_read_io )
 		return state->m_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			cia_set_port_mask_value(cia_0, 0, state->ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 			return mos6526_r(cia_0, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			cia_set_port_mask_value(cia_0, 1, space->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			return mos6526_r(cia_0, offset);
 		}
 	else if (offset < 0xd00)
@@ -558,8 +558,8 @@ static void c128_bankswitch_z80( running_machine &machine )
 #if 1
 	 state->membank("bank10")->set_base(state->m_z80);
 	 state->membank("bank11")->set_base(state->m_ram + 0x1000);
-	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 state->m_ram = NULL;
 #else
 	 if (MMU_BOTTOM)
@@ -609,8 +609,8 @@ static void c128_bankswitch_z80( running_machine &machine )
 	 else
 		state->membank("bank9")->set_base(state->m_memory + 0xff05);
 
-	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 state->m_ram = NULL;
 #endif
 }
@@ -775,8 +775,8 @@ static void c128_bankswitch_128( running_machine &machine, int reset )
 			state->membank("bank16")->set_base(state->m_external_function + 0x3f05);
 		}
 
-		if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-				|| (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+		if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+				|| (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 			state->m_ram = NULL;
 	}
 }
@@ -902,14 +902,14 @@ READ8_HANDLER( c128_mmu8722_port_r )
 			data &= ~0x10;
 		if (!state->m_exrom)
 			data &= ~0x20;
-		if (input_port_read(space->machine(), "SPECIAL") & 0x10)
+		if (space->machine().root_device().ioport("SPECIAL")->read() & 0x10)
 			data &= ~0x80;
 		break;
 	case 0xb:
 		/* hinybble number of 64 kb memory blocks */
-		if ((input_port_read(space->machine(), "SPECIAL") & 0x06) == 0x02)		// 256KB RAM
+		if ((space->machine().root_device().ioport("SPECIAL")->read() & 0x06) == 0x02)		// 256KB RAM
 			data = 0x4f;
-		else if ((input_port_read(space->machine(), "SPECIAL") & 0x06) == 0x04)	//  1MB
+		else if ((state->ioport("SPECIAL")->read() & 0x06) == 0x04)	//  1MB
 			data = 0xf;
 		else
 			data = 0x2f;
@@ -1128,7 +1128,7 @@ READ8_DEVICE_HANDLER(c128_m6510_port_read)
 	else
 		data |=  0x10;
 
-	if (input_port_read(device->machine(), "SPECIAL") & 0x20)		/* Check Caps Lock */
+	if (state->ioport("SPECIAL")->read() & 0x20)		/* Check Caps Lock */
 		data &= ~0x40;
 	else
 		data |=  0x40;
@@ -1259,9 +1259,9 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 	c128_nmi(device->machine());
 
-	if ((input_port_read(device->machine(), "SPECIAL") & 0x08) != state->m_monitor)
+	if ((device->machine().root_device().ioport("SPECIAL")->read() & 0x08) != state->m_monitor)
 	{
-		if (input_port_read(device->machine(), "SPECIAL") & 0x08)
+		if (device->machine().root_device().ioport("SPECIAL")->read() & 0x08)
 		{
 			vic2_set_rastering(vic2e, 0);
 			vdc8563_set_rastering(vdc8563, 1);
@@ -1276,7 +1276,7 @@ INTERRUPT_GEN( c128_frame_interrupt )
 			else
 				device->machine().primary_screen->set_visible_area(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
 		}
-		state->m_monitor = input_port_read(device->machine(), "SPECIAL") & 0x08;
+		state->m_monitor = device->machine().root_device().ioport("SPECIAL")->read() & 0x08;
 	}
 
 
@@ -1285,14 +1285,14 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
     Hence, we overwrite the actual reading as it never happens */
-	if ((input_port_read(device->machine(), "SPECIAL") & 0x40))	//
+	if ((device->machine().root_device().ioport("SPECIAL")->read() & 0x40))	//
 		c64_keyline[1] |= 0x80;
 
 	/* c128 specific: keypad input ports */
 	for (i = 0; i < 3; i++)
 	{
 		value = 0xff;
-		value &= ~input_port_read(device->machine(), c128ports[i]);
+		value &= ~device->machine().root_device().ioport(c128ports[i])->read();
 		state->m_keyline[i] = value;
 	}
 }

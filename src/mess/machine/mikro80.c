@@ -35,20 +35,20 @@ DRIVER_INIT(radio99)
 READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
 {
 	UINT8 key = 0xff;
-	if ((m_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine(),"LINE0"); }
-	if ((m_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine(),"LINE1"); }
-	if ((m_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine(),"LINE2"); }
-	if ((m_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine(),"LINE3"); }
-	if ((m_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine(),"LINE4"); }
-	if ((m_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine(),"LINE5"); }
-	if ((m_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine(),"LINE6"); }
-	if ((m_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine(),"LINE7"); }
+	if ((m_keyboard_mask & 0x01)!=0) { key &= ioport("LINE0")->read(); }
+	if ((m_keyboard_mask & 0x02)!=0) { key &= ioport("LINE1")->read(); }
+	if ((m_keyboard_mask & 0x04)!=0) { key &= ioport("LINE2")->read(); }
+	if ((m_keyboard_mask & 0x08)!=0) { key &= ioport("LINE3")->read(); }
+	if ((m_keyboard_mask & 0x10)!=0) { key &= ioport("LINE4")->read(); }
+	if ((m_keyboard_mask & 0x20)!=0) { key &= ioport("LINE5")->read(); }
+	if ((m_keyboard_mask & 0x40)!=0) { key &= ioport("LINE6")->read(); }
+	if ((m_keyboard_mask & 0x80)!=0) { key &= ioport("LINE7")->read(); }
 	return key & m_key_mask;
 }
 
 READ8_MEMBER(mikro80_state::mikro80_8255_portc_r)
 {
-	return input_port_read(machine(), "LINE8");
+	return ioport("LINE8")->read();
 }
 
 WRITE8_MEMBER(mikro80_state::mikro80_8255_porta_w)

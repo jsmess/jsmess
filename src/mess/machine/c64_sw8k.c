@@ -94,7 +94,7 @@ void c64_switchable_8k_cartridge_device::device_start()
 
 void c64_switchable_8k_cartridge_device::device_reset()
 {
-	m_bank = input_port_read(*this, "SW");
+	m_bank = ioport("SW")->read();
 }
 
 

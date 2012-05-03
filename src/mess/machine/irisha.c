@@ -70,7 +70,7 @@ READ8_MEMBER(irisha_state::irisha_keyboard_r)
 {
 	UINT8 keycode;
 	if (m_keyboard_cnt!=0 && m_keyboard_cnt<11) {
-		keycode = input_port_read(machine(), keynames[m_keyboard_cnt-1]) ^ 0xff;
+		keycode = ioport(keynames[m_keyboard_cnt-1])->read() ^ 0xff;
 	} else {
 		keycode = 0xff;
 	}

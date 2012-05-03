@@ -694,8 +694,8 @@ static void adb_check_mouse(running_machine &machine)
 	/* read mouse values */
 	if ((state->m_adb_kmstatus & 0x80) == 0x00)
 	{
-		new_mouse_x = input_port_read(machine, "adb_mouse_x");
-		new_mouse_y = input_port_read(machine, "adb_mouse_y");
+		new_mouse_x = machine.root_device().ioport("adb_mouse_x")->read();
+		new_mouse_y = machine.root_device().ioport("adb_mouse_y")->read();
 
 		if ((state->m_mouse_x != new_mouse_x) || (state->m_mouse_y != new_mouse_y))
 		{

@@ -133,7 +133,7 @@ void c64_ide64_cartridge_device::device_reset()
 
 	m_enable = 1;
 
-	m_wp = input_port_read(*this, "JP1");
+	m_wp = ioport("JP1")->read();
 	m_game = !m_wp;
 	m_exrom = !m_wp;
 }

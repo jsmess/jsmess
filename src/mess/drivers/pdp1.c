@@ -495,7 +495,7 @@ static MACHINE_RESET( pdp1 )
 	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int cfg;
 
-	cfg = input_port_read(machine, "CFG");
+	cfg = machine.root_device().ioport("CFG")->read();
 	pdp1_reset_param.extend_support = (cfg >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
 	pdp1_reset_param.hw_mul_div = (cfg >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (cfg >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
@@ -1633,7 +1633,7 @@ static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 */
 static void iot_011(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
-	int key_state = input_port_read(device->machine(), "SPACEWAR");
+	int key_state = device->machine().root_device().ioport("SPACEWAR")->read();
 	int reply;
 
 
@@ -1722,7 +1722,7 @@ static void pdp1_keyboard(running_machine &machine)
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = input_port_read(machine, twrnames[i]);
+		typewriter_keys[i] = machine.root_device().ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
@@ -1753,9 +1753,9 @@ static void pdp1_lightpen(running_machine &machine)
 	int x_delta, y_delta;
 	int current_state;
 
-	state->m_lightpen.active = (input_port_read(machine, "CFG") >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
+	state->m_lightpen.active = (machine.root_device().ioport("CFG")->read() >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
 
-	current_state = input_port_read(machine, "LIGHTPEN");
+	current_state = machine.root_device().ioport("LIGHTPEN")->read();
 
 	/* update pen down state */
 	state->m_lightpen.down = state->m_lightpen.active && (current_state & pdp1_lightpen_down);
@@ -1777,8 +1777,8 @@ static void pdp1_lightpen(running_machine &machine)
 	state->m_old_lightpen = current_state;
 
 	/* update pen position */
-	x_delta = input_port_read(machine, "LIGHTX");
-	y_delta = input_port_read(machine, "LIGHTY");
+	x_delta = machine.root_device().ioport("LIGHTX")->read();
+	y_delta = machine.root_device().ioport("LIGHTY")->read();
 
 	if (x_delta >= 0x80)
 		x_delta -= 0x100;
@@ -1816,10 +1816,10 @@ INTERRUPT_GEN( pdp1_interrupt )
 	int ta_transitions;
 
 
-	cpu_set_reg(device, PDP1_SS, input_port_read(device->machine(), "SENSE"));
+	cpu_set_reg(device, PDP1_SS, device->machine().root_device().ioport("SENSE")->read());
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine(), "CSW");
+	control_keys = state->ioport("CSW")->read();
 
 	if (control_keys & pdp1_control)
 	{
@@ -1911,7 +1911,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 
 		/* handle test word keys */
-		tw_keys = (input_port_read(machine, "TWDMSB") << 16) | input_port_read(machine, "TWDLSB");
+		tw_keys = (machine.root_device().ioport("TWDMSB")->read() << 16) | machine.root_device().ioport("TWDLSB")->read();
 
 		/* compute transitions */
 		tw_transitions = tw_keys & (~ state->m_old_tw_keys);
@@ -1924,7 +1924,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 
 		/* handle address keys */
-		ta_keys = input_port_read(machine, "TSTADD");
+		ta_keys = machine.root_device().ioport("TSTADD")->read();
 
 		/* compute transitions */
 		ta_transitions = ta_keys & (~ state->m_old_ta_keys);

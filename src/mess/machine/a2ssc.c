@@ -179,9 +179,9 @@ UINT8 a2bus_ssc_device::read_c0nx(address_space &space, UINT8 offset)
     switch (offset)
     {
         case 1:
-            return input_port_read(device(), "DSW1");
+            return device().ioport("DSW1")->read();
         case 2:
-            return input_port_read(device(), "DSW2");
+            return device().ioport("DSW2")->read();
 
         case 8:
         case 9:

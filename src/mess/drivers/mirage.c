@@ -120,7 +120,7 @@ static WRITE8_DEVICE_HANDLER( mirage_via_write_portb )
 	if (bank != state->last_sndram_bank)
 	{
 		state->last_sndram_bank = bank;
-		state->membank("sndbank")->set_base(device->machine().root_device().memregion("es5503")->base() + bank);
+		state->membank("sndbank")->set_base(state->memregion("es5503")->base() + bank);
 	}
 }
 

@@ -58,7 +58,7 @@ static void oric_refresh_ints(running_machine &machine)
 		/* oric 1 or oric atmos */
 
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
-		if ((input_port_read(machine, "FLOPPY") & 0x07) == ORIC_FLOPPY_INTERFACE_NONE)
+		if ((machine.root_device().ioport("FLOPPY")->read() & 0x07) == ORIC_FLOPPY_INTERFACE_NONE)
 			state->m_irqs &=~(1<<1);
 	}
 
@@ -93,7 +93,7 @@ static void oric_keyboard_sense_refresh(running_machine &machine)
 	int input_port_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
-	input_port_data = input_port_read(machine, keynames[state->m_keyboard_line]);
+	input_port_data = machine.root_device().ioport(keynames[state->m_keyboard_line])->read();
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
@@ -271,7 +271,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
     to the via cb1 input. Interrupts can be generated from the vertical
     sync, and flicker free games can be produced */
 
-	input_port_9 = input_port_read(machine, "FLOPPY");
+	input_port_9 = machine.root_device().ioport("FLOPPY")->read();
 	/* cable is enabled? */
 	if ((input_port_9 & 0x08)!=0)
 	{
@@ -1002,13 +1002,13 @@ static void oric_install_microdisc_interface(running_machine &machine)
 
 static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_intrq_w )
 {
-	if ((input_port_read(device->machine(), "FLOPPY") & 0x07) == ORIC_FLOPPY_INTERFACE_MICRODISC)
+	if ((device->machine().root_device().ioport("FLOPPY")->read() & 0x07) == ORIC_FLOPPY_INTERFACE_MICRODISC)
 		oric_microdisc_wd179x_intrq_w(device, state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_drq_w )
 {
-	switch (input_port_read(device->machine(), "FLOPPY") &  0x07)
+	switch (device->machine().root_device().ioport("FLOPPY")->read() &  0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1066,7 +1066,7 @@ MACHINE_START( oric )
 MACHINE_RESET( oric )
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
+	int disc_interface_id = machine.root_device().ioport("FLOPPY")->read() & 0x07;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	if (state->m_is_telestrat)
 		return;
@@ -1130,7 +1130,7 @@ MACHINE_RESET( oric )
 READ8_MEMBER(oric_state::oric_IO_r)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	switch (input_port_read(machine(), "FLOPPY") & 0x07)
+	switch (ioport("FLOPPY")->read() & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1162,7 +1162,7 @@ READ8_MEMBER(oric_state::oric_IO_r)
 WRITE8_MEMBER(oric_state::oric_IO_w)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	switch (input_port_read(machine(), "FLOPPY") & 0x07)
+	switch (ioport("FLOPPY")->read() & 0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
@@ -1312,13 +1312,13 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 	/* left joystick selected? */
 	if (state->m_telestrat_via2_port_b_data & (1<<6))
 	{
-		data &= input_port_read(device->machine(), "JOY0");
+		data &= state->ioport("JOY0")->read();
 	}
 
 	/* right joystick selected? */
 	if (state->m_telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= input_port_read(device->machine(), "JOY1");
+		data &= device->machine().root_device().ioport("JOY1")->read();
 	}
 
 	data |= state->m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));

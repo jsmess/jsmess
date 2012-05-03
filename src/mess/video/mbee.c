@@ -215,11 +215,11 @@ void mbee_state::keyboard_matrix_r(int offs)
 	UINT8 port = (offs >> 7) & 7;
 	UINT8 bit = (offs >> 4) & 7;
 	sprintf(kbdrow,"X%d",port);
-	UINT8 data = (input_port_read(machine(), kbdrow) >> bit) & 1;
+	UINT8 data = (ioport(kbdrow)->read() >> bit) & 1;
 
 	if ((data | m_is_premium) == 0)
 	{
-		UINT8 extra = input_port_read(machine(), "EXTRA");
+		UINT8 extra = ioport("EXTRA")->read();
 
 		if( extra & 0x01 )	/* extra: cursor up */
 		{

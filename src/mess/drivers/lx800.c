@@ -66,8 +66,8 @@ READ8_MEMBER( lx800_state::lx800_porta_r )
 
 	logerror("%s: lx800_porta_r(%02x)\n", machine().describe_context(), offset);
 
-	result |= input_port_read(machine(), "LINEFEED") << 3;
-	result |= input_port_read(machine(), "FORMFEED") << 4;
+	result |= ioport("LINEFEED")->read() << 3;
+	result |= ioport("FORMFEED")->read() << 4;
 	result |= 1 << 5;
 
 	result |= 1 << 7;
@@ -96,7 +96,7 @@ READ8_MEMBER( lx800_state::lx800_portc_r )
 
 	logerror("%s: lx800_portc_r(%02x)\n", machine().describe_context(), offset);
 
-	result |= input_port_read(machine(), "ONLINE") << 3;
+	result |= ioport("ONLINE")->read() << 3;
 
 	return result;
 }

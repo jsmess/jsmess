@@ -59,7 +59,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		{
 			UINT8 data;
 
-			switch (input_port_read(machine(), "S1") & 0x3c)
+			switch (ioport("S1")->read() & 0x3c)
 			{
 				case 0x04:		data = 0x33;	break;	//right
 				case 0x08:		data = 0x37;	break;	//left
@@ -73,13 +73,13 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x03:	//STRIG(0)
 		{
-			m_out.data[m_out.write++] = (input_port_read(machine(), "S6") & 0x20 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (ioport("S6")->read() & 0x20 ? 0x00 : 0xff);
 		}
 		break;
 
 	case 0x04:	//STRIG(1)
 		{
-			m_out.data[m_out.write++] = (input_port_read(machine(), "S1") & 0x40 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (ioport("S1")->read() & 0x40 ? 0x00 : 0xff);
 		}
 		break;
 
@@ -93,7 +93,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 			if(address == 0xc00e)
 				data = 0x0a;
 			else if(address == 0xd000)
-				data = input_port_read(machine(), "BATTERY");
+				data = ioport("BATTERY")->read();
 			else
 				data = m_t6834_ram[address & 0x7ff];
 
@@ -415,7 +415,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 			for (int i=0 ;i<10; i++)
 				if (matrix & (1<<i))
-					data |= input_port_read(machine(), lines[i]);
+					data |= ioport(lines[i])->read();
 
 			m_out.data[m_out.write++] = data;
 		}
@@ -424,7 +424,7 @@ void x07_state::t6834_cmd (UINT8 cmd)
 	case 0x28:	//test chr
 		{
 			UINT8 idx = kb_get_index(m_in.data[m_in.read++]);
-			m_out.data[m_out.write++] = (input_port_read(machine(), x07_keycodes[idx].tag) & x07_keycodes[idx].mask) ? 0x00 : 0xff;
+			m_out.data[m_out.write++] = (ioport(x07_keycodes[idx].tag)->read() & x07_keycodes[idx].mask) ? 0x00 : 0xff;
 		}
 		break;
 
@@ -911,7 +911,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 
 	if (m_kb_on && newval)
 	{
-		UINT8 shift = (input_port_read(machine(), "A1") & 0x01);
+		UINT8 shift = (ioport("A1")->read() & 0x01);
 		UINT16 udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
@@ -932,8 +932,8 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 {
 	UINT8 modifier;
-	UINT8 a1 = input_port_read(field.machine(), "A1");
-	UINT8 bz = input_port_read(field.machine(), "BZ");
+	UINT8 a1 = field.machine().root_device().ioport("A1")->read();
+	UINT8 bz = field.machine().root_device().ioport("BZ")->read();
 	UINT8 keycode = (UINT8)(FPTR)param;
 
 	if (m_kb_on && !newval)
@@ -1031,7 +1031,7 @@ inline void x07_state::draw_udk()
 	if (m_draw_udk)
 		for(i = 0, x = 0; i < 5; i++)
 		{
-			UINT16 ofs = udk_offset[i + ((input_port_read(machine(), "A1")&0x01) ? 6 : 0)];
+			UINT16 ofs = udk_offset[i + ((ioport("A1")->read()&0x01) ? 6 : 0)];
 			draw_char(x++, 3, 0x83);
 			for(j = 0; j < 3; j++)
 				draw_char(x++, 3, m_t6834_ram[ofs++]);
@@ -1487,7 +1487,7 @@ void x07_state::machine_reset()
 	m_prn_char_code = 0;
 	m_prn_size = 0;
 
-	m_regs_r[2] = input_port_read(machine(), "CARDBATTERY");
+	m_regs_r[2] = ioport("CARDBATTERY")->read();
 
 	cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
 }

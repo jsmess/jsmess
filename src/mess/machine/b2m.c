@@ -23,18 +23,18 @@ READ8_MEMBER(b2m_state::b2m_keyboard_r)
 {
 	UINT8 key = 0x00;
 	if (offset < 0x100) {
-		if ((offset & 0x01)!=0) { key |= input_port_read(machine(),"LINE0"); }
-		if ((offset & 0x02)!=0) { key |= input_port_read(machine(),"LINE1"); }
-		if ((offset & 0x04)!=0) { key |= input_port_read(machine(),"LINE2"); }
-		if ((offset & 0x08)!=0) { key |= input_port_read(machine(),"LINE3"); }
-		if ((offset & 0x10)!=0) { key |= input_port_read(machine(),"LINE4"); }
-		if ((offset & 0x20)!=0) { key |= input_port_read(machine(),"LINE5"); }
-		if ((offset & 0x40)!=0) { key |= input_port_read(machine(),"LINE6"); }
-		if ((offset & 0x80)!=0) { key |= input_port_read(machine(),"LINE7"); }
+		if ((offset & 0x01)!=0) { key |= ioport("LINE0")->read(); }
+		if ((offset & 0x02)!=0) { key |= ioport("LINE1")->read(); }
+		if ((offset & 0x04)!=0) { key |= ioport("LINE2")->read(); }
+		if ((offset & 0x08)!=0) { key |= ioport("LINE3")->read(); }
+		if ((offset & 0x10)!=0) { key |= ioport("LINE4")->read(); }
+		if ((offset & 0x20)!=0) { key |= ioport("LINE5")->read(); }
+		if ((offset & 0x40)!=0) { key |= ioport("LINE6")->read(); }
+		if ((offset & 0x80)!=0) { key |= ioport("LINE7")->read(); }
 	} else {
-		if ((offset & 0x01)!=0) { key |= input_port_read(machine(),"LINE8"); }
-		if ((offset & 0x02)!=0) { key |= input_port_read(machine(),"LINE9"); }
-		if ((offset & 0x04)!=0) { key |= input_port_read(machine(),"LINE10"); }
+		if ((offset & 0x01)!=0) { key |= ioport("LINE8")->read(); }
+		if ((offset & 0x02)!=0) { key |= ioport("LINE9")->read(); }
+		if ((offset & 0x04)!=0) { key |= ioport("LINE10")->read(); }
 	}
 	return key;
 }
@@ -294,7 +294,7 @@ WRITE8_MEMBER(b2m_state::b2m_palette_w)
 
 	m_b2m_color[offset & 3] = data;
 
-	if (input_port_read(machine(),"MONITOR")==1) {
+	if (ioport("MONITOR")->read()==1) {
 		palette_set_color_rgb(machine(),offset, r, g, b);
 	} else {
 		palette_set_color_rgb(machine(),offset, bw, bw, bw);

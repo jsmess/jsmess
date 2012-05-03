@@ -394,19 +394,19 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 
 	switch (m_keylatch)
 	{
-	case 0: data &= input_port_read(machine(), "KEY0"); break;
-	case 1: data &= input_port_read(machine(), "KEY1"); break;
-	case 2: data &= input_port_read(machine(), "KEY2"); break;
-	case 3: data &= input_port_read(machine(), "KEY3"); break;
-	case 4: data &= input_port_read(machine(), "KEY4"); break;
-	case 5: data &= input_port_read(machine(), "KEY5"); break;
-	case 6: data &= input_port_read(machine(), "KEY6"); break;
-	case 7: data &= input_port_read(machine(), "KEY7"); break;
-	case 8: data &= input_port_read(machine(), "KEY8"); break;
-	case 9: data &= input_port_read(machine(), "KEY9"); break;
+	case 0: data &= ioport("KEY0")->read(); break;
+	case 1: data &= ioport("KEY1")->read(); break;
+	case 2: data &= ioport("KEY2")->read(); break;
+	case 3: data &= ioport("KEY3")->read(); break;
+	case 4: data &= ioport("KEY4")->read(); break;
+	case 5: data &= ioport("KEY5")->read(); break;
+	case 6: data &= ioport("KEY6")->read(); break;
+	case 7: data &= ioport("KEY7")->read(); break;
+	case 8: data &= ioport("KEY8")->read(); break;
+	case 9: data &= ioport("KEY9")->read(); break;
 	}
 
-	data &= input_port_read(machine(), "KEY10");
+	data &= ioport("KEY10")->read();
 
 	return data;
 }
@@ -437,7 +437,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	data |= (m_cassette->input() > 0.0) << 5;
 
 	/* keyboard RPT */
-	data |= BIT(input_port_read(machine(), "RPT"), 0) << 6;
+	data |= BIT(ioport("RPT")->read(), 0) << 6;
 
 	/* MC6847 FS */
 	data |= (m_vdg->fs_r() ? 1 : 0) << 7;

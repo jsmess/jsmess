@@ -227,7 +227,7 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	UINT8 keydata = 0;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
-	if (input_port_read(machine(), "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
@@ -236,7 +236,7 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{
@@ -352,7 +352,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( jr200 )
-//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)

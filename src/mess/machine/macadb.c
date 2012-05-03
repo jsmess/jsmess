@@ -40,7 +40,7 @@ int mac_state::adb_pollkbd(int update)
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = input_port_read(machine(), keynames[i]);
+		keybuf = ioport(keynames[i])->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
@@ -168,9 +168,9 @@ int mac_state::adb_pollmouse()
 		return 0;
 	}
 
-	NewButton = input_port_read(machine(), "MOUSE0") & 0x01;
-	NewX = input_port_read(machine(), "MOUSE2");
-	NewY = input_port_read(machine(), "MOUSE1");
+	NewButton = ioport("MOUSE0")->read() & 0x01;
+	NewX = ioport("MOUSE2")->read();
+	NewY = ioport("MOUSE1")->read();
 
 	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
@@ -185,8 +185,8 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = input_port_read(machine(), "MOUSE2");
-	NewY = input_port_read(machine(), "MOUSE1");
+	NewX = ioport("MOUSE2")->read();
+	NewY = ioport("MOUSE1")->read();
 
 	/* see if it moved in the x coord */
 	if (NewX != m_adb_lastmousex)
@@ -218,7 +218,7 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 		m_adb_lastmousey = NewY;
 	}
 
-	m_adb_lastbutton = input_port_read(machine(), "MOUSE0") & 0x01;
+	m_adb_lastbutton = ioport("MOUSE0")->read() & 0x01;
 
 	*MouseX = (UINT8)MouseCountX;
 	*MouseY = (UINT8)MouseCountY;

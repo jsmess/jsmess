@@ -152,7 +152,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 		data |= 0x80;
 	if (!svi318_cassette_present(device->machine(), 0))
 		data |= 0x40;
-	data |= input_port_read(device->machine(), "BUTTONS") & 0x30;
+	data |= device->machine().root_device().ioport("BUTTONS")->read() & 0x30;
 
 	return data;
 }
@@ -181,7 +181,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 
 	row = state->m_svi.keyboard_row;
 	if (row <= 10)
-		return input_port_read(device->machine(), keynames[row]);
+		return device->machine().root_device().ioport(keynames[row])->read();
 
 	return 0xff;
 }
@@ -258,7 +258,7 @@ WRITE8_MEMBER(svi318_state::svi318_ppi_w)
 
 READ8_MEMBER(svi318_state::svi318_psg_port_a_r)
 {
-	return input_port_read(machine(), "JOYSTICKS");
+	return ioport("JOYSTICKS")->read();
 }
 
 /*
