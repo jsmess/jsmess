@@ -273,8 +273,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "machine/isa_mpu401.h"
 #include "machine/isa_ibm_mfc.h"
 #include "machine/pc_lpt.h"
-
-#include "machine/kb_keytro.h"
+#include "machine/pc_keyboards.h"
 #include "includes/genpc.h"
 
 class ibmpc_state : public driver_device
@@ -300,23 +299,9 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8, ibmpc_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ibm5150 )
-	PORT_INCLUDE( kb_keytronic_pc )		/* IN4 - IN11 */
-//  PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
-
-static const kb_keytronic_interface pc_keytronic_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
-};
-
-static const motherboard_interface pc_keytronic_keyboard_intf =
-{
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
-};
 
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
@@ -354,7 +339,7 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ibm_isa8_cards, "cga", NULL)
@@ -364,7 +349,7 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ibm_isa8_cards, NULL, NULL)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -389,7 +374,7 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ibm_isa8_cards, "cga", NULL)
@@ -402,7 +387,7 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", ibm_isa8_cards, NULL, NULL)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
