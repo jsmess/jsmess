@@ -163,39 +163,10 @@ ADDRESS_MAP_END
 /* TI99/4a: 48-key keyboard, plus two optional joysticks (2 shift keys) */
 static INPUT_PORTS_START(ti99_4a)
 
-	PORT_START( "RAM" )	/* config */
-	PORT_CONFNAME( 0x01, 0x09, "Console 32 KiB RAM upgrade (16 bit)" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START( "GROMENA" )
-	PORT_CONFNAME( 0x01, 0x01, "Console GROMs" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
 	PORT_START( "MECMOUSE" )
 	PORT_CONFNAME( 0x01, 0x00, "Mechatronics Mouse" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-/*
-    // We do not want to show this setting; makes only sense for Geneve
-    PORT_START( "MODE" )
-    PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0x0f, EQUALS, GM_NEVER )
-        PORT_CONFSETTING(    0x00, "Standard" )
-        PORT_CONFSETTING(    GENMOD, "GenMod" )
-*/
-
-	/* 3 ports for mouse */
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* Mouse - buttons */
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
-
 
 	/* 4 ports for keyboard and joystick */
 	PORT_START("KEY0")	/* col 0 */
@@ -284,16 +255,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(ti99_4)
 
-	PORT_START( "RAM" )	/* config */
-	PORT_CONFNAME( 0x01, 0x09, "Console 32 KiB RAM upgrade (16 bit)" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START( "GROMENA" )
-	PORT_CONFNAME( 0x01, 0x01, "Console GROMs" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
 	PORT_START( "MECMOUSE" )
 	PORT_CONFNAME( 0x01, 0x00, "Mechatronics Mouse" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -303,17 +264,6 @@ static INPUT_PORTS_START(ti99_4)
 	PORT_CONFNAME( 0x01, 0x00, "IR Handset" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
-	/* 3 ports for mouse */
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* Mouse - buttons */
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
 
 	/* 4 ports for keyboard and joystick */
 	PORT_START("KEY0")	/* col 0 */
