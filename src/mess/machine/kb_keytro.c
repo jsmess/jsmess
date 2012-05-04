@@ -649,3 +649,294 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #include "devtempl.h"
 
 DEFINE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type PC_KBD_KEYTRONIC_PC3270 = &device_creator<pc_kbd_keytronic_pc3270_device>;
+
+
+/*****************************************************************************
+    ADDRESS MAPS
+*****************************************************************************/
+
+static ADDRESS_MAP_START( keytronic_pc3270_program, AS_PROGRAM, 8, pc_kbd_keytronic_pc3270_device )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( keytronic_pc3270_io, AS_IO, 8, pc_kbd_keytronic_pc3270_device )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_read, p1_write)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_read, p2_write)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
+ADDRESS_MAP_END
+
+
+/*****************************************************************************
+    MACHINE CONFIG
+*****************************************************************************/
+
+MACHINE_CONFIG_FRAGMENT( keytronic_pc3270 )
+	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
+	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
+	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
+
+ROM_START( keytronic_pc3270 )
+	ROM_REGION(0x2000, "kb_keytr", 0)
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
+ROM_END
+
+
+pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock ),
+	device_pc_kbd_interface(mconfig, *this),
+	m_cpu(*this, "kb_keytr")
+{
+	m_shortname = "keytronic_pc3270";
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void pc_kbd_keytronic_pc3270_device::device_start()
+{
+	set_pc_kbdc_device();
+
+	/* setup savestates */
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p1_data));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_p3));
+	save_item(NAME(m_last_write_addr));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+void pc_kbd_keytronic_pc3270_device::device_reset()
+{
+	/* set default values */
+	m_p3 = 0xff;
+}
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor pc_kbd_keytronic_pc3270_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( keytronic_pc3270 );
+}
+
+
+ioport_constructor pc_kbd_keytronic_pc3270_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( kb_keytronic_pc );
+}
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
+{
+	return ROM_NAME( keytronic_pc3270 );
+}
+
+
+WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::clock_write )
+{
+	device_set_input_line( m_cpu, MCS51_INT0_LINE, state );
+}
+
+
+WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::data_write )
+{
+	device_set_input_line( m_cpu, MCS51_T0_LINE, state);
+}
+
+
+READ8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_read )
+{
+	if (LOG)
+		logerror("keytronic_pc3270::internal_data_read(): read from %04x\n", offset);
+
+	if ( m_pc_kbdc )
+	{
+		m_pc_kbdc->data_write_from_kb( BIT(offset, 8) );
+		m_pc_kbdc->clock_write_from_kb( BIT(offset, 9) );
+	}
+
+	return 0xff;
+}
+
+
+WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_write )
+{
+	if (LOG)
+		logerror("keytronic_pc3270::internal_data_write(): write to offset %04x\n", offset);
+
+	/* Check for low->high transition on AD8 */
+	if ( ! ( m_last_write_addr & 0x0100 ) && ( offset & 0x0100 ) )
+	{
+		switch (m_p1)
+		{
+		case 0x0e:
+			break;
+		case 0x0f:
+			m_p1_data = ioport("kb_keytronic_0f")->read();
+			break;
+		case 0x30:
+			m_p1_data = ioport("kb_keytronic_30_0")->read();
+			break;
+		case 0x31:
+			m_p1_data = ioport("kb_keytronic_31_0")->read();
+			break;
+		case 0x32:
+			m_p1_data = ioport("kb_keytronic_32_0")->read();
+			break;
+		case 0x33:
+			m_p1_data = ioport("kb_keytronic_33_0")->read();
+			break;
+		case 0x34:
+			m_p1_data = ioport("kb_keytronic_34_0")->read();
+			break;
+		case 0x35:
+			m_p1_data = ioport("kb_keytronic_35_0")->read();
+			break;
+		case 0x36:
+			m_p1_data = ioport("kb_keytronic_36_0")->read();
+			break;
+		case 0x37:
+			m_p1_data = ioport("kb_keytronic_37_0")->read() | (ioport("kb_keytronic_36_0")->read() & 0x01);
+			break;
+		case 0x38:
+			m_p1_data = ioport("kb_keytronic_38_0")->read();
+			break;
+		case 0x39:
+			m_p1_data = ioport("kb_keytronic_39_0")->read();
+			break;
+		case 0x3a:
+			m_p1_data = ioport("kb_keytronic_3a_0")->read();
+			break;
+		case 0x3b:
+			m_p1_data = ioport("kb_keytronic_3b_0")->read();
+			break;
+		}
+	}
+
+	/* Check for low->high transition on AD9 */
+	if ( ! ( m_last_write_addr & 0x0200 ) && ( offset & 0x0200 ) )
+	{
+		switch (m_p1)
+		{
+		case 0x0b:
+			m_p1_data = ioport("kb_keytronic_0b")->read();
+			break;
+		case 0x30:
+			m_p1_data = ioport("kb_keytronic_30_1")->read();
+			break;
+		case 0x31:
+			m_p1_data = ioport("kb_keytronic_31_1")->read();
+			break;
+		case 0x32:
+			m_p1_data = ioport("kb_keytronic_32_1")->read();
+			break;
+		case 0x33:
+			m_p1_data = ioport("kb_keytronic_33_1")->read();
+			break;
+		case 0x34:
+			m_p1_data = ioport("kb_keytronic_34_1")->read();
+			break;
+		case 0x35:
+			m_p1_data = ioport("kb_keytronic_35_1")->read();
+			break;
+		case 0x36:
+			m_p1_data = ioport("kb_keytronic_36_1")->read();
+			break;
+		case 0x37:
+			m_p1_data = ioport("kb_keytronic_37_1")->read();
+			break;
+		case 0x38:
+			m_p1_data = 0xff;
+			break;
+		case 0x39:
+			m_p1_data = 0xff;
+			break;
+		case 0x3a:
+			m_p1_data = 0xff;
+			break;
+		}
+	}
+
+	m_last_write_addr = offset;
+}
+
+
+READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_read )
+{
+	return m_p1 & m_p1_data;
+}
+
+
+WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_write )
+{
+	if (LOG)
+		logerror("keytronic_pc3270::p1_write(): write %02x\n", data);
+
+	m_p1 = data;
+}
+
+
+READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_read )
+{
+	return m_p2;
+}
+
+
+WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
+{
+	if (LOG)
+		logerror("keytronic_pc3270::p2_write(): write %02x\n", data);
+
+	m_p2 = data;
+}
+
+
+READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
+{
+	UINT8 data = m_p3;
+
+	data &= ~0x14;
+
+	/* -INT0 signal */
+	data |= (clock_signal() ? 0x04 : 0x00);
+
+	/* T0 signal */
+	data |= (data_signal() ? 0x00 : 0x10);
+
+	return data;
+}
+
+
+WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_write )
+{
+	if (LOG)
+		logerror("keytronic_pc3270::p3_write(): write %02x\n", data);
+
+	m_p3 = data;
+}
+

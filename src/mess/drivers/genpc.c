@@ -36,7 +36,7 @@
 #include "machine/isa_ibm_mfc.h"
 #include "machine/pc_lpt.h"
 
-#include "machine/kb_keytro.h"
+#include "machine/pc_keyboards.h"
 
 class genpc_state : public driver_device
 {
@@ -77,27 +77,13 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pcgen )
-	PORT_INCLUDE( kb_keytronic_pc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pccga )
-	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
-
-static const kb_keytronic_interface pc_keytronic_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_clock_w),
-	DEVCB_DEVICE_LINE_MEMBER("mb", ibm5160_mb_device, keyboard_data_w)
-};
-
-static const motherboard_interface pc_keytronic_keyboard_intf =
-{
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
-};
 
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
@@ -134,7 +120,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH( 256 )
@@ -147,7 +133,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -161,7 +147,7 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", NULL)
@@ -174,7 +160,8 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -188,7 +175,7 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
 	/* video hardware */
@@ -203,7 +190,7 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -218,7 +205,7 @@ static MACHINE_CONFIG_START( pcega, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "com", NULL)
@@ -232,7 +219,7 @@ static MACHINE_CONFIG_START( pcega, genpc_state )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -247,7 +234,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_CPU_IO_MAP(pc16_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu",pc_keytronic_keyboard_intf)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa1", pc_isa8_cards, "com", NULL)
@@ -261,7 +248,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

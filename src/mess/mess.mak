@@ -516,6 +516,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/ncr5390.o	\
+	$(MESS_MACHINE)/pc_kbdc.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/cntr_covox.o \
 	$(MESS_MACHINE)/pcf8593.o	\
@@ -1396,6 +1397,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_turbo.o	\
 	$(MESS_MACHINE)/pc_fdc.o	\
 	$(MESS_MACHINE)/pc_joy.o	\
+	$(MESS_MACHINE)/pc_keyboards.o \
 	$(MESS_MACHINE)/kb_keytro.o	\
 	$(MESS_MACHINE)/isa_adlib.o	\
 	$(MESS_MACHINE)/ser_mouse.o	\
