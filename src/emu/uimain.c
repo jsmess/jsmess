@@ -738,10 +738,12 @@ void ui_menu_input_specific::populate()
 		for (field = port->first_field(); field != NULL; field = field->next())
 		{
 			const char *name = field->name();
+			int this_inputclass = field->type_class();
 
 			/* add if we match the group and we have a valid name */
 			if (name != NULL && field->enabled() &&
-				((field->type() == IPT_OTHER && field->name() != NULL) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
+				//((field->type() == IPT_OTHER && field->name() != NULL) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
+				(this_inputclass != INPUT_CLASS_CONFIG) && (this_inputclass != INPUT_CLASS_DIPSWITCH))
 			{
 				input_seq_type seqtype;
 				UINT16 sortorder;
