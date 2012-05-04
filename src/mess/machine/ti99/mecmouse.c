@@ -205,4 +205,22 @@ void mecmouse_device::device_reset(void)
 	m_last_my = 0;
 }
 
+INPUT_PORTS_START( mecmouse )
+	/* 3 ports for mouse */
+	PORT_START("MOUSEX") /* Mouse - X AXIS */
+		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSEY") /* Mouse - Y AXIS */
+		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSE0") /* Mouse - buttons */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
+INPUT_PORTS_END
+
+ioport_constructor mecmouse_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( mecmouse );
+}
+
 const device_type MECMOUSE = &device_creator<mecmouse_device>;
