@@ -211,12 +211,13 @@ WRITE8_MEMBER(rainbow_state::share_8088_w)
 
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
+    // todo: this should clear IRQ 27 vector 0x9c on the i8088
     return m_8088_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
-    // todo: this should trigger IRQ 27 vector 0x9c on the i8088
+    device_set_input_line_and_vector(m_z80, 0, ASSERT_LINE, 0xf7);
     m_z80_mailbox = data;
 }
 
@@ -228,7 +229,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
-    device_set_input_line_and_vector(m_z80, 0, ASSERT_LINE, 0xf7);
+    // todo: this should assert IRQ 27 vector 0x9c on the i8088
     m_8088_mailbox = data;
 }
 
