@@ -24,13 +24,16 @@ public:
         m_i8088(*this, "maincpu"),
         m_z80(*this, "subcpu"),
         m_fdc(*this, "wd1793"),
-		m_p_ram(*this, "p_ram"){ }
+		m_p_ram(*this, "p_ram"),
+        m_shared(*this, "sh_ram")
+    { }
 
 	required_device<device_t> m_crtc;
     required_device<device_t> m_i8088;
     required_device<device_t> m_z80;
     required_device<device_t> m_fdc;
 	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_shared;
 	UINT8 m_diagnostic;
 
     virtual void machine_start();
@@ -41,8 +44,6 @@ public:
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
 
-	DECLARE_READ8_MEMBER(share_8088_r);
-	DECLARE_WRITE8_MEMBER(share_8088_w);
 	DECLARE_READ8_MEMBER(share_z80_r);
 	DECLARE_WRITE8_MEMBER(share_z80_w);
 
@@ -57,17 +58,13 @@ public:
     bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 
 private:
-    UINT8 m_shared[64*1024];        // 62k of shared RAM (to make the code simpler, we have 64k and ignore the lower 2k)
     UINT8 m_z80_private[0x800];     // Z80 private 2K
-    UINT8 m_8088_private[0x800];    // 8088 private 2K
     UINT8 m_z80_mailbox, m_8088_mailbox;
 };
 
 void rainbow_state::machine_start()
 {
-    save_item(NAME(m_shared));
     save_item(NAME(m_z80_private));
-    save_item(NAME(m_8088_private));
     save_item(NAME(m_z80_mailbox));
     save_item(NAME(m_8088_mailbox));
     save_item(NAME(m_zflip));
@@ -75,7 +72,7 @@ void rainbow_state::machine_start()
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x00000, 0x0ffff) AM_READWRITE(share_8088_r, share_8088_w)
+    AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 	AM_RANGE(0xec000, 0xedfff) AM_RAM
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
@@ -153,7 +150,7 @@ READ8_MEMBER(rainbow_state::share_z80_r)
             return m_z80_private[offset];
         }
 
-        return m_shared[offset-0x800];
+        return m_shared[offset];
     }
 
     return 0xff;
@@ -182,53 +179,35 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
         }
         else
         {
-            m_shared[offset-0x800] = data;
+            m_shared[offset] = data;
         }
-    }
-}
-
-READ8_MEMBER(rainbow_state::share_8088_r)
-{
-    if (offset < 0x800)
-    {
-        return m_8088_private[offset];
-    }
-
-    return m_shared[offset];
-}
-
-WRITE8_MEMBER(rainbow_state::share_8088_w)
-{
-    if (offset < 0x800)
-    {
-        m_8088_private[offset] = data;
-    }
-    else
-    {
-        m_shared[offset] = data;
     }
 }
 
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
+//    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
     // todo: this should clear IRQ 27 vector 0x9c on the i8088
     return m_8088_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
+//    printf("%02x to Z80 mailbox\n", data);
     device_set_input_line_and_vector(m_z80, 0, ASSERT_LINE, 0xf7);
     m_z80_mailbox = data;
 }
 
 READ8_MEMBER(rainbow_state::z80_latch_r)
 {
+//    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
     device_set_input_line(m_z80, 0, CLEAR_LINE);
     return m_z80_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
+//    printf("%02x to 8088 mailbox\n", data);
     // todo: this should assert IRQ 27 vector 0x9c on the i8088
     m_8088_mailbox = data;
 }
