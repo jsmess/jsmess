@@ -4,9 +4,6 @@
 
         04/01/2012 Skeleton driver.
  
-        TODO: Z80 boots, but no Z80/8088 comms happen (neither CPU writes
-        to the latch)
- 
 ****************************************************************************/
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -187,7 +184,7 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
-    // todo: this should clear IRQ 27 vector 0x9c on the i8088
+    device_set_input_line(m_i8088, INPUT_LINE_INT1, CLEAR_LINE);
     return m_8088_mailbox;
 }
 
@@ -208,7 +205,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
 //    printf("%02x to 8088 mailbox\n", data);
-    // todo: this should assert IRQ 27 vector 0x9c on the i8088
+    device_set_input_line_and_vector(m_i8088, INPUT_LINE_INT1, ASSERT_LINE, 0x27);
     m_8088_mailbox = data;
 }
 
@@ -227,8 +224,14 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 	return m_p_ram[offset];
 }
 
+static INTERRUPT_GEN( vblank_irq )
+{
+    device_set_input_line_and_vector(device, INPUT_LINE_INT0, ASSERT_LINE, 0x20);
+}
+
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 {
+    device_set_input_line(m_i8088, INPUT_LINE_INT0, CLEAR_LINE);
 }
 
 READ8_MEMBER( rainbow_state::diagnostic_r )
@@ -294,6 +297,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24_0734MHz / 5)
 	MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 	MCFG_CPU_IO_MAP(rainbow8088_io)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("subcpu",Z80, XTAL_24_0734MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
