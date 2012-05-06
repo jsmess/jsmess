@@ -38,7 +38,6 @@
 
 #include "machine/8237dma.h"
 
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
 #include "memconv.h"
@@ -618,22 +617,19 @@ static void pcjr_keyb_init(running_machine &machine)
  *
  **********************************************************/
 
-
-WRITE8_MEMBER(pc_state::ibm5150_kb_set_clock_signal)
+WRITE_LINE_MEMBER( pc_state::keyboard_clock_w )
 {
-	device_t *keyboard = machine().device("keyboard");
-
-	if ( m_ppi_clock_signal != data )
+	if ( m_ppi_clock_signal != state )
 	{
 		if ( m_ppi_keyb_clock && m_ppi_shift_enable )
 		{
-			m_ppi_clock_signal = data;
+			m_ppi_clock_signal = state;
 			if ( ! m_ppi_keyboard_clear )
 			{
 				/* Data is clocked in on a high->low transition */
-				if ( ! data )
+				if ( ! state )
 				{
-					UINT8	trigger_irq = m_ppi_shift_register & 0x01;
+					UINT8   trigger_irq = m_ppi_shift_register & 0x01;
 
 					m_ppi_shift_register = ( m_ppi_shift_register >> 1 ) | ( m_ppi_data_signal << 7 );
 					if ( trigger_irq )
@@ -641,25 +637,20 @@ WRITE8_MEMBER(pc_state::ibm5150_kb_set_clock_signal)
 						pic8259_ir1_w(m_pic8259, 1);
 						m_ppi_shift_enable = 0;
 						m_ppi_clock_signal = 0;
-						kb_keytronic_clock_w(keyboard, m_ppi_clock_signal);
+						m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
-
-	kb_keytronic_clock_w(keyboard, m_ppi_clock_signal);
 }
 
 
-WRITE8_MEMBER(pc_state::ibm5150_kb_set_data_signal)
+WRITE_LINE_MEMBER( pc_state::keyboard_data_w )
 {
-	device_t *keyboard = machine().device("keyboard");
-
-	m_ppi_data_signal = data;
-
-	kb_keytronic_data_w(keyboard, m_ppi_data_signal);
+	m_ppi_data_signal = state;
 }
+
 
 static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
@@ -727,7 +718,6 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = device->machine().driver_data<pc_state>();
-	device_t *keyboard = device->machine().device("keyboard");
 
 	/* PPI controller port B*/
 	st->m_ppi_portb = data;
@@ -738,7 +728,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
 
 	st->m_ppi_clock_signal = ( st->m_ppi_keyb_clock ) ? 1 : 0;
-	kb_keytronic_clock_w(keyboard, st->m_ppi_clock_signal);
+	st->m_pc_kbdc->clock_write_from_mb(st->m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->m_ppi_keyboard_clear )

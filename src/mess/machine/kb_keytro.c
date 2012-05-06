@@ -103,19 +103,6 @@ struct _kb_keytr_state
 
 
 /*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE kb_keytr_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == KB_KEYTRONIC);
-
-	return (kb_keytr_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-
-/*****************************************************************************
     INPUT PORTS
 *****************************************************************************/
 
@@ -303,7 +290,7 @@ static INPUT_PORTS_START( kb_keytronic_common )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( kb_keytronic_pc )
+static INPUT_PORTS_START( kb_keytronic_pc )
 	PORT_INCLUDE( kb_keytronic_common )
 
 	PORT_START( "kb_keytronic_0b" )
@@ -329,7 +316,7 @@ INPUT_PORTS_START( kb_keytronic_pc )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( kb_keytronic_at )
+static INPUT_PORTS_START( kb_keytronic_at )
 
 	PORT_INCLUDE( kb_keytronic_common )
 
@@ -357,238 +344,6 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-    EXTERNAL INTERFACE
-***************************************************************************/
-
-/* Write handler which is called when the clock signal may have changed */
-WRITE_LINE_DEVICE_HANDLER( kb_keytronic_clock_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(device);
-
-	keytronic->clock_signal = state;
-	device_set_input_line(keytronic->cpu, MCS51_INT0_LINE, keytronic->clock_signal);
-}
-
-/* Write handler which is called when the data signal may have changed */
-WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(device);
-
-	keytronic->data_signal = state;
-	device_set_input_line(keytronic->cpu, MCS51_T0_LINE, keytronic->data_signal);
-}
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-static READ8_HANDLER( kb_keytronic_p1_r )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-	return keytronic->p1 & keytronic->p1_data;
-}
-
-static WRITE8_HANDLER( kb_keytronic_p1_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-
-	if (LOG)
-		logerror("kb_keytronic_p1_w(): write %02x\n", data);
-
-	keytronic->p1 = data;
-}
-
-static READ8_HANDLER( kb_keytronic_p2_r )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-	return keytronic->p2;
-}
-
-static WRITE8_HANDLER( kb_keytronic_p2_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-
-	if (LOG)
-		logerror("kb_keytronic_p2_w(): write %02x\n", data);
-
-	keytronic->p2 = data;
-}
-
-static READ8_HANDLER( kb_keytronic_p3_r )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-	UINT8 data = keytronic->p3;
-
-	data &= ~0x14;
-
-	/* -INT0 signal */
-	data |= (keytronic->clock_signal ? 0x04 : 0x00);
-
-	/* T0 signal */
-	data |= (keytronic->data_signal ? 0x00 : 0x10);
-
-	return data;
-}
-
-static WRITE8_HANDLER( kb_keytronic_p3_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-
-	if (LOG)
-		logerror("kb_keytronic_p3_w(): write %02x\n", data);
-
-	keytronic->p3 = data;
-}
-
-static READ8_HANDLER( kb_keytronic_internal_data_r )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-
-	if (LOG)
-		logerror("kb_keytronic_internal_data_r(): read from %04x\n", offset);
-
-	keytronic->data_signal = BIT(offset, 8);
-	keytronic->clock_signal = BIT(offset, 9);
-
-	keytronic->out_data_func(keytronic->data_signal);
-	keytronic->out_clock_func(keytronic->clock_signal);
-
-	return 0xff;
-}
-
-static WRITE8_HANDLER( kb_keytronic_internal_data_w )
-{
-	kb_keytr_state *keytronic = get_safe_token(space->device().owner());
-
-	if (LOG)
-		logerror("kb_keytronic_internal_data_w(): write to offset %04x\n", offset);
-
-	/* Check for low->high transition on AD8 */
-	if ( ! ( keytronic->last_write_addr & 0x0100 ) && ( offset & 0x0100 ) )
-	{
-		switch (keytronic->p1)
-		{
-		case 0x0e:
-			break;
-		case 0x0f:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_0f")->read();
-			break;
-		case 0x30:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_30_0")->read();
-			break;
-		case 0x31:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_31_0")->read();
-			break;
-		case 0x32:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_32_0")->read();
-			break;
-		case 0x33:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_33_0")->read();
-			break;
-		case 0x34:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_34_0")->read();
-			break;
-		case 0x35:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_35_0")->read();
-			break;
-		case 0x36:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_36_0")->read();
-			break;
-		case 0x37:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_37_0")->read() | (space->machine().root_device().ioport("kb_keytronic_36_0")->read() & 0x01);
-			break;
-		case 0x38:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_38_0")->read();
-			break;
-		case 0x39:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_39_0")->read();
-			break;
-		case 0x3a:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_3a_0")->read();
-			break;
-		case 0x3b:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_3b_0")->read();
-			break;
-		}
-	}
-
-	/* Check for low->high transition on AD9 */
-	if ( ! ( keytronic->last_write_addr & 0x0200 ) && ( offset & 0x0200 ) )
-	{
-		switch (keytronic->p1)
-		{
-		case 0x0b:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_0b")->read();
-			break;
-		case 0x30:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_30_1")->read();
-			break;
-		case 0x31:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_31_1")->read();
-			break;
-		case 0x32:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_32_1")->read();
-			break;
-		case 0x33:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_33_1")->read();
-			break;
-		case 0x34:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_34_1")->read();
-			break;
-		case 0x35:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_35_1")->read();
-			break;
-		case 0x36:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_36_1")->read();
-			break;
-		case 0x37:
-			keytronic->p1_data = space->machine().root_device().ioport("kb_keytronic_37_1")->read();
-			break;
-		case 0x38:
-			keytronic->p1_data = 0xff;
-			break;
-		case 0x39:
-			keytronic->p1_data = 0xff;
-			break;
-		case 0x3a:
-			keytronic->p1_data = 0xff;
-			break;
-		}
-	}
-
-	keytronic->last_write_addr = offset;
-}
-
-
-/*****************************************************************************
-    ADDRESS MAPS
-*****************************************************************************/
-
-static ADDRESS_MAP_START( keytronic_program, AS_PROGRAM, 8, kb_keytr_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( keytronic_io, AS_IO, 8, kb_keytr_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(kb_keytronic_internal_data_r, kb_keytronic_internal_data_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(kb_keytronic_p1_r, kb_keytronic_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE_LEGACY(kb_keytronic_p2_r, kb_keytronic_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(kb_keytronic_p3_r, kb_keytronic_p3_w)
-ADDRESS_MAP_END
-
-
-/*****************************************************************************
-    MACHINE CONFIG
-*****************************************************************************/
-
-MACHINE_CONFIG_FRAGMENT( kb_keytr )
-	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
-	MCFG_CPU_PROGRAM_MAP(keytronic_program)
-	MCFG_CPU_IO_MAP(keytronic_io)
-MACHINE_CONFIG_END
-
-
-/***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
 
@@ -598,64 +353,12 @@ ROM_START( kb_keytr )
 ROM_END
 
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( kb_keytr )
-{
-	kb_keytr_state *keytronic = get_safe_token(device);
-	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->static_config();
-
-	/* find our cpu */
-	keytronic->cpu = device->subdevice("kb_keytr");
-
-	/* some basic checks */
-	assert(keytronic->cpu != NULL);
-	assert(intf != NULL);
-
-	/* resolve callbacks */
-	keytronic->out_clock_func.resolve(intf->out_clock_func, *device);
-	keytronic->out_data_func.resolve(intf->out_data_func, *device);
-
-	/* set default values */
-	keytronic->p3 = 0xff;
-
-	/* setup savestates */
-	device->save_item(NAME(keytronic->clock_signal));
-	device->save_item(NAME(keytronic->data_signal));
-	device->save_item(NAME(keytronic->p1));
-	device->save_item(NAME(keytronic->p1_data));
-	device->save_item(NAME(keytronic->p2));
-	device->save_item(NAME(keytronic->p3));
-	device->save_item(NAME(keytronic->last_write_addr));
-}
-
-
-/***************************************************************************
-    DEVICE GETINFO
-***************************************************************************/
-
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)				p##kb_keytr##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME				"Keytronic Keyboard"
-#define DEVTEMPLATE_SHORTNAME			"kb_keytro"
-#define DEVTEMPLATE_FAMILY				"PC Keyboard"
-#define DEVTEMPLATE_CLASS				DEVICE_CLASS_PERIPHERAL
-#define DEVTEMPLATE_VERSION				"1.0"
-#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_KEYTRONIC_PC3270 = &device_creator<pc_kbd_keytronic_pc3270_device>;
+const device_type PC_KBD_KEYTRONIC_PC3270		= &device_creator<pc_kbd_keytronic_pc3270_device>;
+const device_type PC_KBD_KEYTRONIC_PC3270_AT	= &device_creator<pc_kbd_keytronic_pc3270_at_device>;
 
 
 /*****************************************************************************
@@ -744,6 +447,12 @@ machine_config_constructor pc_kbd_keytronic_pc3270_device::device_mconfig_additi
 ioport_constructor pc_kbd_keytronic_pc3270_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( kb_keytronic_pc );
+}
+
+
+ioport_constructor pc_kbd_keytronic_pc3270_at_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( kb_keytronic_at );
 }
 
 

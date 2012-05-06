@@ -11,6 +11,8 @@
 
 
 #include "includes/at.h"
+#include "machine/pc_keyboards.h"
+
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
@@ -257,7 +259,6 @@ static INPUT_PORTS_START( atcga )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
 
-	PORT_INCLUDE( kb_keytronic_at )		/* IN4 - IN11 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -298,8 +299,6 @@ static INPUT_PORTS_START( atvga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-
-	PORT_INCLUDE( kb_keytronic_at )
 INPUT_PORTS_END
 
 static const unsigned i286_address_mask = 0x00ffffff;
@@ -310,11 +309,11 @@ static const at_keyboard_controller_interface keyboard_controller_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir1_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
-	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
+	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, clock_write_from_mb),
+	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, data_write_from_mb)
 };
 
-static const kb_keytronic_interface at_keytronic_intf =
+static const pc_kbdc_interface pc_kbdc_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
@@ -400,7 +399,8 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
-	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 

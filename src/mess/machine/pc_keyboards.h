@@ -15,7 +15,7 @@ SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
 
 // PC AT protocol keyboards
 
-// TODO
+SLOT_INTERFACE_EXTERN(pc_at_keyboards);
 
 #endif	/* __KB_KEYBOARDS_H__ */
 

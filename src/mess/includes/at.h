@@ -65,6 +65,7 @@
 #include "machine/isa_ide_cd.h"
 
 #include "machine/pc_lpt.h"
+#include "machine/pc_kbdc.h"
 
 
 class at_state : public driver_device
@@ -85,7 +86,8 @@ public:
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_ram(*this, RAM_TAG),
-	m_mc146818(*this, "rtc")
+	m_mc146818(*this, "rtc"),
+	m_pc_kbdc(*this, "pc_kbdc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -102,6 +104,7 @@ public:
 	required_device<device_t> m_speaker;
 	optional_device<device_t> m_ram;
 	optional_device<mc146818_device> m_mc146818;
+	optional_device<pc_kbdc_device> m_pc_kbdc;
 	DECLARE_READ8_MEMBER(at_page8_r);
 	DECLARE_WRITE8_MEMBER(at_page8_w);
 	DECLARE_READ8_MEMBER(at_portb_r);

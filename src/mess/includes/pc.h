@@ -12,17 +12,23 @@
 #include "machine/8237dma.h"
 #include "machine/serial.h"
 #include "machine/ser_mouse.h"
+#include "machine/pc_kbdc.h"
 
 class pc_state : public driver_device
 {
 public:
 	pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_pc_kbdc(*this, "pc_kbdc")
+	{
+	}
 
 	device_t *m_maincpu;
 	device_t *m_pic8259;
 	device_t *m_dma8237;
 	device_t *m_pit8253;
+	optional_device<pc_kbdc_device>  m_pc_kbdc;
+
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8	m_u73_q2;
@@ -41,14 +47,17 @@ public:
 	UINT8					m_ppi_data_signal;
 	UINT8					m_ppi_shift_register;
 	UINT8					m_ppi_shift_enable;
+
+	// interface to the keyboard
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+
 	DECLARE_READ8_MEMBER(pc_page_r);
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
 	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
-	DECLARE_WRITE8_MEMBER(ibm5150_kb_set_clock_signal);
-	DECLARE_WRITE8_MEMBER(ibm5150_kb_set_data_signal);
 	DECLARE_READ8_MEMBER(input_port_0_r);
 	DECLARE_READ8_MEMBER(pc_rtc_r);
 	DECLARE_WRITE8_MEMBER(pc_rtc_w);
