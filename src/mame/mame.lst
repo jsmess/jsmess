@@ -625,6 +625,8 @@ zokumahj		// (c) 199?
 musobana		// (c) 1995
 niyanpai		// (c) 1996
 
+csplayh1		// (c) 1995
+
 junai			// (c) 1998
 csplayh5		// (c) 1998
 junai2			// (c) 1998
@@ -4732,6 +4734,8 @@ puckpkmn		// (c) 2000 Genie
 puckpkmna		// (c) 2000 IBS
 topshoot		// (c) 1995 Sun Mixing
 
+batlemp
+
 // Sega MegaTech, the number shown is on the label of the instruction rom
 megatech
 mt_beast		// 01
@@ -8676,12 +8680,13 @@ aoh				// (c) 2001
 // Afega games
 twinactn		// (c) 1996 - bootleg of US AFF Mustang
 stagger1		// (c) 1998
-redhawk			// (c) 1997
+redhawk			// (c) 1997 New Vision Ent. license
 redhawke		// (c) 1997 Excellent Co., Ltd license
 redhawki		// (c) 1997 Haedong Corp. license
 redhawkb		// (c) 1997
-grdnstrm		// (c) 1998
-grdnstrmk		// (c) 1998
+grdnstrm		// (c) 1998 Apples Industries license
+grdnstrmk		// (c) 1998 (Korea)
+redfoxwp2		// (c) 1998 (China)
 bubl2000		// (c) 1998 Tuning
 hotbubl			// (c) 1998 Pandora
 popspops		// (c) 1999
@@ -10026,6 +10031,7 @@ policetr10		// (c) 1996 P&P Marketing
 policetr13a		// (c) 1996 P&P Marketing
 policetr13b		// (c) 1996 P&P Marketing
 sshooter		// (c) 1998 P&P Marketing
+sshooter17		// (c) 1998 P&P Marketing
 sshooter12		// (c) 1998 P&P Marketing
 sshooter11		// (c) 1998 P&P Marketing
 pass			// (c) 1992 Oksan
@@ -21454,3 +21460,4 @@ caspoker		// 1987, PM / Beck Elektronik.
 
 manohman		// 199?, Merkur.
 jankenmn		// 1985, Sunwise.
+bikkuric

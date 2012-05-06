@@ -180,7 +180,7 @@ enum ioport_type
 	IPT_DIGITAL_JOYSTICK_FIRST,
 
 		// use IPT_JOYSTICK for panels where the player has one single joystick
-		IPT_JOYSTICK_UP = IPT_DIGITAL_JOYSTICK_FIRST,
+		IPT_JOYSTICK_UP,
 		IPT_JOYSTICK_DOWN,
 		IPT_JOYSTICK_LEFT,
 		IPT_JOYSTICK_RIGHT,
@@ -1037,7 +1037,7 @@ public:
 	ioport_value defvalue() const { return m_defvalue; }
 	ioport_condition &condition() { return m_condition; }
 	ioport_type type() const { return m_type; }
-	UINT8 player() const { return m_player + 1; }
+	UINT8 player() const { return m_player; }
 
 	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); } 
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); } 
@@ -1052,6 +1052,7 @@ public:
 	const char *name() const;
 	const char *specific_name() const { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
+	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	bool has_dynamic_read() const { return !m_read.isnull(); }
 	bool has_dynamic_write() const { return !m_write.isnull(); }
 	
@@ -1255,7 +1256,7 @@ public:
 	bool crosshair_position(int player, float &x, float &y);
 	bool has_keyboard() const;
 	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
-	ioport_value frame_interpolate(ioport_value oldval, ioport_value newval);
+	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	const char *input_type_to_token(astring &string, ioport_type type, int player);
 

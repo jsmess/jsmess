@@ -179,18 +179,18 @@ public:
 	INT32 delta() const { return m_delta; }
 	INT32 centerdelta() const { return m_centerdelta; }
 
-	// helpers
-	ioport_value apply_min_max(ioport_value value) const;
-	ioport_value apply_settings(ioport_value value) const;
-	ioport_value apply_sensitivity(ioport_value value) const;
-	ioport_value apply_inverse_sensitivity(ioport_value value) const;
-
 	// readers
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 	
 private:
+	// helpers
+	INT32 apply_min_max(INT32 value) const;
+	INT32 apply_settings(INT32 value) const;
+	INT32 apply_sensitivity(INT32 value) const;
+	INT32 apply_inverse_sensitivity(INT32 value) const;
+
 	// internal state
 	analog_field *		m_next;					// link to the next analog state for this port
 	ioport_field &		m_field;				// pointer to the input field referenced
@@ -316,7 +316,7 @@ struct char_info
 //	from a numerator and a denominator
 //-------------------------------------------------
 
-inline INT32 compute_scale(INT32 num, INT32 den)
+inline INT64 compute_scale(INT32 num, INT32 den)
 {
 	return (INT64(num) << 24) / den;
 }
@@ -327,7 +327,7 @@ inline INT32 compute_scale(INT32 num, INT32 den)
 //  an 8.24 scale value
 //-------------------------------------------------
 
-inline INT32 recip_scale(INT32 scale)
+inline INT64 recip_scale(INT64 scale)
 {
 	return (INT64(1) << 48) / scale;
 }
@@ -338,7 +338,7 @@ inline INT32 recip_scale(INT32 scale)
 //	a 32-bit value
 //-------------------------------------------------
 
-inline INT32 apply_scale(INT32 value, INT32 scale)
+inline INT32 apply_scale(INT32 value, INT64 scale)
 {
 	return (INT64(value) * scale) >> 24;
 }
@@ -1692,25 +1692,46 @@ const char *ioport_field::name() const
 
 
 //-------------------------------------------------
-//  seq - return the input sequence for the given 
-//  input field
+//  seq - return the live input sequence for the 
+//  given input field
 //-------------------------------------------------
 
 const input_seq &ioport_field::seq(input_seq_type seqtype) const
+{
+	// if no live state, return default
+	if (m_live == NULL)
+		return defseq(seqtype);
+
+	// if the field is disabled, return no key
+	if (m_flags & FIELD_FLAG_UNUSED)
+		return input_seq::empty_seq;
+
+	// if the sequence is the special default code, return the expanded default value
+	if (m_live->seq[seqtype].is_default())
+		return machine().ioport().type_seq(m_type, m_player, seqtype);
+
+	// otherwise, return the sequence as-is
+	return m_live->seq[seqtype];
+}
+
+
+//-------------------------------------------------
+//  defseq - return the default input sequence for 
+//  the given input field
+//-------------------------------------------------
+
+const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
 	// if the field is disabled, return no key
 	if (m_flags & FIELD_FLAG_UNUSED)
 		return input_seq::empty_seq;
 
-	// select either the live or config state depending on whether we have live state
-	const input_seq &portseq = (m_live == NULL) ? m_seq[seqtype] : m_live->seq[seqtype];
-
-	// if the portseq is the special default code, return the expanded default value
-	if (portseq.is_default())
+	// if the sequence is the special default code, return the expanded default value
+	if (m_seq[seqtype].is_default())
 		return machine().ioport().type_seq(m_type, m_player, seqtype);
 
 	// otherwise, return the sequence as-is
-	return portseq;
+	return m_seq[seqtype];
 }
 
 
@@ -1817,7 +1838,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-		settings.seq[seqtype] = m_live->seq[seqtype];
+		settings.seq[seqtype] = seq(seqtype);
 
 	// if there's a list of settings or we're an adjuster, copy the current value
 	if (first_setting() != NULL || m_type == IPT_ADJUSTER)
@@ -2279,7 +2300,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-		seq[seqtype] = field.seq(seqtype);
+		seq[seqtype] = field.defseq(seqtype);
 
 	// if this is a digital joystick field, make a note of it
 	if (field.is_digital_joystick())
@@ -3014,7 +3035,7 @@ g_profiler.stop();
 //  values based on the time between frames
 //-------------------------------------------------
 
-ioport_value ioport_manager::frame_interpolate(ioport_value oldval, ioport_value newval)
+INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
 {
 	// if no last delta, just use new value
 	if (m_last_delta_nsec == 0)
@@ -3326,10 +3347,10 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 				// determine if we changed
 				bool changed = false;
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-					changed |= (field->live().seq[seqtype] != field->seq(seqtype));
+					changed |= (field->seq(seqtype) != field->defseq(seqtype));
 
 				// non-analog changes
-				if (field->live().analog == NULL)
+				if (!field->is_analog())
 					changed |= ((field->live().value & field->mask()) != (field->defvalue() & field->mask()));
 
 				// analog changes
@@ -3357,11 +3378,11 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 
 						// add sequences if changed
 						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-							if (field->live().seq[seqtype] != field->seq(seqtype))
-								save_sequence(portnode, seqtype, field->type(), field->live().seq[seqtype]);
+							if (field->seq(seqtype) != field->defseq(seqtype))
+								save_sequence(portnode, seqtype, field->type(), field->seq(seqtype));
 
 						// write out non-analog changes
-						if (field->live().analog == NULL)
+						if (!field->is_analog())
 						{
 							if ((field->live().value & field->mask()) != (field->defvalue() & field->mask()))
 								xml_set_attribute_int(portnode, "value", field->live().value & field->mask());
@@ -4149,7 +4170,7 @@ analog_field::analog_field(ioport_field &field)
 //  the appropriate min/max for the analog control
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_min_max(ioport_value value) const
+inline INT32 analog_field::apply_min_max(INT32 value) const
 {
 	// take the analog minimum and maximum values and apply the inverse of the
 	// sensitivity so that we can clamp against them before applying sensitivity
@@ -4185,7 +4206,7 @@ inline ioport_value analog_field::apply_min_max(ioport_value value) const
 //	adjustment for a current value
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_sensitivity(ioport_value value) const
+inline INT32 analog_field::apply_sensitivity(INT32 value) const
 {
 	return INT32((INT64(value) * m_sensitivity) / 100.0 + 0.5);
 }
@@ -4196,7 +4217,7 @@ inline ioport_value analog_field::apply_sensitivity(ioport_value value) const
 //	sensitivity adjustment for a current value
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_inverse_sensitivity(ioport_value value) const
+inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
 {
 	return INT32((INT64(value) * 100) / m_sensitivity);
 }
@@ -4207,7 +4228,7 @@ inline ioport_value analog_field::apply_inverse_sensitivity(ioport_value value) 
 //  analog input
 //-------------------------------------------------
 
-ioport_value analog_field::apply_settings(ioport_value value) const
+INT32 analog_field::apply_settings(INT32 value) const
 {
 	// apply the min/max and then the sensitivity
 	value = apply_min_max(value);
