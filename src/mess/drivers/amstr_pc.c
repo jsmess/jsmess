@@ -59,7 +59,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/8237dma.h"
 #include "sound/sn76496.h"
 
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
 static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, pc_state )

@@ -95,8 +95,9 @@ video HW too.
 #include "machine/8237dma.h"
 #include "sound/sn76496.h"
 
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
+#include "machine/pc_keyboards.h"
+
 
 static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -462,7 +463,6 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -532,7 +532,6 @@ static INPUT_PORTS_START( pcega )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -656,7 +655,6 @@ static INPUT_PORTS_START( bondwell )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 //  PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
-    PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -726,13 +724,6 @@ SLOT_INTERFACE_START(ibm5150_com)
 	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-static const kb_keytronic_interface pc_keytronic_intf =
-{
-	DEVCB_DRIVER_MEMBER(pc_state, ibm5150_kb_set_clock_signal),
-	DEVCB_DRIVER_MEMBER(pc_state, ibm5150_kb_set_data_signal),
-};
-
-
 #define MCFG_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MCFG_CPU_ADD("maincpu", type, clock)				\
 	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
@@ -787,6 +778,13 @@ static GFXDECODE_START( ibm5150 )
 GFXDECODE_END
 
 
+static const pc_kbdc_interface pc_kbdc_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_state, keyboard_clock_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_state, keyboard_data_w)
+};
+
+
 static MACHINE_CONFIG_START( pccga, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
@@ -823,7 +821,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -875,7 +874,8 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1244,7 +1244,8 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1296,7 +1297,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1349,7 +1351,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1401,7 +1404,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1453,7 +1457,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1505,7 +1510,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* keyboard */
-	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)

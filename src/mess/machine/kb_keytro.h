@@ -8,46 +8,6 @@
 #define __KB_KEYTRO_H__
 
 #include "devcb.h"
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _kb_keytronic_interface kb_keytronic_interface;
-struct _kb_keytronic_interface
-{
-	devcb_write_line out_clock_func;
-	devcb_write_line out_data_func;
-};
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-WRITE_LINE_DEVICE_HANDLER( kb_keytronic_clock_w );
-WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w );
-
-
-/***************************************************************************
-    INPUT PORTS
-***************************************************************************/
-
-INPUT_PORTS_EXTERN( kb_keytronic_pc );
-INPUT_PORTS_EXTERN( kb_keytronic_at );
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);
-
-#define MCFG_KB_KEYTRONIC_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, KB_KEYTRONIC, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
-
 #include "machine/pc_kbdc.h"
 
 //**************************************************************************
@@ -95,7 +55,21 @@ protected:
 };
 
 
+class pc_kbd_keytronic_pc3270_at_device : public pc_kbd_keytronic_pc3270_device
+{
+public:
+	// construction/destruction
+	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: pc_kbd_keytronic_pc3270_device(mconfig, tag, owner, clock)
+	{
+	}
+
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
 // device type definition
 extern const device_type PC_KBD_KEYTRONIC_PC3270;
+extern const device_type PC_KBD_KEYTRONIC_PC3270_AT;
 
 #endif  /* __KB_KEYTRO_H__ */
