@@ -78,12 +78,9 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 int cpc_multiface2_device::multiface_hardware_enabled()
 {
-	astring t = tag();
-
-	t.cat(":multiface");
 	if (m_multiface_ram!=NULL)
 	{
-		if ((ioport(t)->read() & 0x01)!=0)
+		if ((ioport("multiface")->read() & 0x01)!=0)
 		{
 			return 1;
 		}
@@ -103,22 +100,20 @@ It is believed that it is used to make multiface invisible to programs */
 void cpc_multiface2_device::multiface_rethink_memory()
 {
 	unsigned char *multiface_rom;
-	astring t = tag();
 
 	/* multiface hardware enabled? */
 	if (!multiface_hardware_enabled())
 		return;
 
-	t.cat(":multiface");
-	multiface_rom = memregion(t)->base();
+	multiface_rom = memregion("multiface")->base();
 
 	if ((m_multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0 && m_romdis != 0)
 	{
 		/* set bank addressess */
-		membank("bank1")->set_base(multiface_rom);
-		membank("bank2")->set_base(m_multiface_ram);
-		membank("bank9")->set_base(multiface_rom);
-		membank("bank10")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank1")->set_base(multiface_rom);
+		machine().root_device().membank("bank2")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank9")->set_base(multiface_rom);
+		machine().root_device().membank("bank10")->set_base(m_multiface_ram);
 	}
 }
 
@@ -129,13 +124,10 @@ machine_config_constructor cpc_multiface2_device::device_mconfig_additions() con
 
 void cpc_multiface2_device::check_button_state()
 {
-	astring t = tag();
-
 	if(!multiface_hardware_enabled())
 		return;
-	t.cat(":multiface");
 	// TODO: reset button
-	if (ioport(t)->read() & 0x02)
+	if (ioport("multiface")->read() & 0x02)
 	{
 		multiface_stop();
 	}
