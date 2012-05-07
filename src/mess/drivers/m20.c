@@ -91,7 +91,11 @@ static SCREEN_UPDATE_RGB32( m20 )
 static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_MIRROR(0x40000) AM_REGION("maincpu", 0x10000)
+    AM_RANGE( 0x02000, 0x03fff ) AM_RAM
+    AM_RANGE( 0x20000, 0x2ffff ) AM_RAM
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")//base vram
+    AM_RANGE( 0x60000, 0x6ffff ) AM_RAM
+    AM_RANGE( 0xa8000, 0xaffff ) AM_RAM
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
 //  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 ADDRESS_MAP_END
@@ -111,12 +115,12 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
 
+#if 0
 static ADDRESS_MAP_START(m20_apb_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x007ff ) AM_RAM
 	AM_RANGE( 0xf0000, 0xf7fff ) AM_RAM //mirrored?
 	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("apb_bios",0)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_apb_io, AS_IO, 16, m20_state)
@@ -125,6 +129,7 @@ static ADDRESS_MAP_START(m20_apb_io, AS_IO, 16, m20_state)
 	//0x4060 crtc address
 	//0x4062 crtc data
 ADDRESS_MAP_END
+#endif
 
 static INPUT_PORTS_START( m20 )
 INPUT_PORTS_END
@@ -157,10 +162,12 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_CPU_PROGRAM_MAP(m20_mem)
 	MCFG_CPU_IO_MAP(m20_io)
 
+#if 0
 	MCFG_CPU_ADD("apb", I8086, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_apb_mem)
 	MCFG_CPU_IO_MAP(m20_apb_io)
 	MCFG_DEVICE_DISABLE()
+#endif
 
 	MCFG_MACHINE_RESET(m20)
 
