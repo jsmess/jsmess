@@ -851,9 +851,9 @@ void geneve_mapper_device::device_reset()
 
 	m_genmod = false;
 
-	if (ioport("MODE")->read()==0)
+	if (machine().root_device().ioport("MODE")->read()==0)
 	{
-		switch (ioport("BOOTROM")->read())
+		switch (machine().root_device().ioport("BOOTROM")->read())
 		{
 		case GENEVE_098:
 			if (VERBOSE>0) LOG("geneve: Using 0.98 boot eprom\n");
@@ -874,11 +874,11 @@ void geneve_mapper_device::device_reset()
 			fatalerror("genboard: GenMod boot rom missing.\n");
 		}
 		m_genmod = true;
-		m_turbo = ((ioport("GENMODDIPS")->read() & GM_TURBO)!=0);
-		m_timode = ((ioport("GENMODDIPS")->read() & GM_TIM)!=0);
+		m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GM_TURBO)!=0);
+		m_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GM_TIM)!=0);
 	}
 
-	switch (ioport("SRAM")->read())
+	switch (machine().root_device().ioport("SRAM")->read())
 	{
 /*  1 100. .... .... .... .... on-board sram (128K) -+
     1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
