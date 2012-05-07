@@ -12,9 +12,7 @@
 *             host. In order that we can examine it, I have connected the
 *             'terminal' so we can enter data, and see what gets sent back.
 *             I've also connected the 'votrax' device, but it is far from
-*             complete (the phoneme-to-sample table does not exist), and
-*             therefore produces no sound. Selected phonemes would show in
-*             the error log if the status return was working properly.
+*             complete (the sounds are not understandable).
 *
 *             ACIA status code is set to E2 for no data and E3 for data.
 *
@@ -26,10 +24,7 @@
 *                 are: 08, 0D, 1B, 20. I didn't investigate what the codes do.
 *
 *  ToDo:
-*  - Fix votrax audio device to produce sound.
-*  - Fix votrax device to perform a callback on change of status rather than
-*           having to poll it.
-*  - Allow votrax frequency to be changed via a callable routine.
+*  - Votrax device needs considerable improvement in sound quality.
 *  - Reconnect the ACIA when serial coms become viable in MESS.
 *
 ******************************************************************************/
@@ -63,10 +58,9 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	//required_device<device_t> m_acia;
 	required_device<votrax_sc01_device> m_votrax;
-	DECLARE_READ8_MEMBER( votrtnt_acia_status_r );
-	DECLARE_READ8_MEMBER( votrtnt_acia_data_r );
-	DECLARE_WRITE8_MEMBER( votrtnt_votrax_w );
-	DECLARE_WRITE8_MEMBER( votrtnt_kbd_put );
+	DECLARE_READ8_MEMBER(votrtnt_acia_status_r);
+	DECLARE_READ8_MEMBER(votrtnt_acia_data_r);
+	DECLARE_WRITE8_MEMBER(votrtnt_kbd_put);
 	UINT8 m_term_data;
 	UINT8 m_term_status;
 };
@@ -82,14 +76,6 @@ READ8_MEMBER( votrtnt_state::votrtnt_acia_data_r )
 	return m_term_data;
 }
 
-WRITE8_MEMBER( votrtnt_state::votrtnt_votrax_w )
-{
-	data &= 0x3f;  // intonation bits are grounded
-	//printf("%X ",data);
-	m_votrax->write(space, 0, data);
-}
-
-
 
 /******************************************************************************
  Address Maps
@@ -103,7 +89,7 @@ static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
 	//AM_RANGE(0x2001, 0x2001) AM_NOP AM_MIRROR(0xffe)//AM_DEVREADWRITE("acia_0",aciadata_r,aciadata_w)/* 6850 ACIA */
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xffe) AM_READ(votrtnt_acia_status_r) AM_WRITENOP// temp testing
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0xffe) AM_READ(votrtnt_acia_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write) // temp testing
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(votrtnt_votrax_w) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the tnt) */
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("votrax", votrax_sc01_device, write) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the tnt) */
 	AM_RANGE(0x6000, 0x6fff) AM_ROM /* ROM in potted block */
 ADDRESS_MAP_END
 
@@ -143,17 +129,9 @@ static GENERIC_TERMINAL_INTERFACE( votrtnt_terminal_intf )
 	DEVCB_DRIVER_MEMBER(votrtnt_state, votrtnt_kbd_put)
 };
 
-static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
-{
-	votrtnt_state *state = timer.machine().driver_data<votrtnt_state>();
-	UINT8 status = state->m_votrax->request();
-	//printf("%X ",status);
-	device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static struct votrax_sc01_interface votrtnt_votrax_interface =
 {
-	DEVCB_NULL
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 
 /******************************************************************************
@@ -175,10 +153,9 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_VOTRAX_SC01_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrtnt_terminal_intf)
-	MCFG_TIMER_ADD_PERIODIC("votrtnt_timer", votrtnt_poll_votrax, attotime::from_hz(70) )
 MACHINE_CONFIG_END
 
 
@@ -215,5 +192,5 @@ static ACIA6850_INTERFACE( acia_intf )
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk", GAME_NOT_WORKING )
 
