@@ -387,6 +387,7 @@ DRVLIBS += \
 	$(MESSOBJ)/unisys.a \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vidbrain.a \
+	$(MESSOBJ)/videoton.a \
 	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
@@ -1804,6 +1805,10 @@ $(MESSOBJ)/vidbrain.a:			\
 	$(MESS_DRIVERS)/vidbrain.o	\
 	$(MESS_VIDEO)/vidbrain.o	\
 
+$(MESSOBJ)/videoton.a:			\
+	$(MESS_DRIVERS)/tvc.o		\
+	$(MESS_AUDIO)/tvc.o		\
+
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\
 	$(MESS_VIDEO)/v1050.o		\
@@ -1940,7 +1945,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/tim011.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/tsispch.o	\
-	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/unistar.o	\
 	$(MESS_DRIVERS)/v6809.o		\
