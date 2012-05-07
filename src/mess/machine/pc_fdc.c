@@ -103,7 +103,7 @@ static device_t* pc_get_device(running_machine &machine)
 	return (*fdc->fdc_interface.get_device)(machine);
 }
 
-static void pc_fdc_reset(running_machine &machine)
+void pc_fdc_reset(running_machine &machine)
 {
 	/* setup reset condition */
 	fdc->data_rate_register = 2;

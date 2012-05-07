@@ -1037,15 +1037,28 @@ static MACHINE_RESET( dn3500 )
 
 static void apollo_reset_instr_callback(device_t *device)
 {
-	apollo_state *apollo = device->machine().driver_data<apollo_state>();
+	running_machine &machine = device->machine();
+	apollo_state *apollo = machine.driver_data<apollo_state>();
 
 	DLOG1(("apollo_reset_instr_callback"));
 
-    // reset non-CPU devices here
-    apollo->m_ctape->device_reset();
+	// reset the CPU board devices
+	MACHINE_RESET_CALL(apollo);
+	apollo->dma8237_1->reset();
+	apollo->dma8237_2->reset();
+	apollo->pic8259_master->reset();
+	apollo->pic8259_slave->reset();
 
-    // HACK: should go through our devices and just reset those, not the entire machine object.
-	device->machine().schedule_soft_reset();
+    // reset the ISA bus devices
+    apollo->m_ctape->device_reset();
+	machine.device(APOLLO_ETH_TAG)->reset();
+	machine.device(APOLLO_WDC_TAG)->reset();
+
+	if (!apollo_is_dsp3x00())
+	{
+		machine.device(APOLLO_SCREEN_TAG)->reset();
+		machine.device(APOLLO_KBD_TAG )->reset();
+	}
 }
 
 /***************************************************************************
