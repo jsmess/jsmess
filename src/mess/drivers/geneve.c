@@ -1,6 +1,5 @@
 /*
     MESS Driver for the Myarc Geneve 9640.
-    Raphael Nabet, 2003.
 
     The Geneve has two operation modes.  One is compatible with the TI-99/4a,
     the other is not.
@@ -195,6 +194,10 @@
     before clearing >F79, or the keyboard will be enabled to send data the gate
     array when >F79 is is set to 0, and any such incoming data from the
     keyboard will be cleared as soon as it is buffered by the gate array.
+
+    Original version 2003 by Raphael Nabet
+
+    Rewritten 2012 by Michael Zapf
 */
 
 
@@ -283,11 +286,7 @@ static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve)
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
 
-/*
-    Input ports, used by machine code for keyboard and joystick emulation.
-*/
-
-/* 101-key PC XT keyboard + TI joysticks */
+/* TI joysticks. The keyboard is implemented in genboard.c. */
 static INPUT_PORTS_START(geneve)
 
 	PORT_START( "MODE" )
