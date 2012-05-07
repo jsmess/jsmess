@@ -2,9 +2,10 @@
 
         DEC Rainbow 100
 
-        04/01/2012 Skeleton driver.
+        Driver-in-progress by R. Belmont and Miodrag Milanovic
  
 ****************************************************************************/
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
@@ -44,6 +45,8 @@ public:
 	DECLARE_READ8_MEMBER(share_z80_r);
 	DECLARE_WRITE8_MEMBER(share_z80_w);
 
+	DECLARE_READ8_MEMBER(floating_bus_r);
+
 	DECLARE_READ8_MEMBER(i8088_latch_r);
 	DECLARE_WRITE8_MEMBER(i8088_latch_w);
 	DECLARE_READ8_MEMBER(z80_latch_r);
@@ -53,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_diskdiag_write_w);
 
     bool m_zflip;                   // Z80 alternate memory map with A15 inverted
+    bool m_z80_halted;
 
 private:
     UINT8 m_z80_private[0x800];     // Z80 private 2K
@@ -65,13 +69,15 @@ void rainbow_state::machine_start()
     save_item(NAME(m_z80_mailbox));
     save_item(NAME(m_8088_mailbox));
     save_item(NAME(m_zflip));
-}
+}   // f4e02
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
-	AM_RANGE(0xec000, 0xedfff) AM_RAM
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM
+    AM_RANGE(0x20000, 0xdffff) AM_READ(floating_bus_r)  // test at f4e1c
+    AM_RANGE(0x20000, 0x3ffff) AM_RAM
+    AM_RANGE(0xec000, 0xedfff) AM_RAM
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -116,6 +122,7 @@ static MACHINE_RESET( rainbow )
     rainbow_state *state = machine.driver_data<rainbow_state>();
 
     state->m_zflip = true;
+    state->m_z80_halted = false;
 }
 
 static SCREEN_UPDATE_IND16( rainbow )
@@ -123,6 +130,11 @@ static SCREEN_UPDATE_IND16( rainbow )
 	device_t *devconf = screen.machine().device("vt100_video");
 	rainbow_video_update( devconf, bitmap, cliprect);
 	return 0;
+}
+
+READ8_MEMBER(rainbow_state::floating_bus_r)
+{
+    return (offset>>16) + 2;
 }
 
 READ8_MEMBER(rainbow_state::share_z80_r)
@@ -241,6 +253,20 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 
 WRITE8_MEMBER( rainbow_state::diagnostic_w )
 {
+//    printf("%02x to diag port (PC=%x)\n", data, cpu_get_pc(&space.device()));
+
+    if (data == 0x82)
+    {
+        m_z80_halted = true;
+    }
+
+    if ((data == 0x83) && (m_z80_halted))
+    {
+        m_zflip = true;
+        m_z80_halted = false;
+        m_z80->reset();
+    }
+
 	m_diagnostic = data;
 }
 
