@@ -1,6 +1,17 @@
 ﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="tvc_cart" description="Videoton TVC 64 cartridges">
+	<software name="bridzs">
+		<description>Bridzs</description>
+		<year>198?</year>
+		<publisher>Videoton</publisher>
+		<part name="rom" interface="tvc_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bridzs.crt" size="0x4000" crc="c44ae1a3" sha1="591fc00c68d06ffd73daf554d6fb0cc267a8e569" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="harcaf">
 		<description>Harc a föld körül</description>
 		<year>198?</year>
