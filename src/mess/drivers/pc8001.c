@@ -100,19 +100,19 @@ WRITE8_MEMBER( pc8001mk2_state::port31_w )
 READ8_MEMBER( pc8001_state::port40_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       BUSY
-	    1       ACK
-	    2       CMT CDIN
-	    3       EXP /EXTON
-	    4       RTC DATA OUT
-	    5       VRTC
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       BUSY
+        1       ACK
+        2       CMT CDIN
+        3       EXP /EXTON
+        4       RTC DATA OUT
+        5       VRTC
+        6
+        7
+
+    */
 
 	UINT8 data = 0x08;
 
@@ -127,19 +127,19 @@ READ8_MEMBER( pc8001_state::port40_r )
 WRITE8_MEMBER( pc8001_state::port40_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       STROBE
-	    1       RTC STB
-	    2       RTC CLK
-	    3       CRT /CLDS CLK
-	    4       
-	    5       SPEAKER
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       STROBE
+        1       RTC STB
+        2       RTC CLK
+        3       CRT /CLDS CLK
+        4
+        5       SPEAKER
+        6
+        7
+
+    */
 
 	m_centronics->strobe_w(BIT(data, 0));
 

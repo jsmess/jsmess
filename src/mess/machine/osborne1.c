@@ -193,19 +193,19 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       EOI
-	    4       
-	    5       DAV
-	    6       NDAC
-	    7       NRFD
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3       EOI
+        4
+        5       DAV
+        6       NDAC
+        7       NRFD
+
+    */
 
 	UINT8 data = 0;
 
@@ -221,19 +221,19 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       EOI
-	    4       ATN
-	    5       DAV
-	    6       NDAC
-	    7       NRFD
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3       EOI
+        4       ATN
+        5       DAV
+        6       NDAC
+        7       NRFD
+
+    */
 
 	m_ieee->eoi_w(BIT(data, 3));
 	m_ieee->atn_w(BIT(data, 4));
@@ -245,7 +245,7 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 
 const pia6821_interface osborne1_ieee_pia_config =
 {
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r), 	/* in_a_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),	/* in_a_func */
 	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_r),				/* in_b_func */
 	DEVCB_NULL,							/* in_ca1_func */
 	DEVCB_NULL,							/* in_cb1_func */

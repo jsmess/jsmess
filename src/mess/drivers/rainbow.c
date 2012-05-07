@@ -3,7 +3,7 @@
         DEC Rainbow 100
 
         Driver-in-progress by R. Belmont and Miodrag Milanovic
- 
+
 ****************************************************************************/
 
 #include "emu.h"

@@ -11,9 +11,9 @@
 
     TODO:
 
-	- fast loader does not work with 1541
-	- graphics corruption during Ultimax mode (VIC issue?)
-	- IDE unknown command (E8)
+    - fast loader does not work with 1541
+    - graphics corruption during Ultimax mode (VIC issue?)
+    - IDE unknown command (E8)
     - FT245 USB
     - CompactFlash slot
     - ShortBus (ETH64, DUART, DigiMAX, ETFE)

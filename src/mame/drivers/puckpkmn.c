@@ -128,7 +128,7 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START( batlemp )
+static INPUT_PORTS_START( jzth )
 	PORT_START("P2")	/* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( batlemp_map, AS_PROGRAM, 16, md_boot_state )
+static ADDRESS_MAP_START( jzth_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( batlemp_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
-	
+
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
@@ -297,10 +297,10 @@ static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( batlemp, puckpkmn )
+static MACHINE_CONFIG_DERIVED( jzth, puckpkmn )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(batlemp_map)
+	MCFG_CPU_PROGRAM_MAP(jzth_map)
 
 MACHINE_CONFIG_END
 
@@ -461,7 +461,7 @@ ROM_END
 
 
 
-ROM_START( batlemp )
+ROM_START( jzth )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s.y.u5", 0x000000, 0x080000, CRC(a4a526b5) SHA1(85d0299caf91ff50b6870f845b9aacbd358ed81f) )
 	ROM_LOAD16_BYTE( "s.y.u4", 0x000001, 0x080000, CRC(c16654eb) SHA1(dca4b772a3b9caa7be3fa01511c401b591c2e6f3) )
@@ -480,4 +480,4 @@ ROM_END
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
 GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
 GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, batlemp,  0,        batlemp,   batlemp,  puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang/Battle Emporer", GAME_IMPERFECT_SOUND )
+GAME( 2000, jzth,     0,        jzth,      jzth,     puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", GAME_IMPERFECT_SOUND )
