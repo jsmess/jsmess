@@ -686,10 +686,10 @@ int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
 {
 	int n_chars = 0;
 	UINT16 key_code = 0;
-	UINT8 caps = BIT(ioport("keyboard4")->read(),0);
-	UINT8 shift = BIT(ioport("keyboard4")->read(),1) | BIT(ioport("keyboard4")->read(),5);
-	UINT8 ctrl = BIT(ioport("keyboard4")->read(),2);
-	UINT8 numlock = BIT(ioport("keyboard4")->read(),6);
+	UINT8 caps = BIT(machine().root_device().ioport("keyboard4")->read(),0);
+	UINT8 shift = BIT(machine().root_device().ioport("keyboard4")->read(),1) | BIT(machine().root_device().ioport("keyboard4")->read(),5);
+	UINT8 ctrl = BIT(machine().root_device().ioport("keyboard4")->read(),2);
+	UINT8 numlock = BIT(machine().root_device().ioport("keyboard4")->read(),6);
 	UINT16 index;
 
 	if (keyboard_is_german())
@@ -803,7 +803,7 @@ void apollo_kbd_device::scan_keyboard()
 
 	for (x = 0; x < 0x80; x++)
 	{
-		if (!(ioport(keynames[x / 32])->read() & (1 << (x % 32))))
+		if (!(machine().root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			// no key pressed
 			if (m_keyon[x] != 0)
