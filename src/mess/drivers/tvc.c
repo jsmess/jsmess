@@ -5,7 +5,6 @@
         12/05/2009 Skeleton driver.
 
         TODO:
-        - add sound
         - cassette load/save
         - floppy interface
         - expansion ports
@@ -13,98 +12,93 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
-#include "imagedev/cartslot.h"
+#include "includes/tvc.h"
 
-
-class tvc_state : public driver_device
+void tvc_state::tvc_set_mem_page(UINT8 data)
 {
-public:
-	tvc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	UINT8 m_video_mode;
-	UINT8 m_keyline;
-	UINT8 m_flipflop;
-	UINT8 m_col[4];
-	DECLARE_WRITE8_MEMBER(tvc_bank_w);
-	DECLARE_WRITE8_MEMBER(tvc_video_mode_w);
-	DECLARE_WRITE8_MEMBER(tvc_palette_w);
-	DECLARE_WRITE8_MEMBER(tvc_keyboard_w);
-	DECLARE_READ8_MEMBER(tvc_keyboard_r);
-	DECLARE_READ8_MEMBER(tvc_flipflop_r);
-	DECLARE_WRITE8_MEMBER(tvc_flipflop_w);
-	DECLARE_READ8_MEMBER(tvc_port59_r);
-	DECLARE_WRITE8_MEMBER(tvc_port0_w);
-};
-
-
-
-static void tvc_set_mem_page(running_machine &machine, UINT8 data)
-{
-	tvc_state *state = machine.driver_data<tvc_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	switch(data & 0x18) {
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	switch(data & 0x18)
+	{
 		case 0x00 : // system ROM selected
+			if (m_bank_type[0] != TVC_ROM_BANK)
+			{
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				state->membank("bank1")->set_base(machine.root_device().memregion("sys")->base());
-				break;
+				m_bank_type[0] = TVC_ROM_BANK;
+			}
+			membank("bank1")->set_base(memregion("sys")->base());
+			break;
 		case 0x08 : // Cart ROM selected
+			if (m_bank_type[0] != TVC_ROM_BANK)
+			{
 				space->install_read_bank(0x0000, 0x3fff, "bank1");
 				space->unmap_write(0x0000, 0x3fff);
-				state->membank("bank1")->set_base(machine.root_device().memregion("cart")->base());
-				break;
+				m_bank_type[0] = TVC_ROM_BANK;
+			}
+			membank("bank1")->set_base(memregion("cart")->base());
+			break;
 		case 0x10 : // RAM selected
+			if (m_bank_type[0] != TVC_RAM_BANK)
+			{
 				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-				state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
-				break;
+				m_bank_type[0] = TVC_RAM_BANK;
+			}
+			membank("bank1")->set_base(m_ram->pointer());
+			break;
 	}
 	// Bank 2 is always RAM
-	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000);
+		membank("bank3")->set_base(m_ram->pointer() + 0x10000);
 	} else {
 		// System RAM page 3
-		state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+		membank("bank3")->set_base(m_ram->pointer() + 0x8000);
 	}
-	switch(data & 0xc0) {
+	switch(data & 0xc0)
+	{
 		case 0x00 : // Cart ROM selected
+			if (m_bank_type[1] != TVC_ROM_BANK)
+			{
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				state->membank("bank4")->set_base(machine.root_device().memregion("cart")->base());
-				break;
+				m_bank_type[1] = TVC_ROM_BANK;
+			}
+			membank("bank4")->set_base(memregion("cart")->base());
+			break;
 		case 0x40 : // System ROM selected
+			if (m_bank_type[1] != TVC_ROM_BANK)
+			{
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				state->membank("bank4")->set_base(machine.root_device().memregion("sys")->base());
-				break;
+				m_bank_type[1] = TVC_ROM_BANK;
+			}
+			membank("bank4")->set_base(memregion("sys")->base());
+			break;
 		case 0x80 : // RAM selected
+			if (m_bank_type[1] != TVC_RAM_BANK)
+			{
 				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
-				state->membank("bank4")->set_base(machine.device<ram_device>(RAM_TAG)->pointer()+0xc000);
-				break;
+				m_bank_type[1] = TVC_RAM_BANK;
+			}
+			membank("bank4")->set_base(m_ram->pointer()+0xc000);
+			break;
 		case 0xc0 : // External ROM selected
+			if (m_bank_type[1] != TVC_ROM_BANK)
+			{
 				space->install_read_bank(0xc000, 0xffff, "bank4");
 				space->unmap_write(0xc000, 0xffff);
-				state->membank("bank4")->set_base(machine.root_device().memregion("ext")->base());
-				break;
-
+				m_bank_type[1] = TVC_ROM_BANK;
+			}
+			membank("bank4")->set_base(memregion("ext")->base());
+			break;
 	}
 }
 
 WRITE8_MEMBER(tvc_state::tvc_bank_w)
 {
-	tvc_set_mem_page(machine(), data);
+	tvc_set_mem_page(data);
 }
-
-WRITE8_MEMBER(tvc_state::tvc_video_mode_w)
-{
-	m_video_mode = data & 0x03;
-}
-
 
 WRITE8_MEMBER(tvc_state::tvc_palette_w)
 {
@@ -129,23 +123,56 @@ READ8_MEMBER(tvc_state::tvc_keyboard_r)
 	return ioport(keynames[m_keyline & 0x0f])->read();
 }
 
-READ8_MEMBER(tvc_state::tvc_flipflop_r)
+READ8_MEMBER(tvc_state::tvc_int_state_r)
 {
-	return m_flipflop;
+	/*
+        x--- ----   ACK from printer
+        -x-- ----   colour
+        --x- ----   cassette input
+        ---x ----   vblank or tone interrupt
+        ---- xxxx   expansions interrupt
+    */
+
+	return 0x40 | (m_flipflop << 4);
 }
 
 WRITE8_MEMBER(tvc_state::tvc_flipflop_w)
 {
-	m_flipflop |= 0x10;
+	// every write here clears the vblank flipflop
+	m_flipflop = 1;
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
-READ8_MEMBER(tvc_state::tvc_port59_r)
+
+READ8_MEMBER(tvc_state::tvc_exp_id_r)
 {
+	// TODO: read expansion slot ID
 	return 0xff;
 }
 
-WRITE8_MEMBER(tvc_state::tvc_port0_w)
+WRITE8_MEMBER(tvc_state::tvc_border_color_w)
 {
+	// x-x- x-x-    border color (I G R B)
 }
+
+
+WRITE8_MEMBER(tvc_state::tvc_sound_w)
+{
+	switch(offset)
+	{
+		case 1:
+			// bit 6-7 - cassette motors
+			break;
+		case 2:
+			// bit 0-1 - video mode
+			m_video_mode = data & 0x03;
+			break;
+	}
+
+	// sound ports
+	m_sound->write(space, offset, data);
+}
+
+
 static ADDRESS_MAP_START(tvc_mem, AS_PROGRAM, 8, tvc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
@@ -156,14 +183,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_port0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_border_color_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tvc_bank_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(tvc_keyboard_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(tvc_video_mode_w)
+	AM_RANGE(0x04, 0x06) AM_WRITE(tvc_sound_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tvc_flipflop_w)
 	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
-	AM_RANGE(0x59, 0x59) AM_READ(tvc_flipflop_r)
-	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_port59_r)
+	AM_RANGE(0x59, 0x59) AM_READ(tvc_int_state_r)
+	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_exp_id_r)
 	AM_RANGE(0x60, 0x63) AM_WRITE(tvc_palette_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -269,27 +296,19 @@ static INPUT_PORTS_START( tvc )
 INPUT_PORTS_END
 
 
-static MACHINE_START(tvc)
+void tvc_state::machine_start()
 {
-	tvc_state *state = machine.driver_data<tvc_state>();
-	int i;
+	for (int i=0; i<4; i++)
+		m_col[i] = i;
 
-	for (i=0; i<4; i++)
-		state->m_col[i] = i;
-
-	state->m_flipflop = 0xff;
+	m_flipflop = 0;
 }
 
-static MACHINE_RESET(tvc)
+void tvc_state::machine_reset()
 {
-	tvc_state *state = machine.driver_data<tvc_state>();
-	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,(64+14)*1024);
-	tvc_set_mem_page(machine, 0);
-	state->m_video_mode = 0;
-}
-
-static VIDEO_START( tvc )
-{
+	memset(m_ram->pointer(), 0, m_ram->size());
+	tvc_set_mem_page(0);
+	m_video_mode = 0;
 }
 
 static MC6845_UPDATE_ROW( tvc_update_row )
@@ -305,7 +324,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
 					*p++ = palette[state->m_col[BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,6)]];
 					*p++ = palette[state->m_col[BIT(data,5)]];
@@ -322,7 +341,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -339,7 +358,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
 					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>4) | ((data & 0x08)>>1) | ((data & 0x02)>>1);
 					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>3) | (data & 0x04) | (data & 0x01);
 					*p++ = palette[col0];
@@ -400,8 +419,8 @@ static const mc6845_interface tvc_crtc6845_interface =
 static INTERRUPT_GEN( tvc_interrupt )
 {
 	tvc_state *state = device->machine().driver_data<tvc_state>();
-	state->m_flipflop  &= ~0x10;
-	device_set_input_line(device, 0, HOLD_LINE);
+	state->m_flipflop  = 0;
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( tvc, tvc_state )
@@ -410,12 +429,9 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
     MCFG_CPU_PROGRAM_MAP(tvc_mem)
     MCFG_CPU_IO_MAP(tvc_io)
 
-    MCFG_MACHINE_START(tvc)
-    MCFG_MACHINE_RESET(tvc)
-
 	MCFG_CPU_VBLANK_INT("screen", tvc_interrupt)
 
- /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -426,14 +442,18 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_PALETTE_LENGTH( 16 )
 	MCFG_PALETTE_INIT(tvc)
 
-	MCFG_MC6845_ADD("crtc", MC6845, 3125000, tvc_crtc6845_interface) // clk taken from schematics
-
-    MCFG_VIDEO_START(tvc)
+	MCFG_MC6845_ADD("crtc", MC6845, 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("80K")
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", TVC_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
