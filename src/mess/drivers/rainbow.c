@@ -69,7 +69,7 @@ void rainbow_state::machine_start()
     save_item(NAME(m_z80_mailbox));
     save_item(NAME(m_8088_mailbox));
     save_item(NAME(m_zflip));
-}   // f4e02
+}
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -255,15 +255,17 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 {
 //    printf("%02x to diag port (PC=%x)\n", data, cpu_get_pc(&space.device()));
 
-    if (data == 0x82)
+    if (!(data & 1))
     {
+        device_set_input_line(m_z80, INPUT_LINE_HALT, ASSERT_LINE);
         m_z80_halted = true;
     }
 
-    if ((data == 0x83) && (m_z80_halted))
+    if ((data & 1) && (m_z80_halted))
     {
         m_zflip = true;
         m_z80_halted = false;
+        device_set_input_line(m_z80, INPUT_LINE_HALT, CLEAR_LINE);
         m_z80->reset();
     }
 
