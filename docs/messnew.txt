@@ -1,4 +1,126 @@
-﻿0.145u7
+﻿0.145u8
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-gbcolor: fixed sprite regression. [Alegend45]
+
+-kc: Added emulation of GIDE interface. [Sandro Ronco]
+
+-Apple2: Preliminary infrastructure for emulating Apple IIe auxiliary
+ slot cards [R. Belmont]
+
+-x68k: Added clone X68000 Super (with its own internal SCSI ROM dump).
+ Added internal SCSI ROM dump for the XVI. [Anna Wu, Barry Rodewald]
+
+-apple2: Added "The Mill" 6809 card.  BASIC demo program works; OS9
+ and Excel Flex appear to need undumped additional ROMs. [R. Belmont]
+
+-pc: Corrected SN76496 clocks to /4 of sysclock instead of /5, fixes
+ pitch to match video [MooglyGuy, Kef Schecter]
+
+-tvc: added cartridge support. [Sandro Ronco]
+
+-c64: Added preliminary support for the IDE64 v4.1 cartridge.
+ Load/save from BASIC works, but there is graphics corruption in the
+ menu, and USB/CF is not supported yet. [Curt Coder]
+
+-vectrex: support 64k bankswitched carts and carts with SRAM
+ [mkasick, kbare]
+
+-IBM PC drivers: Implemented the PC keyboard connector as a slot
+ device. In the future this will allow the user to select which
+ keybaord to use with an emulated PC. Converted the Keytronic PC3270
+ keyboard implementation to C++ as an example pc keyboard. 
+ [Wilbert Pol]
+
+-osborne1: Added IEEE-488 bus. [Curt Coder]
+
+-PC Drivers: Updated remaining PC/XT and AT drivers to use the
+ keyboard slot implementation. Removed legacy device implementation for
+ the Keytronic keyboard. Removed an unneeded include from
+ drivers/amstr_pc.c.  [Wilbert Pol]
+
+-DEC Rainbow: fleshed out the Z80 side including partial WD1793 hookup
+ and correct shared RAM handling, but system doesn't get any further
+ yet. [R. Belmont]
+
+-DEC Rainbow: initial Z80/8088 comms work, ends with Error 10 now instead
+ of 18 [R. Belmont]
+
+-DEC Rainbow: Hooked up VBL and Z80->8088 IRQs.  Still doesn't boot,
+ but closer than ever. [R. Belmont]
+
+-DEC Rainbow: 82/83 to the diagnostic port is meant to reboot the Z80. 
+ This passes the "memory arbitration test". [R. Belmont]
+
+-DEC Rainbow: Improved Z80 control, fixed weird garbage on screen and
+ eliminated "Z80 response" system error. [R. Belmont]
+
+-DEC Rainbow: Hooked up keyboard i8251, but our 8251 core needs
+ interrupts. [R. Belmont]
+
+
+
+Software Lists:
+----------------
+-snes.xml: verified more carts [MESSfan]
+-pico.xml: new dumps added [Team Europe]
+-apple1.xml: added a few more tapes [Anon01]
+-tvc: added cartridges softlist. [Sandro Ronco]
+-snes.xml: finished documenting unreleased titles, very special thanks
+ to Evan of snes central who made this a piece of cake [MESSfan]
+
+Source Changes:
+----------------
+-ap2_dsk: added some missing defines and comments and a way to select
+ whether to use lenient (if the address mark contents are sane
+ regardless of whether the checksum byte was good or not) or normal
+ (only if checksum was valid) usage of the address marks. Also switched
+ the default output sector order from prodos order to dos3.3 order,
+ which is slightly more useful. Added a define to switch between the
+ three possible sector orderings: prodos, dos3.3, and logical.
+ [Lord Nightmare]
+
+-dfi_dsk.c: fixed a nasty bug when reading df bytes with 0x80 set
+ throwing the timing way off; this makes most disk images decode a
+ whole heck of a lot better. ap2_dsk.c: fixed a nasty
+ array-out-of-bounds access problem if an address mark with an insane
+ sector value in it is read. [Lord Nightmare, Phil Pemberton]
+
+-Fixed a logic bug in the dfi header check which surprisingly doesn't
+ come up at all on GCC (compiler bug?) but does happen on clang. Also
+ disabled some accidentally enabled debug code, and handle the case of
+ no index transitions at all properly. [Lord Nightmare, Balrog]
+
+-Fix bug found by Clang (behavior *appears* correct but can't verify)
+ [Balrog, R. Belmont]
+
+-3c505 improvements.  Netbooting a MESS Apollo instance off a second
+ MESS Apollo instance is now possible, and Domain/OS 10.4 works.
+ [Hans Ostermeyer]
+
+-Various Clang warning cleanups (and a few actual bugfixes) [Balrog]
+
+-i386: Big pmode update.  OS/2 2.1 more or less runs now.  [Carl]
+
+-ap2_dsk.c: Preliminary, working RWTS18 decoding support; Decodes disks
+ and shows ascii text; not sure if sectors are in the correct order
+ yet. [Lord Nightmare, Balrog, Roland Gustafsson]
+
+
+0.145u7
 
 New System Drivers Supported:
 -----------------------------
