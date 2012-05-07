@@ -12,6 +12,7 @@
 #include "video/vtvideo.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
+#include "machine/i8251.h"
 
 class rainbow_state : public driver_device
 {
@@ -22,6 +23,7 @@ public:
         m_i8088(*this, "maincpu"),
         m_z80(*this, "subcpu"),
         m_fdc(*this, "wd1793"),
+        m_kbd8251(*this, "kbdser"),
 		m_p_ram(*this, "p_ram"),
         m_shared(*this, "sh_ram")
     { }
@@ -30,6 +32,7 @@ public:
     required_device<device_t> m_i8088;
     required_device<device_t> m_z80;
     required_device<device_t> m_fdc;
+    required_device<i8251_device> m_kbd8251;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_shared;
 	UINT8 m_diagnostic;
@@ -92,6 +95,9 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 	// 0x0C Video processor DC012
 	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)
+
+	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -320,6 +326,19 @@ static const floppy_interface floppy_intf =
 	NULL
 };
 
+static const i8251_interface i8251_intf =
+{
+	DEVCB_NULL,         // rxd in
+	DEVCB_NULL,         // txd out
+	DEVCB_NULL,         // dsr
+	DEVCB_NULL,         // dtr
+	DEVCB_NULL,         // rts
+	DEVCB_NULL,         // rx ready
+	DEVCB_NULL,         // tx ready
+	DEVCB_NULL,         // tx empty
+	DEVCB_NULL          // syndet
+};
+
 static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24_0734MHz / 5)
@@ -347,6 +366,8 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+
+	MCFG_I8251_ADD("kbdser", i8251_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
