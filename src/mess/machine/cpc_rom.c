@@ -135,19 +135,3 @@ void rom_image_device::call_unload()
 	free(m_base);
 	m_base = NULL;
 }
-
-void rom_image_device::update_names()
-{
-	image_interface_iterator iter(device().mconfig().root_device());
-	int count = iter.count();
-	int index = iter.indexof(*this);
-	if (count > 1) {
-		m_instance_name.printf("romimage%d", index + 1);
-		m_brief_instance_name.printf("rom%d", index + 1);
-	}
-	else
-	{
-		m_instance_name = "romimage";
-		m_brief_instance_name = "rom";
-	}
-}
