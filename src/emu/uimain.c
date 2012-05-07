@@ -130,7 +130,7 @@ void ui_menu_main::populate()
 	device_iterator deviter(machine().root_device());
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		if (device->rom_region())
-			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 				if (ROMENTRY_ISSYSTEM_BIOS(rom)) { has_bioses= true; break; }
 
 	/* add input menu items */
@@ -319,7 +319,7 @@ void ui_menu_main::handle()
 		case BIOS_SELECTION:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_bios_selection(machine(), container)));
 			break;
-			
+
 		default:
 			fatalerror("ui_menu_main::handle - unknown reference");
 		}
@@ -496,7 +496,7 @@ void ui_menu_bios_selection::populate()
 	{
 		if (device->rom_region()) {
 			const char *val = "default";
-			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 			{
 				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom)==device->system_bios())
 				{
@@ -529,7 +529,7 @@ void ui_menu_bios_selection::handle()
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
 			device_t *dev = (device_t *)menu_event->itemref;
 			int cnt = 0;
-			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 			{
 				if (ROMENTRY_ISSYSTEM_BIOS(rom)) cnt ++;
 			}
@@ -763,7 +763,7 @@ void ui_menu_input_specific::populate()
 					if(pollingitem && pollingref == field && pollingseq == seqtype)
 						pollingitem = item;
 					item->seq = field->seq(seqtype);
-					item->defseq = &get_field_default_seq(field, seqtype);
+					item->defseq = &field->defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
@@ -813,19 +813,6 @@ void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &orig
 	/* otherwise, toggle to "none" */
 	else
 		selected_seq.reset();
-}
-
-/*-------------------------------------------------
-    get_field_default_seq - return a pointer
-    to the default sequence for the given field
--------------------------------------------------*/
-
-const input_seq &ui_menu_input::get_field_default_seq(ioport_field *field, input_seq_type seqtype)
-{
-	if (field->seq(seqtype).is_default())
-		return field->machine().ioport().type_seq(field->type(), field->player(), seqtype);
-	else
-		return field->seq(seqtype);
 }
 
 void ui_menu_input::handle()
@@ -1385,7 +1372,7 @@ void ui_menu_analog::populate()
 					case IPT_PEDAL3:
 						use_autocenter = true;
 						break;
-					
+
 					default:
 						break;
 				}

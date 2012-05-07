@@ -680,7 +680,7 @@ void threecom3c505_device::set_command_pending(int onoff)
 	LOG2(("set_command_pending %d m_rx_pending=%d m_rx_data_buffer.get_length()=%x%s",
 			m_command_pending, m_rx_pending, m_rx_data_buffer.get_length(), onoff ? "" :"\n"));
 
-//-	verbose = onoff ? 1 : 2;
+//- verbose = onoff ? 1 : 2;
 
 	if (!m_command_pending)
 	{
@@ -716,8 +716,8 @@ void threecom3c505_device::do_command()
 	switch (m_command_buffer[0])
 	{
 	case CMD_RESET: // 0x00
-//		FIXME:
-//		device_reset();
+//      FIXME:
+//      device_reset();
 		break;
 
 	case CMD_CONFIGURE_ADAPTER_MEMORY: // 0x01
@@ -1072,19 +1072,19 @@ UINT8 threecom3c505_device::read_command_port()
 				m_tx_data_buffer.reset();
 				if (m_command_buffer[0] != CMD_MC_F9)
 				{
-//					set_command_pending(0);
+//                  set_command_pending(0);
 					m_wait_for_ack = 1;
 				}
 				break;
 
 			case CMD_DOWNLOAD_PROGRAM_RESPONSE:
 				m_program_buffer.reset();
-//				set_command_pending(0);
+//              set_command_pending(0);
 				m_wait_for_ack = 1;
 				break;
 
 			default:
-//				set_command_pending(0);
+//              set_command_pending(0);
 				m_wait_for_ack = 1;
 				break;
 			}
@@ -1224,7 +1224,7 @@ UINT8 threecom3c505_device::read_data_port(){
 			m_status &= ~HRDY; /* data register no longer ready */
 			m_rx_data_buffer.log("Rx Data");
 			m_rx_data_buffer.reset();
-//			set_command_pending(0);
+//          set_command_pending(0);
 			m_wait_for_ack = 1;
 		}
 	}
@@ -1291,7 +1291,7 @@ void threecom3c505_device::write_control_port( UINT8 data)
 		if (m_command_buffer[0] == CMD_MC_F9)
 		{
 			m_mc_f9_pending = 1;
-//-			verbose = 2;
+//-         verbose = 2;
 		}
 
 		if (data == 0x00)

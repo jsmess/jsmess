@@ -238,7 +238,7 @@ void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  rtc_clock_updated - 
+//  rtc_clock_updated -
 //-------------------------------------------------
 
 void hd64610_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)

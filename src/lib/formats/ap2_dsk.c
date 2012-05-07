@@ -1100,7 +1100,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 						visualgrid[se][0] |= ADDRFOUND;
 						visualgrid[se][0] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-//							if ((visualgrid[se][0] & ADDRFOUND) == ADDRFOUND) {
+//                          if ((visualgrid[se][0] & ADDRFOUND) == ADDRFOUND) {
 #else
 							if ((visualgrid[se][0] & ADDRGOOD) == ADDRGOOD) {
 #endif
@@ -1217,7 +1217,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 				io_generic_write(io, data, pos_data, 256);
 				pos_data += 256;
 		}
-		
+
 		// for the rest of the tracks
 		for(int track=2; track < 70; track+=2) {
 				UINT8 sectdata[(768)*6];
@@ -1262,7 +1262,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								visualgrid[se][track/2] |= ADDRFOUND;
 								visualgrid[se][track/2] |= ((chk ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-//									if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
+//                                  if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
 #else
 									if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
 #endif
@@ -1280,13 +1280,13 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 											data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
 											c ^= data[i];
 											/*if (((i&0x3)+1)==0x04) {
-												printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
-												printf("%c", ((((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0))&0x3F)+0x40);
-												printf("%c", ((((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0))&0x3F)+0x40);
-												*dest++ = ((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0);
-												*dest++ = ((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0);
-												*dest++ = ((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0);
-											}*/
+                                                printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
+                                                printf("%c", ((((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0))&0x3F)+0x40);
+                                                printf("%c", ((((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0))&0x3F)+0x40);
+                                                *dest++ = ((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0);
+                                                *dest++ = ((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0);
+                                                *dest++ = ((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0);
+                                            }*/
 										//  printf("%02x ", data[i]);
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
@@ -1297,17 +1297,17 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 												dpost <<= 8;
 												dpost |= gb(buf, ts, pos, wrap);
 										}
-										
+
 										/*if (se == 0) // dump some debug data to help find the lfsr before sector 5
-										{
-											printf("Data Postamble was 0x%08x\n", dpost);
-											for(int i=0; i<0x400; i++) {
-												data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
-												c ^= data[i];
-										  printf("%02x ", data[i]);
-										  if (((i&0xf)+1)==0x10) printf("\n");
-											}
-										}*/
+                                        {
+                                            printf("Data Postamble was 0x%08x\n", dpost);
+                                            for(int i=0; i<0x400; i++) {
+                                                data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+                                                c ^= data[i];
+                                          printf("%02x ", data[i]);
+                                          if (((i&0xf)+1)==0x10) printf("\n");
+                                            }
+                                        }*/
 
 										// only write it if the bitfield of the track shows datagood is NOT set.
 										// if it is set we don't want to overwrite a guaranteed good read with a bad one
@@ -1387,7 +1387,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 											fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x400], c, (data[0x400]==c)?"OK":"BAD", dpost, (dpost&0xFF000000)==0xD4000000?"OK":"BAD");
 										if (data[0x400] == c) visualgrid[se][track/2] |= DATAGOOD;
 										if ((dpost&0xFF000000)==0xD4000000) visualgrid[se][track/2] |= DATAPOST;
-									} 
+									}
 								}
 								hb = 0;
 						}

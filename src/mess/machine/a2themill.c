@@ -3,24 +3,24 @@
     a2themill.c
 
     Implementation of the Stellation Two The Mill 6809 card
- 
+
     The OS9 add-on changes the address mapping as follows:
     6809 0x0000-0xafff -> 6502 0x1000-0xbfff
     6809 0xb000-0xdfff -> 6502 0xd000-0xffff
     6809 0xe000-0xefff -> 6502 0xc000-0xcfff
     6809 0xf000-0xffff -> 6502 0x0000-0x0fff
- 
+
     (reference: http://mirrors.apple2.org.za/ground.icaen.uiowa.edu/MiscInfo/Hardware/mill.6809 )
- 
+
     ProDOS "Stellation The Mill Disk.po" requires Mill in slot 2; boot
     the disc and type "-DEMO1" and press Enter to launch the simple demo.
- 
+
     The OS9 disk image available around the internet seems to be bad - the
     6809 boot vector is 0x4144 which maps to 6502 0x5144 and there's all
     zeros from 6502 1000-8fff.  There is valid 6809 code from 9000-BFFF
     at the point where it wants to boot the 6809, but I don't know what
     is supposed to be the entry point.
-     
+
 *********************************************************************/
 
 #include "a2themill.h"
@@ -166,7 +166,7 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
                 m_status &= ~0x02;
             }
             break;
-        
+
         case 3: // 6809 NMI
             if (data & 0x80)
             {

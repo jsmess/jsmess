@@ -625,5 +625,5 @@ static bool AY3600_keyboard_charqueue_empty(running_machine &machine)
 	return true;
 }
 
- 
+
 
