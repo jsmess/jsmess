@@ -1306,11 +1306,11 @@ static DEVICE_START( apollo_fdc ) {
 	DLOG1(("device_start_apollo_fdc"));
 	apollo_fdc_device = device;
 	pc_fdc_init(device->machine(), &apollo_fdc_interface);
+}
 
-	// hack to make upd765.c work again for apollo with MESS version >= 0.142u6
-	// 2011-07-23 Hans Ostermyer
-//  extern void upd765_hack_for_apollo();
-//  upd765_hack_for_apollo();
+static DEVICE_RESET( apollo_fdc ) {
+	DLOG1(("device_reset_apollo_fdc"));
+	pc_fdc_reset(device->machine());
 }
 
 WRITE8_MEMBER(apollo_state::apollo_fdc_w){
@@ -1425,11 +1425,8 @@ MACHINE_CONFIG_FRAGMENT( apollo )
     MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
 
 	MCFG_UPD765A_ADD(APOLLO_FDC_TAG, pc_fdc_upd765_connected_1_drive_interface)
-#ifdef MCFG_FLOPPY_DRIVE_ADD
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, apollo_fdc_floppy_config)
-#else
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, apollo_fdc_floppy_config)
-#endif
+
 	MCFG_OMTI8621_ADD(APOLLO_WDC_TAG, apollo_wdc_config)
 	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)
 	MCFG_THREECOM3C505_ADD(APOLLO_ETH_TAG, apollo_3c505_config)
@@ -1474,4 +1471,5 @@ MACHINE_RESET( apollo )
 	device_reset_apollo_rtc(machine.device(APOLLO_RTC_TAG));
 	device_reset_apollo_sio(machine.device(APOLLO_SIO_TAG));
 	device_reset_apollo_sio2(machine.device(APOLLO_SIO2_TAG));
+	device_reset_apollo_fdc(apollo_fdc_device);
 }
