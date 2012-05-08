@@ -3,6 +3,13 @@
 #ifndef __VIDBRAIN__
 #define __VIDBRAIN__
 
+#include "emu.h"
+#include "cpu/f8/f8.h"
+#include "imagedev/cartslot.h"
+#include "machine/f3853.h"
+#include "machine/ram.h"
+#include "sound/discrete.h"
+
 #define F3850_TAG			"cd34"
 #define F3853_TAG			"cd5"
 #define SCREEN_TAG			"screen"
@@ -16,6 +23,7 @@ public:
 	vidbrain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, F3850_TAG),
+		  m_smi(*this, F3853_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_screen(*this, SCREEN_TAG),
 		  m_timer_y_odd(*this, TIMER_Y_ODD_TAG),
@@ -23,6 +31,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<device_t> m_discrete;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_timer_y_odd;

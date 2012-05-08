@@ -5,7 +5,8 @@
     http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
     http://www.seanriddle.com/vbinfo.html
     http://www.seanriddle.com/videobrain.html
-    http://www.google.com/patents?q=4232374
+    http://www.google.com/patents/US4232374
+    http://www.google.com/patents/US4177462
 
     07/04/2009 Skeleton driver.
 
@@ -15,23 +16,17 @@
 
     TODO:
 
+	- video interrupts
+	- reset on cartridge unload
     - use machine/f3853.h
-    - discrete sound
     - joystick scan timer 555
-    - reset on cartridge eject
     - expander 1 (cassette, RS-232)
     - expander 2 (modem)
 
 */
 
 
-#include "emu.h"
 #include "includes/vidbrain.h"
-#include "cpu/f8/f8.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "sound/discrete.h"
 
 
 
@@ -74,10 +69,10 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
         bit     description
 
-        0       keyboard row 0
-        1       keyboard row 1
-        2       keyboard row 2
-        3       keyboard row 3
+        0       keyboard row 0, joystick 1 fire
+        1       keyboard row 1, joystick 2 fire
+        2       keyboard row 2, joystick 3 fire
+        3       keyboard row 3, joystick 4 fire
         4
         5
         6
@@ -85,7 +80,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
     */
 
-	UINT8 data = 0;//machine.root_device().ioport("JOY-R")->read();
+	UINT8 data = ioport("JOY-R")->read();
 
 	if (BIT(m_keylatch, 0)) data |= ioport("IO00")->read();
 	if (BIT(m_keylatch, 1)) data |= ioport("IO01")->read();
@@ -111,24 +106,23 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
         bit     description
 
-        0       sound Q0
-        1       sound Q1
+        0
+        1
         2
         3
         4       sound clock
-        5
-        6
+        5		accessory jack pin 5
+        6		accessory jack pin 1
         7       joystick enable
 
     */
 
 	// sound clock
-	int sound_clk = BIT(data, 7);
+	int sound_clk = BIT(data, 4);
 
 	if (!m_sound_clk && sound_clk)
 	{
-		discrete_sound_w(m_discrete, NODE_01, BIT(m_keylatch, 0));
-		discrete_sound_w(m_discrete, NODE_02, BIT(m_keylatch, 1));
+		discrete_sound_w(m_discrete, NODE_01, m_keylatch & 0x03);
 	}
 
 	m_sound_clk = sound_clk;
@@ -330,10 +324,10 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_PLAYER(4)
 
 	PORT_START("JOY-R")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 
@@ -346,9 +340,16 @@ INPUT_PORTS_END
 //  DISCRETE_SOUND( vidbrain )
 //-------------------------------------------------
 
+static const discrete_dac_r1_ladder vidbrain_dac =
+{
+	2,
+	{ RES_K(120), RES_K(120) }, // R=56K, 2R=120K
+	0, 0, RES_K(120), 0
+};
+
 static DISCRETE_SOUND_START( vidbrain )
-	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_INPUT_LOGIC(NODE_02)
+	DISCRETE_INPUT_DATA(NODE_01)
+	DISCRETE_DAC_R1(NODE_02, NODE_01, DEFAULT_TTL_V_LOGIC_1, &vidbrain_dac)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 
@@ -361,33 +362,21 @@ DISCRETE_SOUND_END
 //-------------------------------------------------
 //  f3853_interface smi_intf
 //-------------------------------------------------
-/*
+
 static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
-    device_set_input_line_vector(device->machine().device(F3850_TAG), 0, addr);
+	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
 
-    cputag_set_input_line(device->machine(), F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
+    device_set_input_line_vector(state->m_maincpu, F8_INPUT_LINE_INT_REQ, addr);
+
+    state->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
 }
 
 static const f3853_interface smi_intf =
 {
     f3853_int_req_w
 };
-*/
 
-
-//-------------------------------------------------
-//  cassette_interface vidbrain_cassette_interface
-//-------------------------------------------------
-
-static const cassette_interface vidbrain_cassette_interface =
-{
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
-	NULL
-};
 
 
 //**************************************************************************
@@ -465,8 +454,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// devices
-//  MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_interface)
+	MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -505,4 +493,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING )

@@ -2,7 +2,6 @@
 
     TODO:
 
-    - X order
     - freeze (light pen)
     - screen size
     - scanline based update
@@ -40,8 +39,8 @@
 
 // read/write registers - RAM memory
 #define RAM_RP_LO					0x00	// cartridge pointer low order
-#define RAM_RP_HI					0x10	// cartridge pointer high order and color
-#define RAM_DX						0x20	// dX, intensity, X-copy
+#define RAM_RP_HI_COLOR				0x10	// cartridge pointer high order and color
+#define RAM_DX_INT_XCOPY			0x20	// dX, intensity, X-copy
 #define RAM_DY						0x30	// dY
 #define RAM_X						0x40	// X value
 #define RAM_Y_LO_A					0x50	// Y value low order list A
@@ -66,6 +65,9 @@
 
 #define RAM(_offset) \
 	m_vlsi_ram[_offset + i]
+
+#define RAM_XORD(_offset) \
+	m_vlsi_ram[_offset + xord]
 
 #define IS_VISIBLE(_y) \
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
@@ -362,20 +364,23 @@ UINT32 vidbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int i = 0; i < 16; i++)
 	{
-		UINT16 rp = ((RAM(RAM_RP_HI) << 8) | RAM(RAM_RP_LO)) & 0x1fff;
-		int color = ((RAM(RAM_DX) >> 2) | (BIT(RAM(RAM_RP_HI), 5) << 2) | (BIT(RAM(RAM_RP_HI), 6) << 1) | (BIT(RAM(RAM_RP_HI), 7))) & 0x1f;
-		int dx = RAM(RAM_DX) & 0x1f;
-		int dy = RAM(RAM_DY);
-		int xcopy = BIT(RAM(RAM_DX), 7);
-		int x = RAM(RAM_X);
-		int xord_a = RAM(RAM_Y_LO_A) & 0x0f;
-		int xord_b = RAM(RAM_Y_LO_B) & 0x0f;
-		int y_a = ((RAM(RAM_XY_HI_A) & 0x80) << 1) | RAM(RAM_Y_LO_A);
-		int y_b = ((RAM(RAM_XY_HI_B) & 0x80) << 1) | RAM(RAM_Y_LO_B);
-		int y = (m_cmd & COMMAND_A_B) ? y_a : y_b;
-		int xord = (m_cmd & COMMAND_A_B) ? xord_a : xord_b;
+		UINT8 xy_hi = (m_cmd & COMMAND_A_B) ? RAM(RAM_XY_HI_A) : RAM(RAM_XY_HI_B);
+		UINT8 y_lo = (m_cmd & COMMAND_A_B) ? RAM(RAM_Y_LO_A) : RAM(RAM_Y_LO_B);
+		UINT16 y = (BIT(xy_hi, 7) << 8) | y_lo;
+		int xord = xy_hi & 0x0f;
 
-		if (LOG) logerror("Object %u rp %04x color %u dx %u dy %u xcopy %u x %u y %u xord %u\n", i, rp, color, dx, dy, xcopy, x, y, xord);
+		UINT8 rp_hi_color = RAM_XORD(RAM_RP_HI_COLOR);
+		UINT8 rp_lo = RAM_XORD(RAM_RP_LO);
+		UINT16 rp = ((rp_hi_color << 8) | rp_lo) & 0x1fff;
+
+		UINT8 dx_int_xcopy = RAM_XORD(RAM_DX_INT_XCOPY);
+		int color = ((dx_int_xcopy & 0x60) >> 2) | (BIT(rp_hi_color, 5) << 2) | (BIT(rp_hi_color, 6) << 1) | (BIT(rp_hi_color, 7));
+		UINT8 dx = dx_int_xcopy & 0x1f;
+		UINT8 dy = RAM_XORD(RAM_DY);
+		int xcopy = BIT(dx_int_xcopy, 7);
+		UINT8 x = RAM_XORD(RAM_X);
+
+		if (LOG) logerror("Object %u xord %u y %u x %u dy %u dx %u xcopy %u color %u rp %04x\n", i, xord, y, x, dy, dx, xcopy, color, rp);
 
 		if (rp == 0) continue;
 		if (y > 262) continue;
@@ -480,7 +485,10 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 	if ((state->m_cmd & COMMAND_INT) && !(state->m_cmd & COMMAND_FRZ))
 	{
 		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->m_screen->vpos());
+
+//      f3853_set_external_interrupt_in_line(state->m_smi, 0);
 //      f3853_set_external_interrupt_in_line(state->m_smi, 1);
+		
 		state->m_ext_int_latch = 1;
 		state->interrupt_check();
 	}
@@ -499,7 +507,7 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 MACHINE_CONFIG_FRAGMENT( vidbrain_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(vidbrain_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 320, 525, 0, 243)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 190, 525, 0, 243)
 
 	MCFG_GFXDECODE(vidbrain)
 
