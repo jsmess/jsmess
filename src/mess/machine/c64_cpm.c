@@ -9,6 +9,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- Z80 clock speed
+
+*/
+
 #include "c64_cpm.h"
 
 
@@ -86,8 +94,7 @@ inline void c64_cpm_cartridge_device::update_signals()
 
         if (m_reset)
         {
-            device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-            device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+        	m_maincpu->reset();
             m_maincpu->set_state(Z80_PC, 0);
         	m_reset = 0;
         }
