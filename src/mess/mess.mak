@@ -1803,11 +1803,11 @@ $(MESSOBJ)/veb.a:				\
 
 $(MESSOBJ)/vidbrain.a:			\
 	$(MESS_DRIVERS)/vidbrain.o	\
-	$(MESS_VIDEO)/vidbrain.o	\
+	$(MESS_VIDEO)/uv201.o 		\
 
 $(MESSOBJ)/videoton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\
-	$(MESS_AUDIO)/tvc.o		\
+	$(MESS_AUDIO)/tvc.o			\
 
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\

@@ -17,6 +17,7 @@
     TODO:
 
 	- video interrupts
+	- R-2R ladder DAC
 	- reset on cartridge unload
     - use machine/f3853.h
     - joystick scan timer 555
@@ -90,7 +91,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 	if (BIT(m_keylatch, 5)) data |= ioport("IO05")->read();
 	if (BIT(m_keylatch, 6)) data |= ioport("IO06")->read();
 	if (BIT(m_keylatch, 7)) data |= ioport("IO07")->read();
-	if (!BIT(m_cmd, 4)) data |= ioport("UV201-31")->read();
+	if (!m_uv->kbd_r()) data |= ioport("UV201-31")->read();
 
 	return data;
 }
@@ -129,6 +130,12 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	// joystick enable
 	m_joy_enable = BIT(data, 7);
+
+	if (m_joy_enable)
+	{
+		// TODO calculate NE555 firing time based on input port values
+		//timer_set(attotime::from_msec(t), TIMER_JOYSTICK);
+	}
 }
 
 
@@ -151,7 +158,7 @@ void vidbrain_state::interrupt_check()
 		break;
 	}
 
-	device_set_input_line(m_maincpu, F8_INPUT_LINE_INT_REQ, interrupt);
+	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, interrupt);
 }
 
 
@@ -166,19 +173,19 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 	case 0:
 		// interrupt vector address high
 		m_vector = (data << 8) | (m_vector & 0xff);
-		logerror("F3853 Interrupt Vector %04x\n", m_vector);
+		logerror("%s: F3853 Interrupt Vector %04x\n", machine().describe_context(), m_vector);
 		break;
 
 	case 1:
 		// interrupt vector address low
 		m_vector = (m_vector & 0xff00) | data;
-		logerror("F3853 Interrupt Vector %04x\n", m_vector);
+		logerror("%s: F3853 Interrupt Vector %04x\n", machine().describe_context(), m_vector);
 		break;
 
 	case 2:
 		// interrupt control
 		m_int_enable = data & 0x03;
-		logerror("F3853 Interrupt Control %u\n", m_int_enable);
+		logerror("%s: F3853 Interrupt Control %u\n", machine().describe_context(), m_int_enable);
 		interrupt_check();
 
 		if (m_int_enable == 0x03) fatalerror("F3853 Timer not supported!");
@@ -186,7 +193,7 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 
 	case 3:
 		// timer 8-bit polynomial counter
-		fatalerror("F3853 Timer not supported!");
+		fatalerror("%s: F3853 Timer not supported!", machine().describe_context());
 		break;
 	}
 }
@@ -203,7 +210,7 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 
 static ADDRESS_MAP_START( vidbrain_mem, AS_PROGRAM, 8, vidbrain_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xc000) AM_ROM
-	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(vlsi_r, vlsi_w)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
 	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0xe000) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0xc000) AM_ROM
@@ -367,14 +374,36 @@ static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
 	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
 
-    device_set_input_line_vector(state->m_maincpu, F8_INPUT_LINE_INT_REQ, addr);
-
+	state->m_vector = addr;
     state->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
 }
 
 static const f3853_interface smi_intf =
 {
     f3853_int_req_w
+};
+
+
+//-------------------------------------------------
+//  UV201_INTERFACE( uv_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
+{
+	if (state)
+	{
+		m_ext_int_latch = state;
+		interrupt_check();
+	}
+}
+
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+
+static UV201_INTERFACE( uv_intf )
+{
+	SCREEN_TAG,
+	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
+	DEVCB_MEMORY_HANDLER(F3850_TAG, PROGRAM, memory_read_byte)
 };
 
 
@@ -391,20 +420,34 @@ static IRQ_CALLBACK( vidbrain_int_ack )
 {
 	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
 
+	UINT16 vector = state->m_vector;
+
 	switch (state->m_int_enable)
 	{
 	case 1:
+		vector |= 0x80;
 		state->m_ext_int_latch = 0;
 		break;
 
 	case 3:
+		vector &= ~0x80;
 		state->m_timer_int_latch = 0;
 		break;
 	}
 
 	state->interrupt_check();
 
-	return state->m_vector;
+	return vector;
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_uv->ext_int_w(0);
 }
 
 
@@ -428,6 +471,17 @@ void vidbrain_state::machine_start()
 }
 
 
+//-------------------------------------------------
+//  MACHINE_RESET( vidbrain )
+//-------------------------------------------------
+
+void vidbrain_state::machine_reset()
+{
+	m_int_enable = 0;
+	m_ext_int_latch = 0;
+	m_timer_int_latch = 0;
+}
+
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -444,8 +498,8 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
     MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(vidbrain_video)
-
+	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, XTAL_14_31818MHz, uv_intf)
+	
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -493,4 +547,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING )
+COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
