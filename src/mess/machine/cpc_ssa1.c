@@ -87,14 +87,14 @@ WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
 
 static sp0256_interface sp0256_intf =
 {
-	DEVCB_LINE_MEMBER(cpc_ssa1_device,lrq_cb),
-	DEVCB_LINE_MEMBER(cpc_ssa1_device,sby_cb)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,lrq_cb),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,sby_cb)
 };
 
 static sp0256_interface sp0256_dk_intf =
 {
-	DEVCB_LINE_MEMBER(cpc_dkspeech_device,lrq_cb),
-	DEVCB_LINE_MEMBER(cpc_dkspeech_device,sby_cb)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,lrq_cb),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,sby_cb)
 };
 
 //-------------------------------------------------
