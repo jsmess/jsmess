@@ -1,26 +1,21 @@
-/*
+/**********************************************************************
 
-    TODO:
+    VideoBrain UV201/UV202 video chip emulation
 
-    - freeze (light pen)
-    - screen size
-    - scanline based update
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
-    http://zone.ni.com/devzone/cda/tut/p/id/4750
+**********************************************************************/
 
-*/
-
-#include "emu.h"
-#include "includes/vidbrain.h"
-#include "cpu/f8/f8.h"
+#include "uv201.h"
 
 
 
 //**************************************************************************
-//  CONSTANTS / MACROS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 		0
 
 
 // write-only registers
@@ -64,10 +59,10 @@
 	((m_cmd & _bit) != (data & _bit))
 
 #define RAM(_offset) \
-	m_vlsi_ram[_offset + i]
+	m_ram[_offset + i]
 
 #define RAM_XORD(_offset) \
-	m_vlsi_ram[_offset + xord]
+	m_ram[_offset + xord]
 
 #define IS_VISIBLE(_y) \
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
@@ -78,14 +73,136 @@
 
 
 //**************************************************************************
-//  READ/WRITE HANDLERS
+//  LIVE DEVICE
 //**************************************************************************
+
+// device type definition
+const device_type UV201 = &device_creator<uv201_device>;
+
+
+//-------------------------------------------------
+//  uv201_device - constructor
+//-------------------------------------------------
+
+uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, UV201, "UV201", tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void uv201_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const uv201_interface *intf = reinterpret_cast<const uv201_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<uv201_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_ext_int_cb, 0, sizeof(m_out_ext_int_cb));
+		memset(&m_in_db_cb, 0, sizeof(m_in_db_cb));
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void uv201_device::device_start()
+{
+	// resolve callbacks
+	m_out_ext_int_func.resolve(m_out_ext_int_cb, *this);
+	m_in_db_func.resolve(m_in_db_cb, *this);
+
+	// allocate timers
+	m_timer_y_odd = timer_alloc(TIMER_Y_ODD);
+	m_timer_y_even = timer_alloc(TIMER_Y_EVEN);
+
+	// find devices
+	m_screen = machine().device<screen_device>(m_screen_tag);
+
+	initialize_palette();
+
+	// state saving
+	save_item(NAME(m_ram));
+	save_item(NAME(m_y_int));
+	save_item(NAME(m_fmod));
+	save_item(NAME(m_bg));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_freeze_x));
+	save_item(NAME(m_freeze_y));
+	save_item(NAME(m_field));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void uv201_device::device_reset()
+{
+	m_out_ext_int_func(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_timer - handle timer events
+//-------------------------------------------------
+
+void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if ((m_cmd & COMMAND_INT) && !(m_cmd & COMMAND_FRZ))
+	{
+		int scanline = get_field_vpos();
+
+		if (LOG) logerror("Y-Interrupt at scanline %u\n", scanline);
+
+		m_freeze_y = scanline;
+
+		m_out_ext_int_func(ASSERT_LINE);
+		m_out_ext_int_func(CLEAR_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  initialize_palette -
+//-------------------------------------------------
+
+void uv201_device::initialize_palette()
+{
+	static const UINT8 INTENSITY[] = { 0x90, 0xb0, 0xd0, 0xff };
+
+	for (int i = 0; i < 4; i++)
+	{
+		int offset = i * 8;
+		UINT8 value = INTENSITY[i];
+
+		palette_set_color_rgb(machine(), offset + 0, 0,		0,		0);		// black
+		palette_set_color_rgb(machine(), offset + 1, value,	0,		0);		// red
+		palette_set_color_rgb(machine(), offset + 2, 0,		value,	0);		// green
+		palette_set_color_rgb(machine(), offset + 3, value,	value,	0);		// red-green
+		palette_set_color_rgb(machine(), offset + 4, 0,		0,		value); // blue
+		palette_set_color_rgb(machine(), offset + 5, value,	0,		value); // red-blue
+		palette_set_color_rgb(machine(), offset + 6, 0,		value,	value); // green-blue
+		palette_set_color_rgb(machine(), offset + 7, value,	value,	value); // white
+	}
+}
+
 
 //-------------------------------------------------
 //  get_field_vpos - get scanline within field
 //-------------------------------------------------
 
-int vidbrain_state::get_field_vpos()
+int uv201_device::get_field_vpos()
 {
 	int vpos = m_screen->vpos();
 
@@ -103,17 +220,44 @@ int vidbrain_state::get_field_vpos()
 //  get_field - get video field
 //-------------------------------------------------
 
-int vidbrain_state::get_field()
+int uv201_device::get_field()
 {
 	return m_screen->vpos() < 262;
 }
 
 
 //-------------------------------------------------
-//  vlsi_r - video VLSI read
+//  set_y_interrupt - set Y interrupt timer
 //-------------------------------------------------
 
-READ8_MEMBER( vidbrain_state::vlsi_r )
+void uv201_device::set_y_interrupt()
+{
+	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
+
+	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
+	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
+}
+
+
+//-------------------------------------------------
+//  do_partial_update - update screen
+//-------------------------------------------------
+
+void uv201_device::do_partial_update()
+{
+	int vpos = m_screen->vpos();
+
+	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
+
+	m_screen->update_partial(vpos);
+}
+
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( uv201_device::read )
 {
 	UINT8 data = 0xff;
 
@@ -136,8 +280,8 @@ READ8_MEMBER( vidbrain_state::vlsi_r )
 
             bit     signal      description
 
-            0       Y-F8        Y freeze high order (MSB) bit
-            1       Y-C8        current Y counter high order (MSB) bit
+            0       Y-C8        current Y counter high order (MSB) bit
+            1       Y-F8        Y freeze high order (MSB) bit
             2
             3
             4
@@ -147,7 +291,7 @@ READ8_MEMBER( vidbrain_state::vlsi_r )
 
         */
 
-		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
+		data = (get_field() << 7) | BIT(m_freeze_y, 8) << 1 | BIT(get_field_vpos(), 8);
 
 		if (LOG) logerror("Y-Freeze High %02x\n", data);
 		break;
@@ -160,7 +304,7 @@ READ8_MEMBER( vidbrain_state::vlsi_r )
 
 	default:
 		if (offset < 0x90)
-			data = m_vlsi_ram[offset];
+			data = m_ram[offset];
 		else
 			if (LOG) logerror("Unknown VLSI read from %02x!\n", offset);
 	}
@@ -170,37 +314,10 @@ READ8_MEMBER( vidbrain_state::vlsi_r )
 
 
 //-------------------------------------------------
-//  set_y_interrupt - set Y interrupt timer
+//  write -
 //-------------------------------------------------
 
-void vidbrain_state::set_y_interrupt()
-{
-	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
-
-	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
-	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
-}
-
-
-//-------------------------------------------------
-//  do_partial_update - update screen
-//-------------------------------------------------
-
-void vidbrain_state::do_partial_update()
-{
-	int vpos = m_screen->vpos();
-
-	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
-
-	m_screen->update_partial(vpos);
-}
-
-
-//-------------------------------------------------
-//  vlsi_w - video VLSI write
-//-------------------------------------------------
-
-WRITE8_MEMBER( vidbrain_state::vlsi_w )
+WRITE8_MEMBER( uv201_device::write )
 {
 	switch (offset)
 	{
@@ -265,8 +382,8 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 
             0       X-ZM        X zoom
             1       FRZ         freeze
-            2       ENB         COMMAND_ENB
-            3       INT         COMMAND_INT
+            2       ENB         video enable
+            3       INT         interrupt enable
             4       KBD         general purpose output
             5       Y-ZM        Y zoom
             6       A/_B        list selection
@@ -291,69 +408,43 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 
 	default:
 		if (offset < 0x90)
-			m_vlsi_ram[offset] = data;
+			m_ram[offset] = data;
 		else
 			logerror("Unknown VLSI write %02x to %02x!\n", data, offset);
 	}
 }
 
 
-
-//**************************************************************************
-//  VIDEO
-//**************************************************************************
-
 //-------------------------------------------------
-//  PALETTE_INIT( vidbrain )
+//  ext_int_w - external interrupt write
 //-------------------------------------------------
 
-static PALETTE_INIT( vidbrain )
+WRITE_LINE_MEMBER( uv201_device::ext_int_w )
 {
-	static const UINT8 INTENSITY[] = { 0x90, 0xb0, 0xd0, 0xff };
-
-	for (int i = 0; i < 4; i++)
+	if (!state && (m_cmd & COMMAND_FRZ))
 	{
-		int offset = i * 8;
-		UINT8 value = INTENSITY[i];
-
-		palette_set_color_rgb(machine, offset + 0, 0,		0,		0);		// black
-		palette_set_color_rgb(machine, offset + 1, value,	0,		0);		// red
-		palette_set_color_rgb(machine, offset + 2, 0,		value,	0);		// green
-		palette_set_color_rgb(machine, offset + 3, value,	value,	0);		// red-green
-		palette_set_color_rgb(machine, offset + 4, 0,		0,		value); // blue
-		palette_set_color_rgb(machine, offset + 5, value,	0,		value); // red-blue
-		palette_set_color_rgb(machine, offset + 6, 0,		value,	value); // green-blue
-		palette_set_color_rgb(machine, offset + 7, value,	value,	value); // white
+		m_freeze_y = get_field_vpos();
+		m_freeze_x = m_screen->hpos();
 	}
 }
 
 
 //-------------------------------------------------
-//  VIDEO_START( vidbrain )
+//  kbd_r - keyboard select read
 //-------------------------------------------------
 
-void vidbrain_state::video_start()
+READ_LINE_MEMBER( uv201_device::kbd_r )
 {
-	// register for state saving
-	save_item(NAME(m_vlsi_ram));
-	save_item(NAME(m_y_int));
-	save_item(NAME(m_fmod));
-	save_item(NAME(m_bg));
-	save_item(NAME(m_cmd));
-	save_item(NAME(m_freeze_x));
-	save_item(NAME(m_freeze_y));
-	save_item(NAME(m_field));
+	return (m_cmd & COMMAND_KBD) ? 1 : 0;
 }
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE_IND16( vidbrain )
+//  screen_update -
 //-------------------------------------------------
 
-UINT32 vidbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
 	if (!(m_cmd & COMMAND_ENB))
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -389,7 +480,7 @@ UINT32 vidbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			for (int sx = 0; sx < dx; sx++)
 			{
-				UINT8 data = program->read_byte(rp);
+				UINT8 data = m_in_db_func(rp);
 
 				for (int bit = 0; bit < 8; bit++)
 				{
@@ -447,73 +538,3 @@ UINT32 vidbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	return 0;
 }
-
-
-//-------------------------------------------------
-//  gfx_layout vidbrain_charlayout
-//-------------------------------------------------
-
-static const gfx_layout vidbrain_charlayout =
-{
-	8, 7,
-	59,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ STEP8(0,8) },
-	8*7
-};
-
-
-//-------------------------------------------------
-//  GFXDECODE( vidbrain )
-//-------------------------------------------------
-
-static GFXDECODE_START( vidbrain )
-	GFXDECODE_ENTRY( F3850_TAG, 0x2010, vidbrain_charlayout, 0, 1 )
-GFXDECODE_END
-
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( y_int_tick )
-//-------------------------------------------------
-
-static TIMER_DEVICE_CALLBACK( y_int_tick )
-{
-	vidbrain_state *state = timer.machine().driver_data<vidbrain_state>();
-
-	if ((state->m_cmd & COMMAND_INT) && !(state->m_cmd & COMMAND_FRZ))
-	{
-		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->m_screen->vpos());
-
-//      f3853_set_external_interrupt_in_line(state->m_smi, 0);
-//      f3853_set_external_interrupt_in_line(state->m_smi, 1);
-		
-		state->m_ext_int_latch = 1;
-		state->interrupt_check();
-	}
-}
-
-
-
-//**************************************************************************
-//  MACHINE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vidbrain_video )
-//-------------------------------------------------
-
-MACHINE_CONFIG_FRAGMENT( vidbrain_video )
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(vidbrain_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 190, 525, 0, 243)
-
-	MCFG_GFXDECODE(vidbrain)
-
-    MCFG_PALETTE_LENGTH(32)
-    MCFG_PALETTE_INIT(vidbrain)
-
-	MCFG_TIMER_ADD(TIMER_Y_ODD_TAG, y_int_tick)
-	MCFG_TIMER_ADD(TIMER_Y_EVEN_TAG, y_int_tick)
-MACHINE_CONFIG_END

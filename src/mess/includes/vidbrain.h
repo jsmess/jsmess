@@ -9,13 +9,13 @@
 #include "machine/f3853.h"
 #include "machine/ram.h"
 #include "sound/discrete.h"
+#include "video/uv201.h"
 
 #define F3850_TAG			"cd34"
 #define F3853_TAG			"cd5"
+#define UV201_TAG			"uv201"
 #define SCREEN_TAG			"screen"
 #define DISCRETE_TAG		"discrete"
-#define TIMER_Y_ODD_TAG		"odd"
-#define TIMER_Y_EVEN_TAG	"even"
 
 class vidbrain_state : public driver_device
 {
@@ -24,37 +24,34 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, F3850_TAG),
 		  m_smi(*this, F3853_TAG),
+		  m_uv(*this, UV201_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
-		  m_screen(*this, SCREEN_TAG),
-		  m_timer_y_odd(*this, TIMER_Y_ODD_TAG),
-		  m_timer_y_even(*this, TIMER_Y_EVEN_TAG)
+		  m_screen(*this, SCREEN_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
+	required_device<uv201_device> m_uv;
 	required_device<device_t> m_discrete;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_timer_y_odd;
-	required_device<timer_device> m_timer_y_even;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
+	virtual void machine_reset();
 
-	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	enum
+	{
+		TIMER_JOYSTICK
+	};
 
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( sound_w );
 	DECLARE_WRITE8_MEMBER( f3853_w );
-	DECLARE_READ8_MEMBER( vlsi_r );
-	DECLARE_WRITE8_MEMBER( vlsi_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 
 	void interrupt_check();
-	int get_field_vpos();
-	int get_field();
-	void set_y_interrupt();
-	void do_partial_update();
 
 	// F3853 SMI state
 	UINT16 m_vector;
@@ -65,16 +62,6 @@ public:
 	// keyboard state
 	UINT8 m_keylatch;
 	int m_joy_enable;
-
-	// video state
-	UINT8 m_vlsi_ram[0x90];
-	UINT8 m_y_int;
-	UINT8 m_fmod;
-	UINT8 m_bg;
-	UINT8 m_cmd;
-	UINT8 m_freeze_x;
-	UINT16 m_freeze_y;
-	int m_field;
 
 	// sound state
 	int m_sound_clk;
