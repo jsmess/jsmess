@@ -4,6 +4,22 @@
 
         22/11/2009 Skeleton driver.
 
+        10/MAY/2012 Added keyboard [Robbbert]
+
+To Use:
+- Press MINUS to enter data input mode
+- Press UP or DOWN to cycle through addresses
+
+At the moment Paste cannot be tested, but if it worked, you could
+paste this in:  -0F0011^22^33^44^55^66^77^88^99^
+
+It seems the only way to exit each mode is to do a Soft Reset.
+
+ToDo:
+- Add Cassette
+- Verify that ROMS are good (they seem to be)
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -19,6 +35,7 @@ public:
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
+	UINT8 convert_key(UINT8 data);
 };
 
 
@@ -27,8 +44,40 @@ WRITE8_MEMBER(elekscmp_state::hex_display_w)
 	output_set_digit_value(offset, data);
 }
 
+UINT8 elekscmp_state::convert_key(UINT8 data)
+{
+	UINT8 i;
+	for (i = 0; i < 8; i++)
+		if (BIT(data, i))
+			return i;
+
+	return 0xff;
+}
+
 READ8_MEMBER(elekscmp_state::keyboard_r)
 {
+	UINT8 data;
+
+	data = ioport("X0")->read();
+
+	if (data)
+		return 0x80 | convert_key(data);
+
+	data = ioport("X1")->read();
+
+	if (data)
+		return 0x88 | convert_key(data);
+
+	data = ioport("X2")->read();
+
+	if (data)
+		return 0x80 | (convert_key(data) << 4);
+
+	data = ioport("X3")->read();
+
+	if (data)
+		machine().device("maincpu")->reset();
+
 	return 0;
 }
 
@@ -43,19 +92,45 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( elekscmp )
+	PORT_START("X0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+
+	PORT_START("X1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("X2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CPU Reg") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Block Transfer") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cassette") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Subtract") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Modify") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Run") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('X')
+
+	PORT_START("X3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
-
-
-static MACHINE_RESET(elekscmp)
-{
-}
 
 static MACHINE_CONFIG_START( elekscmp, elekscmp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
-
-	MCFG_MACHINE_RESET(elekscmp)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
@@ -73,5 +148,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp,  0,  "Elektor Electronics", "Elektor SC/MP", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp,  0,  "Elektor Electronics", "Elektor SC/MP", GAME_NO_SOUND_HW)
 
