@@ -58,12 +58,20 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_diskdiag_read_w);
 	DECLARE_WRITE8_MEMBER(z80_diskdiag_write_w);
 
+	DECLARE_READ_LINE_MEMBER(kbd_rx);
+	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
+    DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
+    DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
+
     bool m_zflip;                   // Z80 alternate memory map with A15 inverted
     bool m_z80_halted;
+    bool m_kbd_tx_ready, m_kbd_rx_ready;
 
 private:
     UINT8 m_z80_private[0x800];     // Z80 private 2K
     UINT8 m_z80_mailbox, m_8088_mailbox;
+
+    void update_kbd_irq();
 };
 
 void rainbow_state::machine_start()
@@ -72,6 +80,8 @@ void rainbow_state::machine_start()
     save_item(NAME(m_z80_mailbox));
     save_item(NAME(m_8088_mailbox));
     save_item(NAME(m_zflip));
+    save_item(NAME(m_kbd_tx_ready));
+    save_item(NAME(m_kbd_rx_ready));
 }
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
@@ -127,8 +137,13 @@ static MACHINE_RESET( rainbow )
 {
     rainbow_state *state = machine.driver_data<rainbow_state>();
 
+    device_set_input_line(state->m_z80, INPUT_LINE_HALT, ASSERT_LINE);
+
     state->m_zflip = true;
-    state->m_z80_halted = false;
+    state->m_z80_halted = true;
+    state->m_kbd_tx_ready = state->m_kbd_rx_ready = false;
+
+    state->m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
 }
 
 static SCREEN_UPDATE_IND16( rainbow )
@@ -278,6 +293,41 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 	m_diagnostic = data;
 }
 
+void rainbow_state::update_kbd_irq()
+{
+    if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
+    {
+        device_set_input_line_and_vector(m_i8088, INPUT_LINE_INT2, ASSERT_LINE, 0x26);
+    }
+    else
+    {
+        device_set_input_line(m_i8088, INPUT_LINE_INT2, CLEAR_LINE);
+    }
+}
+
+READ_LINE_MEMBER(rainbow_state::kbd_rx)
+{
+//    printf("read keyboard\n");
+    return 0x00;
+}
+
+WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
+{
+//    printf("%02x to keyboard\n", state);
+}
+
+WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
+{
+    m_kbd_rx_ready = (state == 1) ? true : false;
+    update_kbd_irq();
+}
+
+WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
+{
+    m_kbd_tx_ready = (state == 1) ? true : false;
+    update_kbd_irq();
+}
+
 static const vt_video_interface video_interface =
 {
 	"screen",
@@ -328,13 +378,13 @@ static const floppy_interface floppy_intf =
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_NULL,         // rxd in
-	DEVCB_NULL,         // txd out
+	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rx),         // rxd in
+	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_tx),         // txd out
 	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
-	DEVCB_NULL,         // rx ready
-	DEVCB_NULL,         // tx ready
+	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rxready_w),
+	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_txready_w),
 	DEVCB_NULL,         // tx empty
 	DEVCB_NULL          // syndet
 };
