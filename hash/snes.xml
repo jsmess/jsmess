@@ -64,7 +64,6 @@ Undumped
 
   Cancelled (most of these titles are probably lost forever)
 
-  - Arcus Spirits - USA, for 1993, Renovation Products
   - Asterix - USA, for 1993, Electro Brain
   - Beastball - USA, for 1993, Millennium Interactive
   - Boo! - Europe, for 1994, Micropose
@@ -93,7 +92,7 @@ Undumped
   - Pele! - USA, for 1993 or later, Accolade
   - Pocahontas - USA, for 1996 or later, Funcom
   - Popeye - USA, for 1993 or later, Technos
-  - Railroad Tycoon - USA, for 1993,	MicroProse
+  - Railroad Tycoon - USA, for 1993, MicroProse
   - SGT. Saunder's Combat - USA, for 199?, Play Avenue/Chickenhead
   - Shadowhawk - USA, for 1995 or later, Shadowline Studios
   - Smurfs, The - USA, for 199?, Infogrames
@@ -158,7 +157,7 @@ L*** : 2 ROM chips, one is 32Mb (usually in the first slot)
 *E*** : Commercial board with "OBC1" special chip (LoROM)
 *J*** : Commercial board with no special chip (HiROM)
 *K*** : Commercial board with "DSP-1", "DSB-1 B", "DSP-2", "DSP-3", or "DSP-4" special chip (HiROM)
-*L*** : Commercial board with "SA-1" special chip (LoROM)
+*L*** : Commercial board with "SA1" special chip (LoROM)
 *N*** : Commercial board with "S-DD1" special chip (LoROM)
 *P*** : Evaluation board with no special chip (LoROM)
 *PV***: Evaluation board with no special chip (HiROM)
@@ -166,7 +165,7 @@ L*** : 2 ROM chips, one is 32Mb (usually in the first slot)
 *QW***: Evaluation board with "DSP-1", "DSP-2", "DSP-3", or "DSP-4", special chip (HiROM)
 *RA***: Evaluation board with "GSU1" or "GSU1A" a.k.a. "Super FX" special chip (LoROM)
 *RB***: Evaluation board with "GSU2" a.k.a. "Super FX2" special chip (LoROM)
-*X*** :  ?
+*X*** : Evaluation board with "SA1" special chip
 
 **0* :  No SRAM chip
 **1* : 1 SRAM chip (16Kb)
@@ -4903,7 +4902,8 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="ff4je"> <!-- tempopary note: if we go by the more consistent and solid serial approach then it isn't a clone of ff2 -->
+	<software name="ff4je" cloneof="ff2">
+		<!-- Notes: this clone had its own serial, FE instead of F4 -->
 		<description>Final Fantasy IV - Easy Type (Jpn)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
@@ -21575,7 +21575,8 @@ Alternate board (XL-1)
 <!-- Verified prototypes -->
 
 	<software name="apoclyp2">
-		<!-- Simon Nicol --> <!-- this isn't a dumped ROM image -->
+		<!-- Simon Nicol -->
+		<!-- Notes: this prototype wasn't obtained by dumping a cartridge -->
 		<description>Apocalypse II (Euro, Prototype)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher> <!-- cancelled -->
@@ -21612,7 +21613,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="batmanrnjs" cloneof="batmanrn">
-		<!-- snescentral.com / d4s -->
+		<!-- d4s -->
 		<description>Batman Returns (Jpn, Prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -21633,8 +21634,91 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="batblazp" cloneof="batblaz">
+		<!-- nesworld.com -->
+		<!-- the rom dump of the NES world prototype matched almost entirely the known one that was floating around except for a graphic tile
+		     that was corrupt in the NES world dump, so the latter won't be included because it is most certainly just a corrupt dump -->
+		<description>Battle Blaze (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="1048576">
+				<rom name="battle blaze.u1" size="524288" crc="63ee861c" sha1="ddd0ecfa4592528290462afcb46c2d437770df33" offset="0x000000" />
+				<rom name="u2"              size="524288" crc="9881b12e" sha1="03457d0a49798925bdbef0ad9730c02aecca0872" offset="0x080000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bof2up" cloneof="bof2">
+		<!-- pending: awaiting documentation -->
+		<description>Breath of Fire II (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="breath of fire ii (usa) (beta).sfc" size="3145728" crc="f44859af" sha1="60f35db144c838b4c6df30661e6a8334a7e60af0" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capcomssp" cloneof="sshotout">
+		<!-- pending: awaiting documentation -->
+		<description>Capcom's Soccer Shootout (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1572864">
+				<rom name="capcom's soccer shootout (usa) (beta).sfc" size="1572864" crc="89178bc0" sha1="7166c05333c85375cd1bf6ca2392b338fb7397f2" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captcommup" cloneof="captcomm">
+		<!-- lostlevels.org / snescentral.com -->
+		<!-- Notes: identical to the final US release -->
+		<description>Captain Commando (USA, Final Prototype)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="rom0 cs 00b1.u1" size="524288" crc="e876dcf5" sha1="b0bdb8fef5f77656bb4506f70a8d093e658d0faf" offset="0x000000" />
+				<rom name="rom1 cs ac7b.u2" size="524288" crc="264b4eac" sha1="668784b87718cc2a9a0486ac98afb0efa68d8830" offset="0x080000" />
+				<rom name="rom2 cs f6f8.u3" size="524288" crc="718dfe23" sha1="c59487928ad63588c9b81bf985f8b7ede457e53d" offset="0x100000" />
+				<rom name="rom3 cs 912c.u4" size="524288" crc="9aebbbc4" sha1="b2fdc866c8043199d3e494555c25ff588ca55459" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cvaniadxp" cloneof="cvaniavk">
-		<!-- legrospixel.com --> <!-- identical to the final release -->
+		<!-- legrospixel.com -->
+		<!-- Notes: identical to the final release -->
 		<description>Castlevania - Dracula X (USA, Final Prototype)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
@@ -21662,7 +21746,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="congo">
-		<!-- Martin @ NESWorld -->
+		<!-- nesworld.com -->
 		<description>Congo - The Movie - The Secret of Zinj (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
@@ -21696,6 +21780,45 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="rom" size="2097152" crc="78bcd558" sha1="c99e51c4d64a5f7edaf1cbfe4146b8f6821f1f09" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ff3p" cloneof="ff3">
+		<!-- Rick N. Bruns -->
+		<description>Final Fantasy III (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134" />
+			<feature name="u11" value="U11 EP330" />
+			<feature name="u12" value="U12 EP330" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="dipswitch" value="DSW1" />
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="4194304">
+				<rom name="0.u1" size="524288" crc="470e9188" sha1="7272cd3225f67c454ddbd977050e09ef4a1314af" offset="0x000000" />
+				<rom name="1.u2" size="524288" crc="13001d97" sha1="67430feb3677e1ebb82f3dc105ca8b6c0058ad96" offset="0x080000" />
+				<rom name="2.u3" size="524288" crc="c22796d2" sha1="518b0966c8905fc0272d8fd5e4eefb3d4d19f8e9" offset="0x100000" />
+				<rom name="3.u4" size="524288" crc="a6a27d8c" sha1="1ea58c7fa170e16c51215ede443d1a50eafcff81" offset="0x180000" />
+				<rom name="4.u4" size="524288" crc="82bc9972" sha1="ff9f3243e3d308406b76145d17de45b448d928e9" offset="0x200000" />
+				<rom name="5.u6" size="524288" crc="50dbf901" sha1="0857da72bf8ea6639f8577beb4cc7755ec54c0ef" offset="0x280000" />
+			</dataarea>
+			<!-- sram capacity to be confirmed -->
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -21755,7 +21878,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="fireteama" cloneof="fireteam">
-		<!-- DreamTR -->
+		<!-- Carnivol -->
 		<description>Fireteam Rogue (USA, Earlier Prototype)</description>
 		<year>1995</year>
 		<publisher>Accolade</publisher> <!-- cancelled -->
@@ -21808,7 +21931,8 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="gooftropup" cloneof="gooftrop">
-		<!-- nintendoplayer.com --> <!-- identical to the final release -->
+		<!-- nintendoplayer.com -->
+		<!-- Notes: identical to the final release -->
 		<description>Goof Troop (USA, Final Prototype)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
@@ -21821,7 +21945,7 @@ Alternate board (XL-1)
 			<feature name="u4" value="U4 74F139" /> <!-- 74LS139 on the chip -->
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="none" /> <!-- similar to a standart US cart -->
+			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="524288">
 				<rom name="gft-m 0.u1" size="524288" crc="4aafa462" sha1="b38560d091801db5e833d17393fe1df1398909b6" offset="0x000000" />
@@ -21829,8 +21953,64 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="havoc" cloneof="kingartw">
+		<!-- Carnivol -->
+		<description>Havoc (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Argonaut Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1PON-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="524288">
+				<rom name="u1" size="524288" crc="e76979ce" sha1="e0c31970b286f07b15e4a8b14e70460be1c073c2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtitlep" cloneof="mtitle">
+		<!-- snescentral.com -->
+		<!-- identical to the final release except it has full save capability -->
+		<description>The Irem Major Title (Euro, Final Prototype)</description>
+		<year>1992</year>
+		<publisher>Irem</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1"             size="524288" crc="16422c65" sha1="c33d78fc59991c42fece46805607edf451db6758" offset="0x000000" />
+				<rom name="major title.u2" size="524288" crc="5df60f2c" sha1="a5ba90cae1afe2a773490c31474a354e3362e57f" offset="0x080000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jleagueup" cloneof="jleague">
+		<!-- pending: awaiting documentation -->
+		<description>Justice League Task Force (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2621440">
+				<rom name="rom" size="2621440" crc="50224767" sha1="2893dd99da821d391d5fb1a76630e92cd14952a4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lilmagic">
-		<!-- MattyXB --> <!-- this prototype is hosted in a manually edited cartridge shell of the Japanese version -->
+		<!-- MattyXB -->
+		<!-- Notes: hosted in a SHVC-006, the standard Japanese cartridge shell.
+		     Unlike the retail version, this prototype has full save capability -->
 		<description>Little Magic (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher> <!-- cancelled -->
@@ -21853,6 +22033,75 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="mshup" cloneof="msh">
+		<!-- pending: awaiting documentation -->
+		<description>Marvel Super Heroes - War of the Gems (USA, Prototype)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="marvel super heroes - war of the gems (usa) (beta).sfc" size="2097152" crc="e86cfe8f" sha1="a5f38340c110d96b9d9622ca1fb1de81936c5ef4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman7p" cloneof="megaman7">
+		<!-- lostlevels.org -->
+		<!-- Notes: identical to the final release -->
+		<description>Mega Man 7 (USA, Final Prototype)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="rom 0.u1" size="524288" crc="8742aa77" sha1="60e7a83620efacfef9821f13c83679fa2413fdd2" offset="0x000000" />
+				<rom name="rom 1.u2" size="524288" crc="25eec90a" sha1="2bedac3c3dde6780389a98750ac05ca1ee41caf5" offset="0x080000" />
+				<rom name="rom 2.u3" size="524288" crc="5bcbf00e" sha1="3656ded4e100c20ef396a3d62dbb63d5ecd80642" offset="0x100000" />
+				<rom name="rom 3.u4" size="524288" crc="4b14b4e9" sha1="1ded0d9b2e34d87467ffcc80111eb352819a4f30" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megamnx3up" cloneof="megamnx3">
+		<!-- lostlevels.org -->
+		<!-- Notes: the software matches the final release, but the hardware differs significantly  -->
+		<description>Mega Man X3 (USA, Final Prototype)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<info name="release" value="199601xx"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
+			<feature name="pcb" value="LBM20-94907-00" />
+			<feature name="ic1" value="IC1 CX4" />
+			<feature name="ic2" value="IC2 D411" /> <!-- CIC -->
+			<feature name="ic3" value="IC3 74HC139" />
+			<feature name="ic4" value="IC4 27C1001" />
+			<feature name="ic5" value="IC5 27C1001" />
+			<feature name="ic6" value="IC6 27C1001" />
+			<feature name="ic7" value="IC7 27C1001" />
+			<feature name="oscillator" value="OSC1 20MHz" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="snes ar3e ver. 00 rom 0 1f1a h.u1" size="524288" crc="cadbaec0" sha1="4b0d52f29a8e810eddd620f37f4327b5e01622d4" offset="0x000000" />
+				<rom name="snes ar3e ver. 00 rom 1 632a h.u2" size="524288" crc="521eeff1" sha1="6f9aa429b7ada119aeeec2e3a33bdd131ea8bc0b" offset="0x080000" />
+				<rom name="snes ar3e ver. 00 rom 2 69d3 h.u3" size="524288" crc="0d6c5d18" sha1="52b4c9a5b2757d1e5f4bfb80c562a1ab1d3f90e7" offset="0x100000" />
+				<rom name="snes ar3e ver. 00 rom 3 543e h.u4" size="524288" crc="616750f2" sha1="833784d28e3af761c216a59d000dcba842712276" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mk3up" cloneof="mk3">
 		<!-- legrospixel.com -->
 		<description>Mortal Kombat 3 (USA, Prototype 19950713)</description>
@@ -21865,17 +22114,17 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 4/8M EPROM(J)" />
 			<feature name="u3" value="U3 4/8M EPROM(J)" />
 			<feature name="u4" value="U4 4/8M EPROM(J)" />
-			<feature name="u5" value="U1 4/8M EPROM(J)" />
-			<feature name="u6" value="U2 4/8M EPROM(J)" />
-			<feature name="u7" value="U3 4/8M EPROM(J)" />
-			<feature name="u8" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" />
+			<feature name="u8" value="U8 4/8M EPROM(J)" />
 			<feature name="u9" value="U9 16/64/256K SRAM" />
 			<feature name="u10" value="U10 MM1134" />
 			<feature name="u11" value="U11 EP330" />
 			<feature name="u12" value="U12 EP330" />
 			<feature name="u13" value="U13 LS157" />
 			<feature name="u14" value="U14 CIC" />
-			<feature name="switch" value="DSW1" />
+			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
 			<feature name="cart_back_label" value="none" />
@@ -21906,17 +22155,17 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 4/8M EPROM(J)" />
 			<feature name="u3" value="U3 4/8M EPROM(J)" />
 			<feature name="u4" value="U4 4/8M EPROM(J)" />
-			<feature name="u5" value="U1 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u6" value="U2 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u7" value="U3 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u8" value="U4 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u5" value="U5 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u6" value="U6 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
 			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
 			<feature name="u10" value="U10 MM1134" /> <!-- to be confirmed -->
 			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
 			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
 			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
 			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
-			<feature name="switch" value="DSW1" /> <!-- to be confirmed -->
+			<feature name="dipswitch" value="DSW1" /> <!-- to be confirmed -->
 			<feature name="battery" value="BATT1 CR2032" /> <!-- to be confirmed -->
 			<feature name="cart_model" value="none" />
 			<feature name="cart_back_label" value="none" />
@@ -21938,6 +22187,34 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="rom" size="1572864" crc="58cd1f5a" sha1="58840c2ce4f68e30f3d815e9774a1fd3d0d25bd6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbajamup" cloneof="nbajam">
+		<!-- lostlevels.org / snescentral.com -->
+		<!-- it is a few bytes away from retail version's so it is likely the final prototype -->
+		<description>NBA Jam (USA, Final Prototype)</description>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152">
+				<rom name="nba 1.u1" size="524288" crc="a32eeb5f" sha1="e944f4fa29f8f39d5ebbd55c7b8bb7dc070568eb" offset="0x000000" />
+				<rom name="nba 2.u2" size="524288" crc="c0ca8c3c" sha1="af5caa1b0254f6b42e4f7f3ba07d0af904017e3c" offset="0x080000" />
+				<rom name="nba 3.u3" size="524288" crc="4de70641" sha1="1f575282a1bb842afcc80e29cebc13d96f8158a4" offset="0x100000" />
+				<rom name="nba 4.u4" size="524288" crc="9d59835f" sha1="061872d9a2b39d271fbfc90b9e8f9abefcfa4282" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21967,8 +22244,60 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="pagemstrup1" cloneof="pagemstr">
+		<!-- nesworld.com -->
+		<description>The Pagemaster (USA, Prototype 19940829)</description>
+		<year>1994</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="524288" crc="640ed42e" sha1="dec7fcccbc1886e19dddf2c2d7fb18ac8bd2d303" offset="0x000000" />
+				<rom name="u2" size="524288" crc="cd83aa26" sha1="079670a1d5b9dad150972efd88cb65cc4378a0c1" offset="0x080000" />
+				<rom name="u3" size="524288" crc="0ce02076" sha1="0f3f8d46132df5a6151c935633f5bcb9e35b46b3" offset="0x100000" />
+				<rom name="u4" size="524288" crc="37d4f50a" sha1="e4b8f1ad5f0d219ef6aa60e002a07633fb1f5a89" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piratedwup" cloneof="piratedw">
+		<!-- nesworld.com -->
+		<description>The Pirates of Dark Water (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" /> <!-- to be confirmed -->
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1"                           size="524288" crc="68873f58" sha1="5a696a96e3182cafde41ba4f79b5cdbbbc057c1f" offset="0x000000" />
+				<rom name="pirates of the dark water.u2" size="524288" crc="af410348" sha1="929af6308d9abf2fd3539facc778dd326e096d37" offset="0x080000" />
+			</dataarea>
+			<!-- memory capacity to be confirmed -->
+			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powrslid">
-		<!-- eludevisibility -->
+		<!-- callis -->
 		<description>Power Slide (Euro, Prototype 19940412)</description>
 		<year>1994</year>
 		<publisher>Elite</publisher>
@@ -21987,11 +22316,6 @@ Alternate board (XL-1)
 			<dataarea name="rom" size="2097152">
 				<rom name="powerslide sfx 12-4-94 rn 0010.u1" size="524288" crc="65ce3729" sha1="30115db2558060d9293684f3d5810d063a0c710e" offset="0x000000" />
 			</dataarea>
-			<!--
-			<dataarea name="sram" size="131072">
-			</dataarea>
-			-->
-      <!-- remove this if the following doesn't work -->
 			<dataarea name="sram" size="73728">
 				<!--rom name="u2" size="65536" offset="0x000000" /-->
 				<!--rom name="u3" size="8192"  offset="0x010000" /-->
@@ -22011,11 +22335,38 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="reliefp" cloneof="relief">
+		<!-- ? -->
+		<description>Relief Pitcher (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Left Field Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" /> <!-- to be confirmed -->
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" /> <!-- empty socket -->
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="524288" crc="884fd9db" sha1="c789f2266550f1c01a581379d377474dce728818" offset="0x000000" />
+				<rom name="u2" size="524288" crc="b712fe58" sha1="dc986f743f34781aa24b25155e3affb96a999df9" offset="0x080000" />
+				<rom name="u3" size="524288" crc="fad36e87" sha1="030abfb440b2298fbd22722936825ce1ba08d1b0" offset="0x100000" />
+				<rom name="u4" size="524288" crc="56655a08" sha1="1ee9135607bc0b04dddcb3fbff3818391eeabc18" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rhirol95">
 		<!-- DreamTR -->
 		<description>RHI Roller Hockey '95 (USA, Prototype)</description>
 		<year>19??</year>
-		<publisher>American Softworks</publisher>
+		<publisher>Radical Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-4PV5B-01" />
 			<feature name="u1" value="U1 EPROM" />
@@ -22035,8 +22386,59 @@ Alternate board (XL-1)
 				<rom name="rhi-2.u3" size="524288" crc="4ad5de35" sha1="42c9202413447f18517609cd2ab51bb7dc9f5273" offset="0x100000" />
 				<rom name="rhi-3.u4" size="524288" crc="4d0c0839" sha1="81930e050bedf68055c9fad2d7541cdfc1f8d429" offset="0x180000" />
 			</dataarea>
-			<!-- unknown sram capacity -->
+			<!-- sram capacity to be confirmed -->
 			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rnrracinp" cloneof="rnrracin">
+		<!-- snescentral.com -->
+		<!-- Notes: this prototype is hosted in a custom Ocean Software board
+		     it contains two eproms, a 74LS139 decoder and a CIC lockout -->
+		<description>Rock n' Roll Racing (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="rock n'roll snes rom 0.u1"         size="524288" crc="81356abc" sha1="88e5558511c9845b75c41c6a4a5c2a46a7782541" offset="0x000000" />
+				<rom name="rom 1 snes rock 'n roll racing.u2" size="524288" crc="70b01122" sha1="08b18b2af54d8db938f0add6d0780e4fda512431" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman7p" cloneof="megaman7">
+		<!-- lostlevels.org -->
+		<description>Rockman 7 - Shukumei no Taiketsu! (Jpn, Prototype 19941111)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u6" value="U6 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134" />
+			<feature name="u11" value="U11 EP330" />
+			<feature name="u12" value="U12 EP330" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="dipswitch" value="DSW1" />
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152"> <!-- underscore = unreadable -->
+				<rom name="sj07 ir (94-11-11) 6504 0.u1" size="524288" crc="20549b6c" sha1="1da64f1820e0a413e02c38176679c72823d2936d" offset="0x000000" />
+				<rom name="sj07 ir (94-11-11) _d2b 1.u2" size="524288" crc="123267f6" sha1="5aa50699f40e8aafd966ff008a9558cc4d081a2e" offset="0x080000" />
+				<rom name="sj07 ir (94-11-11) 3eb0 2.u3" size="524288" crc="b574dc7c" sha1="6eaba91e078fb543880b8653e2c7c1a3f1d0f4a1" offset="0x100000" />
+				<rom name="sj07 ir (94-11-11) 3___ 3.u4" size="524288" crc="d6c97858" sha1="f5553bc4f08756a4d39c4d36444e4518ec3d420f" offset="0x180000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -22064,6 +22466,39 @@ Alternate board (XL-1)
 				<rom name="u2" size="524288" crc="28af74b5" sha1="5f94e3faea8151df1585f8e1fb5a3abd67a200b5" offset="0x080000" />
 				<rom name="u3" size="524288" crc="5682a577" sha1="78a64f9c49b6401edb425b6b9f198688d3fab4ec" offset="0x100000" />
 				<rom name="u4" size="524288" crc="4336b678" sha1="410f4f418d5406270c47fd49aa5953ee87b7328d" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdf1gpp" cloneof="sdf1gp" supported="no">
+		<description>SD F-1 Grand Prix (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Video System</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SHVC-8X7B-01" />
+			<feature name="u1" value="U1 4M-EPROM" />
+			<feature name="u2" value="U2 4M-EPROM" />
+			<feature name="u3" value="U3 4M-EPROM" />
+			<feature name="u4" value="U4 4M-EPROM" />
+			<feature name="u5" value="U5 4M-EPROM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 4M-EPROM" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4M-EPROM" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4M-EPROM" /> <!-- empty socket -->
+			<feature name="u9" value="U9 SRAM" />
+			<feature name="u10" value="U10 MM1026" />
+			<feature name="u11" value="U11" /> <!-- SA1 -->
+			<feature name="dipswitch" value="" /> <!-- unnamed, 6 switches -->
+			<feature name="battery" value="BT1 CR2032" /> <!-- empty socket -->
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="524288" crc="a71c183f" sha1="9b77b41807f3fb1038e64248b429caecab8caba7" offset="0x000000" />
+				<rom name="u2" size="524288" crc="3ec0e423" sha1="f2597412102a644633ab8a1fa7d5f05b92a927d8" offset="0x080000" />
+				<rom name="u3" size="524288" crc="520c2f9a" sha1="5f997444fcd9a1d0a5fe7ac0e4840605a83235bd" offset="0x100000" />
+				<rom name="u4" size="524288" crc="d8606df0" sha1="942d814abb5d09c3ca68334811875b9e08ab67a2" offset="0x180000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -22105,17 +22540,17 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 4/8M EPROM(J)" />
 			<feature name="u3" value="U3 4/8M EPROM(J)" />
 			<feature name="u4" value="U4 4/8M EPROM(J)" />
-			<feature name="u5" value="U1 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u6" value="U2 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u7" value="U3 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u8" value="U4 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u5" value="U5 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u6" value="U6 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
 			<feature name="u9" value="U9 16/64/256K SRAM" />
 			<feature name="u10" value="U10 MM1134" />
 			<feature name="u11" value="U11 EP330" />
 			<feature name="u12" value="U12 EP330" />
 			<feature name="u13" value="U13 LS157" />
 			<feature name="u14" value="U14 CIC" />
-			<feature name="switch" value="DSW1" />
+			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
 			<feature name="cart_back_label" value="none" />
@@ -22124,6 +22559,89 @@ Alternate board (XL-1)
 				<rom name="ss2.u2" size="524288" crc="839f1efb" sha1="45566b127fd9c295cf2bc363b25e58877fab3071" offset="0x080000" />
 				<rom name="ss3.u3" size="524288" crc="32c955c4" sha1="60a35a60c9fb7834738944c87d13e71389080132" offset="0x100000" />
 				<rom name="ss4.u4" size="524288" crc="1ba1365b" sha1="7b2baf0e9cd2a159755ecfabfa446ef42de51420" offset="0x180000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stuntfxp">
+		<!-- Retrology -->
+		<!-- Notes: identical software but significantly different hardware -->
+		<description>Stunt Race FX (Euro, Final Prototype)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SPAL-CQ"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
+			<feature name="pcb" value="SHVC-1RA3B6S-01" />
+			<feature name="u1" value="U1 8M-EPROM" />
+			<feature name="u2" value="U2 512K-SRAM" />
+			<feature name="u3" value="U3 64K-SRAM" />
+			<feature name="u4" value="U4 GSU1-100P" />
+			<feature name="u5" value="U5 MM1134" />
+			<feature name="u6" value="U6 HCU04" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="battery" value="BT1" />
+			<feature name="cart_model" value="none" /> <!-- similar to a standard PAL cartridge -->
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="1048576">
+				<rom name="snsp p-cq.u1" size="1048576" crc="24935769" sha1="de21be64fde447d9c6a2f1b063d2f2e0d4034ca0" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="73728">
+				<!--rom name="u2" size="65536" offset="0x000000" /-->
+				<!--rom name="u3" size="8192"  offset="0x010000" /-->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbbrosp" cloneof="spang">
+		<!-- lostlevels.org / snescentral.com -->
+		<description>Super Buster Bros. (USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" /> <!-- empty socket -->
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1" size="524288" crc="3c3c2562" sha1="013c053a287a22d065cb06360139c82cd5e76cab" offset="0x000000" />
+			</dataarea>
+			<!-- memory capacity to be confirmed -->
+			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdriftop" cloneof="sdrifto">
+		<!-- snescentral.com -->
+		<description>Super Drift Out - World Rally Championships (USA, Prototype 19950518)</description>
+		<year>1995</year>
+		<publisher>Accolade ~ Visco</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152">
+				<rom name="driftout rom-1 usa 05-18-95 c234.u1" size="524288" crc="2dc7f2d9" sha1="9d3084d684fc9fb00dea1c78464608aed7a8ff5d" offset="0x000000" />
+				<rom name="driftout rom-2 usa 05-18-95 fe18.u2" size="524288" crc="6f9c1e99" sha1="6e8848a7aaac8bace38cb7f56be750beb786c949" offset="0x080000" />
+				<rom name="driftout rom-3 usa 05-18-95 e157.u3" size="524288" crc="54802853" sha1="789ec05b4236d2fc1e01cf5006607fcd68a76822" offset="0x100000" />
+				<rom name="driftout rom-4 usa 05-18-95 45e5.u4" size="524288" crc="1f1d34a3" sha1="c448199840340ead46cb3aa9bd24ffce7a9f6fa7" offset="0x180000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -22159,7 +22677,8 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="smasup" cloneof="smas">
-		<!-- nintendoplayer.com --> <!-- identical to the final release -->
+		<!-- nintendoplayer.com -->
+		<!-- Notes: identical to the final release -->
 		<description>Super Mario All-Stars (USA, Final Prototype)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -22176,7 +22695,7 @@ Alternate board (XL-1)
 			<feature name="u7" value="U7 74LS157" />
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="none" /> <!-- similar to a standart US cart -->
+			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-4m-0 rom1.u1" size="524288" crc="4dd005b3" sha1="9e04968c6980e0705cee2d7360fb85e50f43ebfc" offset="0x000000" />
@@ -22189,37 +22708,9 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sdriftop" cloneof="sdrifto">
-		<!-- snescentral.com -->
-		<description>Super Drift Out - World Rally Championships (USA, Prototype 19950518)</description>
-		<year>1995</year>
-		<publisher>Accolade ~ Visco</publisher> <!-- cancelled -->
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-4PV5B-01" />
-			<feature name="u1" value="U1 EPROM" />
-			<feature name="u2" value="U2 EPROM" />
-			<feature name="u3" value="U3 EPROM" />
-			<feature name="u4" value="U4 EPROM" />
-			<feature name="u5" value="U5 SRAM" />
-			<feature name="u6" value="U6 PLD" />
-			<feature name="u7" value="U7 74LS157" />
-			<feature name="u8" value="U8 CIC" />
-			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
-			<dataarea name="rom" size="2097152">
-				<rom name="driftout rom-1 usa 05-18-95 c234.u1" size="524288" crc="2dc7f2d9" sha1="9d3084d684fc9fb00dea1c78464608aed7a8ff5d" offset="0x000000" />
-				<rom name="driftout rom-1 usa 05-18-95 fe18.u2" size="524288" crc="6f9c1e99" sha1="6e8848a7aaac8bace38cb7f56be750beb786c949" offset="0x080000" />
-				<rom name="driftout rom-1 usa 05-18-95 e157.u3" size="524288" crc="54802853" sha1="789ec05b4236d2fc1e01cf5006607fcd68a76822" offset="0x100000" />
-				<rom name="driftout rom-1 usa 05-18-95 45e5.u4" size="524288" crc="1f1d34a3" sha1="c448199840340ead46cb3aa9bd24ffce7a9f6fa7" offset="0x180000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="starwarsp" cloneof="starwars">
-		<!-- legrospixel.com --> <!-- identical to the final release, except it has save capability -->
+		<!-- legrospixel.com -->
+		<!-- identical to the final release, except it has full save capability -->
 		<description>Super Star Wars (USA, Final Prototype)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -22278,7 +22769,7 @@ Alternate board (XL-1)
 			<feature name="u4" value="U4 74F139" /> <!-- 74LS139 on the chip -->
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" /> <!-- empty socket -->
-			<feature name="cart_model" value="none" /> <!-- similar to a standart US cart -->
+			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="rg 007l.u1" size="524288" crc="228e9e34" sha1="31c913860fa175218929906d3566852fe044cbf5" offset="0x000000" />
@@ -22303,7 +22794,6 @@ Alternate board (XL-1)
 			<dataarea name="rom" size="524288">
 				<rom name="yoshi's cookie 1-19-93.u1" size="524288" crc="fbdfcdab" sha1="094af3a0739521ec524aea713080b77809d04769" offset="0x000000" />
 			</dataarea>
-			<!-- sram capacity to be confirmed, owner contacted -->
 			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
@@ -22313,6 +22803,20 @@ Alternate board (XL-1)
 
 
 <!-- ROMs labeled as prototypes without conclusive evidence or without any documantation -->
+
+	<software name="arcus">
+		<!-- not much is known about this rom, this title was displayed at the 1993 Summer CES but there is no evidence of any localization progress -->
+		<description>Arcus Odyssey (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Wolf Team</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1572864">
+				<rom name="arcus odyssey (usa) (proto).sfc" size="1572864" crc="184ef398" sha1="1748c5df2cbcf2e1cc3720b6cb1206c0e966ec95" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="1024">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="batman">
 		<!-- never announced, unknown source, it isn't even known whether it is an image or a binary
@@ -22343,6 +22847,57 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="bubsyup1" cloneof="bubsy">
+		<!-- this rom image was released by a bbs group in March 1993
+		     it is 23 bytes away from the final release so it is most certainly the final prototype -->
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Final Prototype)</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="bubsy in claws encounters of the furred kind (usa) (beta).sfc" size="2097152" crc="3f3a7180" sha1="6354cc73672d6c8ada94218c873d10844f616465" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubsyup2" cloneof="bubsy">
+		<!-- this rom image was released without any documentation -->
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="bubsy (prototype).sfc" size="2097152" crc="49da572f" sha1="ffd0d78ce7e7489cb8a3870d64662e8f51debabd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chodorap" cloneof="mcfang">
+		<!-- this rom image was released without any documentation on snes central, but there is an auction picture of the cartridge -->
+		<description>Chou Makai Taisen! Dorabocchan (Jpn, Prototype 19921221)</description>
+		<year>1993</year>
+		<publisher>Naxat Soft</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="chou makai taisen! dorabocchan (japan) (beta) (1992-12-21).sfc" size="1048576" crc="0c34d7b5" sha1="68c77c52e5d91c379a897ce4048922e15ac9b9ed" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybernatup" cloneof="cybernat">
+		<!-- this rom image was released by retrology with only a picture of the cartridge (model SNS-006) -->
+		<description>Cybernator (USA, Prototype 199211)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="cybernator (usa) (beta).sfc" size="1048576" crc="aca397e8" sha1="acc2b4c01e97b72a83fbb3f4db1bb2e4535ad864" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firearm">
 		<!-- released on the snesorama boards in 2010 without any documentation, due to the bad internal size it is likely a compiled binary -->
 		<description>Firearm (USA, Prototype)</description> <!-- it supposedly had the date stamp 19931217 but it is not confirmed -->
@@ -22363,6 +22918,21 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="first samurai (europe) (beta).sfc" size="524288" crc="9b855ed0" sha1="93f142fb27f778576a8e0ccc06e8fef60eaf637b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flintsmp" cloneof="flintsm">
+		<!-- this legitimate prototype cartridge is glued shut so there is no information about the board -->
+		<description>The Flintstones - The Treasure of Sierra Madrock (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
+			<dataarea name="rom" size="1048576">
+				<rom name="flintstones, the - the treasure of sierra madrock (proto).sfc" size="1048576" crc="bfc15ed9" sha1="379212d62a273fe335726518dd0691b95155cee9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -22454,6 +23024,34 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="pagemstrup2" cloneof="pagemstr">
+		<!-- released by a bbs group in August 1993 -->
+		<description>The Pagemaster (USA, Earlier Prototype)</description>
+		<year>1994</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pagemaster, the (usa) (bbs alpha).sfc" size="2097152" crc="0df6088b" sha1="4ce822cb637645f0222854cf11ff67e1ba581e2a" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pagemstrup" cloneof="pagemstr">
+		<!-- not much is known about this rom -->
+		<description>The Pagemaster (USA, Prototype)</description>
+		<year>1994</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pagemaster, the (usa) (beta).sfc" size="2097152" crc="6f2c46c6" sha1="f25992309bce84273463d321f8d6e76a680cff36" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prime">
 		<!-- not much is known about this rom, but many sources corroborate this game was in development by Malibu Interactive -->
 		<description>Prime (USA, Prototype)</description>
@@ -22484,6 +23082,20 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shadow, the (usa) (proto).sfc" size="2097152" crc="13380511" sha1="130618b7eb2449f564152ff0583353612babd483" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solstic2p" cloneof="equinox">
+		<!-- no source and no documentation -->
+		<description>Solstice II (Jpn, Prototype 19930303)</description>
+		<year>1993</year>
+		<publisher>Epic / Sony Records</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="solstice ii (japan) (beta) (1993-03-03).sfc" size="1048576" crc="37c2ec0c" sha1="a20974aeb0b3d23e13313ceca0831b1e00d34cb1" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -23847,19 +24459,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="arcus">
-		<description>Arcus Odyssey (USA, Prototype)</description>
-		<year>1993</year>
-		<publisher>Renovation</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="arcus odyssey (usa) (proto).sfc" size="1572864" crc="184ef398" sha1="1748c5df2cbcf2e1cc3720b6cb1206c0e966ec95" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="1024">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="arcusspi">
 		<description>Arcus Spirits (Jpn)</description>
 		<year>1993</year>
@@ -24306,17 +24905,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="batman returns (europe).sfc" size="1048576" crc="42f98e71" sha1="79cb69f300c58b3eec38e14a1f85ccba38c8c781" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batblazp" cloneof="batblaz">
-		<description>Battle Blaze (USA, Prototype)</description>
-		<year>1993</year>
-		<publisher>American Sammy</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="battle blaze (usa) (beta).sfc" size="1048576" crc="9f2ba6a9" sha1="cfcc60d3987545429c2196acecb1b3d1f7e56015" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25471,19 +26059,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bof2up" cloneof="bof2">
-		<description>Breath of Fire II (USA, Prototype)</description>
-		<year>1995</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="breath of fire ii (usa) (beta).sfc" size="3145728" crc="f44859af" sha1="60f35db144c838b4c6df30661e6a8334a7e60af0" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bof2jnp" cloneof="bof2">
 		<description>Breath of Fire II - Shimei no Ko (Jpn, Rev. A, NP)</description>
 		<year>1994</year>
@@ -25622,29 +26197,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bubsy in claws encounters of the furred kind (europe).sfc" size="2097152" crc="74a94d60" sha1="1e9c1591046d7f45ea0cb33a3994771a3dc56f25" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bubsyup1" cloneof="bubsy">
-		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype)</description>
-		<!-- 23 bytes away from the final release-->
-		<year>1993</year>
-		<publisher>Accolade</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="bubsy in claws encounters of the furred kind (usa) (beta).sfc" size="2097152" crc="3f3a7180" sha1="6354cc73672d6c8ada94218c873d10844f616465" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bubsyup2" cloneof="bubsy">
-		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype Earlier)</description>
-		<year>1993</year>
-		<publisher>Accolade</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="bubsy (prototype).sfc" size="2097152" crc="49da572f" sha1="ffd0d78ce7e7489cb8a3870d64662e8f51debabd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25899,19 +26451,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="capcom's mvp football (usa).sfc" size="1048576" crc="bd0a0c0e" sha1="2d4f33f1b72f158916ca2560ef42b9b831e50393" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="capcomssp" cloneof="sshotout">
-		<description>Capcom's Soccer Shootout (USA, Prototype)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="capcom's soccer shootout (usa) (beta).sfc" size="1572864" crc="89178bc0" sha1="7166c05333c85375cd1bf6ca2392b338fb7397f2" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -26359,19 +26898,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="chou aniki - bakuretsu rantou hen (japan).sfc" size="2097152" crc="70f5d440" sha1="c37763eec397ee14a9f4c8510c1e886002a11b1a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chodorap" cloneof="mcfang">
-		<description>Chou Makai Taisen! Dorabocchan (Jpn, Prototype 19921221)</description>
-		<year>1993</year>
-		<publisher>Naxat Soft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="chou makai taisen! dorabocchan (japan) (beta) (1992-12-21).sfc" size="1048576" crc="0c34d7b5" sha1="68c77c52e5d91c379a897ce4048922e15ac9b9ed" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -27028,18 +27554,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="cyber spin (usa).sfc" size="524288" crc="44018650" sha1="1b6a1b0332a8301cbec0d6c9171e8fd0bfc0fc57" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cybernatup" cloneof="cybernat">
-		<!-- owned by retrology -->
-		<description>Cybernator (USA, Prototype 199211)</description>
-		<year>1993</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="cybernator (usa) (beta).sfc" size="1048576" crc="aca397e8" sha1="acc2b4c01e97b72a83fbb3f4db1bb2e4535ad864" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29990,20 +30504,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="flintstones, the - the treasure of sierra madrock (usa).sfc" size="1048576" crc="594f5cc6" sha1="1083161ad7474b9be1152240247d569b405bea25" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flintsmp" cloneof="flintsm">
-	<!-- Martin, NES World -->
-		<description>The Flintstones - The Treasure of Sierra Madrock (USA) (Prototype)</description>
-		<year>1994</year>
-		<publisher>Taito</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="flintstones, the - the treasure of sierra madrock (proto).sfc" size="1048576" crc="bfc15ed9" sha1="379212d62a273fe335726518dd0691b95155cee9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -34130,17 +34630,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jleagueup" cloneof="jleague">
-		<description>Justice League Task Force (USA, Prototype)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2621440">
-				<rom name="justice league task force (usa) (beta).sfc" size="2621440" crc="50224767" sha1="2893dd99da821d391d5fb1a76630e92cd14952a4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jleagueu" cloneof="jleague">
 		<description>Justice League Task Force (USA)</description>
 		<year>1995</year>
@@ -36852,17 +37341,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="marvel super heroes - war of the gems (japan).sfc" size="2097152" crc="ab628c0c" sha1="8662105aae89d1fe9a0cd484ca96fb39fe7dc638" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mshup" cloneof="msh">
-		<description>Marvel Super Heroes - War of the Gems (USA, Prototype)</description>
-		<year>1996</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="marvel super heroes - war of the gems (usa) (beta).sfc" size="2097152" crc="e86cfe8f" sha1="a5f38340c110d96b9d9622ca1fb1de81936c5ef4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40178,43 +40656,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="pagemstrup" cloneof="pagemstr">
-		<description>The Pagemaster (USA, Prototype)</description>
-		<year>1994</year>
-		<publisher>Fox Interactive</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pagemaster, the (usa) (beta).sfc" size="2097152" crc="6f2c46c6" sha1="f25992309bce84273463d321f8d6e76a680cff36" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pagemstrup1" cloneof="pagemstr">
-		<description>The Pagemaster (USA, Prototype, Alt)</description>
-		<year>1994</year>
-		<publisher>Fox Interactive</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pagemaster, the (usa) (nesworld beta).sfc" size="2097152" crc="a251b8bf" sha1="70337cd6ef8a303d7552934d93fb30a2e3a6c9b1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pagemstrup2" cloneof="pagemstr">
-		<description>The Pagemaster (USA, Prototype Earlier)</description>
-		<year>1994</year>
-		<publisher>Fox Interactive</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pagemaster, the (usa) (bbs alpha).sfc" size="2097152" crc="0df6088b" sha1="4ce822cb637645f0222854cf11ff67e1ba581e2a" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pagemstru" cloneof="pagemstr">
 		<description>The Pagemaster (USA)</description>
 		<year>1994</year>
@@ -40892,17 +41333,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pirates of dark water, the (europe).sfc" size="1048576" crc="4c4782b5" sha1="daed2aa89dfc2fb4de1c690c2e26acf271c0aa31" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="piratedwup" cloneof="piratedw">
-		<description>The Pirates of Dark Water (USA, Prototype)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pirates of dark water, the (usa) (beta).sfc" size="1048576" crc="2bb26c4a" sha1="524b7252fb07c7085d6539da91bf2f9e18c92d8b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -42112,17 +42542,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="reliefp" cloneof="relief">
-		<description>Relief Pitcher (USA, Prototype)</description>
-		<year>1994</year>
-		<publisher>Left Field Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="relief pitcher (usa) (beta).sfc" size="2097152" crc="cfed1ea8" sha1="8e665cef3007c77b94636448295c09d0209e768a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="relief">
 		<description>Relief Pitcher (USA)</description>
 		<year>1994</year>
@@ -42570,17 +42989,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="rocketeer, the (usa).sfc" size="1048576" crc="4c68a3c7" sha1="cb544a7ac485cf0337f6f8494a935da3100e07a3" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockman7s" cloneof="megaman7">
-		<description>Rockman 7 - Shukumei no Taiketsu! (Jpn, Sample)</description>
-		<year>1995</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="rockman 7 - shukumei no taiketsu! (japan) (sample).sfc" size="2097152" crc="ee05a1af" sha1="1702bd66db2860ff2c399af34d62fc1ba59b32bd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43068,20 +43476,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sanrio world smash ball! (japan).sfc" size="262144" crc="0e318416" sha1="f182eb75f21e46e516cbb6e6bef0324724bc0f04" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sdf1gps" cloneof="sdf1gp" supported="no">
-		<description>SD F-1 Grand Prix (Jpn, Sample)</description>
-		<year>1995</year>
-		<publisher>Video System</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="SA1" />
-			<dataarea name="rom" size="2097152">
-				<rom name="sd f-1 grand prix (japan) (sample).sfc" size="2097152" crc="e846f7a1" sha1="ada4e36fa44c98576697783e2db7a1ab0129413b" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -44621,19 +45015,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="solid runner (japan).sfc" size="3145728" crc="b907bb27" sha1="e46a3bc826f0a5cbc2300913b7f9cc1d5ebe537b" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="solstic2p" cloneof="equinox">
-		<description>Solstice II (Jpn, Prototype 19930303)</description>
-		<year>1993</year>
-		<publisher>Epic / Sony Records</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="solstice ii (japan) (beta) (1993-03-03).sfc" size="1048576" crc="37c2ec0c" sha1="a20974aeb0b3d23e13313ceca0831b1e00d34cb1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -46476,17 +46857,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="super bowling (usa).sfc" size="524288" crc="94945b50" sha1="b17492bb3d7ebe9fdcf465c1eeb78944b0484cda" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sbbrosp" cloneof="spang">
-		<description>Super Buster Bros. (USA, Prototype)</description>
-		<year>1992</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super buster bros. (usa) (beta).sfc" size="524288" crc="3c3c2562" sha1="013c053a287a22d065cb06360139c82cd5e76cab" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
