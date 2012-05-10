@@ -47,6 +47,7 @@ struct uv201_interface
 	const char *m_screen_tag;
 	
 	devcb_write_line		m_out_ext_int_cb;
+	devcb_write_line		m_out_hblank_cb;
 	devcb_read8				m_in_db_cb;
 };
 
@@ -79,7 +80,9 @@ private:
 	enum
 	{
 		TIMER_Y_ODD,
-		TIMER_Y_EVEN
+		TIMER_Y_EVEN,
+		TIMER_HBLANK_ON,
+		TIMER_HBLANK_OFF
 	};
 
 	void initialize_palette();
@@ -89,6 +92,7 @@ private:
 	void do_partial_update();
 
 	devcb_resolved_write_line	m_out_ext_int_func;
+	devcb_resolved_write_line	m_out_hblank_func;
 	devcb_resolved_read8		m_in_db_func;
 
 	screen_device *m_screen;
@@ -105,6 +109,8 @@ private:
 	// timers
 	emu_timer *m_timer_y_odd;
 	emu_timer *m_timer_y_even;
+	emu_timer *m_timer_hblank_on;
+	emu_timer *m_timer_hblank_off;
 };
 
 

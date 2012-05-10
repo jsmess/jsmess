@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER( f3853_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
+	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 
 	void interrupt_check();
 
@@ -65,6 +66,9 @@ public:
 
 	// sound state
 	int m_sound_clk;
+
+	// timers
+	emu_timer *m_timer_ne555;	
 };
 
 //----------- defined in video/vidbrain.c -----------

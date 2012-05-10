@@ -107,6 +107,7 @@ void uv201_device::device_config_complete()
 	else
 	{
 		memset(&m_out_ext_int_cb, 0, sizeof(m_out_ext_int_cb));
+		memset(&m_out_hblank_cb, 0, sizeof(m_out_hblank_cb));
 		memset(&m_in_db_cb, 0, sizeof(m_in_db_cb));
 	}
 }
@@ -120,11 +121,14 @@ void uv201_device::device_start()
 {
 	// resolve callbacks
 	m_out_ext_int_func.resolve(m_out_ext_int_cb, *this);
+	m_out_hblank_func.resolve(m_out_hblank_cb, *this);
 	m_in_db_func.resolve(m_in_db_cb, *this);
 
 	// allocate timers
 	m_timer_y_odd = timer_alloc(TIMER_Y_ODD);
 	m_timer_y_even = timer_alloc(TIMER_Y_EVEN);
+	m_timer_hblank_on = timer_alloc(TIMER_HBLANK_ON);
+	m_timer_hblank_off = timer_alloc(TIMER_HBLANK_OFF);
 
 	// find devices
 	m_screen = machine().device<screen_device>(m_screen_tag);

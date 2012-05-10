@@ -130,12 +130,6 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	// joystick enable
 	m_joy_enable = BIT(data, 7);
-
-	if (m_joy_enable)
-	{
-		// TODO calculate NE555 firing time based on input port values
-		//timer_set(attotime::from_msec(t), TIMER_JOYSTICK);
-	}
 }
 
 
@@ -307,28 +301,28 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, vidbrain_state, trigger_reset, 0)
 
 	PORT_START("JOY1-X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(1)
 
 	PORT_START("JOY1-Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(1)
 
 	PORT_START("JOY2-X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(2)
 
 	PORT_START("JOY2-Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(2)
 
 	PORT_START("JOY3-X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(3)
 
 	PORT_START("JOY3-Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(3)
 
 	PORT_START("JOY4-X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_PLAYER(4)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(4)
 
 	PORT_START("JOY4-Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_PLAYER(4)
+	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(4)
 
 	PORT_START("JOY-R")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -397,12 +391,38 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 	}
 }
 
+WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
+{
+	if (state && m_joy_enable && !m_timer_ne555->enabled())
+	{
+		UINT8 joydata = 0;
+
+		if (!BIT(m_keylatch, 0)) joydata = ioport("JOY1-X")->read();
+		if (!BIT(m_keylatch, 1)) joydata = ioport("JOY1-Y")->read();
+		if (!BIT(m_keylatch, 2)) joydata = ioport("JOY2-X")->read();
+		if (!BIT(m_keylatch, 3)) joydata = ioport("JOY2-Y")->read();
+		if (!BIT(m_keylatch, 4)) joydata = ioport("JOY3-X")->read();
+		if (!BIT(m_keylatch, 5)) joydata = ioport("JOY3-Y")->read();
+		if (!BIT(m_keylatch, 6)) joydata = ioport("JOY4-X")->read();
+		if (!BIT(m_keylatch, 7)) joydata = ioport("JOY4-Y")->read();
+
+		// NE555 in monostable mode
+		// R = 3K9 + (0..140K)
+		// C = 0.003uF
+		// t = 1.1 * R * C
+		double t = 1.1 * (RES_K(3.9) + RES_K(joydata)) * 3;
+		
+		timer_set(attotime::from_nsec(t), TIMER_JOYSTICK);
+	}
+}
+
 static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
 
 static UV201_INTERFACE( uv_intf )
 {
 	SCREEN_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
+	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, hblank_w),
 	DEVCB_MEMORY_HANDLER(F3850_TAG, PROGRAM, memory_read_byte)
 };
 
@@ -448,6 +468,9 @@ static IRQ_CALLBACK( vidbrain_int_ack )
 void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_uv->ext_int_w(0);
+
+	m_ext_int_latch = 1;
+	interrupt_check();
 }
 
 
@@ -459,6 +482,9 @@ void vidbrain_state::machine_start()
 {
 	// register IRQ callback
 	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
+	
+	// allocate timers
+	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);
 
 	// register for state saving
 	save_item(NAME(m_vector));
