@@ -26,6 +26,10 @@ tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *ta
 void tvc_sound_device::device_start()
 {
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this );
+	m_sndint_timer = timer_alloc(TIMER_SNDINT);
+
+	// resolve callbacks
+	m_sndint_func.resolve(m_sndint_cb, *this);
 }
 
 //-------------------------------------------------
@@ -37,7 +41,39 @@ void tvc_sound_device::device_reset()
 	m_freq    = 0;
 	m_incr    = 0;
 	m_signal  = 1;
+	m_sndint_timer->reset();
+}
 
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tvc_sound_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const tvc_sound_interface *intf = reinterpret_cast<const tvc_sound_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<tvc_sound_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_sndint_cb, 0, sizeof(m_sndint_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_sndint_func(1);
 }
 
 //-------------------------------------------------
@@ -91,6 +127,12 @@ WRITE8_MEMBER(tvc_sound_device::write)
 		{
 			UINT16 pitch = (m_ports[0] | (m_ports[1]<<8)) & 0x0fff;
 			m_freq = (pitch == 0x0fff) ? 0 : (int)(195312.5 / (4096 - pitch));
+
+			if ((m_ports[1] & 0x20) && m_freq != 0)
+				m_sndint_timer->adjust(attotime::from_hz(m_freq), 0, attotime::from_hz(m_freq));
+			else
+				m_sndint_timer->reset();
+
 			break;
 		}
 
@@ -98,4 +140,22 @@ WRITE8_MEMBER(tvc_sound_device::write)
 			m_volume = (data>>2) & 0x0f;
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  tvc_sound_device::reset_divider
+//-------------------------------------------------
+
+void tvc_sound_device::reset_divider()
+{
+	m_stream->update();
+
+	m_incr = 0;
+	m_signal = 1;
+
+	if (m_ports[1] & 0x20 && m_freq != 0)
+		m_sndint_timer->adjust(attotime::from_hz(m_freq), 0, attotime::from_hz(m_freq));
+	else
+		m_sndint_timer->reset();
 }
