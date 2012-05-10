@@ -45,9 +45,13 @@ class m20_state : public driver_device
 public:
 	m20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+        m_maincpu(*this, "maincpu"),
 		m_p_videoram(*this, "p_videoram"){ }
 
+    required_device<device_t> m_maincpu;
 	required_shared_ptr<UINT16> m_p_videoram;
+
+    virtual void machine_reset();
 };
 
 
@@ -90,10 +94,11 @@ static SCREEN_UPDATE_RGB32( m20 )
 
 static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_MIRROR(0x40000) AM_REGION("maincpu", 0x10000)
+	AM_RANGE( 0x00000, 0x01fff ) AM_RAM AM_SHARE("mainram")
     AM_RANGE( 0x02000, 0x03fff ) AM_RAM
     AM_RANGE( 0x20000, 0x2ffff ) AM_RAM
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")//base vram
+	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x10000)
     AM_RANGE( 0x60000, 0x6ffff ) AM_RAM
     AM_RANGE( 0xa8000, 0xaffff ) AM_RAM
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
@@ -138,8 +143,15 @@ static DRIVER_INIT( m20 )
 {
 }
 
-static MACHINE_RESET( m20 )
+void m20_state::machine_reset()
 {
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
+
+    ROM += 0x10000; // don't know why they load at an offset, but let's go with it
+
+    memcpy(RAM, ROM, 256);  // should be more than sufficient to boot
+    m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
 }
 
 static const mc6845_interface mc6845_intf =
@@ -168,8 +180,6 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_CPU_IO_MAP(m20_apb_io)
 	MCFG_DEVICE_DISABLE()
 #endif
-
-	MCFG_MACHINE_RESET(m20)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
