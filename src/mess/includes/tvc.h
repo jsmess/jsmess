@@ -12,11 +12,15 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
+#include "machine/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 
 #define		TVC_RAM_BANK	1
 #define		TVC_ROM_BANK	2
+
+ #define CENTRONICS_TAG	"centronics"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -75,13 +79,15 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_ram(*this, RAM_TAG),
 		  m_sound(*this, "custom"),
-		  m_cassette(*this, CASSETTE_TAG)
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_centronics(*this, CENTRONICS_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
 	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
 
 	void machine_start();
 	void machine_reset();
@@ -99,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tvc_cassette_w);
 	DECLARE_READ8_MEMBER(tvc_5b_r);
 	DECLARE_WRITE_LINE_MEMBER(tvc_int_ff_set);
+	DECLARE_WRITE_LINE_MEMBER(tvc_centronics_ack);
 
 	UINT8		m_video_mode;
 	UINT8		m_keyline;
@@ -106,6 +113,7 @@ public:
 	UINT8		m_col[4];
 	UINT8		m_bank_type[2];
 	UINT8		m_cassette_ff;
+	UINT8		m_centronics_ff;
 };
 
 
