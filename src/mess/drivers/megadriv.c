@@ -1,243 +1,3 @@
-/*
-
-    Megadrive / Genesis support
-
-    Current Issues
-
-    Timing is wrong
-     -- DMA timing not emulated
-     -- Sprite render timing incorrect
-     -- Interrupt Timing Problems
-
-    Known Problems
-     -- g_lem / Lemmings (JU) (REV01) [!]
-      Rasters are off
-     -- g_drac / Bram Stoker's Dracula (U) [!]
-      Doesn't work, Timing Sensisitve
-     -- g_sscc / Sesame Street Counting Cafe (U) [!]
-      Doesn't work
-     -- g_fatr / Fatal Rewind (UE) [!] (and clones)
-      Doesn't work. Timing Sensitive
-
-     -- various
-      Rasters off by 1 line, bottom line corrupt? bad frame timing?
-
-      + more
-
-    ToDo:
-
-    Fix bugs - comprehensive testing!
-
-    Add SegaCD
-
-    Fix 32X support (not used by any arcade systems?)
-     - this seems to require far greater sync and timing accuracy on rom / ram access than MAME can provide
-     - split NTSC / PAL drivers
-     - 36greatju: missing backup ram, has issues with golfer select due of that
-     - bcracers: write to undefined PWM register?
-     - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
-     - marsch1: doesn't boot, Master / Slave communicates through SCI
-     - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
-     - nflquart: black screen, missing h irq?
-     - sangoku4: black screen after the Sega logo
-     - soulstar: OSD and player sprite isn't drawn;
-     - tempo: intro is too fast, mostly noticeable with the PWM sound that cuts off too early when it gets to the title screen;
-     - tmek: gameplay is clearly too fast
-     - vrdxu: has 3d geometry bugs, caused by a SH-2 DRC bug;
-     - vrdxu: crashes if you attempt to enter into main menu;
-     - wwfraw: writes fb data to the cart area and expects it to be read back, kludging the cart area to be writeable makes the 32x gfxs to appear, why?
-     - wwfwre: no 32x gfxs
-     - xmen: black screen after that you choose the level, needs bare minimum SH-2 SCI support
-
-Known Non-Issues (confirmed on Real Genesis)
-    Castlevania - Bloodlines (U) [!] - Pause text is missing on upside down level
-    Blood Shot (E) (M4) [!] - corrupt texture in level 1 is correct...
-
-Cleanup / Rewrite notes:
-
-32x Marsch tests documentation (keep start pressed at start-up for individual tests):
-
-MD side check:
-#1 Communication Check
-#2 FM Bit
-#3 Irq Register
-#4 Bank Control Register
-#5 DREQ Control FULL bit
-#6 DREQ SRC Address
-#7 DREQ DST Address
-#8 DREQ SIZE Address
-#9 SEGA TV Register
-#10 H IRQ Vector
-#11 PWM Control Register
-#12 PWM Frequency Register
-#13 PWM Lch Pulse Width Register
-#14 PWM Rch Pulse Width Register
-#15 PWM MONO Pulse Width Register
-32x side check:
-#16 SH-2 Master Communication Check
-#17 SH-2 Slave Communication Check
-#18 SH-2 Master FM Bit
-#19 SH-2 Slave FM Bit
-#20 SH-2 Master IRQ Mask Register
-#21 SH-2 Slave IRQ Mask Register
-#22 SH-2 Master H Counter Register
-#23 SH-2 Slave H Counter Register
-#24 SH-2 Master PWM Timer Register
-#25 SH-2 Slave PWM Timer Register
-#26 SH-2 Master PWM Cont. Register
-#27 SH-2 Slave PWM Cont. Register
-#28 SH-2 Master PWM Freq. Register
-#29 SH-2 Slave PWM Freq. Register
-#30 SH-2 Master PWM Lch Register
-#31 SH-2 Slave PWM Lch Register
-#32 SH-2 Master PWM Rch Register
-#33 SH-2 Slave PWM Rch Register
-#34 SH-2 Master PWM Mono Register
-#35 SH-2 Slave PWM Mono Register
-#36 SH-2 Master ROM Read Check
-#37 SH-2 Slave ROM Read Check
-#38 SH-2 Serial Communication (ERROR - returns a Timeout Error)
-MD & 32x check:
-#39 MD&SH-2 Master Communication
-#40 MD&SH-2 Slave Communication
-#41 MD&SH-2 Master FM Bit R/W
-#42 MD&SH-2 Slave FM Bit R/W
-#43 MD&SH-2 Master DREQ CTL
-#44 MD&SH-2 Slave DREQ CTL
-#45 MD&SH-2 Master DREQ SRC address
-#46 MD&SH-2 Slave DREQ SRC address
-#47 MD&SH-2 Master DREQ DST address
-#48 MD&SH-2 Slave DREQ DST address
-#49 MD&SH-2 Master DREQ SIZE address
-#50 MD&SH-2 Slave DREQ SIZE address
-#51 SH-2 Master V IRQ
-#52 SH-2 Slave V IRQ
-#53 SH2 Master H IRQ (MD 0)
-#54 SH2 Slave H IRQ (MD 0)
-#55 SH2 Master H IRQ (MD 1)
-#56 SH2 Slave H IRQ (MD 1)
-#57 SH2 Master H IRQ (MD 2)
-#58 SH2 Slave H IRQ (MD 2)
-MD VDP check:
-#59 Bitmap Mode Register
-#60 Shift Register
-#61 Auto Fill Length Register
-#62 Auto Fill Start Address Register
-#63 V Blank BIT
-#64 H Blank BIT
-#65 Palette Enable BIT
-SH-2 VDP check:
-#66 Frame Swap BIT
-#67 SH-2 Master Bitmap MD
-#68 SH-2 Slave Bitmap MD
-#69 SH-2 Master Shift
-#70 SH-2 Slave Shift
-#71 SH-2 Master Fill SIZE
-#72 SH-2 Slave Fill SIZE
-#73 SH-2 Master Fill START
-#74 SH-2 Slave Fill START
-#75 SH-2 Master V Blank Bit
-#76 SH-2 Slave V Blank Bit
-#77 SH-2 Master H Blank Bit
-#78 SH-2 Slave H Blank Bit
-#79 SH-2 Master Palette Enable Bit
-#80 SH-2 Slave Palette Enable Bit
-#81 SH-2 Master Frame Swap Bit
-#82 SH-2 Slave Frame Swap Bit
-Framebuffer Check:
-#83 MD Frame Buffer 0
-#84 MD Frame Buffer 1
-#85 SH-2 Master Frame Buffer 0
-#86 SH-2 Slave Frame Buffer 0
-#87 SH-2 Master Frame Buffer 1
-#88 SH-2 Slave Frame Buffer 1
-#89 MD Frame Buffer 0 Overwrite
-#90 MD Frame Buffer 1 Overwrite
-#91 MD Frame Buffer 0 Byte Write
-#92 MD Frame Buffer 1 Byte Write
-#93 SH-2 Master Frame Buffer 0 Overwrite
-#94 SH-2 Slave Frame Buffer 0 Overwrite
-#95 SH-2 Master Frame Buffer 1 Overwrite
-#96 SH-2 Slave Frame Buffer 1 Overwrite
-#97 SH-2 Master Frame Buffer 0 Byte Write
-#98 SH-2 Slave Frame Buffer 0 Byte Write
-#99 SH-2 Master Frame Buffer 1 Byte Write
-#100 SH-2 Slave Frame Buffer 1 Byte Write
-#101 MD Frame Buffer 0 Fill Data
-#102 MD Frame Buffer 1 Fill Data
-#103 MD Frame Buffer 0 Fill Length & Address
-#104 MD Frame Buffer 1 Fill Length & Address
-#105 SH-2 Master Frame Buffer 0 Fill Data
-#106 SH-2 Slave Frame Buffer 0 Fill Data
-#107 SH-2 Master Frame Buffer 1 Fill Data
-#108 SH-2 Slave Frame Buffer 1 Fill Data
-#109 SH-2 Master Frame Buffer 0 Fill Address
-#110 SH-2 Slave Frame Buffer 0 Fill Address
-#111 SH-2 Master Frame Buffer 1 Fill Address
-#112 SH-2 Slave Frame Buffer 1 Fill Address
-#113 MD Palette R/W (Blank Mode)
-#114 MD Palette R/W (Display Mode)
-#115 MD Palette R/W (Fill Mode)
-#116 SH-2 Master Palette R/W (Blank Mode)
-#117 SH-2 Slave Palette R/W (Blank Mode)
-#118 SH-2 Master Palette R/W (Display Mode)
-#119 SH-2 Slave Palette R/W (Display Mode)
-#120 SH-2 Master Palette R/W (Fill Mode)
-#121 SH-2 Slave Palette R/W (Fill Mode)
-MD or SH-2 DMA check:
-#122 SH-2 Master CPU Write DMA (68S) (ERROR)
-#123 SH-2 Slave CPU Write DMA (68S) (ERROR)
-#124 MD ROM to VRAM DMA (asserts after this)
------
-#127 SH-2 Master ROM to SDRAM DMA
-#128 SH-2 Slave ROM to SDRAM DMA
-#129 SH-2 Master ROM to Frame DMA
-#130 SH-2 Slave ROM to Frame DMA
-#131 SH-2 Master SDRAM to Frame DMA
-#132 SH-2 Slave SDRAM to Frame DMA
-#133 SH-2 Master Frame to SDRAM DMA
-#134 SH-2 Slave Frame to SDRAM DMA
-Sound Test (these don't explicitly fails):
-#135 MD 68k Monaural Sound
-#136 MD 68k L Sound
-#137 MD 68k R Sound
-#138 MD 68k L -> R Sound
-#139 MD 68k R -> L Sound
-#140 SH-2 Master Monaural Sound
-#141 SH-2 Master L Sound
-#142 SH-2 Master R Sound
-#143 SH-2 Master L -> R Pan
-#144 SH-2 Master R -> L Pan
-#145 SH-2 Slave Monaural Sound
-#146 SH-2 Slave L Sound
-#147 SH-2 Slave R Sound
-#148 SH-2 Slave L -> R Pan
-#149 SH-2 Slave R -> L Pan
-#150 SH-2 Master PWM Interrupt
-#151 SH-2 Slave PWM Interrupt
-#152 SH-2 Master PWM DMA Write (!)
-#153 SH-2 Slave PWM DMA Write (!)
-#154 Z80 PWM Monaural Sound (!)
-#155 Z80 PWM L Sound (!)
-#156 Z80 PWM R Sound (!)
-GFX check (these don't explicitly fails):
-#157 Direct Color Mode
-#158 Packed Pixel Mode
-#159 Runlength Mode
-#160 Runlength Mode
-#161 Runlength Mode
-
-
-----------------------------
-SegaCD notes
-----------------------------
-
-the use of the MAME tilemap system for the SegaCD 'Roz tilemap' isn't intended as a long-term
-solution.  (In reality it's not a displayable tilemap anyway, just a source buffer which has
-a tilemap-like structure, from which data is copied)
-
-*/
-
 
 #include "emu.h"
 #include "includes/megadriv.h"
@@ -539,22 +299,6 @@ static INPUT_PORTS_START( md )
 INPUT_PORTS_END
 
 
-/* MegaDrive inputs + Fake Region Selection */
-/* We need this as long as we only have the US version of the SVP add-on, otherwise we could not play
-   Non-US Virtua Racing versions. It is also handy to develop add-ons emulation without adding each
-   region variants, while they do not even work. Once emulation is working this must disappear.  */
-static INPUT_PORTS_START( md_sel )
-	PORT_INCLUDE( md )
-
-	PORT_START("REGION")
-	/* Region setting for Console */
-	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, "Use Default Choice" )
-	PORT_CONFSETTING(      0x0001, "US (NTSC, 60fps)" )
-	PORT_CONFSETTING(      0x0002, "Japan (NTSC, 60fps)" )
-	PORT_CONFSETTING(      0x0003, "Europe (PAL, 50fps)" )
-INPUT_PORTS_END
-
 
 /*************************************
  *
@@ -604,6 +348,18 @@ static MACHINE_CONFIG_START( ms_megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( ms_megdsvppal, mdsvp_state )
+	MCFG_FRAGMENT_ADD( md_pal )
+	MCFG_FRAGMENT_ADD( md_svp )
+	MCFG_NVRAM_HANDLER_CLEAR()
+
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
+
+	MCFG_FRAGMENT_ADD( genesis_cartslot )
+MACHINE_CONFIG_END
+
+
 
 
 /*************************************
@@ -620,11 +376,6 @@ ROM_START(genesis)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START(gensvp)
-	ROM_REGION(0x1415000, "maincpu", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
-ROM_END
-
 ROM_START(megadriv)
 	ROM_REGION(0x1415000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
@@ -635,6 +386,21 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
+
+ROM_START(gensvp)
+	ROM_REGION(0x1415000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(mdsvp)
+	ROM_REGION(0x1415000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(mdsvpj)
+	ROM_REGION(0x1415000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
 
 /*************************************
  *
@@ -649,14 +415,6 @@ static DRIVER_INIT( mess_md_common )
 }
 
 static DRIVER_INIT( genesis )
-{
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 1;
-	megadrive_region_pal = 0;
-}
-
-static DRIVER_INIT( gensvp )
 {
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -693,35 +451,61 @@ static DRIVER_INIT( mess_32x )
 	megadrive_region_pal = 0;
 }
 
+static DRIVER_INIT( mess_32x_eur )
+{
+	DRIVER_INIT_CALL(_32x);
+	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 1;
+	megadrive_region_pal = 1;
+}
+
+
+static DRIVER_INIT( mess_32x_jpn )
+{
+	DRIVER_INIT_CALL(_32x);
+	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 0;
+	megadrive_region_pal = 0;
+}
+
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
 	MCFG_NVRAM_HANDLER_CLEAR()
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ms_32x_pal, genesis_32x_pal )
+	MCFG_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_NVRAM_HANDLER_CLEAR()
+MACHINE_CONFIG_END
+
+#define _32X_ROMS \
+	ROM_REGION16_BE( 0x400000, "gamecart", ROMREGION_ERASE00 ) /* 68000 Code */ \
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 ) /* Copy for the SH2 */ \
+	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */ \
+	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) ) \
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 ) \
+	/* temp, rom should only be visible here when one of the regs is set, tempo needs it */ \
+	/* ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR) */ \
+	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100) \
+	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */ \
+	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" ) \
+	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS( 1, "sdk", "Mars Version 1.0 (early sdk)" ) \
+	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(2) ) \
+	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */ \
+	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) ) \
+
 
 ROM_START( 32x )
-	ROM_REGION16_BE( 0x400000, "gamecart", ROMREGION_ERASE00 ) /* 68000 Code */
-//  ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
+	_32X_ROMS
+ROM_END
 
-	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 ) /* Copy for the SH2 */
-//  ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
+ROM_START( 32xe )
+	_32X_ROMS
+ROM_END
 
-	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
-	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
-
-	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	// temp, rom should only be visible here when one of the regs is set, tempo needs it
-//  ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR)
-	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
-
-	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
-	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" )
-	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "sdk", "Mars Version 1.0 (early sdk)" )
-	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(2) )
-
-	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
-	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
+ROM_START( 32xj )
+	_32X_ROMS
 ROM_END
 
 /* We need proper names for most of these BIOS ROMs! */
@@ -1044,14 +828,6 @@ static INPUT_PORTS_START( pico )
 
 	PORT_START("PENY")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0,255 ) PORT_PLAYER(1) PORT_NAME("PEN Y")
-
-	PORT_START("REGION")
-	/* Region setting for Console */
-	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
-	PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
-	PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
-	PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
 INPUT_PORTS_END
 
 
@@ -1108,18 +884,24 @@ ROM_END
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT       COMPANY   FULLNAME */
 CONS( 1989, genesis,    0,         0,      ms_megadriv,     md,     genesis,   "Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md_sel, gensvp,    "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
 CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", 0)
 CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", 0)
-CONS( 1994, pico,       0,         0,      picopal,         pico,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)
 
-/* Not Working */
-CONS( 1994, 32x,        0,         0,      ms_32x,          md_sel, mess_32x,  "Sega",   "32X", GAME_NOT_WORKING )
+// these should not exist, the SVP hardware is in the cart and should be installed dynamically when selected from the Software List
+// this however involves installing entire CPUs at run/load time and I don't think we can do that.
+CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md,     genesis,   "Sega",   "Genesis (USA, NTSC, for SVP cart)", 0)
+CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md,     md_eur,    "Sega",   "Mega Drive (Europe, PAL, for SVP cart)", 0)
+CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
+
+// the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
+CONS( 1994, 32x,        0,         0,      ms_32x,          md, mess_32x,      "Sega",   "32X (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, mess_32x_eur,  "Sega",   "32X (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, mess_32x_jpn,  "Sega",   "32X (Japan, NTSC)", GAME_NOT_WORKING )
+
+// the SegaCD plugged into the expansion port..
 CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd,     segacd,    0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
 CONS( 1991, megacda,    segacd,    0,      genesis_scd_mcdj,md,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
 CONS( 1993, segacd2,    0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd2,    segacd2,   0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
@@ -1131,4 +913,10 @@ CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md,     md_jpn,    "
 CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md_sel, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+
+// this is a standalone system based on the md-like hardware (same vdp etc.)
+
+CONS( 1994, pico,       0,         0,      picopal,         pico,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)

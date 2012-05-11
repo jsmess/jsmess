@@ -436,6 +436,10 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/rdpspn16.o	\
 	$(MAME_MACHINE)/pcshare.o	\
 	$(MAME_MACHINE)/megadriv.o  \
+	$(MAME_MACHINE)/megacd.o \
+	$(MAME_MACHINE)/mega32x.o \
+	$(MAME_MACHINE)/megasvp.o \
+	$(MAME_MACHINE)/megavdp.o \
 	$(MAME_MACHINE)/dc.o		\
 	$(MAME_DRIVERS)/naomi.o 	\
 	$(MAME_MACHINE)/dc.o		\
