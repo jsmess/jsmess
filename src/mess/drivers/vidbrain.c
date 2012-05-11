@@ -32,6 +32,14 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 		1
+
+
+
+//**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
@@ -55,6 +63,8 @@ WRITE8_MEMBER( vidbrain_state::keyboard_w )
         7       keyboard column 7
 
     */
+
+    if (LOG) logerror("Keyboard %02x\n", data);
 
 	m_keylatch = data;
 }
@@ -117,6 +127,8 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
         7       joystick enable
 
     */
+
+    if (LOG) logerror("Sound %02x\n", data);
 
 	// sound clock
 	int sound_clk = BIT(data, 4);
@@ -301,25 +313,25 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, vidbrain_state, trigger_reset, 0)
 
 	PORT_START("JOY1-X")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_X ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(1)
 
 	PORT_START("JOY1-Y")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_Y ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(1)
 
 	PORT_START("JOY2-X")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_X ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(2)
 
 	PORT_START("JOY2-Y")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_Y ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(2)
 
 	PORT_START("JOY3-X")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_X ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(3)
 
 	PORT_START("JOY3-Y")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_Y ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(3)
 
 	PORT_START("JOY4-X")
-	PORT_BIT( 0xff, 70, IPT_AD_STICK_X ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(4)
+	PORT_BIT( 0xff, 50, IPT_AD_STICK_X ) PORT_MINMAX(0, 99) PORT_SENSITIVITY(25) PORT_PLAYER(4)
 
 	PORT_START("JOY4-Y")
 	PORT_BIT( 0xff, 70, IPT_AD_STICK_Y ) PORT_MINMAX(0, 139) PORT_SENSITIVITY(25) PORT_PLAYER(4)
@@ -407,7 +419,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 		if (!BIT(m_keylatch, 7)) joydata = ioport("JOY4-Y")->read();
 
 		// NE555 in monostable mode
-		// R = 3K9 + (0..140K)
+		// R = 3K9 + 100K linear pot
 		// C = 0.003uF
 		// t = 1.1 * R * C
 		double t = 1.1 * (RES_K(3.9) + RES_K(joydata)) * 3;

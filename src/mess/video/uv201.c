@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 		0
+#define LOG 		1
 
 
 // write-only registers
