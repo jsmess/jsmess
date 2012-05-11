@@ -433,11 +433,11 @@ READ8_MEMBER( vic20_state::via0_pa_r )
         PA4     JOY 2
         PA5     LITE PEN
         PA6     CASS SWITCH
-        PA7     SERIAL ATN OUT
+        PA7     
 
     */
 
-	UINT8 data = 0xfc;
+	UINT8 data = 0;
 
 	// serial clock in
 	data |= m_iec->clk_r();
@@ -445,14 +445,19 @@ READ8_MEMBER( vic20_state::via0_pa_r )
 	// serial data in
 	data |= m_iec->data_r() << 1;
 
+	// user port
+	data |= m_user->joy0_r() << 2;
+	data |= m_user->joy1_r() << 3;
+	data |= m_user->joy2_r() << 4;
+	data |= m_user->light_pen_r() << 5;
+	data |= m_user->cassette_switch_r() << 6;
+
 	// joystick
 	data &= ~(ioport("JOY")->read() & 0x3c);
 
 	// cassette switch
 	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x40;
-	else
-		data |=  0x40;
 
 	return data;
 }
@@ -463,57 +468,19 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
 
         bit     description
 
-        PA0     SERIAL CLK IN
-        PA1     SERIAL DATA IN
-        PA2     JOY 0
-        PA3     JOY 1
-        PA4     JOY 2
-        PA5     LITE PEN
-        PA6     CASS SWITCH
+        PA0     
+        PA1     
+        PA2     
+        PA3     
+        PA4     
+        PA5     
+        PA6     
         PA7     SERIAL ATN OUT
 
     */
 
 	// serial attention out
 	m_iec->atn_w(!BIT(data, 7));
-}
-
-READ8_MEMBER( vic20_state::via0_pb_r )
-{
-	/*
-
-        bit     description
-
-        PB0     USER PORT C
-        PB1     USER PORT D
-        PB2     USER PORT E
-        PB3     USER PORT F
-        PB4     USER PORT H
-        PB5     USER PORT J
-        PB6     USER PORT K
-        PB7     USER PORT L
-
-    */
-
-	return 0;
-}
-
-WRITE8_MEMBER( vic20_state::via0_pb_w )
-{
-	/*
-
-        bit     description
-
-        PB0     USER PORT C
-        PB1     USER PORT D
-        PB2     USER PORT E
-        PB3     USER PORT F
-        PB4     USER PORT H
-        PB5     USER PORT J
-        PB6     USER PORT K
-        PB7     USER PORT L
-
-    */
 }
 
 WRITE_LINE_MEMBER( vic20_state::via0_ca2_w )
@@ -533,17 +500,17 @@ WRITE_LINE_MEMBER( vic20_state::via0_ca2_w )
 static const via6522_interface via0_intf =
 {
 	DEVCB_DRIVER_MEMBER(vic20_state, via0_pa_r),
-	DEVCB_DRIVER_MEMBER(vic20_state, via0_pb_r),
+	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_r),
 	DEVCB_NULL, // RESTORE
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vic20_state, via0_pa_w),
-	DEVCB_DRIVER_MEMBER(vic20_state, via0_pb_w),
+	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb1_w),
 	DEVCB_DRIVER_LINE_MEMBER(vic20_state, via0_ca2_w), // CASS MOTOR
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb2_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI)
 };
 
@@ -773,6 +740,18 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 };
 
 
+//-------------------------------------------------
+//  VIC20_USER_PORT_INTERFACE( user_intf )
+//-------------------------------------------------
+
+static VIC20_USER_PORT_INTERFACE( user_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(M6522_0_TAG, via6522_device, write_cb1),
+	DEVCB_DEVICE_LINE_MEMBER(M6522_0_TAG, via6522_device, write_cb2),
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_RESET)
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -819,6 +798,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
 
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic1001_cart")

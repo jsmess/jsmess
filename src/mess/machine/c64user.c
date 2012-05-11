@@ -123,9 +123,9 @@ void c64_user_port_device::device_reset()
 }
 
 
-READ8_MEMBER( c64_user_port_device::pb_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->c64_pb_r(space, offset); return data; }
+READ8_MEMBER( c64_user_port_device::pb_r ) { UINT8 data = 0xff; if (m_cart != NULL) data = m_cart->c64_pb_r(space, offset); return data; }
 WRITE8_MEMBER( c64_user_port_device::pb_w ) { if (m_cart != NULL) m_cart->c64_pb_w(space, offset, data); }
-READ_LINE_MEMBER( c64_user_port_device::pa2_r ) { int state = 0; if (m_cart != NULL) state = m_cart->c64_pa2_r(); return state; }
+READ_LINE_MEMBER( c64_user_port_device::pa2_r ) { int state = 1; if (m_cart != NULL) state = m_cart->c64_pa2_r(); return state; }
 WRITE_LINE_MEMBER( c64_user_port_device::pa2_w ) { if (m_cart != NULL) m_cart->c64_pa2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::pc2_w ) { if (m_cart != NULL) m_cart->c64_pc2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->c64_atn_w(state); }

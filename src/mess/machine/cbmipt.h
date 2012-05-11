@@ -146,6 +146,7 @@ SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 SLOT_INTERFACE_EXTERN( sx1541_iec_devices );
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
 SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
+SLOT_INTERFACE_EXTERN( vic20_user_port_cards );
 SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_user_port_cards );

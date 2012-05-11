@@ -84,11 +84,14 @@ public:
 	c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~c64_user_port_device();
 
+	// computer interface
 	DECLARE_READ8_MEMBER( pb_r );
 	DECLARE_WRITE8_MEMBER( pb_w );
 	DECLARE_READ_LINE_MEMBER( pa2_r );
 	DECLARE_WRITE_LINE_MEMBER( pa2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
+
+	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( sp1_w );
 	DECLARE_WRITE_LINE_MEMBER( cnt1_w );
 	DECLARE_WRITE_LINE_MEMBER( sp2_w );
@@ -124,10 +127,10 @@ public:
 	device_c64_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_c64_user_port_interface();
 
-	virtual UINT8 c64_pb_r(address_space &space, offs_t offset) { return 0; };
+	virtual UINT8 c64_pb_r(address_space &space, offs_t offset) { return 0xff; };
 	virtual void c64_pb_w(address_space &space, offs_t offset, UINT8 data) { };
 
-	virtual int c64_pa2_r() { return 0; };
+	virtual int c64_pa2_r() { return 1; };
 	virtual void c64_pa2_w(int state) { };
 	virtual void c64_cnt1_w(int state) { };
 	virtual void c64_sp1_w(int state) { };

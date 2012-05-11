@@ -15,6 +15,7 @@
 #include "machine/ieee488.h"
 #include "machine/ram.h"
 #include "machine/vic20exp.h"
+#include "machine/vic20user.h"
 #include "sound/dac.h"
 #include "sound/mos6560.h"
 
@@ -38,6 +39,7 @@ public:
 		  m_vic(*this, M6560_TAG),
 		  m_iec(*this, CBM_IEC_TAG),
 		  m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
+		  m_user(*this, VIC20_USER_PORT_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_cassette_timer(*this, TIMER_C1530_TAG)
@@ -49,6 +51,7 @@ public:
 	required_device<device_t> m_vic;
 	required_device<cbm_iec_device> m_iec;
 	required_device<vic20_expansion_slot_device> m_exp;
+	required_device<vic20_user_port_device> m_user;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<timer_device> m_cassette_timer;
@@ -60,8 +63,6 @@ public:
 
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via0_ca2_w );
 	DECLARE_READ8_MEMBER( via1_pa_r );
 	DECLARE_READ8_MEMBER( via1_pb_r );
