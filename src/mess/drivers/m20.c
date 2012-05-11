@@ -92,15 +92,31 @@ static SCREEN_UPDATE_RGB32( m20 )
 	return 0;
 }
 
+/* from the M20 hardware reference manual:
+   M20 memory is configured according to the following scheme:
+   Segment   Contents
+         0   PCOS kernel
+         1   Basic interpreter and PCOS utilities
+         2   PCOS variables, Basic stock and tables, user memory
+         3   Screen bitmap
+         4   Diagnostics and Bootstrap
+*/
 static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_RAM AM_SHARE("mainram")
-    AM_RANGE( 0x02000, 0x03fff ) AM_RAM
+    AM_RANGE( 0x02000, 0x0ffff ) AM_RAM
+    AM_RANGE( 0x10000, 0x1ffff ) AM_RAM
     AM_RANGE( 0x20000, 0x2ffff ) AM_RAM
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")//base vram
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x10000)
-    AM_RANGE( 0x60000, 0x6ffff ) AM_RAM
-    AM_RANGE( 0xa8000, 0xaffff ) AM_RAM
+    AM_RANGE( 0x44000, 0x4bfff ) AM_RAM
+    AM_RANGE( 0x50000, 0x5bfff ) AM_RAM
+    AM_RANGE( 0x60000, 0x67fff ) AM_RAM
+    AM_RANGE( 0x80000, 0x8ffff ) AM_RAM
+    AM_RANGE( 0x90000, 0x9ffff ) AM_RAM
+    AM_RANGE( 0xa0000, 0xaffff ) AM_RAM
+    AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM
+    AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
 //  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 ADDRESS_MAP_END
