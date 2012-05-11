@@ -176,6 +176,32 @@ Notes:
 
 */
 
+/* Notes added 2012-05-11 [Robbbert]
+    General
+    - Added F1 key to toggle the sound on 'sb2m600b', to silence the awful screech.
+    - Added F3 key to simulate the RESET / BREAK key on the real keyboard.
+    - These machines only uses uppercase input. Shift-Lock must be on at all times.
+    - At boot you get a screen DCWM or similar:
+      D = boot from floppy
+      C = Cold boot & start BASIC
+      W = Warm boot (don't use after turning on the machine) jump to 0000.
+      M = Monitor (only options are to read/modify memory, Go, Load a tape).
+    - The corrupt error messages in Basic are normal and are documented in the user
+      manual. It's not a bug.
+
+    Compukit UK101
+    - The Monitor ROM that had always been there is for a 32x32 screen. I assume it
+      was the prototype referred to in the first Practical Electronics construction
+      article. Also, the keyboard doesn't work in Basic.
+    - I found a working rom in another emulator, this runs fine on the 64x16 screen.
+    - But, the proper rom that came with the kit needs to be found.
+    - The proper rom (and the prototype) allow you to boot from floppy, but this is
+      not normally fitted. It appears that it would work the same as in the other
+      systems in this driver.
+
+*/
+
+
 #include "includes/osi.h"
 
 /* Sound */
@@ -223,6 +249,9 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( sb2m600_state::keyboard_r )
 {
+	if (ioport("Reset")->read())
+		machine().device(M6502_TAG)->reset();
+
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	UINT8 data = 0xff;
@@ -240,7 +269,8 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 {
 	m_keylatch = data;
 
-	discrete_sound_w(m_discrete, NODE_01, (data >> 2) & 0x0f);
+	if (ioport("Sound")->read())
+		discrete_sound_w(m_discrete, NODE_01, (data >> 2) & 0x0f);
 }
 
 WRITE8_MEMBER( uk101_state::keyboard_w )
@@ -448,7 +478,8 @@ static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READ(keyboard_r) AM_WRITE(keyboard_w)
+	AM_RANGE(0xd400, 0xd7ff) AM_NOP  // bios sets this to spaces at boot
+	AM_RANGE(0xdc00, 0xdfff) AM_READ(keyboard_r) AM_WRITE(keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -573,6 +604,12 @@ static INPUT_PORTS_START( osi600 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+
+	PORT_START("Sound")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
+
+	PORT_START("Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( uk101 )
@@ -855,7 +892,10 @@ ROM_START( uk101 )
 	ROM_LOAD( "basus02.ic10",  0xa800, 0x0800, CRC(0039ef6a) SHA1(1397f0dc170c16c8e0c7d02e63099e986e86385b) )
 	ROM_LOAD( "basuk03.ic11",  0xb000, 0x0800, CRC(0d011242) SHA1(54bd33522a5d1991086eeeff3a4f73c026be45b6) )
 	ROM_LOAD( "basuk04.ic12",  0xb800, 0x0800, CRC(667223e8) SHA1(dca78be4b98317413376d69119942d692e39575a) )
-	ROM_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e) )
+	// This monitor came from another emulator and works well on the 64x16 screen
+	ROM_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(e5b7028d) SHA1(74f0934014fdf83d33c8d3579e562b53c0683270) )
+	// This monitor is for a 32x32 screen, and could be the prototype referred to in Practical Electronics
+	//ROM_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chguk101.ic41", 0x0000, 0x0800, CRC(fce2c84a) SHA1(baa66a7a48e4d62282671ef53abfaf450b888b70) )
@@ -878,9 +918,9 @@ static DRIVER_INIT( c1p )
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT      INIT   COMPANY            FULLNAME
-COMP( 1978, sb2m600b,	0,		0,		osi600,   osi600,    0,		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", GAME_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,          0,      osi600c,  osi600,    0,     "Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
-COMP( 1980, c1p,	sb2m600b,	0,		c1p,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
-COMP( 1980, c1pmf,	sb2m600b,	0,		c1pmf,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
-COMP( 1979, uk101,	sb2m600b,	0,		uk101,	  uk101,     0, 	"Compukit",        "UK101", GAME_NOT_WORKING | GAME_NO_SOUND)
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT      INIT   COMPANY            FULLNAME
+COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. B)", GAME_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600,    0,   "Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600,    c1p, "Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600,    c1p, "Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101,     0,   "Compukit",        "UK101", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
