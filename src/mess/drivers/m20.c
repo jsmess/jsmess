@@ -38,7 +38,8 @@ E11     Vectored interrupt error
 #include "cpu/z8000/z8000.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
-
+#include "machine/i8251.h"
+#include "machine/i8255.h"
 
 class m20_state : public driver_device
 {
@@ -46,12 +47,21 @@ public:
 	m20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
         m_maincpu(*this, "maincpu"),
+        m_kbdi8251(*this, "i8251_1"),
+        m_ttyi8251(*this, "i8251_2"),
+        m_i8255(*this, "ppi8255"),
 		m_p_videoram(*this, "p_videoram"){ }
 
     required_device<device_t> m_maincpu;
+    required_device<i8251_device> m_kbdi8251;
+    required_device<i8251_device> m_ttyi8251;
+    required_device<i8255_device> m_i8255;
 	required_shared_ptr<UINT16> m_p_videoram;
 
     virtual void machine_reset();
+
+	DECLARE_READ8_MEMBER(ppi_r);
+	DECLARE_WRITE8_MEMBER(ppi_w);
 };
 
 
@@ -92,6 +102,17 @@ static SCREEN_UPDATE_RGB32( m20 )
 	return 0;
 }
 
+// translate addresses 81/83/85/87 to PPI offsets 0/1/2/3
+READ8_MEMBER(m20_state::ppi_r)
+{
+    return m_i8255->read(space, offset/2);
+}
+
+WRITE8_MEMBER(m20_state::ppi_w)
+{
+    m_i8255->write(space, offset/2, data);
+}
+
 /* from the M20 hardware reference manual:
    M20 memory is configured according to the following scheme:
    Segment   Contents
@@ -126,11 +147,12 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // may not be needed
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x63, 0x63) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	// 0x81 / 0x87 - i8255A
-	// 0xa1 - i8251 keyboard data
-	// 0xa3 - i8251 keyboard status / control
-	// 0xc1 - i8251 TTY / printer data
-	// 0xc3 - i8251 TTY / printer status / control
+    AM_RANGE(0x81, 0x87) AM_READWRITE(ppi_r, ppi_w)
+    AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
+    AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
+    AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
+    AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
+
 	// 0x121 / 0x127 - pit8253 (TTY/printer, keyboard, RTC/NVI)
 
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
@@ -184,6 +206,42 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static I8255A_INTERFACE( ppi_interface )
+{
+	DEVCB_NULL,     // port A read
+	DEVCB_NULL,     // port A write
+    DEVCB_NULL,     // port B read
+	DEVCB_NULL,     // port B write
+    DEVCB_NULL,     // port C read
+    DEVCB_NULL      // port C write
+};
+
+static const i8251_interface kbd_i8251_intf =
+{
+	DEVCB_NULL,         // rxd in
+	DEVCB_NULL,         // txd out
+	DEVCB_NULL,         // dsr
+	DEVCB_NULL,         // dtr
+	DEVCB_NULL,         // rts
+	DEVCB_NULL,         // rx ready
+	DEVCB_NULL,         // tx ready
+	DEVCB_NULL,         // tx empty
+	DEVCB_NULL          // syndet
+};
+
+static const i8251_interface tty_i8251_intf =
+{
+	DEVCB_NULL,         // rxd in
+	DEVCB_NULL,         // txd out
+	DEVCB_NULL,         // dsr
+	DEVCB_NULL,         // dtr
+	DEVCB_NULL,         // rts
+	DEVCB_NULL,         // rx ready
+	DEVCB_NULL,         // tx ready
+	DEVCB_NULL,         // tx empty
+	DEVCB_NULL          // syndet
+};
+
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
@@ -209,6 +267,9 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
+	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
+	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
+	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
 MACHINE_CONFIG_END
 
 ROM_START(m20)
