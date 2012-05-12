@@ -342,6 +342,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 	tvc_state *state = device->machine().driver_data<tvc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32  *p = &bitmap.pix32(y);
+	UINT16 offset = (ma*4 + ra*0x40) & 0x3fff;
 	int i;
 
 	switch(state->m_video_mode) {
@@ -349,8 +350,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				//  2 colors mode
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT16 offset = i  + (y * 64);
-					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
 					*p++ = palette[state->m_col[BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,6)]];
 					*p++ = palette[state->m_col[BIT(data,5)]];
@@ -366,8 +366,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				// a0 b0 c0 d0 a1 b1 c1 d1
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT16 offset = i  + (y * 64);
-					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -383,8 +382,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				// IGRB IGRB
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT16 offset = i  + (y * 64);
-					UINT8 data = state->m_ram->pointer()[offset + 0x10000];
+					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
 					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>4) | ((data & 0x08)>>1) | ((data & 0x02)>>1);
 					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>3) | (data & 0x04) | (data & 0x01);
 					*p++ = palette[col0];
