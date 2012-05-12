@@ -38,6 +38,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "machine/terminal.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -59,9 +60,11 @@ class dm7000_state : public driver_device
 public:
 	dm7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")	{ }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	
 	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );
 	DECLARE_READ8_MEMBER ( dm7000_iic0_r );
@@ -139,7 +142,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 	switch(offset) {
 		case UART_THR:
 			if(!(m_scc0_lcr & UART_LCR_DLAB)) {
-				printf("%c", data);
+				m_terminal->write(space, 0, data);
 			}
 			break;
 		case UART_LCR:
@@ -280,6 +283,11 @@ static WRITE32_DEVICE_HANDLER( dcr_w )
 	state->dcr[offset] = data;
 }
 
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_NULL
+};
+
 static const powerpc_config ppc405_config =
 {
 	252000000,
@@ -304,6 +312,8 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
+	
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_VIDEO_START(dm7000)
 MACHINE_CONFIG_END
