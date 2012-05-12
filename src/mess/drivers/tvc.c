@@ -1,6 +1,6 @@
 /***************************************************************************
 
-        Videotone TVC 32/64 driver
+        Videoton TVC 32/64 driver
 
         12/05/2009 Skeleton driver.
 
@@ -457,7 +457,7 @@ static QUICKLOAD_LOAD(tvc64)
 	}
 	else
 	{
-		return IMAGE_INIT_PASS;
+		return IMAGE_INIT_FAIL;
 	}
 }
 
