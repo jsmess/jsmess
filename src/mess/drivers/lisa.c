@@ -53,7 +53,7 @@ static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_SHARE("fdc_ram")				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0800, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_SHARE("fdc_rom")				/* ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("fdccpu", 0x1000)	AM_SHARE("fdc_rom")		/* ROM */
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0400, 0x07ff) AM_NOP										/* nothing, or RAM wrap-around ??? */
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0c00, 0x0fff) AM_NOP										/* nothing, or IO port wrap-around ??? */
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_SHARE("fdc_rom")				/* ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("fdccpu", 0x1000)	AM_SHARE("fdc_rom")			/* ROM */
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
@@ -405,7 +405,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
-    ROM_LOAD( "341-0138f.bin", 0x000000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
+    ROM_LOAD( "341-0138f.bin", 0x001000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
 
 	ROM_REGION(0x4000,"profile", 0)		/* Profile/5 HDD */
 	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */

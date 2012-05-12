@@ -1394,7 +1394,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 	{	/* special setup mode */
 		if (offset & 0x002000)
 		{
-//          the_seg = 0;    /* correct ??? */
+            the_seg = 0;        // TRUSTED by Lisa Hardware Manual section 2.3.3 and MMU startup test
 		}
 		else
 		{
@@ -1565,7 +1565,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 	{
 		if (offset & 0x002000)
 		{
-//          the_seg = 0;    /* correct ??? */
+            the_seg = 0;        // TRUSTED by Lisa Hardware Manual section 2.3.3 and MMU startup test
 		}
 		else
 		{
