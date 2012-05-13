@@ -51,8 +51,7 @@ static MACHINE_START(apexc)
     the user to enter such a loader manually, but it would take hours...)
 */
 
-class apexc_cylinder_image_device :	public device_t,
-									public device_image_interface
+class apexc_cylinder_image_device :	public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
@@ -74,7 +73,7 @@ public:
 	virtual void call_unload();
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { update_names(); }
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start() { }
 private:
 	int m_writable;
@@ -83,7 +82,7 @@ private:
 const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
 
 apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock),
+	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock),
 	  device_image_interface(mconfig, *this)
 {
 }
@@ -96,7 +95,7 @@ bool apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( memregion("maincpu")->base(), /*0x8000*/0x1000);
+	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
@@ -104,7 +103,7 @@ bool apexc_cylinder_image_device::call_load()
 
 		RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
-		for (i=0; i < /*0x2000*/0x0400; i++)
+		for (i=0; i < 0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 	}
 #endif
@@ -187,8 +186,7 @@ void apexc_cylinder_image_device::call_unload()
     11111                   Letters
 */
 
-class apexc_tape_puncher_image_device :	public device_t,
-										public device_image_interface
+class apexc_tape_puncher_image_device :	public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
@@ -207,14 +205,14 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { update_names(); }
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start() { }
 };
 
 const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
 
 apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock),
+	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock),
 	  device_image_interface(mconfig, *this)
 {
 }
@@ -222,8 +220,7 @@ apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_c
 #define MCFG_APEXC_TAPE_PUNCHER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
 
-class apexc_tape_reader_image_device :	public device_t,
-										public device_image_interface
+class apexc_tape_reader_image_device :	public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
@@ -242,14 +239,14 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { update_names(); }
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start() { }
 };
 
 const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
 
 apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock),
+	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock),
 	  device_image_interface(mconfig, *this)
 {
 }
@@ -823,7 +820,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = machine.root_device().memregion("gfx1")->base();
+	dst = machine.root_device().memregion("chargen")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -840,7 +837,7 @@ static const gfx_layout fontlayout =
 };
 
 static GFXDECODE_START( apexc )
-	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, 0, 2 )
+	GFXDECODE_ENTRY( "chargen", 0, fontlayout, 0, 2 )
 GFXDECODE_END
 
 
@@ -898,10 +895,10 @@ ROM_START(apexc)
 	ROM_REGION32_BE(0x10000, "maincpu", ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
-	ROM_REGION(apexcfontdata_size, "gfx1", ROMREGION_ERASEFF)
+	ROM_REGION(apexcfontdata_size, "chargen", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
-/*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
-//COMP(      1951,    apexc53,    0,            0,      apexc53,    apexc,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP(      1955,    apexc,	/*apexc53*/0,	0,	apexc,      apexc,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , GAME_NO_SOUND_HW)
+//     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
+//COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP(  1955,    apexc,      0,        0,      apexc,      apexc,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , GAME_NO_SOUND_HW)
