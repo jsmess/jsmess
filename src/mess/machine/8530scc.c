@@ -226,6 +226,7 @@ UINT8 scc8530_t::getareg()
 
 		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
 		rv |= (ourCh->syncHunt) ? 0x10 : 0;
+		rv |= channel[0].reg_val[0] & 0x05; // pick up TXBE and RXBF bits 
 
 		return rv;
 	}
@@ -256,7 +257,7 @@ UINT8 scc8530_t::getbreg()
 
 		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
 		rv |= (ourCh->syncHunt) ? 0x10 : 0;
-		rv |= (1 << 2);
+		rv |= channel[1].reg_val[0] & 0x05; // pick up TXBE and RXBF bits 
 
 		return rv;
 	}
