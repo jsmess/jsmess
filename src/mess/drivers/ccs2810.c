@@ -8,25 +8,25 @@
 Press Enter to start the system.
 All commands are in uppercase.
 
-A
+A    Assign logical device
 Dn,n Dump memory
-E
+E    Punch End-of-File to paper tape
 F    Fill
 G    Go
 H    Hex arithmetic
 I    In
-L
+L    Punch Leader to paper tape
 M    Move
 O    Out
-Q
-R
+Q    Query logical devices
+R    Read a file from paper tape
 S    Edit memory
-T
-V
-W
-X    Registers
-Y
-Z
+T    Test memory
+V    Verify (compare 2 blocks of memory)
+W    Write a file to paper tape
+X    Examine Registers
+Y    Set Baud rate of i8250
+Z    Zleep (lock terminal). Press control+G twice to unlock.
 
 ****************************************************************************/
 
@@ -67,7 +67,7 @@ READ8_MEMBER( ccs2810_state::ccs2810_20_r )
 
 READ8_MEMBER( ccs2810_state::ccs2810_25_r )
 {
-	return 0x20 | (m_term_data ? 1 : 0);
+	return (m_term_data) ? 0x21 : 0x20;
 }
 
 READ8_MEMBER( ccs2810_state::ccs2810_26_r )
