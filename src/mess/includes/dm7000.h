@@ -62,7 +62,12 @@ public:
 #define SCP_CDM 6
 
 /* STB045xxx DCRs */
-#define DCRSTB045_SCCR		 0x120		/* Serial Clock Control Register */
-#define DCRSTB045_CMD_STAT	 0x14a		/* Command status */
+
+#define DCRSTB045_CICVCR			0x033		/* CIC Video Control Register */
+#define DCRSTB045_SCCR				0x120		/* Serial Clock Control Register */
+#define DCRSTB045_VIDEO_CNTL		0x140		/* Video Control Register */
+#define DCRSTB045_CMD_STAT			0x14a		/* Command status */
+#define DCRSTB045_DISP_MODE			0x154		/* Display Mode Register */
+#define DCRSTB045_FRAME_BUFR_BASE	0x179		/* Frame Buffers Base Address Register */
 
 #endif /* DM7000_H_ */

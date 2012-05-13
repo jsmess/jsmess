@@ -157,6 +157,19 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
  400c 000x   scp
  400d 000x   modem
  
+ STBx25xx
+ 
+ 4000 000x   Serial1 Controller
+ 4001 000x   Serial2 Controller
+ 4002 00xx   Smart Card Interface 0
+ 4003 000x   IIC Interface 0
+ 4004 000x   Serial0 Controller
+ 4005 0xxx   General Purpose Timers
+ 4006 00xx   General Purpose Input / Output
+ 4007 00xx   Smart Card Interface 1
+ 400c 000x   Serial Controller Port
+ 400d 00xx   Synchronous Serial Port
+ 
  STB04xxx
  
  4000 00xx   Serial1/Infrared Controller
@@ -187,6 +200,7 @@ static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 	
 	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
+	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -198,7 +212,11 @@ static MACHINE_RESET(dm7000)
 {
 	dm7000_state *state = machine.driver_data<dm7000_state>();
 	
+	state->dcr[DCRSTB045_CICVCR] = 0x00000001;
 	state->dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
+	state->dcr[DCRSTB045_VIDEO_CNTL] = 0x00009000;
+	state->dcr[DCRSTB045_DISP_MODE] = 0x00880000;
+	state->dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
 	state->m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
 }
 
@@ -272,6 +290,7 @@ ROM_START( dm7000 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
 	ROMX_LOAD( "dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54), ROM_GROUPWORD )
 	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
+	ROM_LOAD( "rel108.img", 0x0000, 0x5e0000, CRC(e78b6407) SHA1(aaa786d341c629eec92fcf04bfafc1de43f6dabf))
 ROM_END
 
 ROM_START( dm5620 )
@@ -288,6 +307,7 @@ ROM_START( dm500 )
 	ROM_SYSTEM_BIOS( 1, "phil", "Philips" )
 	ROMX_LOAD( "dm500-philps-boot.bin", 0x0000, 0x20000, CRC(af3477c7) SHA1(9ac918f6984e6927f55bea68d6daaf008787136e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
+	ROM_LOAD( "rel108.img", 0x0000, 0x5aa000, CRC(44be2376) SHA1(1f360572998b1bc4dc10c5210a2aed573a75e2fa))
 ROM_END
 /* Driver */
 
