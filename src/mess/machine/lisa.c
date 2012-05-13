@@ -1867,10 +1867,8 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			/* I/O Board Devices */
 			switch ((offset & 0x0600) >> 9)
 			{
-			case 0:	/* serial ports control */
-				/*SCCBCTL           .EQU    $FCD241         ;SCC channel B control
-                ACTL            .EQU    2           ;offset to SCC channel A control
-                SCCDATA         .EQU    4           ;offset to SCC data regs*/
+            case 0:	/* serial ports control */
+                return m_scc->reg_r(space, offset&7);
 				break;
 
 			case 2:	/* parallel port */
@@ -1996,7 +1994,8 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 			/* I/O Board Devices */
 			switch ((offset & 0x0600) >> 9)
 			{
-			case 0:	/* serial ports control */
+            case 0:	/* serial ports control */
+                m_scc->reg_w(space, offset&7, data);
 				break;
 
 			case 2:	/* paralel port */
@@ -2032,4 +2031,7 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 	}
 }
 
+void lisa_state::set_scc_interrupt(bool value)
+{
+}
 

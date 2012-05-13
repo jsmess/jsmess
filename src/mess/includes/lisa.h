@@ -10,6 +10,7 @@
 #define LISA_H_
 
 #include "machine/6522via.h"
+#include "machine/8530scc.h"
 
 #define COP421_TAG		"u9f"
 #define KB_COP421_TAG	"kbcop"
@@ -93,8 +94,13 @@ class lisa_state : public driver_device
 public:
 	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_scc(*this, "scc"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram") { }
+
+	required_device<device_t> m_maincpu;
+	required_device<scc8530_t> m_scc;
 
 	required_shared_ptr<UINT8> m_fdc_rom;
 	required_shared_ptr<UINT8> m_fdc_ram;
@@ -149,6 +155,8 @@ public:
 	DECLARE_WRITE16_MEMBER(lisa_w);
 	DECLARE_READ16_MEMBER(lisa_IO_r);
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+
+	void set_scc_interrupt(bool value);
 };
 
 

@@ -195,6 +195,8 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
 	MCFG_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
+
+	MCFG_SCC8530_ADD("scc", 7833600, line_cb_t(FUNC(lisa_state::set_scc_interrupt), static_cast<lisa_state *>(owner)))
 MACHINE_CONFIG_END
 
 
