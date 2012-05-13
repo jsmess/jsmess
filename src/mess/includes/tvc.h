@@ -20,7 +20,7 @@
 #define		TVC_RAM_BANK	1
 #define		TVC_ROM_BANK	2
 
- #define CENTRONICS_TAG	"centronics"
+#define CENTRONICS_TAG	"centronics"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -94,6 +94,7 @@ public:
 
 	void tvc_set_mem_page(UINT8 data);
 	DECLARE_WRITE8_MEMBER(tvc_bank_w);
+	DECLARE_WRITE8_MEMBER(tvc_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(tvc_palette_w);
 	DECLARE_WRITE8_MEMBER(tvc_keyboard_w);
 	DECLARE_READ8_MEMBER(tvc_keyboard_r);
@@ -111,7 +112,9 @@ public:
 	UINT8		m_keyline;
 	UINT8		m_flipflop;
 	UINT8		m_col[4];
-	UINT8		m_bank_type[2];
+	UINT8		m_bank_type[4];
+	UINT8		m_bank;
+	UINT8		m_vram_bank;
 	UINT8		m_cassette_ff;
 	UINT8		m_centronics_ff;
 };

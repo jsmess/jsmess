@@ -14,82 +14,98 @@
 #include "emu.h"
 #include "includes/tvc.h"
 
+
+
+#define TVC_INSTALL_ROM_BANK(_bank,_tag,_start,_end) \
+	if (m_bank_type[_bank] != TVC_ROM_BANK) \
+	{ \
+		space->install_read_bank(_start, _end, _tag); \
+		space->unmap_write(_start, _end); \
+		m_bank_type[_bank] = TVC_ROM_BANK; \
+	} \
+
+#define TVC_INSTALL_RAM_BANK(_bank,_tag,_start,_end) \
+	if (m_bank_type[_bank] != TVC_RAM_BANK) \
+	{ \
+		space->install_readwrite_bank(_start, _end, _tag); \
+		m_bank_type[_bank] = TVC_RAM_BANK; \
+	} \
+
 void tvc_state::tvc_set_mem_page(UINT8 data)
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	switch(data & 0x18)
 	{
 		case 0x00 : // system ROM selected
-			if (m_bank_type[0] != TVC_ROM_BANK)
-			{
-				space->install_read_bank(0x0000, 0x3fff, "bank1");
-				space->unmap_write(0x0000, 0x3fff);
-				m_bank_type[0] = TVC_ROM_BANK;
-			}
+			TVC_INSTALL_ROM_BANK(0, "bank1", 0x0000, 0x3fff);
 			membank("bank1")->set_base(memregion("sys")->base());
 			break;
 		case 0x08 : // Cart ROM selected
-			if (m_bank_type[0] != TVC_ROM_BANK)
-			{
-				space->install_read_bank(0x0000, 0x3fff, "bank1");
-				space->unmap_write(0x0000, 0x3fff);
-				m_bank_type[0] = TVC_ROM_BANK;
-			}
+			TVC_INSTALL_ROM_BANK(0, "bank1", 0x0000, 0x3fff);
 			membank("bank1")->set_base(memregion("cart")->base());
 			break;
 		case 0x10 : // RAM selected
-			if (m_bank_type[0] != TVC_RAM_BANK)
-			{
-				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-				m_bank_type[0] = TVC_RAM_BANK;
-			}
+			TVC_INSTALL_RAM_BANK(0, "bank1", 0x0000, 0x3fff);
 			membank("bank1")->set_base(m_ram->pointer());
 			break;
+		case 0x18 : // Video RAM
+			if (memregion("vram")->bytes() > 0x4000)
+			{
+				// TVC 64+ only
+				TVC_INSTALL_RAM_BANK(0, "bank1", 0x0000, 0x3fff);
+				membank("bank1")->set_base(memregion("vram")->base() + ((m_vram_bank & 0x03)<<14));
+			}
+			else
+			{
+				space->unmap_readwrite(0x0000, 0x3fff);
+				m_bank_type[0] = -1;
+			}
+			break;
 	}
-	// Bank 2 is always RAM
-	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
-	if ((data & 0x20)==0) {
-		// Video RAM
-		membank("bank3")->set_base(m_ram->pointer() + 0x10000);
-	} else {
-		// System RAM page 3
-		membank("bank3")->set_base(m_ram->pointer() + 0x8000);
+
+	if ((data & 0x20)==0)		// Video RAM
+	{
+		TVC_INSTALL_RAM_BANK(2, "bank3", 0x8000, 0xbfff);
+		membank("bank3")->set_base(memregion("vram")->base() + ((m_vram_bank & 0x0c)<<12));
 	}
+	else						// System RAM page 3
+	{
+		if (m_ram->size() > 0x8000)
+		{
+			TVC_INSTALL_RAM_BANK(2, "bank3", 0x8000, 0xbfff);
+			membank("bank3")->set_base(m_ram->pointer() + 0x8000);
+		}
+		else
+		{
+			space->unmap_readwrite(0x8000, 0xbfff);
+			m_bank_type[2] = -1;
+		}
+	}
+
 	switch(data & 0xc0)
 	{
 		case 0x00 : // Cart ROM selected
-			if (m_bank_type[1] != TVC_ROM_BANK)
-			{
-				space->install_read_bank(0xc000, 0xffff, "bank4");
-				space->unmap_write(0xc000, 0xffff);
-				m_bank_type[1] = TVC_ROM_BANK;
-			}
+			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(memregion("cart")->base());
 			break;
 		case 0x40 : // System ROM selected
-			if (m_bank_type[1] != TVC_ROM_BANK)
-			{
-				space->install_read_bank(0xc000, 0xffff, "bank4");
-				space->unmap_write(0xc000, 0xffff);
-				m_bank_type[1] = TVC_ROM_BANK;
-			}
+			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(memregion("sys")->base());
 			break;
 		case 0x80 : // RAM selected
-			if (m_bank_type[1] != TVC_RAM_BANK)
+			if (m_ram->size() > 0x8000)
 			{
-				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
-				m_bank_type[1] = TVC_RAM_BANK;
+				TVC_INSTALL_RAM_BANK(3, "bank4", 0xc000, 0xffff);
+				membank("bank4")->set_base(m_ram->pointer() + 0xc000);
 			}
-			membank("bank4")->set_base(m_ram->pointer()+0xc000);
+			else
+			{
+				space->unmap_readwrite(0xc000, 0xffff);
+				m_bank_type[3] = -1;
+			}
 			break;
 		case 0xc0 : // External ROM selected
-			if (m_bank_type[1] != TVC_ROM_BANK)
-			{
-				space->install_read_bank(0xc000, 0xffff, "bank4");
-				space->unmap_write(0xc000, 0xffff);
-				m_bank_type[1] = TVC_ROM_BANK;
-			}
+			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(memregion("ext")->base());
 			break;
 	}
@@ -97,7 +113,22 @@ void tvc_state::tvc_set_mem_page(UINT8 data)
 
 WRITE8_MEMBER(tvc_state::tvc_bank_w)
 {
+	m_bank = data;
 	tvc_set_mem_page(data);
+}
+
+WRITE8_MEMBER(tvc_state::tvc_vram_bank_w)
+{
+	// TVC 64+ only
+	if (memregion("vram")->bytes() > 0x4000)
+	{
+		// bit 4-5 - screen video RAM
+		// bit 2-3 - video RAM active in bank 3
+		// bit 0-1 - video RAM active in bank 1
+
+		m_vram_bank = data;
+		tvc_set_mem_page(m_bank);
+	}
 }
 
 WRITE8_MEMBER(tvc_state::tvc_palette_w)
@@ -111,7 +142,10 @@ WRITE8_MEMBER(tvc_state::tvc_palette_w)
 
 WRITE8_MEMBER(tvc_state::tvc_keyboard_w)
 {
-	m_keyline = data;
+	// bit 4-5 - expansion select
+	// bit 0-3 - keyboard scan
+
+	m_keyline = data & 0x0f;
 }
 
 READ8_MEMBER(tvc_state::tvc_keyboard_r)
@@ -210,6 +244,7 @@ static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(tvc_keyboard_w)
 	AM_RANGE(0x04, 0x06) AM_WRITE(tvc_sound_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tvc_flipflop_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(tvc_vram_bank_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tvc_cassette_w)
 	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
 	AM_RANGE(0x59, 0x59) AM_READ(tvc_int_state_r)
@@ -335,6 +370,11 @@ void tvc_state::machine_reset()
 	m_video_mode = 0;
 	m_cassette_ff = 1;
 	m_centronics_ff = 1;
+	m_bank = 0;
+	m_vram_bank = 0;
+
+	// Bank 2 is always RAM
+	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
 }
 
 static MC6845_UPDATE_ROW( tvc_update_row )
@@ -342,7 +382,8 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 	tvc_state *state = device->machine().driver_data<tvc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32  *p = &bitmap.pix32(y);
-	UINT16 offset = (ma*4 + ra*0x40) & 0x3fff;
+	UINT8 *vram = state->memregion("vram")->base() + ((state->m_vram_bank & 0x30)<<10);
+	UINT16 offset = ((ma*4 + ra*0x40) & 0x3fff);
 	int i;
 
 	switch(state->m_video_mode) {
@@ -350,7 +391,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				//  2 colors mode
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
+					UINT8 data = vram[offset + i];
 					*p++ = palette[state->m_col[BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,6)]];
 					*p++ = palette[state->m_col[BIT(data,5)]];
@@ -366,7 +407,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				// a0 b0 c0 d0 a1 b1 c1 d1
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
+					UINT8 data = vram[offset + i];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[state->m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -382,7 +423,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				// IGRB IGRB
 				for ( i = 0; i < x_count; i++ )
 				{
-					UINT8 data = state->m_ram->pointer()[i + offset + 0x10000];
+					UINT8 data = vram[offset + i];
 					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>4) | ((data & 0x08)>>1) | ((data & 0x02)>>1);
 					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>3) | (data & 0x04) | (data & 0x01);
 					*p++ = palette[col0];
@@ -516,7 +557,8 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("80K")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -551,6 +593,8 @@ ROM_START( tvc64 )
 	ROM_CART_LOAD( "cart", 0, 0x4000, 0 )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc12_d7.64k", 0x2000, 0x2000, CRC(1cbbeac6) SHA1(54b29c9ca9942f04620fbf3edab3b8e3cd21c194))
+
+	ROM_REGION( 0x4000, "vram", ROMREGION_ERASE )
 ROM_END
 
 ROM_START( tvc64p )
@@ -561,6 +605,8 @@ ROM_START( tvc64p )
 	ROM_CART_LOAD( "cart", 0, 0x4000, 0 )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc22_d7.64k", 0x2000, 0x2000, CRC(05e1c3a8) SHA1(abf119cf947ea32defd08b29a8a25d75f6bd4987))
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
 /*
 
     ROM_LOAD( "tvcru_d4.bin", 0x0000, 0x2000, CRC(bac5dd4f) SHA1(665a1b8c80b6ad82090803621f0c73ef9243c7d4))
@@ -577,6 +623,8 @@ ROM_START( tvc64pru )
 	ROM_CART_LOAD( "cart", 0, 0x4000, 0 )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
 ROM_END
 
 /* Driver */
