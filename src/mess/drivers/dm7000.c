@@ -37,8 +37,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/powerpc/ppc.h"
-#include "machine/terminal.h"
+#include "includes/dm7000.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -54,36 +53,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		logerror( "%s: %s", machine.describe_context( ), buf);
 	}
 }
-
-class dm7000_state : public driver_device
-{
-public:
-	dm7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)		{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	
-	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic0_r );
-	DECLARE_WRITE8_MEMBER ( dm7000_iic1_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic1_r );
-	
-	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
-	UINT8 m_scc0_lcr;
-	UINT8 m_scc0_lsr;
-	
-	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
-	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );
-	
-	DECLARE_WRITE8_MEMBER ( dm7000_scp0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scp0_r );
-	
-	UINT32			dcr[512];	
-};
 
 READ8_MEMBER( dm7000_state::dm7000_iic0_r )
 {
@@ -108,22 +77,6 @@ WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
 {
 	verboselog( machine(), 9, "(IIC1) %08X <- %08X (PC %08X)\n", 0x400b0000 + offset, data, cpu_get_pc(m_maincpu));
 }
-
-#define UART_DLL	0
-#define UART_RBR	0
-#define UART_THR	0
-#define UART_DLH	1
-#define UART_IER	1
-#define UART_IIR	2
-#define UART_FCR	2
-#define UART_LCR	3
-#define 	UART_LCR_DLAB	0x80
-#define UART_MCR	4
-#define UART_LSR	5
-#define		UART_LSR_TEMT	0x20
-#define		UART_LSR_THRE	0x40
-#define UART_MSR	6
-#define UART_SCR	7
 
 READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 {
@@ -163,14 +116,6 @@ WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
 {
 	verboselog( machine(), 9, "(GPIO0) %08X <- %08X (PC %08X)\n", 0x40060000 + offset, data, cpu_get_pc(m_maincpu));
 }
-
-#define SCP_SPMODE 0
-#define SCP_RXDATA 1
-#define SCP_TXDATA 2
-#define SCP_SPCOM 3
-#define SCP_STATUS 4
-#define 	SCP_STATUS_RXRDY 1
-#define SCP_CDM 6
 
 READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 {
@@ -240,7 +185,8 @@ static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 	AM_RANGE(0x400b0000, 0x400b000f) AM_READWRITE8(dm7000_iic1_r, dm7000_iic1_w, 0xffffffff)
 	AM_RANGE(0x400c0000, 0x400c0007) AM_READWRITE8(dm7000_scp0_r, dm7000_scp0_w, 0xffffffff)
 	
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
+	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -252,6 +198,7 @@ static MACHINE_RESET(dm7000)
 {
 	dm7000_state *state = machine.driver_data<dm7000_state>();
 	
+	state->dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
 	state->m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
 }
 
@@ -263,11 +210,11 @@ static SCREEN_UPDATE_IND16( dm7000 )
 {
 	return 0;
 }
-#define DCRSTB045_CMD_STAT	 0x14a		/* Command status */
 
 static READ32_DEVICE_HANDLER( dcr_r )
 {
 	dm7000_state *state = device->machine().driver_data<dm7000_state>();
+	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
 			return 0; // assume that video dev is always ready
@@ -280,6 +227,7 @@ static READ32_DEVICE_HANDLER( dcr_r )
 static WRITE32_DEVICE_HANDLER( dcr_w )
 {
 	dm7000_state *state = device->machine().driver_data<dm7000_state>();
+	if(offset>=1024) {printf("get %04X\n", offset); } else
 	state->dcr[offset] = data;
 }
 
@@ -297,7 +245,8 @@ static const powerpc_config ppc405_config =
 
 static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000) // Should be PPC405
+	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000) // Should be PPC405D4?
+	MCFG_CPU_CONFIG(ppc405_config)
 	MCFG_CPU_PROGRAM_MAP(dm7000_mem)
 
 	MCFG_MACHINE_RESET(dm7000)
@@ -322,11 +271,14 @@ MACHINE_CONFIG_END
 ROM_START( dm7000 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
 	ROMX_LOAD( "dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54), ROM_GROUPWORD )
+	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
 ROM_END
 
 ROM_START( dm5620 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
 	ROMX_LOAD( "dm5620.bin", 0x0000, 0x20000, CRC(ccddb822) SHA1(3ecf553ced0671599438368f59d8d30df4d13ade), ROM_GROUPWORD )
+	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
+	ROM_LOAD( "rel106.img", 0x0000, 0x57b000, CRC(2313d71d) SHA1(0d3d99ab3b3266624f237b7b67e045d7910c44a5))
 ROM_END
 
 ROM_START( dm500 )
@@ -335,6 +287,7 @@ ROM_START( dm500 )
 	ROMX_LOAD( "dm500-alps-boot.bin",   0x0000, 0x20000, CRC(daf2da34) SHA1(68f3734b4589fcb3e73372e258040bc8b83fd739), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "phil", "Philips" )
 	ROMX_LOAD( "dm500-philps-boot.bin", 0x0000, 0x20000, CRC(af3477c7) SHA1(9ac918f6984e6927f55bea68d6daaf008787136e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_REGION( 0x800000, "user2", ROMREGION_32BIT | ROMREGION_BE | ROMREGION_ERASEFF  )
 ROM_END
 /* Driver */
 
