@@ -144,9 +144,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff) // may not be needed
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x63, 0x63) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
     AM_RANGE(0x81, 0x87) AM_READWRITE(ppi_r, ppi_w)
     AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
     AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
