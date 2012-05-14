@@ -1892,6 +1892,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/cp1.o		\
 	$(MESS_DRIVERS)/csc.o		\
 	$(MESS_DRIVERS)/cvicny.o	\
+	$(MESS_DRIVERS)/cxhumax.o	\
 	$(MESS_DRIVERS)/czk80.o		\
 	$(MESS_DRIVERS)/d6800.o		\
 	$(MESS_DRIVERS)/d6809.o		\
