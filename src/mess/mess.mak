@@ -1869,6 +1869,7 @@ $(MESSOBJ)/zvt.a:				\
 	$(MESS_VIDEO)/pp01.o		\
 
 $(MESSOBJ)/test.a:				\
+	$(MESS_DRIVERS)/test_t400.o	\
 	$(MESS_DRIVERS)/zexall.o	\
 
 $(MESSOBJ)/skeleton.a:			\
