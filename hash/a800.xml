@@ -265,7 +265,7 @@ Compiled by K1W1
    - Thompson Elec.                  R        Proburner
 
    - Video 61                           1999  Mr.Robot
-   - Video 61                        U  2000  Ra(Rev.lly Speedway
+   - Video 61                        U  2000  Rally Speedway
    - Video 61                           1998  Amazing Maze
    - Video 61                                 Arkanoid
    - Video 61                           1998  Bumpers
@@ -356,6 +356,8 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="400-800 salt diagnostic cartridge v2.04 (a).rom" size="8192" crc="6c40248f" sha1="a98671b814ad6ce6f45c17593ab374f1f578bb4c" offset="0" />
+				<!-- File Difference -->
+				<!-- 0xbc02 : 0xa2 0xfe 0xa0 0xdf ('salt204') - 0x00 0x66 0x03 0x04 ('salt204a') -->
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +467,7 @@ Compiled by K1W1
 
 	<software name="dt80" cloneof="ace80xl">
 		<description>DT-80: Eighty Column Dumb Terminal for the ATR-8000</description>
-		<!-- Once this cartridge is installed, most text based software loaded will be displayed in 80 column format. -->
+		<!-- This cartridge is used with an 400/800 series computer interfaced to an ATR-8000 to enable an 80 column display. -->
 		<year>1984</year>
 		<publisher>Amiable Computer Enhancements</publisher>
 		<part name="cart" interface="a800_cart">
@@ -743,6 +745,7 @@ Compiled by K1W1
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4013" />
+		<info name="usage" value="3 or 4 player gameplay available only on 400/800 systems" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -753,8 +756,11 @@ Compiled by K1W1
 
 	<software name="achase">
 		<description>Astro Chase</description>
+		<!-- Cartridge created for the Exidy Max-a-Flex arcade cabinet -->
 		<year>1982</year>
-		<publisher>First Star</publisher>
+		<publisher>Exidy</publisher>
+		<info name="developer" value="First Star" />
+		<sharedfeat name="compatibility" value="XL"/>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -767,6 +773,7 @@ Compiled by K1W1
 		<description>Astro Chase (Re-Badge)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="developer" value="First Star" />
 		<info name="serial" value="1190" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a800_cart">
@@ -806,9 +813,9 @@ Compiled by K1W1
 
 	<software name="basicb" cloneof="basicc">
 		<description>Atari BASIC Programming Language (Rev. B)</description>
+		<!-- Never released in cartridge form. Only built into Atari XL series. -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="RX8002" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -881,7 +888,7 @@ Compiled by K1W1
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8053" />
 		<part name="cart" interface="a800_cart">
-			<feature name="peripheral" value="cx77_touch" /> <!-- Works with the Atari CX77 touch tablet device -->
+			<feature name="peripheral" value="cx77_touch" /> <!-- Uses the Atari CX77 touch tablet device -->
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="atariartist.rom" size="16384" crc="bbe37542" sha1="f7a8923c1e72b346a69b858bdd1f01c31b7c8dee" offset="0" /> <!-- Verified -->
@@ -1003,7 +1010,7 @@ Compiled by K1W1
 		<info name="serial" value="RX8054" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
-			<feature name="peripheral" value="cx75_pen" /> <!-- Works with the Atari CX75 light pen device -->
+			<feature name="peripheral" value="cx75_pen" /> <!-- Uses the Atari CX75 light pen device -->
 			<dataarea name="rom" size="16384">
 				<rom name="atarigraphics.rom" size="16384" crc="6ccdb004" sha1="9ebc119316113950c98e984cc9b0110047ad34a1" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -1030,7 +1037,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xe programming language v4.1.rom" size="16384" crc="003d3a36" sha1="76f06d212c5f972f9540bee26b23ecc010f3b535" offset="0" />
+				<rom name="basic xe programming language v4.1.rom" size="16384" crc="003d3a36" sha1="76f06d212c5f972f9540bee26b23ecc010f3b535" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 			<part name="flop1" interface="floppy_5_25">
@@ -1048,7 +1055,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.03.rom" size="16384" crc="94a05568" sha1="01eefc1ed8625cf264a00b15acd6c3698cebfdcc" offset="0" />
+				<rom name="basic xl programming language v1.03.rom" size="16384" crc="94a05568" sha1="01eefc1ed8625cf264a00b15acd6c3698cebfdcc" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1061,19 +1068,20 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" offset="0" />
+				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bxl102a" cloneof="bxl103" supported="no">
 		<description>Basic XL Programming Language v1.02 (Alt)</description>
+		<!-- Different cartridge mapping. -->
 		<year>1983</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss 043m" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02 (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" />
+				<rom name="basic xl programming language v1.02 (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1097,6 +1105,7 @@ Compiled by K1W1
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4004" />
+		<info name="usage" value="3 or 4 player gameplay available only on 400/800 systems" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1202,6 +1211,7 @@ Compiled by K1W1
 		<description>Bomb Jake</description>
 		<year>2009</year>
 		<publisher>GR8 Software</publisher>
+		<info name="usage" value="Plays music only in PAL" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="corina" />
 			<dataarea name="rom" size="532480">
@@ -1212,6 +1222,7 @@ Compiled by K1W1
 
 	<software name="bdash">
 		<description>Boulder Dash</description>
+		<!-- Also released on the Exidy Max-a-Flex arcade cabinet. -->
 		<year>1984</year>
 		<publisher>First Star</publisher>
 		<part name="cart" interface="a800_cart">
@@ -1249,6 +1260,7 @@ Compiled by K1W1
 
 	<software name="bristles">
 		<description>Bristles</description>
+		<!-- Also released on the Exidy Max-a-Flex arcade cabinet. -->
 		<year>1983</year>
 		<publisher>First Star</publisher>
 		<part name="cart" interface="a800_cart">
@@ -1979,7 +1991,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="donkey kong jr..rom" size="16384" crc="a3e2d833" sha1="f6d917daf916683a4785792c72d30a914769846a" offset="0" /> <!-- Verified -->
+				<rom name="donkey kong jr.rom" size="16384" crc="a3e2d833" sha1="f6d917daf916683a4785792c72d30a914769846a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2320,6 +2332,7 @@ Compiled by K1W1
 
 	<software name="flipflop">
 		<description>Flip and Flop</description>
+		<!-- Also released on the Exidy Max-a-Flex arcade cabinet. -->
 		<year>1983</year>
 		<publisher>First Star</publisher>
 		<part name="cart" interface="a800_cart">
@@ -2350,7 +2363,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="fortune hunter.rom" size="8192" crc="5cee3180" sha1="5ea0655ff8fcdb2f0db41831fb0781b53541036f" offset="0" />
+				<rom name="fortune hunter.rom" size="8192" crc="5cee3180" sha1="5ea0655ff8fcdb2f0db41831fb0781b53541036f" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2428,7 +2441,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="gateway to apshai.rom" size="16384" crc="4ccdbef0" sha1="4214638ed6a7ea3409b96dcfb3210617f05c441b" offset="0" />
+				<rom name="gateway to apshai.rom" size="16384" crc="4ccdbef0" sha1="4214638ed6a7ea3409b96dcfb3210617f05c441b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2525,7 +2538,20 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="hamsoft">
+	<software name="hamtor">
+		<description>Hamsoft / Amtor v1.2</description>
+		<year>1984</year>
+		<publisher>Kantronics</publisher>
+		<info name="usage" value="Kantronics interface II required" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="hamsoft - amtor v1.2.rom" size="8192" crc="e9ba99a6" sha1="11accca3ea77160108f91dd12c412966b7539e7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamsoft" cloneof="hamtor">
 		<description>Hamsoft</description>
 		<year>1982</year>
 		<publisher>Kantronics</publisher>
@@ -2684,7 +2710,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="jr pac-man (repro).bin" size="16384" crc="ebc1db55" sha1="39fe5fdcf7905af9d4cba4c06011f0e8a9364ff9" offset="0" />
+				<rom name="jr pac-man (repro).rom" size="16384" crc="ebc1db55" sha1="39fe5fdcf7905af9d4cba4c06011f0e8a9364ff9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3126,6 +3152,7 @@ Compiled by K1W1
 
 	<software name="mega3" supported="partial">
 		<description>Mega Cartridge 03 (Spa, Pirate)</description>
+		<!-- The last game (Hot Lips) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<part name="cart" interface="a800_cart">
@@ -3234,6 +3261,7 @@ Compiled by K1W1
 
 	<software name="mega12" supported="partial">
 		<description>Mega Cartridge 12 (Spa, Pirate)</description>
+		<!-- The last game (Rescue on Fractalus) doesn't run. Possible Bad dump. -->
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<part name="cart" interface="a800_cart">
@@ -3374,7 +3402,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="matterhorn.rom" size="16384" crc="dcc308cf" sha1="c03815e4038bf94134b76a255378250ef12c1d50" offset="0" />
+				<rom name="matterhorn.rom" size="16384" crc="dcc308cf" sha1="c03815e4038bf94134b76a255378250ef12c1d50" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3383,6 +3411,7 @@ Compiled by K1W1
 		<description>McDonald's Pac-Mac (Beta 2)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3395,6 +3424,7 @@ Compiled by K1W1
 		<description>McDonald's Pac-Mac (Beta 1)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3723,7 +3753,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr do!'s castle (proto).rom" size="8192" crc="f1b9a24a" sha1="0420ba79b3859a0921f950b46426cef8e2579f9f" offset="0" />
+				<rom name="mr do!'s castle (proto).rom" size="8192" crc="abed3b88" sha1="c44711b34d3a2372d39a34b9cab25ba96bc6d504" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3749,7 +3779,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr tnt.rom" size="8192" crc="701dbdea" sha1="e3129963ab78c64511dcad6539367d3e9dc7ad32" offset="0" />
+				<rom name="mr tnt.rom" size="8192" crc="701dbdea" sha1="e3129963ab78c64511dcad6539367d3e9dc7ad32" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3858,6 +3888,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="orcattka" cloneof="orcattk">
+		<description>Orc Attack (Alt)</description>
+		<year>1983</year>
+		<publisher>Thorn EMI</publisher>
+		<info name="serial" value="THA12008" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="orc attack (a).rom" size="16384" crc="fbfaefcd" sha1="4e42caa95764f33f988bd7bab75268d66d203530" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orchard">
 		<description>Ozzy's Orchard</description>
 		<year>1983</year>
@@ -3943,7 +3986,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="picnic paranoia.rom" size="16384" crc="e386a621" sha1="b63514aa944b8771a4a12d5f8c661cac8e04dd06" offset="0" />
+				<rom name="picnic paranoia.rom" size="16384" crc="e386a621" sha1="b63514aa944b8771a4a12d5f8c661cac8e04dd06" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4167,6 +4210,7 @@ Compiled by K1W1
 
 	<software name="prisma3" supported="partial">
 		<description>Prisma 3 (Spa, Pirate)</description>
+		<!-- The last game (Crystal Raider) doesn't run. Possible Bad dump. -->
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<part name="cart" interface="a800_cart">
@@ -4473,6 +4517,17 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="sinistar" supported="no">
+		<description>Sinistar (Reproduction)</description>
+		<year>199?</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sinistar.rom" size="32768" crc="6092c611" sha1="3993362cc0efa2325a5d72484bb05bb398e2655a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sistema">
 		<description>Sistema Controlado por Computadora</description>
 		<year>1992</year>
@@ -4765,7 +4820,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="speedway blast.rom" size="8192" crc="8e67192b" sha1="d819708553249cd63462a7001fb28702f4f165b8" offset="0" />
+				<rom name="speedway blast.rom" size="8192" crc="8e67192b" sha1="d819708553249cd63462a7001fb28702f4f165b8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4857,6 +4912,20 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="star trek - strategic operations simulator.rom" size="16384" crc="9df169d9" sha1="d91f27803065f6b88f2f595c4b6503b76d16a4e4" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="startrux">
+		<description>Star Trux (Prototype)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="star trux (proto).rom" size="8192" crc="8212c4b7" sha1="0ad167b5fa57ef8e4e8ea82e0f22fe874aece8e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5175,7 +5244,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="the last starfighter (proto).rom" size="16384" crc="b4c640f1" sha1="18390545ea0bb8818908a9dc9e8372ec9bb56cba" offset="0" />
+				<rom name="the last starfighter (proto).rom" size="16384" crc="3267eba7" sha1="7451b20259450f55ec68d99328fe917f50e04584" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5216,7 +5285,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="the monkey wrench 2.rom" size="8192" crc="7191a903" sha1="318a3e7629565db8554a627da56e778a2c0155a9" offset="0" />
+				<rom name="the monkey wrench 2.rom" size="8192" crc="7191a903" sha1="318a3e7629565db8554a627da56e778a2c0155a9" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -5422,6 +5491,7 @@ Compiled by K1W1
 
 	<software name="turbod4" supported="no">
 		<description>Turbo Cartridge D4 (Spa, Pirate)</description>
+		<!-- Half of the games don't run. Possible Bad dump. -->
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
 		<part name="cart" interface="a800_cart">
@@ -5599,7 +5669,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="up for grabs.rom" size="8192" crc="fc62c1ce" sha1="ef2b552602067ebcc781710d36a1dde783b34209" offset="0" />
+				<rom name="up for grabs.rom" size="8192" crc="9893ae7a" sha1="9e4774f5213579b814926d9c940a8c7f090f2c62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5786,7 +5856,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="zone ranger.rom" size="16384" crc="1b6c7b78" sha1="bd5c67f16132af3b60f78f47c3a337382ff94618" offset="0" />
+				<rom name="zone ranger.rom" size="16384" crc="1b6c7b78" sha1="bd5c67f16132af3b60f78f47c3a337382ff94618" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
