@@ -666,10 +666,11 @@ void serial_terminal_device::device_start()
 
 INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
 {
-	set_tra_rate(rates[newval & 0x0f]);
-	set_rcv_rate(rates[newval & 0x0f]);
+	UINT8 val = ioport("TERM_FRAME")->read();
+	set_tra_rate(rates[val & 0x0f]);
+	set_rcv_rate(rates[val & 0x0f]);
 
-	switch(newval & 0x30)
+	switch(val & 0x30)
 	{
 	case 0x10:
 		set_data_frame(7, 1, SERIAL_PARITY_EVEN);
