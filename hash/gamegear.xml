@@ -1784,6 +1784,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="crazyfac">
+		<description>Crazy Faces (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="crazy faces [proto].bin" size="131072" crc="46ad6257" sha1="00cfce623709b8d9bc9e6bbb96feb9faf9a81f84" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crystalw">
 		<description>Crystal Warriors (Euro, USA)</description>
 		<year>1992</year>

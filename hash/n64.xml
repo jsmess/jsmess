@@ -10,7 +10,14 @@ There appear to exist some undumped N64 protos
   - Looney Tunes Space Race,
   - Ohcouchi Gengorou Ikka,
   - Star Soldier Vanishing Earth (Europe),
+  - Wild Waters (a more complete version than the available proto was shown)
 
+Canceled games (possibly never got to the proto stage)
+  - Acclaim Sports Soccer / Ultra Soccer,
+  - Addams Family Pinball,
+  - Freak Boy,
+  - Ikazuchi No Go Toku,
+  - X-Men Mutant Academy
 -->
 
 <softwarelist name="n64" description="Nintendo 64 cartridges">
@@ -273,6 +280,17 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="aidynchru" cloneof="aidynchr">
+		<description>Aidyn Chronicles - The First Mage (USA, Rev. A)</description>
+		<year>2001</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="aidyn chronicles - the first mage (usa) (rev a).bin" size="33554432" crc="276178df" sha1="c4d93da5205edcad44177a26e32532d98795fa3e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aidynchru1" cloneof="aidynchr">
 		<description>Aidyn Chronicles - The First Mage (USA)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
@@ -7640,6 +7658,17 @@ There appear to exist some undumped N64 protos
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="rockman dash - hagane no boukenshin (japan).bin" size="33554432" crc="e1919c66" sha1="cd8c73a181a137dc8a4ac24e9f26ccc2518dc35f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinho64" cloneof="iss64">
+		<description>Mundial Ronaldinho Soccer 64 (Bra)</description>
+		<year>1998</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="ronaldinho soccer 64 (brazil) (pirate).bin" size="8388608" crc="19380e04" sha1="dfd37b71df3f22c4f65ee1477fd5e1bb07049537" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

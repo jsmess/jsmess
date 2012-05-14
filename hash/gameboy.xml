@@ -9459,6 +9459,18 @@
 		</part>
 	</software>
 
+	<software name="lostwrldf" cloneof="lostwrld">
+		<!-- Notes: SGB enhanced -->
+		<description>Le Mond Perdu - Jurassic Park (Fra)</description>
+		<year>1997</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mond perdu, le - jurassic park (france).bin" size="524288" crc="fb22d72e" sha1="589efa9ef5a6ce38200a137083f856f75d75a8c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="luckyluk">
 		<description>Lucky Luke (Euro)</description>
 		<year>1996</year>
