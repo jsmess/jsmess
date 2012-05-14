@@ -51,11 +51,13 @@ Undumped
   USA
 
   - Fighter's History (USA) - Initial release prior to Rev A
-  - Ignition Factor, The (USA) (Sample)
+  - Ignition Factor, The (USA) (Prototype)
   - PGA Tour Golf (USA) (Rev A)
   - Star Fox (USA) (Rev A)
+  - Super Mario Kart (USA) (Prototype)
   - Super Mario World/Pilot Wings/F-Zero Competition Cartridge (USA)
-  - X Band (USA, Prototype)
+  - Theme Park (USA?) (Prototype)
+  - X Band (USA) (Prototype)
 
   Europe
 
@@ -21049,7 +21051,7 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="not identified" />
 			<feature name="chip" value="not identified" /> <!-- 3 epoxy chips, no info printed -->
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart (SNS-006) without the back sticker -->
+			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="3145728">
 				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
@@ -21327,24 +21329,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="testcart">
-		<!-- single cartridge source: Lord Nightmare -->
-		<description>Test Cartridge / Super NES Service Version D (USA)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="PN23278"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1P0N-01" />
-			<feature name="u1" value="U1 EPROM" />
-			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_model" value="N/A" /> <!-- similar to SNS-006 -->
-			<feature name="cart_back_label" value="N/A" /> <!-- no back sticker -->
-			<dataarea name="rom" size="524288">
-				<rom name="burn-in w acc 24814 r.d.u1" size="524288" crc="7bc95444" sha1="c0bd7ec6a96740320d655c386e47af9631646766" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="turnburns" cloneof="turnburn">
 		<!-- single cartridge source: hydr0x -->
 		<description>Turn and Burn - No-Fly Zone (Spa)</description>
@@ -21604,7 +21588,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
 				<rom name="batman.u1" size="524288" crc="11603d9b" sha1="301813f85e039b28ac1c36700c0f6018bae3e4c6" offset="0x000000" />
 				<rom name="batman.u2" size="524288" crc="16866f1c" sha1="30983787df55605ad9bf1468901ce41fc165362a" offset="0x080000" />
@@ -21626,7 +21609,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" /> <!-- empty socket -->
 			<feature name="cart_model" value="unknown" /> <!-- standard japanese prototype cart -->
-			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ep9245650.u1" size="524288" crc="b61d48c6" sha1="429a55692e16e839b4591af696e8392b62182e5a" offset="0x000000" />
 				<rom name="ep9245629.u2" size="524288" crc="9e376929" sha1="6b3393f00a7b7e97d4ca297073fee6585d59086a" offset="0x080000" />
@@ -21650,7 +21632,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="battle blaze.u1" size="524288" crc="63ee861c" sha1="ddd0ecfa4592528290462afcb46c2d437770df33" offset="0x000000" />
 				<rom name="u2"              size="524288" crc="9881b12e" sha1="03457d0a49798925bdbef0ad9730c02aecca0872" offset="0x080000" />
@@ -21706,7 +21687,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rom0 cs 00b1.u1" size="524288" crc="e876dcf5" sha1="b0bdb8fef5f77656bb4506f70a8d093e658d0faf" offset="0x000000" />
 				<rom name="rom1 cs ac7b.u2" size="524288" crc="264b4eac" sha1="668784b87718cc2a9a0486ac98afb0efa68d8830" offset="0x080000" />
@@ -21722,7 +21702,6 @@ Alternate board (XL-1)
 		<description>Castlevania - Dracula X (USA, Final Prototype)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
-		<info name="release" value="199509xx"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-4PV5B-01" />
 			<feature name="u1" value="U1 EPROM" />
@@ -21735,7 +21714,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rom 0 dracula x.u1" size="524288" crc="8d5b91cf" sha1="461a68ba9f3caa9d16e7b6ceb64bbb8dae76862c" offset="0x000000" />
 				<rom name="u2" size="524288" crc="5696e603" sha1="4f67f802eee6cf37da676bc518bf844639476f00" offset="0x080000" />
@@ -21762,12 +21740,34 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="94cca476" sha1="130009b46c7d1cf0a2b87e13dadd44df2bd1c6c6" offset="0x000000" />
 				<rom name="u2" size="524288" crc="0d1a83bd" sha1="402ab3d703c9196c3484b919ee186e6abb59da8b" offset="0x080000" />
 				<rom name="u3" size="524288" crc="aa226415" sha1="6252e88611a57e989c43735e2f3b113032a70630" offset="0x100000" />
 				<rom name="u4" size="524288" crc="605f9d48" sha1="5a219c97ec284f858136c0dd53e8d6934988a08c" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongcuce" cloneof="dkongc">
+		<!-- snescentral.com -->
+		<description>Donkey Kong Country (USA, Competition Cartridge)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DIS-SNS-8E-USA"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sns-8e-0.u1" size="4194304" crc="0e204fbd" sha1="05bca9d1097a148d8808028b8d75553dd8b7b972" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -21808,7 +21808,6 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="4194304">
 				<rom name="0.u1" size="524288" crc="470e9188" sha1="7272cd3225f67c454ddbd977050e09ef4a1314af" offset="0x000000" />
 				<rom name="1.u2" size="524288" crc="13001d97" sha1="67430feb3677e1ebb82f3dc105ca8b6c0058ad96" offset="0x080000" />
@@ -21840,7 +21839,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
 				<rom name="firemen r0 d0c2.u1" size="524288" crc="ea1bc97a" sha1="2f895eab52eec641322c02fba8ab02e3e69d4a94" offset="0x000000" />
 				<rom name="firemen r1 2dca.u2" size="524288" crc="05b651bf" sha1="57350966d9b16f187a11539f2bbd13a1097569d2" offset="0x080000" />
@@ -21865,7 +21863,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="ftr 1-16 1.u1" size="524288" crc="f6bc8b79" sha1="8201412af4cde8a3f70272dc5e840ee646ab0ae0" offset="0x000000" />
 				<rom name="ftr 1-16 2.u2" size="524288" crc="fa8c1cbb" sha1="a61f070dba074a2228c404bad836ff348e3fb325" offset="0x080000" />
@@ -21894,7 +21891,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="fire team rogue 1.u1" size="524288" crc="07948a08" sha1="79ef02793e50b5fdfa33ac40d4f2fa6493dc911a" offset="0x000000" />
 				<rom name="2.u2" size="524288" crc="f4e3c286" sha1="d72aeb1c2c424cd59d0d7c0615c6316b5f3ec838" offset="0x080000" />
@@ -21920,7 +21916,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1" size="524288" crc="cb15c33d" sha1="927d5eac1f3ea7656c34499ad9f0c49f38bfb9a5" offset="0x000000" />
 				<rom name="u2" size="524288" crc="af5d863a" sha1="e09b988dbb46549ada62e97f6c9d4e13d7ac9cbd" offset="0x080000" />
@@ -21936,7 +21931,6 @@ Alternate board (XL-1)
 		<description>Goof Troop (USA, Final Prototype)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
-		<info name="release" value="199307xx"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2P3B-01" />
 			<feature name="u1" value="U1 EPROM(J)" />
@@ -21945,8 +21939,7 @@ Alternate board (XL-1)
 			<feature name="u4" value="U4 74F139" /> <!-- 74LS139 on the chip -->
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
-			<feature name="cart_back_label" value="none" />
+			<feature name="cart_model" value="SNS-006" />
 			<dataarea name="rom" size="524288">
 				<rom name="gft-m 0.u1" size="524288" crc="4aafa462" sha1="b38560d091801db5e833d17393fe1df1398909b6" offset="0x000000" />
 			</dataarea>
@@ -21959,11 +21952,10 @@ Alternate board (XL-1)
 		<year>1993</year>
 		<publisher>Argonaut Software</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1PON-01" />
+			<feature name="pcb" value="SHVC-1P0N-01" />
 			<feature name="u1" value="U1 EPROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
-			<feature name="cart_back_label" value="none" />
+			<feature name="cart_model" value="SNS-006" />
 			<dataarea name="rom" size="524288">
 				<rom name="u1" size="524288" crc="e76979ce" sha1="e0c31970b286f07b15e4a8b14e70460be1c073c2" offset="0x000000" />
 			</dataarea>
@@ -21985,12 +21977,28 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1"             size="524288" crc="16422c65" sha1="c33d78fc59991c42fece46805607edf451db6758" offset="0x000000" />
 				<rom name="major title.u2" size="524288" crc="5df60f2c" sha1="a5ba90cae1afe2a773490c31474a354e3362e57f" offset="0x080000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeffseup">
+		<!-- pending: awaiting proper redump (owner contacted) -->
+		<description>Jeff's Shoot'Em Up (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>Iguana Entertainment</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1P0N-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="524288">
+				<rom name="jeff's shoot'em up.u1" size="524288" crc="8265ea53" sha1="746e73d26f31813fa0179bf01f8cd89ad47f01e3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22023,7 +22031,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1" size="524288" crc="59059d83" sha1="7ced82ff061dd5a7ee9e35b67fba068b78754120" offset="0x000000" />
 			</dataarea>
@@ -22063,7 +22070,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rom 0.u1" size="524288" crc="8742aa77" sha1="60e7a83620efacfef9821f13c83679fa2413fdd2" offset="0x000000" />
 				<rom name="rom 1.u2" size="524288" crc="25eec90a" sha1="2bedac3c3dde6780389a98750ac05ca1ee41caf5" offset="0x080000" />
@@ -22079,7 +22085,6 @@ Alternate board (XL-1)
 		<description>Mega Man X3 (USA, Final Prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
-		<info name="release" value="199601xx"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="CX4" />
 			<feature name="pcb" value="LBM20-94907-00" />
@@ -22092,7 +22097,6 @@ Alternate board (XL-1)
 			<feature name="ic7" value="IC7 27C1001" />
 			<feature name="oscillator" value="OSC1 20MHz" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="snes ar3e ver. 00 rom 0 1f1a h.u1" size="524288" crc="cadbaec0" sha1="4b0d52f29a8e810eddd620f37f4327b5e01622d4" offset="0x000000" />
 				<rom name="snes ar3e ver. 00 rom 1 632a h.u2" size="524288" crc="521eeff1" sha1="6f9aa429b7ada119aeeec2e3a33bdd131ea8bc0b" offset="0x080000" />
@@ -22107,7 +22111,6 @@ Alternate board (XL-1)
 		<description>Mortal Kombat 3 (USA, Prototype 19950713)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="release" value="19950713"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-8PV5B-01" />
 			<feature name="u1" value="U1 4/8M EPROM(J)" />
@@ -22127,7 +22130,6 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mk3 snes 7-13 0.u1" size="524288" crc="6df60c89" sha1="b320ad416036b64abbea499598746988d0071bad" offset="0x000000" />
 				<rom name="1.u2" size="524288" crc="b91e68d5" sha1="1542ed8b0bc41258636ff7182070ed5855b959ff" offset="0x080000" />
@@ -22148,7 +22150,6 @@ Alternate board (XL-1)
 		<description>Mr. Bloopy - Saves the World (USA, Prototype 19950216)</description>
 		<year>1994</year>
 		<publisher>Compedia</publisher>
-		<info name="release" value="19950216"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-8PV5B-01" />
 			<feature name="u1" value="U1 4/8M EPROM(J)" />
@@ -22168,7 +22169,6 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" /> <!-- to be confirmed -->
 			<feature name="battery" value="BATT1 CR2032" /> <!-- to be confirmed -->
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="da05a113" sha1="4adac4799ee54db5348c075b75025bbaed722322" offset="0x000000" /> <!-- unreadable chip name -->
 				<rom name="u2" size="524288" crc="61d1dc94" sha1="f62548c25fb1890891ac12f3bbb061b6542baefc" offset="0x080000" /> <!-- unreadable chip name -->
@@ -22183,7 +22183,6 @@ Alternate board (XL-1)
 		<description>Mr. Tuff (Euro, Prototype 19940712)</description>
 		<year>1994</year>
 		<publisher>Sales Curve Interactive</publisher> <!-- cancelled -->
-		<info name="release" value="19940712"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="rom" size="1572864" crc="58cd1f5a" sha1="58840c2ce4f68e30f3d815e9774a1fd3d0d25bd6" offset="0x000000" />
@@ -22209,7 +22208,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba 1.u1" size="524288" crc="a32eeb5f" sha1="e944f4fa29f8f39d5ebbd55c7b8bb7dc070568eb" offset="0x000000" />
 				<rom name="nba 2.u2" size="524288" crc="c0ca8c3c" sha1="af5caa1b0254f6b42e4f7f3ba07d0af904017e3c" offset="0x080000" />
@@ -22236,7 +22234,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
 				<rom name="night mare busters 0.u1" size="524288" crc="95866d44" sha1="9fffe95a62650915d353f7f3d1eda59e20aa0739" offset="0x000000" />
 				<rom name="night mare busters 1.u2" size="524288" crc="a10feef7" sha1="91506f43f8babbd7ac9ec07d41b43dfd504dc3e3" offset="0x080000" />
@@ -22261,7 +22258,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="640ed42e" sha1="dec7fcccbc1886e19dddf2c2d7fb18ac8bd2d303" offset="0x000000" />
 				<rom name="u2" size="524288" crc="cd83aa26" sha1="079670a1d5b9dad150972efd88cb65cc4378a0c1" offset="0x080000" />
@@ -22285,7 +22281,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1"                           size="524288" crc="68873f58" sha1="5a696a96e3182cafde41ba4f79b5cdbbbc057c1f" offset="0x000000" />
 				<rom name="pirates of the dark water.u2" size="524288" crc="af410348" sha1="929af6308d9abf2fd3539facc778dd326e096d37" offset="0x080000" />
@@ -22312,7 +22307,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U7 CIC" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="powerslide sfx 12-4-94 rn 0010.u1" size="524288" crc="65ce3729" sha1="30115db2558060d9293684f3d5810d063a0c710e" offset="0x000000" />
 			</dataarea>
@@ -22352,7 +22346,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="884fd9db" sha1="c789f2266550f1c01a581379d377474dce728818" offset="0x000000" />
 				<rom name="u2" size="524288" crc="b712fe58" sha1="dc986f743f34781aa24b25155e3affb96a999df9" offset="0x080000" />
@@ -22379,7 +22372,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rhi-0.u1" size="524288" crc="36520c40" sha1="99c648a220c3dbfcf5fda481c140eb96ae07ff71" offset="0x000000" />
 				<rom name="rhi-1.u2" size="524288" crc="17d8475f" sha1="e78e18d00f9134620ab7090d8a6e5e7592255f76" offset="0x080000" />
@@ -22431,12 +22423,11 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
-			<dataarea name="rom" size="2097152"> <!-- underscore = unreadable -->
-				<rom name="sj07 ir (94-11-11) 6504 0.u1" size="524288" crc="20549b6c" sha1="1da64f1820e0a413e02c38176679c72823d2936d" offset="0x000000" />
-				<rom name="sj07 ir (94-11-11) _d2b 1.u2" size="524288" crc="123267f6" sha1="5aa50699f40e8aafd966ff008a9558cc4d081a2e" offset="0x080000" />
-				<rom name="sj07 ir (94-11-11) 3eb0 2.u3" size="524288" crc="b574dc7c" sha1="6eaba91e078fb543880b8653e2c7c1a3f1d0f4a1" offset="0x100000" />
-				<rom name="sj07 ir (94-11-11) 3___ 3.u4" size="524288" crc="d6c97858" sha1="f5553bc4f08756a4d39c4d36444e4518ec3d420f" offset="0x180000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sj07 ir (94-11-11) 6501 0.u1" size="524288" crc="20549b6c" sha1="1da64f1820e0a413e02c38176679c72823d2936d" offset="0x000000" />
+				<rom name="sj07 ir (94-11-11) 5d2b 1.u2" size="524288" crc="123267f6" sha1="5aa50699f40e8aafd966ff008a9558cc4d081a2e" offset="0x080000" />
+				<rom name="sj07 ir (94-11-11) 3e30 2.u3" size="524288" crc="b574dc7c" sha1="6eaba91e078fb543880b8653e2c7c1a3f1d0f4a1" offset="0x100000" />
+				<rom name="sj07 ir (94-11-11) 3d6a 3.u4" size="524288" crc="d6c97858" sha1="f5553bc4f08756a4d39c4d36444e4518ec3d420f" offset="0x180000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
@@ -22460,7 +22451,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="653461d5" sha1="ea85dfcce82edb4d0742abab199430b7dee1413a" offset="0x000000" />
 				<rom name="u2" size="524288" crc="28af74b5" sha1="5f94e3faea8151df1585f8e1fb5a3abd67a200b5" offset="0x080000" />
@@ -22471,6 +22461,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="sdf1gpp" cloneof="sdf1gp" supported="no">
+		<!-- John Weidman -->
 		<description>SD F-1 Grand Prix (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
@@ -22491,7 +22482,6 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="" /> <!-- unnamed, 6 switches -->
 			<feature name="battery" value="BT1 CR2032" /> <!-- empty socket -->
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u1" size="524288" crc="a71c183f" sha1="9b77b41807f3fb1038e64248b429caecab8caba7" offset="0x000000" />
 				<rom name="u2" size="524288" crc="3ec0e423" sha1="f2597412102a644633ab8a1fa7d5f05b92a927d8" offset="0x080000" />
@@ -22499,6 +22489,23 @@ Alternate board (XL-1)
 				<rom name="u4" size="524288" crc="d8606df0" sha1="942d814abb5d09c3ca68334811875b9e08ab67a2" offset="0x180000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shooterp">
+		<!-- nintendoplayer.com -->
+		<description>Shooter (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>Punk Development</publisher> <!-- cancelled -->
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1P0N-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="none" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="524288">
+				<rom name="shooter demo.u1" size="262144" crc="f4aa6642" sha1="5631c3199b96dfd387562a586e4ceb1595cd3d6e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22519,12 +22526,38 @@ Alternate board (XL-1)
 			<feature name="u7" value="U7 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1" size="524288" crc="88a1b7d5" sha1="f0bf2258ee6653bafe2d106e15d4a98be7ee80f2" offset="0x000000" />
 				<rom name="u2" size="524288" crc="d0a6bf51" sha1="811bde6a959c1f4f79938f4b8ec3acd3b4b95938" offset="0x080000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfoxswc" cloneof="starwing">
+		<!-- snescentral.com -->
+		<description>Star Fox Super Weekend (USA, Competition Cartridge)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNS-FU-USA"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
+			<feature name="pcb" value="LR0G1802" />
+			<!-- epoxy version -->
+			<feature name="u1" value="U1 ROM" />
+			<feature name="u2" value="U2 RAM" />
+			<feature name="u3" value="U3 1992 A/N Inc MARIO CHIP 1" />
+			<feature name="u4" value="U4 139" />
+			<feature name="u5" value="U5 CIC F411A" />
+			<feature name="battery" value="none" />
+			<!-- end of epoxy version -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-fu-0.u1" size="1048576" crc="cd1f04b8" sha1="2ba5f446dcb56d1164e28b337ae7b4833278b6d9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -22553,7 +22586,6 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="ss1.u1" size="524288" crc="0f943938" sha1="5665d95c107ed35bda6bcbfd2e65042e329434a7" offset="0x000000" />
 				<rom name="ss2.u2" size="524288" crc="839f1efb" sha1="45566b127fd9c295cf2bc363b25e58877fab3071" offset="0x080000" />
@@ -22584,7 +22616,6 @@ Alternate board (XL-1)
 			<feature name="u7" value="U7 CIC" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="none" /> <!-- similar to a standard PAL cartridge -->
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="snsp p-cq.u1" size="1048576" crc="24935769" sha1="de21be64fde447d9c6a2f1b063d2f2e0d4034ca0" offset="0x000000" />
 			</dataarea>
@@ -22609,12 +22640,23 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
 				<rom name="u1" size="524288" crc="3c3c2562" sha1="013c053a287a22d065cb06360139c82cd5e76cab" offset="0x000000" />
 			</dataarea>
 			<!-- memory capacity to be confirmed -->
 			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schinwl2p" cloneof="schinwl2">
+		<!-- pending: awaiting documentation -->
+		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, Prototype)</description>
+		<year>1993</year>
+		<publisher>Culture Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super chinese world 2 - uchuu ichibutou taikai (japan) (beta).sfc" size="2097152" crc="404638d0" sha1="69dfba8fad75e25c281e80a9466ad549e14b5799" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22636,7 +22678,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" />
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
 				<rom name="driftout rom-1 usa 05-18-95 c234.u1" size="524288" crc="2dc7f2d9" sha1="9d3084d684fc9fb00dea1c78464608aed7a8ff5d" offset="0x000000" />
 				<rom name="driftout rom-2 usa 05-18-95 fe18.u2" size="524288" crc="6f9c1e99" sha1="6e8848a7aaac8bace38cb7f56be750beb786c949" offset="0x080000" />
@@ -22665,7 +22706,6 @@ Alternate board (XL-1)
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
-			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1572864">
 				<rom name="u1" size="524288" crc="dc30dbbf" sha1="8b29b80cca07dddc73d1d839a88d1c5158ff41b9" offset="0x000000" />
 				<rom name="u2" size="524288" crc="aa37fb03" sha1="768e070f4fd1fad29d50fbb3ee5912cfbe14cf14" offset="0x080000" />
@@ -22683,7 +22723,6 @@ Alternate board (XL-1)
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-4M"/>
-		<info name="release" value="199308xx"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-4PV5B-01" />
 			<feature name="u1" value="U1 EPROM" />
@@ -22695,8 +22734,7 @@ Alternate board (XL-1)
 			<feature name="u7" value="U7 74LS157" />
 			<feature name="u8" value="U8 CIC" />
 			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
-			<feature name="cart_back_label" value="none" />
+			<feature name="cart_model" value="SNS-006" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-4m-0 rom1.u1" size="524288" crc="4dd005b3" sha1="9e04968c6980e0705cee2d7360fb85e50f43ebfc" offset="0x000000" />
 				<rom name="sns-4m-0 rom2.u2" size="524288" crc="f70564a1" sha1="6e0559fa959936a6c8fc7a85f398639bd723c0c4" offset="0x080000" />
@@ -22723,7 +22761,6 @@ Alternate board (XL-1)
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="star wars snes 1.u1" size="524288" crc="ebf30c6f" sha1="3930b6b0498307de0dc2490e6422e551aec71913" offset="0x000000" />
 				<rom name="star wars snes 2.u2" size="524288" crc="d43cf27f" sha1="2adf9e02d14a000b9d03262127356c2a0cb4ef1f" offset="0x080000" />
@@ -22756,6 +22793,29 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="tecmonbaup" cloneof="tecmonba">
+		<!-- i2a2n2 -->
+		<description>Tecmo Super NBA Basketball (USA, Prototype 19921026)</description>
+		<year>1993</year>
+		<publisher>Tecmo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<dataarea name="rom" size="1048576">
+				<rom name="snba 10-26 rm0 chk sum 878a.u1" size="524288" crc="9b121bab" sha1="331d29bc4ea722a442b0bedaf6fb9a87b68d1c6c" offset="0x000000" />
+				<rom name="snba 10-26 rm1 chk sum 73de.u2" size="524288" crc="01625ba3" sha1="c241c20a450f1f955385c4e73c682959894389b7" offset="0x080000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tmnt4up" cloneof="tmnt4">
 		<!-- nintendoplayer.com -->
 		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, Prototype)</description>
@@ -22769,11 +22829,98 @@ Alternate board (XL-1)
 			<feature name="u4" value="U4 74F139" /> <!-- 74LS139 on the chip -->
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" /> <!-- empty socket -->
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
-			<feature name="cart_back_label" value="none" />
+			<feature name="cart_model" value="SNS-006" />
 			<dataarea name="rom" size="1048576">
 				<rom name="rg 007l.u1" size="524288" crc="228e9e34" sha1="31c913860fa175218929906d3566852fe044cbf5" offset="0x000000" />
 				<rom name="rg 007h.u2" size="524288" crc="0554c358" sha1="462adc5bd27fc3114ffdfec9e93b6893a81a5b4a" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="testcart">
+		<!-- Lord Nightmare -->
+		<description>Test Cartridge / Super NES Service Version D (USA)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="PN23278"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1P0N-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="N/A" /> <!-- similar to SNS-006 -->
+			<feature name="cart_back_label" value="N/A" /> <!-- no back sticker -->
+			<dataarea name="rom" size="524288">
+				<rom name="burn-in w acc 24814 r.d.u1" size="524288" crc="7bc95444" sha1="c0bd7ec6a96740320d655c386e47af9631646766" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tkous" cloneof="tko">
+		<!-- nesworld.com -->
+		<description>TKO Super Championship Boxing (USA, Prototype 199208xx)</description>
+		<year>1992</year>
+		<publisher>Sofel</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" /> <!-- to be confirmed -->
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" /> <!-- empty socket -->
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" /> <!-- empty socket -->
+			<feature name="cart_model" value="SNS-006" />
+			<dataarea name="rom" size="524288">
+				<rom name="u1" size="524288" crc="5f2ab21d" sha1="b0ef4e1c0dbf5f70bb699d5696925e78dbd9d00e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tonymeolp" cloneof="worldsoc">
+		<!-- nesworld.com -->
+		<description>Tony Meola's Sidekicks Soccer (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tony meola rom 0 22d4.u1" size="524288" crc="0d206b93" sha1="44d96aed93c9af3a894b95b3755c18be0cc64175" offset="0x000000" />
+				<rom name="tony meola rom 1 b3d6.u2" size="524288" crc="4be204b7" sha1="f96f4c0b2b48afd53cf7e07ed19bb3f531b661b3" offset="0x080000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildgunsup" cloneof="wildguns">
+		<!-- lostleves.org -->
+		<description>Wild Guns (USA, Final Prototype)</description>
+		<year>1995</year>
+		<publisher>Natsume</publisher>
+		<info name="release" value="199507xx"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<dataarea name="rom" size="1048576">
+				<rom name="wild guns.u1" size="524288" crc="112b8b6f" sha1="44e97d42d0dc42a507885e06e9812093beae7ebc" offset="0x000000" />
+				<rom name="u2"           size="524288" crc="268ca9a2" sha1="9a52b30afd999e089aac1e2806d7f049c75204a1" offset="0x080000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22795,6 +22942,29 @@ Alternate board (XL-1)
 				<rom name="yoshi's cookie 1-19-93.u1" size="524288" crc="fbdfcdab" sha1="094af3a0739521ec524aea713080b77809d04769" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoopp" cloneof="zoop">
+		<!-- nesworld.com -->
+		<description>Zoop (USA, Prototype 19950720)</description>
+		<year>1996</year>
+		<publisher>Viacom New Media</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<dataarea name="rom" size="524288">
+				<rom name="u1" size="524288" crc="3758068a" sha1="eb271d8dc7f2ec04cddf1dd9cc7e24e51563d547" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22928,7 +23098,7 @@ Alternate board (XL-1)
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="cart_model" value="none" /> <!-- similar to a standard US cart -->
+			<feature name="cart_model" value="SNS-006" />
 			<dataarea name="rom" size="1048576">
 				<rom name="flintstones, the - the treasure of sierra madrock (proto).sfc" size="1048576" crc="bfc15ed9" sha1="379212d62a273fe335726518dd0691b95155cee9" offset="0x000000" />
 			</dataarea>
@@ -26180,7 +26350,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="bubsy">
-		<description>Bubsy in Claws Encounters of the Furred Kind (Euro)</description>
+		<description>Bubsy in Claws Encounters of the Furred Kind (Euro, Accolade)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26191,7 +26361,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="bubsya" cloneof="bubsy">
-		<description>Bubsy in Claws Encounters of the Furred Kind (Euro, Alt)</description>
+		<description>Bubsy in Claws Encounters of the Furred Kind (Euro, Nintendo)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
@@ -28358,19 +28528,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="donkey kong country (europe) (en,fr,de) (rev 1).sfc" size="4194304" crc="17657db6" sha1="6f246abae39820e3267704bdf342ad1d27121f19" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dkongcuce" cloneof="dkongc">
-		<description>Donkey Kong Country (USA, Competition Edition)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="donkey kong country (usa) (competition edition).sfc" size="4194304" crc="0e204fbd" sha1="05bca9d1097a148d8808028b8d75553dd8b7b972" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -45745,21 +45902,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="starfoxswc" cloneof="starwing">
-		<description>Star Fox (USA, Super Weekend Competition)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<info name="release" value="199305xx"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="GSU-1" />
-			<dataarea name="rom" size="1048576">
-				<rom name="star fox (usa) (super weekend competition).sfc" size="1048576" crc="cd1f04b8" sha1="2ba5f446dcb56d1164e28b337ae7b4833278b6d9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="131072">
-			</dataarea>
-		</part>
-	</software>
-
 <!-- removed for now since however interesting it may be, it is still homebrew material,
      keeping it here quoted in case we'd want to reintegrate it for some reason
 	<software name="starfox2a" cloneof="starfox2">
@@ -46999,17 +47141,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="super chinese fighter (japan).sfc" size="2097152" crc="84767959" sha1="8f526ab6bd508df51f08fed13034923e017566c8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="schinwl2p" cloneof="schinwl2">
-		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, Prototype)</description>
-		<year>1993</year>
-		<publisher>Culture Brain</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super chinese world 2 - uchuu ichibutou taikai (japan) (beta).sfc" size="2097152" crc="404638d0" sha1="69dfba8fad75e25c281e80a9466ad549e14b5799" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50585,17 +50716,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tkous" cloneof="tko">
-		<description>TKO Super Championship Boxing (USA, Sample)</description>
-		<year>1992</year>
-		<publisher>Sofel</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="tko super championship boxing (usa) (sample).sfc" size="524288" crc="5f2ab21d" sha1="b0ef4e1c0dbf5f70bb699d5696925e78dbd9d00e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tkou" cloneof="tko">
 		<description>TKO Super Championship Boxing (USA)</description>
 		<year>1992</year>
@@ -50708,17 +50828,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tony meola's sidekicks soccer (usa).sfc" size="1048576" crc="32b658c1" sha1="4e76b176d6ead55e4bb9a1e06626061c9f37f22c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tonymeolp" cloneof="worldsoc">
-		<description>Tony Meola's Sidekicks Soccer (Prototype)</description>
-		<year>1993</year>
-		<publisher>Electro Brain</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tony meola's sidekicks soccer (proto).sfc" size="1048576" crc="7a021e12" sha1="06fb1286af285b6d0b4323daeb58590c22e1119b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52454,18 +52563,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wildgunsu" cloneof="wildguns">
-		<description>Wild Guns (USA)</description>
-		<year>1995</year>
-		<publisher>Natsume</publisher>
-		<info name="release" value="199507xx"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="wild guns (usa).sfc" size="1048576" crc="085d8d14" sha1="1ecf28d5f3d2e84e3cc58ed621cb0fc0dd9d70d0" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wildsnak">
 		<description>WildSnake (USA)</description>
 		<year>1994</year>
@@ -53918,17 +54015,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="zoop (usa).sfc" size="524288" crc="06f0e94c" sha1="051c767b843fc4112e0b06c2f81b65abbac9e7fc" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoopp" cloneof="zoop">
-		<description>Zoop (Prototype 19950720)</description>
-		<year>1996</year>
-		<publisher>Viacom New Media</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="zoop (prototype).sfc" size="524288" crc="3758068a" sha1="eb271d8dc7f2ec04cddf1dd9cc7e24e51563d547" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
