@@ -209,6 +209,9 @@ void generic_terminal_device::term_write(UINT8 data)
 			case 0x0b:	if (m_y_pos) m_y_pos--;
 					break;
 
+			case 0x0c:	clear();
+					break;
+
 			case 0x0d:	m_x_pos = 0;
 					break;
 
@@ -404,7 +407,7 @@ void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id,
 {
 	UINT8 new_code;
 	new_code = keyboard_handler(m_last_code, &m_scan_line);
-	if(m_last_code != new_code)
+	if ((m_last_code != new_code) && (new_code))
 		send_key(new_code);
 	m_last_code = new_code;
 }
