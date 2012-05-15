@@ -98,6 +98,7 @@ woodpeck		// (c) 1981 Amenip (Palcom Queen River)
 woodpeca		// (c) 1981 Amenip Nova Games Ltd.
 mspacmab		// bootleg
 mspacmbe		// bootleg
+mspacii			// bootleg
 pacgal			// hack
 mspacpls		// hack
 ponpoko			// (c) 1982 Sigma Ent. Inc.
@@ -3568,7 +3569,8 @@ ddrjb			// 1998 - Dance Dance Revolution (GC845 VER. JAB)
 ddra			// 1999 - Dance Dance Revolution (GN845 VER. AAA)
 fbait2bc		// 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)
 bassang2		// 1998 - Bass Angler 2 (GE865 VER. JAA)
-hyperbb			// 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
+hyperbbc		// 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
+hyperbbca		// 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 drmn			// 1999 - DrumMania (GQ881 VER. JAD)
 gtrfrks			// 1999 - Guitar Freaks (GQ886 VER. EAC)
 gtrfrksu		// 1999 - Guitar Freaks (GQ886 VER. UAC)
@@ -3595,8 +3597,8 @@ ddr3mj			// 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. JAA)
 ddrsbm			// 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)
 ddrs2k			// 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA)
 ddrs2kj			// 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA)
-hyperbbc		// 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA)
-hyperbbck		// 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA)
+hypbbc2p		// 1999 - Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. JAA)
+hypbbc2pk		// 1999 - Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)
 dsfdct			// 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JCA)
 dsfdcta			// 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JAA)
 drmn2m			// 1999 - DrumMania 2nd Mix (GE912 VER. JAB)
@@ -5222,7 +5224,8 @@ csuperas		// 09 1981.05 Super Astro Fighter
 clocknch		// 11 1981.04 Lock'n'Chase
 				// 12 1981.08 Flash Boy/DECO Kid
 cprogolf		// 13 1981.08 Tournament Pro Golf
-				// 14 1981.06 DS Telejan
+cprogolfj		// 13 1981.08 Tournament Pro Golf (Japan)
+cdsteljn 		// 14 1981.06 DS Telejan
 cluckypo		// 15 1981.?? Lucky Poker
 ctisland		// 16 1982.02 Treasure Island
 ctisland2		// 16
@@ -5238,6 +5241,7 @@ cptennis		// 22 1982.06 Pro Tennis
 				// 24 1982.07 Tsumego Kaisyou
 				// 25 1982.10 Angler Dangler? (fishing)
 cbtime			// 26 1982.08 Hamburger/Burger Time
+chamburger   		// 26 1982.08 Hamburger (Japan)
 cburnrub		// 27 1982.11 Burnin' Rubber
 cburnrub2		// 27
 cbnj			// 27         Bump 'n' Jump
@@ -10041,15 +10045,18 @@ newsa			// "Jeansole / Poby
 taxidriv		// [1984 Graphic Techno]
 xyonix			// [1989 Philko]
 gt507uk			// (c) 1986 Grayhound Electronics
-gt5				// (c) 1984 Grayhound Electronics
 gtsers8			// (c) 1984 Greyhound Electronics
 gtsers9			// (c) 1984 Greyhound Electronics
 gtsers10		// (c) 1984 Greyhound Electronics
+gtsers10a		// (c) 1984 Greyhound Electronics
 gtsers11		// (c) 1984 Greyhound Electronics
+gtsers11a		// (c) 1984 Greyhound Electronics
 gtsers12		// (c) 1984 Greyhound Electronics
-gtsers14		// (c) 1984 Greyhound Electronics
+gtsers14		// (c) 1986 Greyhound Electronics
+gtsers15		// (c) 1986 Greyhound Electronics
 gt103a1			// (c) 1984 Greyhound Electronics
 gt103aa			// (c) 1984 Greyhound Electronics
+gt103ab			// (c) 1984 Greyhound Electronics
 gt103asx		// (c) 1984 Greyhound Electronics
 reelfun			// (c) 1986 Grayhound Electronics
 reelfun1		// (c) 1986 Grayhound Electronics
@@ -10058,9 +10065,9 @@ quizvid			// (c) 1986 Greyhound Electronics
 quiz			// (c) 1986 Italian bootleg
 quiz211			// (c) 1986 Italian bootleg
 jokpoker		// (c) 1982 Greyhound Electronics
-jokpokera		// (c) 1982 Greyhound Electronics
-jokpokerb
-jokpokerc
+jokpokera		// (c) 1983 Greyhound Electronics
+jokpokerb		// (c) 1983 Greyhound Electronics
+jokpokerc		// (c) 1983 Greyhound Electronics
 superbwl		// (c) 1982 Greyhound Electronics
 amuse			// (c) 1982 Greyhound Electronics
 amuse1			// (c) 1982 Greyhound Electronics
@@ -10082,7 +10089,8 @@ sextriv2		// (c) 1985 Kinky Kit and Game Co.
 geimulti		// (c) 1992 Grayhound Electronics
 sprtauth		// (c) 1982 Classic Games
 suprpokr		// (c) 1986 Grayhound Electronics
-suprpkr1		// (c) 1986 Grayhound Electronics
+suprpokra		// (c) 1986 Grayhound Electronics
+suprpokrb		// (c) 1986 Grayhound Electronics
 sshot			// (c) 1979 Model Racing
 dribling		// (c) 1983 Model Racing
 driblingo		// (c) 1983 Olympia
@@ -10216,6 +10224,7 @@ hidctch3		// (c) 2000 Eolith
 crazywar		// (c) 2002 Eolith
 bballoon		// (c) 2003 Eolith
 hapytour		// (c) 2005 GAV Company (on Eolith's Ghost hardware)
+touryuu			// (c) 200? Yuki Enterprise
 funkball		// (c) 1998 dgPIX Entertainment Inc
 xfiles			// (c) 1999 dgPIX Entertainment Inc
 kdynastg		// (c) 1999 EZ Graphics
