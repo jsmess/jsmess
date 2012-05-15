@@ -14,9 +14,9 @@ APB notes:
 
 Error codes:
 Triangle    Test CPU registers and instructions
-Triangle    Test system RAM
+Square      Test ROM
 4 vertical lines    Test CPU call and trap instructions
-Diamond     Initialize screen and printer drivers
+Diamond     Test system RAM
 EC0     8255 parallel interface IC test failed
 EC1     6845 CRT controller IC test failed
 EC2     1797 floppy disk controller chip failed
@@ -25,11 +25,11 @@ EC4     8251 keyboard interface failed
 EC5     8251 keyboard test failed
 EC6     8259 PIC IC test failed
 EK0     Keyboard did not respond
-Ek1     Keyboard responds, but self test failed
+EK1     Keyboard responds, but self test failed
 ED1     Disk drive 1 test failed
 ED0     Disk drive 0 test failed
-E10     Non-vectored interrupt error
-E11     Vectored interrupt error
+EI0     Non-vectored interrupt error
+EI1     Vectored interrupt error
 
 *************************************************************************************************/
 
@@ -38,8 +38,12 @@ E11     Vectored interrupt error
 #include "cpu/z8000/z8000.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "machine/wd17xx.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
 
 class m20_state : public driver_device
 {
@@ -113,6 +117,17 @@ WRITE8_MEMBER(m20_state::ppi_w)
     m_i8255->write(space, offset/2, data);
 }
 
+// same for pit8253
+READ8_DEVICE_HANDLER(m20_pit8253_r)
+{
+    return pit8253_r(device, offset / 2);
+}
+
+WRITE8_DEVICE_HANDLER(m20_pit8253_w)
+{
+    pit8253_w(device, offset / 2, data);
+}
+
 /* from the M20 hardware reference manual:
    M20 memory is configured according to the following scheme:
    Segment   Contents
@@ -144,6 +159,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
+
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("wd177x", wd17xx_command_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_data_r, wd17xx_data_w)
+
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
     AM_RANGE(0x81, 0x87) AM_READWRITE(ppi_r, ppi_w)
@@ -152,7 +173,7 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
     AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
     AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
 
-	// 0x121 / 0x127 - pit8253 (TTY/printer, keyboard, RTC/NVI)
+	AM_RANGE(0x121, 0x127) AM_DEVREADWRITE_LEGACY("pit8253", m20_pit8253_r, m20_pit8253_w)
 
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
@@ -241,6 +262,57 @@ static const i8251_interface tty_i8251_intf =
 	DEVCB_NULL          // syndet
 };
 
+const wd17xx_interface m20_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL, //DEVCB_LINE(bbc_wd177x_intrq_w),
+	DEVCB_NULL, //DEVCB_LINE(bbc_wd177x_drq_w),
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static LEGACY_FLOPPY_OPTIONS_START(m20)
+	LEGACY_FLOPPY_OPTION(m20, "img", "M20 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface m20_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(m20),
+	NULL,
+	NULL
+};
+
+const struct pit8253_config pit8253_intf =
+{
+	{
+		{
+			1000000,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			1000000,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			1000000,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
@@ -265,10 +337,13 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PALETTE_LENGTH(4)
 
 	/* Devices */
+	MCFG_WD1770_ADD("wd177x", m20_wd17xx_interface )
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
 	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
+	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(m20_floppy_interface)
 MACHINE_CONFIG_END
 
 ROM_START(m20)
