@@ -46,4 +46,4 @@
 
 1                       24      MOVEABLE PURE   "mame.man"
 
-IDI_ICON_MESS           ICON    DISCARDABLE     "mess.ico"
+2                       ICON    DISCARDABLE     "mess.ico"
