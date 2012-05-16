@@ -23,7 +23,7 @@
 # 
 # This file was generated on 2010-05-14 from the info stored in the MESS DevWiki.
 
-$info=3do
+$info=3do,3do_pal
 $bio
 ====== 3DO Interactive Multiplayer (1993) ======
 
@@ -454,9 +454,7 @@ There are two undocumented built-in Basic instructions that can be used if you h
 
 
 
-The PLOT instruction draws lines in multicolor mode (which is entered by "MODE 8" through "MODE 15"). "PLOT 0,n" sets up the screen for multicolor mode, and must be executed before any other PLOT instruction (n is ignored). "PLOT 1,c[,x,y]" sets the pen color to c, and sets the coordinates of the lower left corner to (x,y). "PLOT 5,x,y" sets the pen position absolutely, and "PLOT 3,x,y" sets the pen position relatively to the current pen position. "PLOT 6,x,y" draws a line from the current pen position to a new pen position
-
-expressed absolutely, and "PLOT 4,x,y" draws a line from the current pen position to a new pen position expressed relatively to the current pen position. "PLOT 2,x,y" and "PLOT 7,x,y" do not do anything.
+The PLOT instruction draws lines in multicolor mode (which is entered by "MODE 8" through "MODE 15"). "PLOT 0,n" sets up the screen for multicolor mode, and must be executed before any other PLOT instruction (n is ignored). "PLOT 1,c[,x,y]" sets the pen color to c, and sets the coordinates of the lower left corner to (x,y). "PLOT 5,x,y" sets the pen position absolutely, and "PLOT 3,x,y" sets the pen position relatively to the current pen position. "PLOT 6,x,y" draws a line from the current pen position to a new pen position expressed absolutely, and "PLOT 4,x,y" draws a line from the current pen position to a new pen position expressed relatively to the current pen position. "PLOT 2,x,y" and "PLOT 7,x,y" do not do anything.
 
 
 
@@ -2455,7 +2453,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=abc800c
+$info=abc800c,abc802,abc806
 $bio
 ====== Luxor ABC 800 M / 800 C (1981) and ABC 802 / 806 (1983) ======
 
@@ -3663,7 +3661,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=alice
+$info=alice32
 $bio
 ====== Matra & Hachette Alice (1983) ======
 
@@ -7070,7 +7068,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=atarist
+$info=st
 $bio
 ====== Atari ST (1985) ======
 
@@ -7313,7 +7311,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=atariste
+$info=ste
 $bio
 ====== Atari STe (1989) ======
 
@@ -10439,7 +10437,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=c64
+$info=c64n
 $bio
 ====== CBM Commodore 64 (1982) ======
 
@@ -11368,7 +11366,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=cbm40
+$info=pet40
 $bio
 ====== CBM PET 40xx / CBM 40xx series (1980) ======
 
@@ -11561,7 +11559,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=cbm500
+$info=cbm500,p500
 $bio
 ====== CBM Commodore B128-40 / Pet-II / P500 (1983) ======
 
@@ -12086,9 +12084,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=cbm80
+$info=pet80
 $bio
-====== CBM 80xx series (1981) ======
+====== CBM PET 80xx / CBM 80xx series (1981) ======
 
 
 
@@ -12374,7 +12372,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=cdi
+$info=cdimono1
 $bio
 ====== Philips CD-i (1991) ======
 
@@ -16980,7 +16978,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=dc
+$info=dcjp
 $bio
 ====== Sega Dreamcast (1998) ======
 
@@ -18056,9 +18054,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=ep128
+$info=ep64
 $bio
-====== Enterprise 128 (1985) ======
+====== Enterprise 64 / 128 (1985) ======
 
 
 
@@ -18328,7 +18326,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=exidy
+$info=sorcerer
 $bio
 ====== Exidy Sorcerer (1978) ======
 
@@ -21217,7 +21215,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=genesis
+$info=genesis,32x,32x_scd,cdx,laseract,segacd,segacd2,xeye
 $bio
 ====== Sega MegaDrive / Genesis (1988) ======
 
@@ -22198,7 +22196,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=hp48g
+$info=hp48gx
 $bio
 ====== Hewlett Packard HP 48GX (1993), HP 48G (1993), HP 48G+ (1998) ======
 
@@ -23637,7 +23635,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=ip225015
+$info=ip225015,ip224613
 $bio
 ====== SGI Indy (1993) ======
 
@@ -23966,7 +23964,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=jupiter
+$info=jupace
 $bio
 ====== Jupiter Cantab Jupiter Ace (1981) ======
 
@@ -24091,7 +24089,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=kaypro
+$info=kaypro2x
 $bio
 ====== Kaypro IIx (1982) ======
 
@@ -26285,9 +26283,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=lisa2
+$info=lisa,lisa2
 $bio
-====== Apple Lisa 2 / Mac XL (1983) ======
+====== Apple Lisa / Lisa 2 / Mac XL (1983) ======
 
 
 
@@ -27503,9 +27501,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=max
+$info=vic10
 $bio
-====== CBM Commodore Max Machine (1982) ======
+====== CBM Commodore VIC 10 / Max Machine (1982) ======
 
 
 
@@ -28889,7 +28887,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=mk1
+$info=ccmk1
 $bio
 ====== Novag Industries / Videomaster Chess Champion MKI (1978) ======
 
@@ -29032,7 +29030,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=mk2
+$info=ccmk2
 $bio
 ====== Novag Industries Chess Champion MKII / Super System II (1979) ======
 
@@ -35577,9 +35575,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=pc1251
+$info=pc1250
 $bio
-====== Sharp Pocket Computer 1251 (1982) ======
+====== Sharp Pocket Computer 1250 / 1251 (1982) ======
 
 
 
@@ -36333,9 +36331,7 @@ Eight models were offered: The PC 1512 SD/DD (with one or two 5.25" floppy disk 
 
 
 
-The Amstrad used an "enhanced" CGA graphic mode, which could display 640x200 pixels with 16 colors (or grayscale). It was sold with MS-DOS 3.2, DR-DOS plus 1.2 (an operating system from Digital Research), GEM (a graphic interface, also used in the Atari ST, 
-
-TT & Falcon), GEMPAINT and GEM BASIC.
+The Amstrad used an "enhanced" CGA graphic mode, which could display 640x200 pixels with 16 colors (or grayscale). It was sold with MS-DOS 3.2, DR-DOS plus 1.2 (an operating system from Digital Research), GEM (a graphic interface, also used in the Atari ST, TT & Falcon), GEMPAINT and GEM BASIC.
 
 
 
@@ -36558,7 +36554,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=pc88srl
+$info=pc8801
 $bio
 ====== NEC PC-8801 series (1985) ======
 
@@ -41403,7 +41399,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=sfzch
+$info=sfzch,wofch
 $bio
 ====== Capcom CPS Changer (1994) ======
 
@@ -42533,7 +42529,7 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=sordm5
+$info=m5
 $bio
 ====== Sord M5 (1982) ======
 
@@ -47752,9 +47748,7 @@ The emulation of this system is still Preliminary.
 
 
 
-The TI-83 was released as the successor to the TI-82 and featured a newer, more contoured case design that has since been used on all of TI's newer calculators. The TI-83 features backwards compatibility with TI-82 programs and some newer financial functions, but by far the most notable aspect of this calculator is built-in assembly programming capability supported by TI itself. This advance saved curious programmers the trouble of "hacking" the calculator themselves to achieve this functionality, and marked the beginning of TI's embracement of assembly programming. The TI-83 was a popular programming platform, but has now been largely replaced by the TI-83 Plus, 
-
-an updated model.
+The TI-83 was released as the successor to the TI-82 and featured a newer, more contoured case design that has since been used on all of TI's newer calculators. The TI-83 features backwards compatibility with TI-82 programs and some newer financial functions, but by far the most notable aspect of this calculator is built-in assembly programming capability supported by TI itself. This advance saved curious programmers the trouble of "hacking" the calculator themselves to achieve this functionality, and marked the beginning of TI's embracement of assembly programming. The TI-83 was a popular programming platform, but has now been largely replaced by the TI-83 Plus, an updated model.
 
 
 
@@ -53248,9 +53242,9 @@ $end
 #---------------------------------------------------------------------------------------------#
 
 
-$info=vic20
+$info=vic1001
 $bio
-====== CBM VIC 20 and VC-20 (1981) ======
+====== CBM VIC 1001 and VIC 20 (1981) ======
 
 
 
