@@ -70,6 +70,10 @@ public:
     DECLARE_READ16_MEMBER(m20_i8259_r);
     DECLARE_WRITE16_MEMBER(m20_i8259_w);
     DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
+    DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
+    DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
+	DECLARE_READ_LINE_MEMBER(kbd_rx);
+	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 };
 
 
@@ -110,6 +114,20 @@ static SCREEN_UPDATE_RGB32( m20 )
 	return 0;
 }
 
+// these two i8251 callbacks will ask for/send 1 bit at a time.
+READ_LINE_MEMBER(m20_state::kbd_rx)
+{
+//    printf("read keyboard\n");
+    return 0x00;
+}
+
+// this should send 0-0-0-0-0-0-1-1 after the BIOS writes 0x03 to the data port.
+// it comes back 0-1-1-0-0-0-0-0-0-1-1 instead, with 3 leading extraneous bits.  why?
+WRITE_LINE_MEMBER(m20_state::kbd_tx)
+{
+    printf("%d to keyboard\n", state);
+}
+
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
     return pic8259_r(m_i8259, offset)<<1;
@@ -130,6 +148,18 @@ WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
     {
         // PIC lowered IRQ line
     }
+}
+
+WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
+{
+    m_ttyi8251->transmit_clock();
+    m_ttyi8251->receive_clock();
+}
+
+WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
+{
+    m_kbdi8251->transmit_clock();
+    m_kbdi8251->receive_clock();
 }
 
 /* from the M20 hardware reference manual:
@@ -247,8 +277,8 @@ static I8255A_INTERFACE( ppi_interface )
 
 static const i8251_interface kbd_i8251_intf =
 {
-	DEVCB_NULL,         // rxd in
-	DEVCB_NULL,         // txd out
+	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rx),
+	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_tx),
 	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
@@ -307,12 +337,12 @@ const struct pit8253_config pit8253_intf =
 		{
 			1000000,
 			DEVCB_NULL,
-			DEVCB_NULL
+            DEVCB_DRIVER_LINE_MEMBER(m20_state, tty_clock_tick_w)
 		},
 		{
 			1000000,
 			DEVCB_NULL,
-			DEVCB_NULL
+            DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_clock_tick_w)
 		},
 		{
 			1000000,
