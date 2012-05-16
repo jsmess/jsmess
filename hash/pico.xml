@@ -215,6 +215,28 @@
 		</part>
 	</software>
 
+	<software name="mickbmt">
+		<description>Mickey no Boku wa Meitantei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Disney</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mickey no boku wa meitantei (japan).bin" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickuts">
+		<description>Mickey to Utau Tori no Shima (Jpn)</description>
+		<year>1998</year>
+		<publisher>Disney</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey toutautorino shima minnie wo sagashite wakuwaku daibouken! (japan).bin" size="1048576" crc="643700aa" sha1="d47298e7dab451218cede56fd758401e356e6b2b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickblstg" cloneof="mickblst" supported="no">
 		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
 		<year>19??</year>
