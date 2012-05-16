@@ -138,7 +138,7 @@ static void duart_output(device_t *device, UINT8 data)
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
-	if ((data != 0) && (channel == 1)) printf("[%d]: %02x %c\n", channel, data, data);
+	if ((data != 0) && (channel == 1)) printf("%c", data);
 }
 
 static const duart68681_config duart_config =
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 
 	MCFG_MACHINE_RESET( esq1 )
 
-	MCFG_DUART68681_ADD("duart", 40000000, duart_config)
+	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
