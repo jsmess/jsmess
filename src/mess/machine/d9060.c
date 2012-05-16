@@ -431,18 +431,18 @@ WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 static const via6522_interface via_intf =
 {
 	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_r),
-	DEVCB_MEMBER(base_d9060_device, via_pb_r),
-	DEVCB_LINE_MEMBER(base_d9060_device, req_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_w),
-	DEVCB_MEMBER(base_d9060_device, via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(base_d9060_device, ack_w),
-	DEVCB_LINE_MEMBER(base_d9060_device, enable_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, ack_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, enable_w),
 
 	DEVCB_CPU_INPUT_LINE(M6502_HDC_TAG, INPUT_LINE_IRQ0)
 };
