@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Victor 9000 keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __VICTOR9K_KEYBOARD__

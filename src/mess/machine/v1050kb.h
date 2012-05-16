@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Visual 1050 keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __V1050_KEYBOARD__

@@ -1,6 +1,14 @@
+/**********************************************************************
+
+    COMX-35 80-Column Card emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
-COMX-35 80-Column Card
 (c) 1985 Comx World Operations
 
 PCB Layout

@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Apricot keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __APRICOT_KEYBOARD__

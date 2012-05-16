@@ -1,6 +1,13 @@
-/*
+/**********************************************************************
 
-Luxor ABC99
+    Luxor ABC-99 keyboard and mouse emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
+/*
 
 Keyboard PCB Layout
 -------------------
@@ -47,12 +54,7 @@ Notes:
 
 */
 
-
-#include "emu.h"
 #include "abc99.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/devhelpr.h"
-#include "sound/speaker.h"
 
 
 

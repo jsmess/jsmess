@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    COMX-35 F&M Joycard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 #include "comx_joy.h"
 
 

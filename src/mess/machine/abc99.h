@@ -1,9 +1,20 @@
+/**********************************************************************
+
+    Luxor ABC-99 keyboard and mouse emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __ABC99__
 #define __ABC99__
 
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
+#include "sound/speaker.h"
 
 
 

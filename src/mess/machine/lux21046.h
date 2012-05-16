@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Luxor 55-21046 "fast" floppy disk controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __LUXOR_55_21046__

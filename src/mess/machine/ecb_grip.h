@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Conitec Datensysteme GRIP graphics card emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 #pragma once
 
 #ifndef __GRIP__

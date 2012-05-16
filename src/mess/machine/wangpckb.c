@@ -1,9 +1,16 @@
+/**********************************************************************
+
+    Wang PC keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 /*
 
-Wang Professional Computer
-
-Keyboard PCB Layout
--------------------
+PCB Layout
+----------
 
 Key Tronic A65-02454-002
 PCB 201

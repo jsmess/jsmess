@@ -1,9 +1,16 @@
+/**********************************************************************
+
+    Luxor ABC-55/77 keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 /*
 
-Luxor ABC55/77
-
-Keyboard PCB Layout
--------------------
+PCB Layout
+----------
 
 KTC A65-02486-232
 

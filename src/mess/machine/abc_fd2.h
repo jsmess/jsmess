@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Scandia Metric FD2 floppy controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __ABC_FD2__

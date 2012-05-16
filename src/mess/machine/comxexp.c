@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    COMX-35 expansion bus emulation
+    COMX-35 Expansion Slot emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

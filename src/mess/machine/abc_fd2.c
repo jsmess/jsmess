@@ -1,5 +1,13 @@
+/**********************************************************************
+
+    Scandia Metric FD2 floppy controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 /*
-ABC FD2
 
 PCB Layout
 ----------

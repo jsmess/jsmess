@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Luxor 4105 SASI hard disk controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #include "lux4105.h"
 
 

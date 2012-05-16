@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Luxor ABC-55/77 keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __ABC77__
@@ -6,7 +15,6 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/devhelpr.h"
 #include "sound/discrete.h"
 #include "sound/speaker.h"
 

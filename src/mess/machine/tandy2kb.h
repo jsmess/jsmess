@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Tandy 2000 keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+*********************************************************************/
+
 #pragma once
 
 #ifndef __TANDY2K_KEYBOARD__

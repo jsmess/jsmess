@@ -1,8 +1,11 @@
-/***************************************************************************
+/**********************************************************************
 
-    GRIP - Grafik Interface Prozessor
+    Conitec Datensysteme GRIP graphics card emulation
 
-***************************************************************************/
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
 
 #include "ecb_grip.h"
 

@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    ECB Bus emulation
+    Conitec Datensysteme ECB Bus emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    COMX PL-80 plotter emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
     TODO:
@@ -6,11 +15,7 @@
 
 */
 
-
-#include "emu.h"
 #include "comxpl80.h"
-#include "cpu/m6805/m6805.h"
-#include "machine/devhelpr.h"
 
 
 

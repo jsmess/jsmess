@@ -1,6 +1,14 @@
+/**********************************************************************
+
+    COMX-35E Expansion Box emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
-COMX-35E Expansion Box
 (c) 1984 Comx World Operations
 
 PCB Layout
