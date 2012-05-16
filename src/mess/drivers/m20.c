@@ -42,6 +42,7 @@ EI1     Vectored interrupt error
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "machine/pic8259.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
@@ -54,18 +55,21 @@ public:
         m_kbdi8251(*this, "i8251_1"),
         m_ttyi8251(*this, "i8251_2"),
         m_i8255(*this, "ppi8255"),
+        m_i8259(*this, "i8259"),
 		m_p_videoram(*this, "p_videoram"){ }
 
     required_device<device_t> m_maincpu;
     required_device<i8251_device> m_kbdi8251;
     required_device<i8251_device> m_ttyi8251;
     required_device<i8255_device> m_i8255;
+    required_device<device_t> m_i8259;
 	required_shared_ptr<UINT16> m_p_videoram;
 
     virtual void machine_reset();
 
-	DECLARE_READ8_MEMBER(ppi_r);
-	DECLARE_WRITE8_MEMBER(ppi_w);
+    DECLARE_READ16_MEMBER(m20_i8259_r);
+    DECLARE_WRITE16_MEMBER(m20_i8259_w);
+    DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
 };
 
 
@@ -106,26 +110,26 @@ static SCREEN_UPDATE_RGB32( m20 )
 	return 0;
 }
 
-// translate addresses 81/83/85/87 to PPI offsets 0/1/2/3
-READ8_MEMBER(m20_state::ppi_r)
+READ16_MEMBER(m20_state::m20_i8259_r)
 {
-    return m_i8255->read(space, offset/2);
+    return pic8259_r(m_i8259, offset)<<1;
 }
 
-WRITE8_MEMBER(m20_state::ppi_w)
+WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-    m_i8255->write(space, offset/2, data);
+    pic8259_w(m_i8259, offset, (data>>1));
 }
 
-// same for pit8253
-READ8_DEVICE_HANDLER(m20_pit8253_r)
+WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
 {
-    return pit8253_r(device, offset / 2);
-}
-
-WRITE8_DEVICE_HANDLER(m20_pit8253_w)
-{
-    pit8253_w(device, offset / 2, data);
+    if (state)
+    {
+        // PIC raised IRQ line
+    }
+    else
+    {
+        // PIC lowered IRQ line
+    }
 }
 
 /* from the M20 hardware reference manual:
@@ -157,23 +161,28 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 //  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m20_io, AS_IO, 8, m20_state)
+static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("wd177x", wd17xx_command_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8_LEGACY("wd177x", wd17xx_command_w, 0x00ff)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_track_r, wd17xx_track_w, 0x00ff)
+	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_sector_r, wd17xx_sector_w, 0x00ff)
+	AM_RANGE(0x06, 0x07) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_data_r, wd17xx_data_w, 0x00ff)
 
-	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-    AM_RANGE(0x81, 0x87) AM_READWRITE(ppi_r, ppi_w)
-    AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
-    AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
-    AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
-    AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
 
-	AM_RANGE(0x121, 0x127) AM_DEVREADWRITE_LEGACY("pit8253", m20_pit8253_r, m20_pit8253_w)
+	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
+
+    AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
+    AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+    AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
+    AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
+
+	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)
+
+	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
+//	AM_RANGE(0x140, 0x143) AM_DEVREADWRITE8_LEGACY("i8259", pic8259_r, pic8259_w, 0xffff)
 
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
@@ -313,6 +322,13 @@ const struct pit8253_config pit8253_intf =
 	}
 };
 
+const struct pic8259_interface pic_intf =
+{
+	DEVCB_DRIVER_LINE_MEMBER(m20_state, pic_irq_line_w),
+    DEVCB_LINE_VCC, // we're the only 8259, so we're the master
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
@@ -343,6 +359,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
 	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
 	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
+	MCFG_PIC8259_ADD("i8259", pic_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(m20_floppy_interface)
 MACHINE_CONFIG_END
 
