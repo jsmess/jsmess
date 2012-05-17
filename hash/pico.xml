@@ -137,6 +137,17 @@
 		</part>
 	</software>
 
+	<software name="carrangr">
+		<description>Gekisou Sentai CarRanger (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gekisou sentai carranger (japan).bin" size="524288" crc="8ed536bc" sha1="b4f276d4ecc300b38b73bf1d7030f6820786fe55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gojirado">
 		<description>Gojira Dokidoki Kaijuu Shima (Jpn)</description>
 		<year>1995</year>
@@ -178,6 +189,17 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hello kitty no machiheodekake (japan).bin" size="1048576" crc="3f336747" sha1="28e866688fed6e7c0a82c3f1e91f205600afcf68" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanshuno">
+		<description>Kanshuu Unou Image Training - Hiragana - Katakana (Jpn)</description>
+		<year>2004</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shichi ta makoto kanshuu unou imeejitoreeningu hiragana - katakana kajino de mojabegasudoriimu (japan).bin" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
