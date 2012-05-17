@@ -47,8 +47,7 @@
 
 
         Thanks to Amigan site for various documents.
-        We used Winarcadia emulator to get an idea of what the computer
-        should look like, but we DID NOT look at the source code.
+
 
 ****************************************************************************/
 

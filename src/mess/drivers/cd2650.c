@@ -17,12 +17,9 @@
         TODO
         - Lots, probably. The computer is a complete mystery. No pictures,
                 manuals or schematics exist.
-        - Find out how the scrolling works - if it scrolls at all.
         - Using the terminal keyboard, as it is unknown if it has its own.
         - Cassette interface.
-
-        We used Winarcadia emulator to get an idea of what the computer
-        might possibly look like, but we DID NOT read the source code.
+        - Need the proper chargen rom.
 
 ****************************************************************************/
 
@@ -98,10 +95,9 @@ SCREEN_UPDATE16_MEMBER(cd2650_state)
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
     Further, the letters have bit 6 set low, thus the range is 01 to 1A.
-    When the bottom of the screen is reached, it does not scroll, it just wraps around.
-    There is no scroll register or any indication of how scrolling might be accomplished. */
+    When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
-	UINT16 offset = 0; // if we figure out how the scrolling works, that calculation goes here
+	UINT16 offset = 0;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,x,mem;
 

@@ -8,13 +8,13 @@
         All input must be in uppercase.
 
         Commands:
-        A — See and alter memory
-        B — Set breakpoint (2 permitted)
-        C — Clear breakpoint
-        D — Dump memory to paper tape
-        G — Go to address, run
-        L — Load memory from paper tape
-        S — See and alter registers
+        A - See and alter memory
+        B - Set breakpoint (2 permitted)
+        C - Clear breakpoint
+        D - Dump memory to paper tape
+        G - Go to address, run
+        L - Load memory from paper tape
+        S - See and alter registers
 
         PIPBUG isn't a computer; it is a the name of the bios used
         in a number of small 2650-based computers from 1976 to 1978.
