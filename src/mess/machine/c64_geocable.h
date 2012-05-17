@@ -48,7 +48,7 @@ protected:
 	virtual void c64_pa2_w(int level);
 
 private:
-	required_device<centronics_printer_device> m_centronics;
+	required_device<centronics_device> m_centronics;
 };
 
 

@@ -95,7 +95,7 @@ void c64_geocable_device::device_start()
 
 void c64_geocable_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
 {
-	m_centronics->write(data);
+	m_centronics->write(space, 0, data);
 }
 
 
