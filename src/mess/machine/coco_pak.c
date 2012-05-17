@@ -172,12 +172,14 @@ void coco_pak_banked_device::banked_pak_set_bank(UINT32 bank)
 	UINT8 *rom = memregion(CARTSLOT_TAG)->base();
 	UINT32 rom_length = memregion(CARTSLOT_TAG)->bytes();
 
-	pos = (bank * 0x4000) % m_cart->length();
+	if (m_cart->exists()) {
+		pos = (bank * 0x4000) % m_cart->length();
 
-	for (i = 0; i < rom_length / 0x4000; i++)
-	{
-		m_cart->fseek(pos, SEEK_SET);
-		m_cart->fread(&rom[i * 0x4000], 0x4000);
+		for (i = 0; i < rom_length / 0x4000; i++)
+		{
+			m_cart->fseek(pos, SEEK_SET);
+			m_cart->fread(&rom[i * 0x4000], 0x4000);
+		}
 	}
 }
 
