@@ -215,6 +215,17 @@
 		</part>
 	</software>
 
+	<software name="kitereda">
+		<description>Kiteretsu Daihyakka - Edo ni Itte Kiteretsu Saisamaniau Nari (Jpn)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="kiteretsu daihyakka edoniitte kiteretsu saisamaniau nari (japan).bin" size="524288" crc="85f80871" sha1="e13ad62f7dbd270f74a4dbbe881d1ca619899d31" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kumapooh">
 		<description>Kuma no Pooh-san - Christopher Robin wo Sagase (Jpn)</description>
 		<year>1999</year>
@@ -244,6 +255,17 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mickey no boku wa meitantei (japan).bin" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickybk">
+		<description>Mickey no Yukai na Bouken (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey no yukai na bouken (japan).bin" size="524288" crc="5a6767a9" sha1="bb35a699c883121dbe5b16877531c2ba8e1d2242" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
