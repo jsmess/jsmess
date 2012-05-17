@@ -1,4 +1,4 @@
-# ====== MESS System Information File ======
+﻿# ====== MESS System Information File ======
 # 
 # This file contains the basic system information for most of the drivers presented in the MESS distribution. The most current copy of this file resides at [[http://mess.redump.net/sysinfo]] and is also available in the MESS SVN repository.
 # 
@@ -275,7 +275,7 @@ None of the above project seems to have reached the completion.
 
 
 
-//(info from old-computers.org, Wikipedia, FAQs, etc.)//
+(info from old-computers.org, Wikipedia, FAQs, etc.)
 
 
 
@@ -318,11 +318,31 @@ $bio
 
 
 
+===== Usage =====
+
+
+
+When switched on, the display is blank with 4 flashing dots. Press 1 to start the clock. The clock has 4 displays (1) Date (2) Days to retirement (3) Time (4) Time to retirement. To select a display, press 1, press 2, press 1 to choose the display. (0 = cycle through displays 1,2,3.)
+
+
+To set the time, press 1 twice, press 2. Press 2 to set the hours (24 hour time), press 1, press 2 to set the minutes, press 1, press 2 to set the seconds, press 1.
+
+
+To set the date, press 1 3 times, then press 2. The screen format is American (MM:DD:YY). Press 2 to set the year, then press 1 for the month, then the day, then a leap-year digit(?).
+
+
+To set the days to retirement, press 1 4 times.
+
+
+To set the time to retirement, press 1 5 times.
+
+
+
 ===== History and Trivia =====
 
 
 
-This is a clock designed by John L. Weinrich, around a i4004 CPU, in occasion of his retirement in 2008. Its //display// consists of 6 Nixie tubes and 4 Neon Lamps.
+This is a clock designed by John L. Weinrich, around a i4004 CPU, in occasion of his retirement in 2008. Its display consists of 6 Nixie tubes and 4 Neon Lamps.
 
 
 
@@ -405,7 +425,7 @@ TI additionally sold University Basic for the TM990/189.  It is a relatively sim
 
 
 
-//(info from Raphael Nabet, author of the MESS driver)//
+(info from Raphael Nabet, author of the MESS driver)
 
 
 
@@ -484,7 +504,7 @@ This board was not designed by TI, but an external society (Eyring Research Inst
 
 
 
-//(info from Raphael Nabet, author of the MESS driver)//
+(info from Raphael Nabet, author of the MESS driver)
 
 
 
@@ -597,7 +617,7 @@ There were two versions of the Amiga 1000. The first one, just called "Amiga", w
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -1173,7 +1193,7 @@ These computers were followed by a great family of computers called RISC PC whic
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -1344,7 +1364,7 @@ The Atari 400 was known inside Atari as code name "Candy".
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -1527,7 +1547,7 @@ This computer was, and is still used a lot in the "demoscene" to create cool vid
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -1670,7 +1690,7 @@ The Atari 5200 suffered from its initial incompatibility with the VCS/2600 (an a
 
 
 
-//(info on the different hardware versions based on Wikipedia)//
+(info on the different hardware versions based on Wikipedia)
 
 
 
@@ -1855,7 +1875,7 @@ would be in contact with him. He never heard from Atari again."
 
 
 
-//(info on 7800 models from Zube's "Atari 2600/7800 FAQ")//
+(info on 7800 models from Zube's "Atari 2600/7800 FAQ")
 
 
 
@@ -2056,7 +2076,7 @@ In 1983, Atari released the 800XL computer. It has the same CPU as the Atari 800
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -2195,7 +2215,7 @@ They would be replaced in 1985 with the XE series when Atari launched the ST.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -2412,7 +2432,7 @@ Many schools in Sweden had ABC 80 or ABC 800 for the students. It was possible t
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -2663,7 +2683,7 @@ The ABC 800 series was also sold by Facit under the DTC (DeskTop Computer) name,
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -2806,7 +2826,7 @@ It found however one's place in computing history when Apple took legal action a
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -2833,8 +2853,23 @@ $info=acrnsys1
 $bio
 ====== Acorn System 1 (1979) ======
 
+===== Usage =====
 
+-   (modify) Memory display and modification
 
+L   (load) Reads a block of bytes from tape
+
+X   (go) Run program starting at an address
+
+R   (return) Resume after a breakpoint
+
+P   (point) Inserts or removes breakpoint
+
+S   (store) Writes a block of bytes to tape
+
+(up) Increment displayed address
+
+(down) Decrement displayed address
 
 
 ===== Features =====
@@ -2939,7 +2974,7 @@ The System 1 itself was composed of two Eurocard boards (one for the CPU and the
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -3102,7 +3137,7 @@ The Adam had a pretty short life, only two years! Despite this there is still a 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -3294,7 +3329,7 @@ This design choice made by SNK, resulted in a very high price for the units. Ori
 
 
 
-//(info based on Wikipedia and old-computers.com)//
+(info based on Wikipedia and old-computers.com)
 
 
 
@@ -3344,33 +3379,6 @@ $bio
 ====== Rockwell AIM-65 (1977) ======
 
 
-
-
-
-===== Features =====
-
-
-
-  * CPU: Rockwell 6502 1MHz
-
-  * RAM: 1 to 4 KB (up to 32 KB of static RAM)
-
-  * ROM: 8 to 20 KB
-
-  * Integrated 20 digit (16 segment) display
-
-  * Full size keyboard
-
-  * Integrated printer
-
-  * Connector for tty input/output
-
-  * Tape interface
-
-
-
-
-
 ===== Usage =====
 
 
@@ -3395,7 +3403,31 @@ For example, to use BASIC, load ''aim65_basic.z26'' into slot 1 and ''aim65_basi
 
 
 
-Once in the emulated machine, type "5" to start it.
+Once in the emulated machine, type "5" to start Basic.
+
+Press N to start the Assembler.
+
+
+
+===== Features =====
+
+
+
+  * CPU: Rockwell 6502 1MHz
+
+  * RAM: 1 to 4 KB (up to 32 KB of static RAM)
+
+  * ROM: 8 to 20 KB
+
+  * Integrated 20 digit (16 segment) display
+
+  * Full size keyboard
+
+  * Integrated printer
+
+  * Connector for tty input/output
+
+  * Tape interface
 
 
 
@@ -3477,7 +3509,6 @@ Different RAM configurations are possible for the aim65 in MESS. You can switch 
 
   * Would suffer from support for intelligent terminals as tty equipment.
 
-  * Due to a MESS core problem, only .z24 carts are accepted at the moment
 
 
 
@@ -3499,7 +3530,7 @@ The board featured five 4 KB-ROM sockets. Two of them were dedicated to the AIM 
 
 
 
-Several cards were developped for this machine, especially language cards and ROMs: a BASIC card (BASIC language with floating point mathematics capabilities), PL/65 (a mixture of the PL/1 and Algol languages), Instant Pascal (an interpreted version of Pascal), Assembler and the FORTH programming language.
+Several cards were developed for this machine, especially language cards and ROMs: a BASIC card (BASIC language with floating point mathematics capabilities), PL/65 (a mixture of the PL/1 and Algol languages), Instant Pascal (an interpreted version of Pascal), Assembler and the FORTH programming language.
 
 
 
@@ -3507,7 +3538,7 @@ In 1981 Rockwell introduced an improved model with a 40 character display as the
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -3636,7 +3667,7 @@ Finally, it includes a software emulation of the MSX2 VDP, used in the ports of 
 
 
 
-//(info from MESS driver)//
+(info from MESS driver)
 
 
 
@@ -3656,7 +3687,32 @@ Finally, it includes a software emulation of the MSX2 VDP, used in the ports of 
 
 $end
 
+#---------------------------------------------------------------------------------------------#
 
+$info=al8800bt
+$bio
+====== Altair 8800bt ======
+
+===== Usage =====
+
+All commands must be in uppercase. Address and data is specified in Octal format (not hex).
+
+
+Press space to input your command line (not return).
+
+
+D - Memory Dump
+
+J - Jump to address
+
+M - Modify memory
+
+
+
+
+
+
+$end
 
 #---------------------------------------------------------------------------------------------#
 
@@ -3789,7 +3845,7 @@ But this computer was, like the MC 10, a flop in the marketplace. It was replace
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -3907,7 +3963,7 @@ $bio
 
 
 
-//(from the source code)//
+(from the source code)
 
 
 
@@ -4380,7 +4436,7 @@ An additional disc interface was available.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -4824,7 +4880,7 @@ This machine was so popular that Jack Tramiel of Commodore (!) offered to buy Ap
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -5232,7 +5288,7 @@ The Apple //c was replaced with the Apple IIc+ in 1988.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -5437,7 +5493,7 @@ The Apple IIc Plus was the finest Apple 8-bit computer ever built, but due to a 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -5897,7 +5953,7 @@ The ||GS also had all the graphics modes found on the //c.
 
 
 
-//(info from old-computers.com and other sources)//
+(info from old-computers.com and other sources)
 
 
 
@@ -6112,7 +6168,7 @@ The Apple II+ was sold in Europe as the Apple IIeuroplus which could display vid
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -6331,7 +6387,7 @@ The Apple ///%% was followed in december 1983 by the Apple %%/// plus which had 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -6518,7 +6574,7 @@ Note that the BASIC shortcuts listed above were also written above each key, to 
 
 
 
-Also, notice that by default SPACE is mapped to "Left Shift" key and RTN is mapped to "/" key, to accurately reproduce the locations on the original keyboard. If you feel uncomfortable with this mapping, you can remap them (//TAB->Input (This System)//) or use the -natural emulation of the keyboard.
+Also, notice that by default SPACE is mapped to "Left Shift" key and RTN is mapped to "/" key, to accurately reproduce the locations on the original keyboard. If you feel uncomfortable with this mapping, you can remap them (//TAB->Input (This System)) or use the -natural emulation of the keyboard.
 
 
 
@@ -6594,7 +6650,7 @@ There were also a Modem planned and Mattel even announced network services for g
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -6833,7 +6889,7 @@ As previously mentioned, this hardware was sold from several firms with differen
 
 
 
-//(info on models from Digital Archaelogy -- http://www.digitpress.com/the_digs/arcadia/)//
+(info on models from Digital Archaelogy -- http://www.digitpress.com/the_digs/arcadia/)
 
 
 
@@ -7254,7 +7310,7 @@ There was also a STfM model with a built-in floppy (the f) and an RF Modulator (
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -7445,7 +7501,7 @@ Not long after this, Atari launched the Mega STe to replace the Mega STf.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -7596,7 +7652,7 @@ Original Keyboard: QWERTY, full-stroke keyboard, 60 keys
 
 
 
-The original location of the 8271 memory mapped registers is 0xa00-0x0a04. (This is the memory range assigned by Acorn in their design.) This is in the middle of the area for expansion RAM. Many Atom owners thought this was a bad design and have modified their Atom's and dos rom to use a different memory area. The atom driver in MESS uses the original memory area. //(from the source)//
+The original location of the 8271 memory mapped registers is 0xa00-0x0a04. (This is the memory range assigned by Acorn in their design.) This is in the middle of the area for expansion RAM. Many Atom owners thought this was a bad design and have modified their Atom's and dos rom to use a different memory area. The atom driver in MESS uses the original memory area. (from the source)
 
 
 
@@ -7642,7 +7698,7 @@ A lot of other peripherals were developed :
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -7810,7 +7866,7 @@ Some of the features of the Avigo that distinguish it from competing devices pro
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -7927,7 +7983,7 @@ It was the second product of BPNO, a small manufacturer located in Bashkiria (no
 
 
 
-//(info based on bashkiria-2m.narod.ru, roughly translated from Russian)//
+(info based on bashkiria-2m.narod.ru, roughly translated from Russian)
 
 
 
@@ -8164,7 +8220,7 @@ It was then followed by the BBC Master.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -8552,7 +8608,7 @@ The BBC Master and Master Compact could be considered the most accomplished 8-bi
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -8739,7 +8795,7 @@ It's a digital and analog I/O and DC power connector, 37-pin connector on the IS
 
 
 
-//(info based on various Wikipedia pages)//
+(info based on various Wikipedia pages)
 
 
 
@@ -8858,7 +8914,7 @@ The FOCAL language was distributed in separate ROM block which connected via spe
 
 
 
-//(info from homecomputer.de)//
+(info from homecomputer.de)
 
 
 
@@ -9076,7 +9132,7 @@ It is, however, a true portable computer running CP/M, which is quite rare.
 
 
 
-//(info from vintage-computer.com)//
+(info from vintage-computer.com)
 
 
 
@@ -9779,7 +9835,7 @@ Differences between the 128D and the 128DCR were:
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -10390,7 +10446,7 @@ Final assembly was done in Mexico by a company named Sigma.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -10825,7 +10881,7 @@ Finally, the C64GS was released in 1990. Basically it was a re-boxed C64, withou
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -10970,7 +11026,7 @@ The C64GS was also plagued with hardware problems. Indeed, the C64GS was not com
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -11335,7 +11391,7 @@ Commodore produced about 50 C65's, the first ones display C64DX at boot, the lat
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -11522,7 +11578,7 @@ The 4032 and the 4016 were sold with an 80-column dot matrix printer (5x8 charac
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -11685,7 +11741,7 @@ The 500 / 600 series was mainly sold in Europe, but a few models are known to ha
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -11860,7 +11916,7 @@ The 500 / 600 series was mainly sold in Europe, but a few models are known to ha
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -12047,7 +12103,7 @@ Both versions could be purchased with a built-in dual floppy disk drive which wa
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -12224,7 +12280,7 @@ of RAM and 12 KB of ROM (which contains the DOS). It was sold with Ozz, a Databa
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -12257,6 +12313,69 @@ of RAM and 12 KB of ROM (which contains the DOS). It was sold with Ozz, a Databa
 $end
 
 
+
+#---------------------------------------------------------------------------------------------#
+
+
+$info=ccs2810
+$bio
+====== CCS Model 2810 ======
+
+
+
+
+
+===== Usage =====
+
+Press Enter to start the system.
+
+All commands are in uppercase.
+
+
+A    Assign logical device
+
+Dn,n Dump memory
+
+E    Punch End-of-File to paper tape
+
+F    Fill
+
+G    Go
+
+H    Hex arithmetic
+
+I    In
+
+L    Punch Leader to paper tape
+
+M    Move
+
+O    Out
+
+Q    Query logical devices
+
+R    Read a file from paper tape
+
+S    Edit memory
+
+T    Test memory
+
+V    Verify (compare 2 blocks of memory)
+
+W    Write a file to paper tape
+
+X    Examine Registers
+
+Y    Set Baud rate of i8250
+
+Z    Zleep (lock terminal). Press control+G twice to unlock.
+
+
+
+
+
+
+$end
 
 #---------------------------------------------------------------------------------------------#
 
@@ -12333,7 +12452,7 @@ Unfortunately for Commodore their financial problems had begun to take hold by t
 
 
 
-//(info from old-computers.com and from CD32 FAQ)// 
+(info from old-computers.com and from CD32 FAQ)
 
 
 
@@ -12548,7 +12667,7 @@ On the other hand, they are not compatible with the following kind of discs:
 
 
 
-//(info based on Wikipedia and ICDiA FAQs)//
+(info based on Wikipedia and ICDiA FAQs)
 
 
 
@@ -12681,7 +12800,7 @@ The manager of the team promoting the CDTV was Nolan Bushnell, the man who found
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -13058,7 +13177,7 @@ However, the machine was reliable and solidly built. It featured a good mechanic
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -13163,7 +13282,7 @@ On the console, five buttons are present: a RESET button, plus four button (numb
 
 
 
-MESS controls are mapped in the following way (P1 buttons as indicated in the //Input (this system)// menu): button 1 is mapped to "P1 Start", button 2 is mapped to "P1 button 5", button 3 is mapped to "P1 button 6", button 4 is mapped to "P1 button 7". 
+MESS controls are mapped in the following way (P1 buttons as indicated in the //Input (this system) menu): button 1 is mapped to "P1 Start", button 2 is mapped to "P1 button 5", button 3 is mapped to "P1 button 6", button 4 is mapped to "P1 button 7". 
 
 P1 buttons 1 to 4 are reserved to PUSH DOWN, PULL UP, MOVE CLOCKWISE, MOVE COUNTERCLOCKWISE (movements you could do with the joystick, on the original hardware) respectively.
 
@@ -13229,7 +13348,7 @@ Various version of the Channel F were marketed: in Sweden the game-station was m
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -13336,7 +13455,7 @@ On the console, five buttons are present: a RESET button, plus four button (numb
 
 
 
-MESS controls are mapped in the following way (P1 buttons as indicated in the //Input (this system)// menu): button 1 is mapped to "P1 Start", button 2 is mapped to "P1 button 5", button 3 is mapped to "P1 button 6", button 4 is mapped to "P1 button 7". 
+MESS controls are mapped in the following way (P1 buttons as indicated in the //Input (this system) menu): button 1 is mapped to "P1 Start", button 2 is mapped to "P1 button 5", button 3 is mapped to "P1 button 6", button 4 is mapped to "P1 button 7". 
 
 P1 buttons 1 to 4 are reserved to PUSH DOWN, PULL UP, MOVE CLOCKWISE, MOVE COUNTERCLOCKWISE (movements you could do with the joystick, on the original hardware) respectively.
 
@@ -13398,7 +13517,7 @@ Various version of the Channel F were marketed: in Sweden the game-station was m
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -13589,7 +13708,7 @@ To load a basic file (/BAS), type
 
 
 
-//(Thanks to "Axe" for the command summary)//
+(Thanks to "Axe" for the command summary)
 
 
 
@@ -13699,7 +13818,7 @@ The BASIC developed by Microware (the developers of the OS-9 operating system an
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -13878,7 +13997,7 @@ To load a basic file (/BAS), type
 
 
 
-//(Thanks to "Axe" for the command summary)//
+(Thanks to "Axe" for the command summary)
 
 
 
@@ -13986,7 +14105,7 @@ The BASIC developed by Microware (the developers of the OS-9 operating system an
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -14225,7 +14344,7 @@ Tandy made several prototypes of a Color Computer model IV but it was never rele
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -14418,7 +14537,7 @@ Telegames purchased the rights to the system, and many of the manufactured games
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -14557,7 +14676,7 @@ The following languages were available on disk: Comal, Pascal, Fortran, Cobol.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -14799,7 +14918,7 @@ The COMX-35 did have a successor: the COMX-PC1. This was just a COMX-35 in a dif
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -14938,7 +15057,7 @@ The price was about $4000 for a bare 256-kbyte system in 1984 ($1000 for extra 2
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -15099,7 +15218,7 @@ To load a basic file (/BAS), type
 
 
 
-//(Thanks to "Axe" for the command summary)//
+(Thanks to "Axe" for the command summary)
 
 
 
@@ -15155,7 +15274,7 @@ When the MSX systems came in 1985/1986 (in Brazil), sales of the CP-400 started 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -15171,7 +15290,7 @@ When the MSX systems came in 1985/1986 (in Brazil), sales of the CP-400 started 
 
 
 
-// (check also links in the CoCo entry)//
+// (check also links in the CoCo entry)
 
 
 
@@ -15436,7 +15555,7 @@ emissions. Therefore the German CPC's are much heavier than the English CPC's. I
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -15585,7 +15704,7 @@ As Atari did with the 65-XE when it reached the end of its life, so Amstrad made
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -15862,7 +15981,7 @@ emissions. Therefore the German CPC's are much heavier than the English CPC's. I
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -16009,7 +16128,7 @@ As Atari did with the 65-XE when it reached the end of its life, so Amstrad made
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -16278,7 +16397,7 @@ emissions. Therefore the German CPC's are much heavier than the English CPC's. I
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -16423,7 +16542,7 @@ The console had 2 integrated joystick/membrane keypad controllers (much like the
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -16588,7 +16707,7 @@ The company stopped manufacturing the units after two product versions and only 
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -16860,7 +16979,7 @@ A lot of peripherals were developed for this computer : a hard disk (8 MB), seve
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -17126,7 +17245,7 @@ Despite its short lifespan, as of 2007, Dreamcast is still a popular and highly-
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -17247,7 +17366,7 @@ An updated version of the DG-1 (Model 2) appeared later, with a much improved el
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -17410,7 +17529,7 @@ To load a basic file (/BAS), type
 
 
 
-//(Thanks to "Axe" for the command summary)//
+(Thanks to "Axe" for the command summary)
 
 
 
@@ -17490,7 +17609,7 @@ Two years later, Welsh launched the DRAGON 64 which has the same characteristics
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -17669,7 +17788,7 @@ To load a basic file (/BAS), type
 
 
 
-//(Thanks to "Axe" for the command summary)//
+(Thanks to "Axe" for the command summary)
 
 
 
@@ -17703,7 +17822,7 @@ In 85 Eurohard, a spanish manufacturer, acquired Dragons Data. Then the Dragon 2
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -17852,7 +17971,7 @@ The TC-01 is the first version of the hardware, with the 256 being the second ve
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -18013,7 +18132,7 @@ Despite being more powerful than the ZX Spectrum, the Electron didn't sell well 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -18230,7 +18349,7 @@ Unsold stocks of these systems (nearly all :-)), were sold to East-Europeans cou
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -18506,7 +18625,7 @@ The Sorcerer also had a strong following in Australia. This is most likely due t
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -18847,7 +18966,7 @@ A number of peripheral devices and software packages were released for the Famic
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -19163,7 +19282,7 @@ There were two known mainboard revisions:
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -19308,7 +19427,7 @@ The Most outstanding feature of the FM-7 was the quality and speed of the graphi
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -19469,7 +19588,7 @@ There were two models : the AV-1 which has one 3.5" disk-drive (double density) 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -19550,7 +19669,7 @@ When Fujitsu lowered the price and released the Marty 2, sales started to slowly
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -19663,7 +19782,7 @@ There exist various variations of the G7400: the Jopac JO7400, the Schneider G74
 
 
 
-//(info from Odyssey FAQs and videopac.org)//
+(info from Odyssey FAQs and videopac.org)
 
 
 
@@ -19856,7 +19975,7 @@ The story has many more details, including broadcasting Galaksija programs over 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -19965,7 +20084,7 @@ Galaksija Plus was an improvement of regular Galaksija, created by different aut
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -20074,7 +20193,7 @@ The production ended at the end of 1984 and there were only 250 units produced (
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -20239,7 +20358,7 @@ Various accessories were produce for the Game Boy.
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -20370,7 +20489,7 @@ In an effort to revitalize their system, Tiger later released the game.com Pocke
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -20525,7 +20644,7 @@ The Game Gear was also re-released in a smaller handheld form factor in late 200
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -20777,7 +20896,7 @@ All the Game Boy Advance systems feature no regional lockouts on software, so No
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -21164,7 +21283,7 @@ The infrared communications was introduced to allow trading of items and sharing
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -21711,7 +21830,7 @@ During its lifespan, the Sega MegaDrive and Genesis quite possibly received more
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -22034,7 +22153,7 @@ The Hartung Game Master has a black and grey color casing with a border and name
 
 
 
-//(info from Game Master FAQs)//
+(info from Game Master FAQs)
 
 
 
@@ -22139,7 +22258,7 @@ Only a few cartridge games were released, adding to the frustration of unlucky b
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -22653,7 +22772,7 @@ The HP48GII is different to the rest of the HP 48 series because it uses an ARM 
 
 
 
-//(info from hpcc.org)//
+(info from hpcc.org)
 
 
 
@@ -22784,7 +22903,7 @@ And it does not have a regular battery either, but a Dallas self-contained CMOS 
 
 
 
-//(info from Theodor Lauppert's Homepage, link below)//
+(info from Theodor Lauppert's Homepage, link below)
 
 
 
@@ -22907,7 +23026,7 @@ Another notable great feature of the PC line was the expansion base: it added ad
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -23048,7 +23167,7 @@ Clones of the XT, such as the Tandy 1000 became commonplace by the end of the de
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -23141,7 +23260,7 @@ This computer was revolutionary, but it was the last time IBM imposed a standard
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -23270,7 +23389,7 @@ well.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -23923,7 +24042,7 @@ After the Atari Corporation properties were bought out by Hasbro Interactive in 
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -24048,7 +24167,7 @@ Steve Vickers wrote the ZX Spectrum manual - he has been an academic researcher 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -24213,7 +24332,7 @@ In 1985, Arthur C. Clarke published a sequel to 2001 : 2010 Odyssey Two. He work
 
 
 
-//(info based on old-computers.com)//
+(info based on old-computers.com)
 
 
 
@@ -24336,7 +24455,7 @@ Both CAOS and Basic interpreter also had some new commands, especially for graph
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -24467,7 +24586,7 @@ There are two expansion slots, which could be extended to four through an expans
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -24947,7 +25066,7 @@ Soon after release, Commodore Business Machines would buy out MOS Technologies a
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -25086,7 +25205,7 @@ Different addons were available : 16 KB and 32 KB RAM upgrades, color (and high 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -25213,7 +25332,7 @@ A Z80 card with CP/M 80 was available, as well as an Intel 8088 card.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -25368,7 +25487,7 @@ An obscure VZ-100 version was also released but this wasn't the same machine as 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -25535,7 +25654,7 @@ Later, Video Technology also had a line of PC machines ranging from an XT 10 MHz
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -26040,7 +26159,7 @@ This model was also sold worldwide, the most popular version being the VZ-300 fr
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -26179,7 +26298,7 @@ There are now 6 graphical modes, ranging from 160 x 96 in 16 colors to 640 x 192
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -26258,7 +26377,7 @@ NEC also released its version of the system (PDE-LD1), compatible with all the P
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -26459,7 +26578,7 @@ Lisa is a milestone in the history of computing. Arguably, the Xerox PARC resear
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -26777,7 +26896,7 @@ The games were originally meant to be loaded from tape, but were later changed t
 
 
 
-//(info based on Wikipedia, Lynx FAQs and Atari Age)//
+(info based on Wikipedia, Lynx FAQs and Atari Age)
 
 
 
@@ -26924,7 +27043,7 @@ There were also two variants of Macintosh 512K. The 512K was shipped with a 400K
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -27178,7 +27297,7 @@ One unique feature of the Classic was the ability to start from a ROM disk by ho
 
 
 
-//(info based on various Wikipedia pages)//
+(info based on various Wikipedia pages)
 
 
 
@@ -27303,7 +27422,7 @@ Although the Mac Plus was made obsolete in march 1987 by the new Macintosh serie
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -27460,7 +27579,7 @@ A couple years later it was replaced with the SE FDHD (Floppy Disk High Density)
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -27695,7 +27814,7 @@ Though initially planned for world-wide release, the Commodore Max Machine was s
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -27888,7 +28007,7 @@ The Microbee 32 was followed by Microbee 56, 64 and 128 models. There were all d
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -28065,7 +28184,7 @@ It is fully compatible with the first version of the Matra Alice (a French compu
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -28182,7 +28301,7 @@ There were around 30 games made for the system.
 
 
 
-//(info from the MegaDuck FAQs)//
+(info from the MegaDuck FAQs)
 
 
 
@@ -28325,7 +28444,7 @@ The Mega ST had a pretty good success and was replaced by the Mega STe and by th
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -28476,7 +28595,7 @@ The Mega STe ended production in 1993. This was also the only Atari product ever
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -28553,7 +28672,7 @@ There was also a parallel bus interface for general purpose I/O.
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -28682,7 +28801,7 @@ The 1kb ROM contained TANBUG, a monitor which allowed to enter machine code prog
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -28765,7 +28884,7 @@ It used a common tape recorder as "mass-storage".
 
 
 
-//(info from homecomputer.de)//
+(info from homecomputer.de)
 
 
 
@@ -30311,7 +30430,7 @@ There are in fact two models : MPF-1 (later called MPF-1A) and MPF-1B. The MPF-1
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -30574,7 +30693,7 @@ Almost all Japanese and Korean computer companies made their own MSX computers (
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -31010,7 +31129,7 @@ Almost all Japanese and Korean computer companies made their own MSX computers (
 
 
 
-//(MSX system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX1 specific info.)//
+(MSX system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX1 specific info.)
 
 
 
@@ -31295,7 +31414,7 @@ After the (relative) success of the MSX 1 computer (in Japan, Europe and South A
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -31361,7 +31480,7 @@ After the (relative) success of the MSX 1 computer (in Japan, Europe and South A
 
 
 
-//(MSX2 system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX2 specific info.)//
+(MSX2 system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX2 specific info.)
 
 
 
@@ -31660,7 +31779,7 @@ MSX2+ computers were only produced by Panasonic, Sony and Sanyo (the one picture
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -31686,7 +31805,7 @@ MSX2+ computers were only produced by Panasonic, Sony and Sanyo (the one picture
 
 
 
-//(MSX2+ system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX2p specific info.)//
+(MSX2+ system list compiled from the list by TRD, Manuel Bilderbeek & Alex Wulms. Thanks to Stefano Priore, for abridging it to MSX2p specific info.)
 
 
 
@@ -31927,7 +32046,7 @@ There exists also a second model, the MTX 500 which has the same characteristics
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -32076,7 +32195,7 @@ The MZ 700 series is composed of four machines: the first three models were laun
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -32227,7 +32346,7 @@ It was sold under three reference numbers:
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -32374,7 +32493,7 @@ Before the console release, two companies, Rareware (UK) and Midway (USA), creat
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -32579,7 +32698,7 @@ including BASIC, PASCAL, C, FORTH, etc.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -32798,7 +32917,7 @@ Sadly, in 1980, Nascom Limited company met difficulties in components sourcing, 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -33119,7 +33238,7 @@ All the NC computers were made in Japan by Nakajima. The company also sold its o
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -33298,7 +33417,7 @@ It also had a spreadsheet, which the NC100 did not, as well as twice as much bui
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -33472,7 +33591,7 @@ Three versions of the Neo Geo CD were released:
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -33707,7 +33826,7 @@ NES and Famicom were not exactly the same console, even if they shared most of t
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -33904,7 +34023,7 @@ An optional VideoText module enabled NewBrains owners to access British TeleText
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -33995,7 +34114,7 @@ Despite the short life of the system, there were some significant games released
 
 
 
-//(info based on Wikipedia and old-computers.com)//
+(info based on Wikipedia and old-computers.com)
 
 
 
@@ -34124,7 +34243,7 @@ It was possible to link multiple systems through a link cable, and also to conne
 
 
 
-//(info based on Wikipedia and old-computers.com)//
+(info based on Wikipedia and old-computers.com)
 
 
 
@@ -34311,7 +34430,7 @@ Though not as popular as the Atari VCS, or later Intellivision, the Odyssey<sup>
 
 
 
-//(info from old-computers.com and Wikipedia)//
+(info from old-computers.com and Wikipedia)
 
 
 
@@ -34430,7 +34549,7 @@ When turned on, it would start the monitor and you have to type a command to sta
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -34631,7 +34750,7 @@ Its ROM was very buggy and the system was later replaced by the Oric Atmos.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -34828,7 +34947,7 @@ The Atmos was somehow legally licensed  in Yugoslavia as the Nova 64. The Pravet
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -35015,7 +35134,7 @@ The Orion has a TV-output and uses a tape recorder as mass-storage device. In 19
 
 
 
-//(info from homecomputer.de)//
+(info from homecomputer.de)
 
 
 
@@ -35140,7 +35259,7 @@ Only ~2000 computer were released because it came in beginning of 1994 when chea
 
 
 
-//(info from homecomputer.de)//
+(info from homecomputer.de)
 
 
 
@@ -35257,7 +35376,7 @@ Despite its interesting characteristics, Osborne Computer Corporation suffered t
 
 
 
-//(info from old-computer.com)//
+(info from old-computer.com)
 
 
 
@@ -35372,7 +35491,7 @@ According to Nano brochure, over Telmac1800 it featured: PAL video (1864 video c
 
 
 
-//(info from hobbylabs.org)//
+(info from hobbylabs.org)
 
 
 
@@ -35487,7 +35606,7 @@ The P2000 didn't meet a great success in Europe, except in the Netherlands, its 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -35675,7 +35794,7 @@ The PC-1250 was the same machine as the PC-1251 but with only 2 KB of RAM.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -35997,7 +36116,7 @@ The PC-14xx series consisted of various models; here, only those directly derive
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36214,7 +36333,7 @@ The hardware was based on a later incarnation of the SC61860 CPU, paced at 768 k
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36339,7 +36458,7 @@ The mouse port, although using 9 pins like a COM port, is proprietary to Amstrad
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36426,7 +36545,7 @@ The Amstrad PC 1640 was the successor to the Amstrad PC 1512. It had the same ch
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36531,7 +36650,7 @@ At the same time, Amstrad presented the PC 20, which was in fact the same comput
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36690,7 +36809,7 @@ It ran in three bootable modes: CPM, MS-Dos, and N88-Basic. The N-Basic would na
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -36927,7 +37046,7 @@ Another version of the system was also marketed, the handheld version called Tur
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -37054,7 +37173,7 @@ With time, NEC became far more liberal than most other companies with regard to 
 
 
 
-//(info based on Wikipedia and pcenginefx.com)//
+(info based on Wikipedia and pcenginefx.com)
 
 
 
@@ -37235,7 +37354,7 @@ Amstrad provided Several internal expansions for the PCW-16, 1 MB RAM, 2 MB Flas
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -37438,7 +37557,7 @@ Finally in 1993, these models were replaced with the PcW-10.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -37482,7 +37601,7 @@ A few games were written for it, two of these are "Head Over Heels" and "Hitchhi
 
 
 
-//(info from Kevin Thacker, author of MESS driver)//
+(info from Kevin Thacker, author of MESS driver)
 
 
 
@@ -38124,7 +38243,7 @@ The 3xxx series introduced the 3000 series ROM sets, BASIC v3, and a completely 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -38211,7 +38330,7 @@ A particular feature of the system are its cartridges, called "Storyware", which
 
 
 
-//(info based on Wikipedia)// 
+(info based on Wikipedia) 
 
 
 
@@ -38288,7 +38407,7 @@ The Pilot has a 160 x 160 pixel monochrome LCD tactile panel, with a "Graffiti i
 
 
 
-//(info based on Wikipedia)// 
+(info based on Wikipedia) 
 
 
 
@@ -38397,7 +38516,7 @@ The Pippin was abandoned in 1996.
 
 
 
-//(info from Pippin FAQ and Wikipedia)//
+(info from Pippin FAQ and Wikipedia)
 
 
 
@@ -38594,7 +38713,7 @@ That's what I call innovative approach :-)
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -38675,7 +38794,7 @@ Also, it features infrared communication capability which allows direct transfer
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -38760,7 +38879,7 @@ The Gamecube game "Pokémon Channel" contained demo versions of some Pokémon mi
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -38884,7 +39003,7 @@ The differences between the PPC-512 and PPC-640 were a different colour case, a 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -39344,7 +39463,7 @@ B type could works together with the Commodore VC1541 floppy drive unit (externa
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -39784,7 +39903,7 @@ There were three differences between the "PSone" and the original, the first one
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -40039,7 +40158,7 @@ The British ICL company conceived a desktop information system based on the QL m
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -40100,7 +40219,7 @@ This driver supported (at a certain point) the LED backdrop images: spec_bt.png 
 
 
 
-The Spectrum I+ has 8 buttons, one for each color, which are mapped to "P1 button 1" to "P1 button 8" (they can be re-mapped from the //Input (This System)// menu).
+The Spectrum I+ has 8 buttons, one for each color, which are mapped to "P1 button 1" to "P1 button 8" (they can be re-mapped from the //Input (This System) menu).
 
 
 
@@ -40541,7 +40660,7 @@ This was a time when the 16-bit machines, the Atari ST and the Amiga, were reall
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -40800,7 +40919,7 @@ There is no internal variation between PAL and SECAM machines as all were shippe
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -40933,7 +41052,7 @@ A 40 pin IC socket allowed an expansion board and OSI bus to be connected, givin
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -41130,7 +41249,7 @@ This computer was also marketed by Yeno under the same name (Yeno SC-3000 & SC-3
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -41606,7 +41725,7 @@ The SG-1000 was followed by the SG-1000 Mark II, which was released in 1984.
 
 
 
-//(info from old-computers.com & Wikipedia)//
+(info from old-computers.com & Wikipedia)
 
 
 
@@ -41789,7 +41908,7 @@ In 1985 the Mark II was replaced by the Mark III.
 
 
 
-//(info from old-computers.com & Wikipedia)//
+(info from old-computers.com & Wikipedia)
 
 
 
@@ -41916,7 +42035,7 @@ One notable accessory was the Power Console, designed to add a full flight yoke,
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -42177,7 +42296,7 @@ One of the most unique features of the Sega Master System was its dual media inp
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -42482,7 +42601,7 @@ hardware designers made it easy to interface special coprocessor chips to the co
 
 
 
-//(info based on Wikipedia, FAQs, etc.)//
+(info based on Wikipedia, FAQs, etc.)
 
 
 
@@ -42659,7 +42778,7 @@ One year later the M5 Pro and M5 Jr were released with a built-in power supply u
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -42836,7 +42955,7 @@ Because there were still large unsold stocks of Spectrum+ in the UK, the Spectru
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -43194,7 +43313,7 @@ When Amstrad conceived the +2A/B and the +3 they redesigned the motherboard and 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -43403,7 +43522,7 @@ The +2A and +2B models vere launched a little later, but were just a revision of
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -44121,7 +44240,7 @@ Alan Wilson reports to us: The 16K version of the computer had only the 16K ram 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -44908,7 +45027,7 @@ One year later the M5 Pro and M5 Jr were released with a built-in power supply u
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -45126,7 +45245,7 @@ A word of warning: The cases & screen on this computer are VERY FRAGILE! Whateve
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -45291,7 +45410,7 @@ It is interesting to notice that MPT-02 systems are Studio RCA 2 software-compat
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -45706,7 +45825,7 @@ Dick Smith quickly lost interest as newer computers became available, and by 198
 
 
 
-//(info from Raphael Nabet and Robbbert)//
+(info from Raphael Nabet and Robbbert)
 
 
 
@@ -45988,7 +46107,7 @@ Commodore 8000 series owners could upgrade their system and make them SuperPets 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -46203,7 +46322,7 @@ A more professional version of the SV318 was launched a while later: the SV-328 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -46450,7 +46569,7 @@ MSX compliant models. When MSX took of the User Group supported bith the older S
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -46597,7 +46716,7 @@ The Supervision was marketed by several different companies around the world and
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -46756,7 +46875,7 @@ The SX64 was not the only machine that Commodore made in this chassis, there was
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -46881,7 +47000,7 @@ It was reported to us that the Sym card also came in a 6809 version that support
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -47034,7 +47153,7 @@ It was also here that the DOS in ROM was getting a little old and for the first 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -47129,7 +47248,7 @@ The difference with the original model 1000, is that the CPU (Intel 8088) can be
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -47262,7 +47381,7 @@ As Timex Computers was only allowed to distribute the TC-2048 in countries where
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -47387,7 +47506,7 @@ Several ROM cartridges were developed for this machine: Midi software (unrelease
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -47498,7 +47617,7 @@ The TI-81, TI's first graphing calculator, was designed for algebra and precalcu
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -47621,7 +47740,7 @@ The TI-82 was released as a more user-friendly version of the TI-85, at the sacr
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -47752,7 +47871,7 @@ The TI-83 was released as the successor to the TI-82 and featured a newer, more 
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -47871,7 +47990,7 @@ The TI-83 Plus is nearly identical to the TI-83, maintaining backwards compatibi
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -48060,7 +48179,7 @@ The TI-85 was designed as a powerful engineering and calculus calculator. It was
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -48255,7 +48374,7 @@ Just as the TI-83 succeeded the TI-82, the TI-86 followed up on the TI-85's adva
 
 
 
-//(info from ticalc.org)//
+(info from ticalc.org)
 
 
 
@@ -49371,7 +49490,7 @@ Maybe there are yet more command-keys, but I haven't discovered them yet. Curiou
 
 
 
-//(info from Stefano "JoJo" Priore)//
+(info from Stefano "JoJo" Priore)
 
 
 
@@ -49397,7 +49516,7 @@ The TK-95 was one of the last machine made by Electronica. It didn't sell well b
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -49512,7 +49631,7 @@ Finally, the more professional TMC-600 followed.
 
 
 
-//(info from hobbylabs.org)//
+(info from hobbylabs.org)
 
 
 
@@ -51527,7 +51646,7 @@ However, the Model 3 wasn't FULLY compatible with the model 1. There were differ
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -51654,7 +51773,7 @@ A portable version of the Model IV called Model 4P (ref. 26-1080) was also marke
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -51789,7 +51908,7 @@ Timex Sinclair was also working on another machine, the TS-2048, but never passe
 
 
 
-//(info from old-computers.com, which took the text from "Sinclair Computer Hardware Factsheet")//
+(info from old-computers.com, which took the text from "Sinclair Computer Hardware Factsheet")
 
 
 
@@ -51974,7 +52093,7 @@ There are at least 4 versions:
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -52247,7 +52366,7 @@ This TX-8000 is exactly identical as the Video Technology Laser 200. It was sold
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -52394,7 +52513,7 @@ At the time, The UK101 was heavily supported by Watford Electronics in the UK, a
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -52566,7 +52685,7 @@ The system's EXT port, located on the underside of the system below the controll
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -52739,7 +52858,7 @@ About 40 cartridges were released (37 so far). The games are not bad for 1978, b
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -52805,7 +52924,7 @@ Notice that consoles are directly compatible with the other consoles in its sub-
 
 
 
-//(info on the models from 1292 FAQ -- http://www.consoledatabase.com/faq/1292/1292faq.txt)//
+(info on the models from 1292 FAQ -- http://www.consoledatabase.com/faq/1292/1292faq.txt)
 
 
 
@@ -53056,7 +53175,7 @@ As previously mentioned, this hardware was sold from several firms with differen
 
 
 
-//(info on models from Digital Archaelogy -- http://www.digitpress.com/the_digs/arcadia/)//
+(info on models from Digital Archaelogy -- http://www.digitpress.com/the_digs/arcadia/)
 
 
 
@@ -53157,7 +53276,7 @@ This way you would also obtain the .lay file which provides a list of the availa
 
 
 
-Finally, either run MESS with the ''-nonewui'' option and use the //TAB// menu under //Video Options// to select an overlay at run-time (//TAB -> Video Options -> Overlay//), or specify the desired overlay on the command line, e.g. with
+Finally, either run MESS with the ''-nonewui'' option and use the //TAB// menu under //Video Options// to select an overlay at run-time (//TAB -> Video Options -> Overlay), or specify the desired overlay on the command line, e.g. with
 
 
 
@@ -53674,7 +53793,7 @@ A wide range of peripherals and software were developed for the VIC-20. When it 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -53835,7 +53954,7 @@ To the left of the hexadecimal keyboard are a reset switch and LED indicators fo
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -53956,7 +54075,7 @@ The SwanCrystal was available in four case colors: Skeleton Blue, Skeleton Black
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -54087,7 +54206,7 @@ The WonderSwan was later replaced by the WonderSwan Color, an evolution of the h
 
 
 
-//(info based on Wikipedia)//
+(info based on Wikipedia)
 
 
 
@@ -54374,7 +54493,7 @@ It was followed by the X68000 Ace and Ace HD.
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -54762,7 +54881,7 @@ The BBC Basic in the Z88, although very powerful, lacks an essential feature: th
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -54933,7 +55052,7 @@ The ZX-80 met some success with nearly 70.000 machines sold in less than one yea
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
@@ -55140,7 +55259,7 @@ It was followed by the ZX-Spectrum and was also sold as the Timex Sinclair 1000 
 
 
 
-//(info from old-computers.com)//
+(info from old-computers.com)
 
 
 
