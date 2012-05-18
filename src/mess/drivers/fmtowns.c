@@ -2172,9 +2172,9 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // SCSI controller
   AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
   // CMOS
-  AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
+  AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
-//  AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+  //AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
   AM_RANGE(0xff80,0xffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)

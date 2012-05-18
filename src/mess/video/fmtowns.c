@@ -691,7 +691,7 @@ static void render_sprite_4(running_machine &machine, UINT32 poffset, UINT32 cof
 	UINT16 xstart,xend,ystart,yend;
 	int xdir,ydir;
 	int width = (state->m_video.towns_crtc_reg[12] - state->m_video.towns_crtc_reg[11]) / (((state->m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (state->m_video.towns_crtc_reg[16] - state->m_video.towns_crtc_reg[15]) / (((state->m_video.towns_crtc_reg[27] & 0xf000) >> 12)+1);
+	int height = (state->m_video.towns_crtc_reg[16] - state->m_video.towns_crtc_reg[15]) / (((state->m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if(xflip)
 	{
@@ -735,11 +735,14 @@ static void render_sprite_4(running_machine &machine, UINT32 poffset, UINT32 cof
 			col = state->m_towns_txtvram[coffset+(pixel*2)] | (state->m_towns_txtvram[coffset+(pixel*2)+1] << 8);
 			voffset += (state->m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
-			voffset &= 0x3ffff;
-			if(xpos < width && ypos < height && pixel != 0)
+			if((state->m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
+					|| (state->m_video.towns_sprite_page == 0 && voffset < 0x20000))
 			{
-				state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-				state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				if(xpos < width && ypos < height && pixel != 0)
+				{
+					state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+					state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				}
 			}
 			if(xflip)
 				voffset+=2;
@@ -747,11 +750,14 @@ static void render_sprite_4(running_machine &machine, UINT32 poffset, UINT32 cof
 				voffset-=2;
 			pixel = state->m_towns_txtvram[poffset] & 0x0f;
 			col = state->m_towns_txtvram[coffset+(pixel*2)] | (state->m_towns_txtvram[coffset+(pixel*2)+1] << 8);
-			voffset &= 0x3ffff;
-			if(xpos < width && ypos < height && pixel != 0)
+			if((state->m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
+					|| (state->m_video.towns_sprite_page == 0 && voffset < 0x20000))
 			{
-				state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-				state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				if(xpos < width && ypos < height && pixel != 0)
+				{
+					state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+					state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				}
 			}
 			poffset++;
 			poffset &= 0x1ffff;
@@ -768,7 +774,7 @@ static void render_sprite_16(running_machine &machine, UINT32 poffset, UINT16 x,
 	UINT16 xstart,ystart,xend,yend;
 	int xdir,ydir;
 	int width = (state->m_video.towns_crtc_reg[12] - state->m_video.towns_crtc_reg[11]) / (((state->m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (state->m_video.towns_crtc_reg[16] - state->m_video.towns_crtc_reg[15]) / (((state->m_video.towns_crtc_reg[27] & 0xf000) >> 12)+1);
+	int height = (state->m_video.towns_crtc_reg[16] - state->m_video.towns_crtc_reg[15]) / (((state->m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if(xflip)
 	{
@@ -811,11 +817,14 @@ static void render_sprite_16(running_machine &machine, UINT32 poffset, UINT16 x,
 			col = state->m_towns_txtvram[poffset] | (state->m_towns_txtvram[poffset+1] << 8);
 			voffset += (state->m_video.towns_crtc_reg[24] * 4) * (ypos & 0x1ff);  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
-			voffset &= 0x3ffff;
-			if(xpos < width && ypos < height && col < 0x8000)
+			if((state->m_video.towns_sprite_page != 0 && voffset > 0x1ffff && voffset < 0x40000)
+					|| (state->m_video.towns_sprite_page == 0 && voffset < 0x20000))
 			{
-				state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
-				state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				if(xpos < width && ypos < height && col < 0x8000)
+				{
+					state->m_towns_gfxvram[0x40000+voffset+1] = (col & 0xff00) >> 8;
+					state->m_towns_gfxvram[0x40000+voffset] = col & 0x00ff;
+				}
 			}
 			poffset+=2;
 			poffset &= 0x1ffff;
@@ -1843,15 +1852,15 @@ UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%04x %i %i %i | %04x %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x\nReg28=%04x",
-		state->m_video.towns_crtc_reg[0],state->m_video.towns_crtc_reg[1],state->m_video.towns_crtc_reg[2],state->m_video.towns_crtc_reg[3],
-		state->m_video.towns_crtc_reg[4],state->m_video.towns_crtc_reg[5],state->m_video.towns_crtc_reg[6],state->m_video.towns_crtc_reg[7],
-		state->m_video.towns_crtc_reg[8],
-		state->m_video.towns_crtc_reg[9],state->m_video.towns_crtc_reg[10],state->m_video.towns_crtc_reg[11],state->m_video.towns_crtc_reg[12],
-		state->m_video.towns_crtc_reg[13],state->m_video.towns_crtc_reg[14],state->m_video.towns_crtc_reg[15],state->m_video.towns_crtc_reg[16],
-		state->m_video.towns_crtc_reg[17],state->m_video.towns_crtc_reg[18],state->m_video.towns_crtc_reg[19],state->m_video.towns_crtc_reg[20],
-		state->m_video.towns_crtc_reg[21],state->m_video.towns_crtc_reg[22],state->m_video.towns_crtc_reg[23],state->m_video.towns_crtc_reg[24],
-		state->m_video.towns_crtc_reg[27],state->m_video.towns_video_reg[0],state->m_video.towns_video_reg[1],state->m_video.towns_tvram_enable,state->m_video.towns_sprite_reg[1] & 0x80,
-		state->m_video.towns_crtc_reg[28]);
+		m_video.towns_crtc_reg[0],m_video.towns_crtc_reg[1],m_video.towns_crtc_reg[2],m_video.towns_crtc_reg[3],
+		m_video.towns_crtc_reg[4],m_video.towns_crtc_reg[5],m_video.towns_crtc_reg[6],m_video.towns_crtc_reg[7],
+		m_video.towns_crtc_reg[8],
+		m_video.towns_crtc_reg[9],m_video.towns_crtc_reg[10],m_video.towns_crtc_reg[11],m_video.towns_crtc_reg[12],
+		m_video.towns_crtc_reg[13],m_video.towns_crtc_reg[14],m_video.towns_crtc_reg[15],m_video.towns_crtc_reg[16],
+		m_video.towns_crtc_reg[17],m_video.towns_crtc_reg[18],m_video.towns_crtc_reg[19],m_video.towns_crtc_reg[20],
+		m_video.towns_crtc_reg[21],m_video.towns_crtc_reg[22],m_video.towns_crtc_reg[23],m_video.towns_crtc_reg[24],
+		m_video.towns_crtc_reg[27],m_video.towns_video_reg[0],m_video.towns_video_reg[1],m_video.towns_tvram_enable,m_video.towns_sprite_reg[1] & 0x80,
+		m_video.towns_crtc_reg[28]);
 #endif
 
 	return 0;
