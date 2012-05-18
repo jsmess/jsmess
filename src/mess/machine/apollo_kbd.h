@@ -16,6 +16,15 @@
 
 #include "emu.h"
 
+// BSD-derived systems get very sad when you party with system reserved names.
+#ifdef getchar
+#undef getchar
+#endif
+
+#ifdef putchar
+#undef putchar
+#endif
+
 #define TX_FIFO_SIZE 128
 
 //**************************************************************************
