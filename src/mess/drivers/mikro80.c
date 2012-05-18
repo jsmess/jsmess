@@ -33,6 +33,11 @@ static ADDRESS_MAP_START( mikro80_io , AS_IO, 8, mikro80_state )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(mikro80_keyboard_r, mikro80_keyboard_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kristall_io , AS_IO, 8, mikro80_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+ADDRESS_MAP_END
+
 static WRITE8_DEVICE_HANDLER( radio99_dac_w )	{ dac_data_w(device, data); }
 
 static ADDRESS_MAP_START( radio99_io , AS_IO, 8, mikro80_state )
@@ -206,6 +211,11 @@ static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( kristall, mikro80 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(kristall_io)
+MACHINE_CONFIG_END
+
 
 /* ROM definition */
 
@@ -217,14 +227,20 @@ ROM_START( mikro80 )
 ROM_END
 
 ROM_START( radio99 )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "monrk88.bin", 0xf800, 0x0800, CRC(5415D847) SHA1(c8233c72548bc79846b9d998766a10df349c5bda))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )
 ROM_END
 
-
+ROM_START( kristall2 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "kristall-2.rom", 0xf800, 0x0800, CRC(e1b5c60f) SHA1(8ce5158def7fca91ec7e11efbb10aa5d70b7c36d))
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD( "kristall-2.fnt", 0x0000, 0x0800, CRC(9661c9f5) SHA1(830c38735dcb1c8a271fa0027f94b4e034848fc8))
+ROM_END
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
 COMP( 1983, mikro80,	 0, 	 0,	mikro80,	mikro80,	mikro80, "<unknown>", "Mikro-80",	 0)
 COMP( 1993, radio99, mikro80,	 0,	radio99,	mikro80,	radio99, "<unknown>", "Radio-99DM",	 0)
+COMP( 1987, kristall2, mikro80,	 0,	kristall,	mikro80,	mikro80, "<unknown>", "Kristall-2",	 0)

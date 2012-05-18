@@ -235,9 +235,16 @@ ROM_START( pk6128c )
 	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
+ROM_START( krista2 )
+    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "krista2.epr", 0x10000, 0x0200, CRC(df5440b0) SHA1(bcbbb3cc10aeb17c1262b45111d20279266b9ba4))
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
+	ROM_LOAD( "krista2.pal", 0x0000, 0x0200, CRC(b243da33) SHA1(9af7873e6f8bf452c8d831833ffb02dce833c095))
+ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
 COMP( 1987, vector06,    0,        0,      vector06,   vector06,   0,    "<unknown>", "Vector 06c",  GAME_NOT_WORKING)
 COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06,   0,    "<unknown>", "Vector 1200", GAME_NOT_WORKING)
 COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06,   0,    "<unknown>", "PK-6128c",    GAME_NOT_WORKING)
+COMP( 1987, krista2,     vector06, 0,      vector06,   vector06,   0,    "<unknown>", "Krista-2",    GAME_NOT_WORKING)

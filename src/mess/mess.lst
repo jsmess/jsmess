@@ -1486,6 +1486,7 @@ ut88mini
 // Mikro-80
 mikro80
 radio99
+kristall2
 
 // Specialist
 special
@@ -1549,6 +1550,9 @@ bk8t
 
 // Vector-06c
 vector06
+vec1200
+pk6128c
+krista2
 
 // Robotron 1715
 rt1715
@@ -1854,8 +1858,6 @@ vesta
 hobby
 pk8002
 unior
-vec1200
-pk6128c
 tvc64
 tvc64p
 tvc64pru
