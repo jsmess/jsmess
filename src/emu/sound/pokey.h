@@ -21,6 +21,13 @@
 
 #include "devlegcy.h"
 
+/* uncomment the line below for MESS to avoid breaking compile
+ * please migrate as soon as possible to new device so that we can get rid of the legacy */
+
+//#define OLDDEVICE_FOR_MESS 1
+
+//#define POKEY_EXEC_INTERFACE
+
 /* CONSTANT DEFINITIONS */
 
 /* POKEY WRITE LOGICALS */
@@ -78,7 +85,7 @@ struct _pokey_interface
 	void (*interrupt_cb)(device_t *device, int mask);
 };
 
-
+#ifdef OLDDEVICE_FOR_MESS
 READ8_DEVICE_HANDLER( pokey_r );
 WRITE8_DEVICE_HANDLER( pokey_w );
 
@@ -92,15 +99,19 @@ void pokey_kbcode_w (device_t *device, int kbcode, int make);
 
 DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 
+#endif
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
 // ======================> pokey_device
 
 class pokeyn_device : public device_t,
-						public device_sound_interface
+					  public device_sound_interface
+#ifdef POKEY_EXEC_INTERFACE
+					  public ,device_execute_interface
+#endif
 {
 public:
 	// construction/destruction
@@ -108,6 +119,13 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	UINT8 read(offs_t offset);
+	void  write(offs_t offset, UINT8 data);
+
+	void serin_ready(int after);
+	void break_w(int shift);
+	void kbcode_w(int kbcode, int make);
 
 protected:
 	// device-level overrides
@@ -120,21 +138,25 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
+#ifdef POKEY_EXEC_INTERFACE
+	virtual void execute_run() { m_icount = 0; } //printf("execute: %d\n", m_icount); m_icount = 0; }
+#endif
+
 	// configuration state
 	pokey_interface m_intf;
 
+	// other internal states
+    int m_icount;
+
 private:
 
-	void poly_init(UINT8 *poly, int size, int left, int right, int add);
-	void rand_init(UINT8 *rng, int size, int left, int right, int add);
+	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
+	void poly_init_9_17(UINT32 *poly, int size);
 	inline void process_channel(int ch);
 	inline void reset_channel(int ch);
 	inline void inc_chan(int ch);
 	inline int check_borrow(int ch);
 	void pokey_potgo(void);
-	void write_cmd(int offset, UINT8 data);
-
-
 
 	// internal state
 	sound_stream* m_stream;
@@ -181,19 +203,20 @@ private:
 	attotime m_ad_time_fast;
 	attotime m_ad_time_slow;
 
-	UINT8 m_poly4[0x0f];
-	UINT8 m_poly5[0x1f];
-	UINT8 m_poly9[0x1ff];
-	UINT8 m_poly17[0x1ffff];
-
-	UINT8 m_rand9[0x1ff];
-	UINT8 m_rand17[0x1ffff];
-
+	UINT32 m_poly4[0x0f];
+	UINT32 m_poly5[0x1f];
+	UINT32 m_poly9[0x1ff];
+	UINT32 m_poly17[0x1ffff];
 };
 
 
 // device type definition
 extern const device_type POKEYN;
+
+
+/* fix me: eventually this should be a single device with pokey subdevices */
+READ8_HANDLER( quad_pokeyn_r );
+WRITE8_HANDLER( quad_pokeyn_w );
 
 
 #endif	/* __POKEY_H__ */
