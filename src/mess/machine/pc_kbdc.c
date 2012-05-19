@@ -2,6 +2,12 @@
 
   PC Keyboard connector interface
 
+The following basic program can be useful for identifying scancodes:
+10 sc%=0:sp%=0
+20 sc%=inp(96)
+30 if sc%<>sp% then print hex$(sc%):sp%=sc%
+40 goto 20
+
 ***************************************************************************/
 
 
