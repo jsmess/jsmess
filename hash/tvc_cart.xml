@@ -123,9 +123,6 @@
 			<dataarea name="rom" size="0x4000">
 				<rom name="c_tvcupm.128" size="0x4000" crc="efca95fc" sha1="d4c606d84c9672c4a7bc4ecc38643c6400fbc753" offset="0" />
 			</dataarea>
-			<dataarea name="rom2" size="0x4000">
-				<rom name="d_tvcupm.128" size="0x4000" crc="b3a567ad" sha1="f92df6074b07f5f19e8c96ff1315da0cfeec9f74" offset="0" />
-			</dataarea>
 		</part>
 	</software>
 
@@ -137,9 +134,6 @@
 			<dataarea name="rom" size="0x4000">
 				<rom name="c_dos12.128" size="0x4000" crc="ffd453da" sha1="971fb29ebd8b34a9981ff40adc5ca2a2de9c391a" offset="0" />
 			</dataarea>
-			<dataarea name="rom2" size="0x4000">
-				<rom name="d_dos12.128" size="0x4000" crc="f5c35597" sha1="2fa44ad089a51f453b580e0b13e3be96a0f14649" offset="0" />
-			</dataarea>
 		</part>
 	</software>
 
@@ -150,9 +144,6 @@
 		<part name="rom" interface="tvc_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="c_tvcdos.128" size="0x4000" crc="40ddc741" sha1="811bdf21f60c8ff9dfe3e58b7b225150535b5261" offset="0" />
-			</dataarea>
-			<dataarea name="rom2" size="0x4000">
-				<rom name="d_tvcdos.128" size="0x4000" crc="2acf8477" sha1="07bf39b633a564f98dd4b2e93bd889501b341550" offset="0" />
 			</dataarea>
 		</part>
 	</software>

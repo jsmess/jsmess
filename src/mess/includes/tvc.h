@@ -17,6 +17,9 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 
+#include "machine/tvcexp.h"
+#include "machine/tvc_hbf.h"
+
 #define		TVC_RAM_BANK	1
 #define		TVC_ROM_BANK	2
 
@@ -100,7 +103,6 @@ public:
 	DECLARE_READ8_MEMBER(tvc_keyboard_r);
 	DECLARE_READ8_MEMBER(tvc_int_state_r);
 	DECLARE_WRITE8_MEMBER(tvc_flipflop_w);
-	DECLARE_READ8_MEMBER(tvc_exp_id_r);
 	DECLARE_WRITE8_MEMBER(tvc_border_color_w);
 	DECLARE_WRITE8_MEMBER(tvc_sound_w);
 	DECLARE_WRITE8_MEMBER(tvc_cassette_w);
@@ -108,9 +110,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tvc_int_ff_set);
 	DECLARE_WRITE_LINE_MEMBER(tvc_centronics_ack);
 
+	// expansions
+	DECLARE_WRITE8_MEMBER(tvc_expansion_w);
+	DECLARE_READ8_MEMBER(tvc_expansion_r);
+	DECLARE_READ8_MEMBER(tvc_exp_id_r);
+	DECLARE_WRITE8_MEMBER(tvc_expint_ack_w);
+
+	tvcexp_slot_device * m_expansions[4];
 	UINT8		m_video_mode;
 	UINT8		m_keyline;
-	UINT8		m_flipflop;
+	UINT8		m_active_slot;
+	UINT8		m_int_flipflop;
 	UINT8		m_col[4];
 	UINT8		m_bank_type[4];
 	UINT8		m_bank;

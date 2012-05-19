@@ -1814,6 +1814,8 @@ $(MESSOBJ)/vidbrain.a:			\
 $(MESSOBJ)/videoton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_AUDIO)/tvc.o			\
+	$(MESS_MACHINE)/tvcexp.o	\
+	$(MESS_MACHINE)/tvc_hbf.o	\
 
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\

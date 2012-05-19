@@ -5,8 +5,9 @@
         12/05/2009 Skeleton driver.
 
         TODO:
-        - floppy interface
-        - expansion ports
+        - floppy write doesn't work
+        - overscan and mid-frame changes
+        - load cassette in .cas format
 
 ****************************************************************************/
 
@@ -106,8 +107,22 @@ void tvc_state::tvc_set_mem_page(UINT8 data)
 		case 0xc0 : // External ROM selected
 			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(memregion("ext")->base());
+			space->install_readwrite_handler (0xc000, 0xdfff, 0, 0, read8_delegate(FUNC(tvc_state::tvc_expansion_r), this), write8_delegate(FUNC(tvc_state::tvc_expansion_w), this), 0);
+			m_bank_type[3] = -1;
 			break;
 	}
+}
+
+
+WRITE8_MEMBER(tvc_state::tvc_expansion_w)
+{
+	m_expansions[m_active_slot & 3]->write(space, offset, data);
+}
+
+
+READ8_MEMBER(tvc_state::tvc_expansion_r)
+{
+	return m_expansions[m_active_slot & 3]->read(space, offset);
 }
 
 WRITE8_MEMBER(tvc_state::tvc_bank_w)
@@ -141,10 +156,11 @@ WRITE8_MEMBER(tvc_state::tvc_palette_w)
 
 WRITE8_MEMBER(tvc_state::tvc_keyboard_w)
 {
-	// bit 4-5 - expansion select
+	// bit 6-7 - expansion select
 	// bit 0-3 - keyboard scan
 
 	m_keyline = data & 0x0f;
+	m_active_slot = (data>>6) & 0x03;
 }
 
 READ8_MEMBER(tvc_state::tvc_keyboard_r)
@@ -168,20 +184,29 @@ READ8_MEMBER(tvc_state::tvc_int_state_r)
 
 	double level = m_cassette->input();
 
-	return 0x4f | (m_flipflop << 4) | (level > 0.01 ? 0x20 : 0x00) | (m_centronics_ff << 7);
+	UINT8 expint = (m_expansions[0]->int_r()<<0) | (m_expansions[1]->int_r()<<1) |
+				   (m_expansions[2]->int_r()<<2) | (m_expansions[3]->int_r()<<3);
+
+	return 0x40 | (m_int_flipflop << 4) | (level > 0.01 ? 0x20 : 0x00) | (m_centronics_ff << 7) | (expint & 0x0f);
 }
 
 WRITE8_MEMBER(tvc_state::tvc_flipflop_w)
 {
 	// every write here clears the vblank flipflop
-	m_flipflop = 1;
+	m_int_flipflop = 1;
 	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 READ8_MEMBER(tvc_state::tvc_exp_id_r)
 {
-	// TODO: read expansion slot ID
-	return 0xff;
+	// expansion slots ID
+	return	(m_expansions[0]->id_r()<<0) | (m_expansions[1]->id_r()<<2) |
+			(m_expansions[2]->id_r()<<4) | (m_expansions[3]->id_r()<<6);
+}
+
+WRITE8_MEMBER(tvc_state::tvc_expint_ack_w)
+{
+	m_expansions[offset & 3]->int_ack();
 }
 
 WRITE8_MEMBER(tvc_state::tvc_border_color_w)
@@ -244,11 +269,16 @@ static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	AM_RANGE(0x04, 0x06) AM_WRITE(tvc_sound_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tvc_flipflop_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(tvc_vram_bank_w)
+	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("exp1", tvcexp_slot_device, io_read, io_write)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("exp2", tvcexp_slot_device, io_read, io_write)
+	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("exp3", tvcexp_slot_device, io_read, io_write)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("exp4", tvcexp_slot_device, io_read, io_write)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tvc_cassette_w)
 	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
 	AM_RANGE(0x59, 0x59) AM_READ(tvc_int_state_r)
 	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_exp_id_r)
 	AM_RANGE(0x5b, 0x5b) AM_READ(tvc_5b_r)
+	AM_RANGE(0x58, 0x5b) AM_WRITE(tvc_expint_ack_w)
 	AM_RANGE(0x60, 0x63) AM_WRITE(tvc_palette_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -457,7 +487,12 @@ void tvc_state::machine_start()
 	for (int i=0; i<4; i++)
 		m_col[i] = i;
 
-	m_flipflop = 0;
+	m_int_flipflop = 0;
+
+	m_expansions[0] = machine().device<tvcexp_slot_device>("exp1");
+	m_expansions[1] = machine().device<tvcexp_slot_device>("exp2");
+	m_expansions[2] = machine().device<tvcexp_slot_device>("exp3");
+	m_expansions[3] = machine().device<tvcexp_slot_device>("exp4");
 }
 
 void tvc_state::machine_reset()
@@ -470,6 +505,7 @@ void tvc_state::machine_reset()
 	m_bank = 0;
 	m_vram_bank = 0;
 	memset(m_bank_type, 0, sizeof(m_bank_type));
+	m_active_slot = 0;
 
 	// Bank 2 is always RAM
 	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
@@ -569,7 +605,7 @@ WRITE_LINE_MEMBER(tvc_state::tvc_int_ff_set)
 {
 	if (state)
 	{
-		m_flipflop = 0;
+		m_int_flipflop = 0;
 		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 	}
 }
@@ -633,6 +669,16 @@ static tvc_sound_interface  tvc_sound_intf =
 	DEVCB_DRIVER_LINE_MEMBER(tvc_state, tvc_int_ff_set),
 };
 
+static const tvcexp_interface tvc_exp_interface =
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
+};
+
+extern SLOT_INTERFACE_START(tvc_exp)
+	SLOT_INTERFACE("hbf", TVC_HBF)			// Videoton HBF floppy interface
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( tvc, tvc_state )
     /* basic machine hardware */
@@ -671,6 +717,12 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("tvc_cart")
+
+	/* expansion interface */
+	MCFG_TVC64_EXPANSION_ADD("exp1", tvc_exp_interface, tvc_exp , NULL, NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp2", tvc_exp_interface, tvc_exp , NULL, NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp3", tvc_exp_interface, tvc_exp , NULL, NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp4", tvc_exp_interface, tvc_exp , NULL, NULL)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, tvc_cassette_interface )
