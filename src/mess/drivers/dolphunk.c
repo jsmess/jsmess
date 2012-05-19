@@ -58,7 +58,7 @@
         The red digits are the address, and the orange digits are the data.
         The address range is 200-2FF (the 2 isn't displayed). To select an address,
         either press the UP key until you get there, or type the address and press
-        minus. The ornage digits show the current data at that address. To alter
+        minus. The orange digits show the current data at that address. To alter
         data, just type it in and press UP.
 
         TODO:
@@ -174,17 +174,11 @@ static INPUT_PORTS_START( dolphunk )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dolphunk)
-{
-}
-
 static MACHINE_CONFIG_START( dolphunk, dolphunk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(dolphunk_mem)
 	MCFG_CPU_IO_MAP(dolphunk_io)
-
-	MCFG_MACHINE_RESET(dolphunk)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
