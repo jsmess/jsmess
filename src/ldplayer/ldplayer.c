@@ -84,7 +84,7 @@ public:
 		  m_playing(false) { }
 
 	// callback hook
-	static chd_file *get_disc_static(laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
+	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
 
 protected:
 	// device overrides
