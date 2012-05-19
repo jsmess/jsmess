@@ -1901,7 +1901,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/dim68k.o	\
 	$(MESS_DRIVERS)/dm7000.o	\
 	$(MESS_DRIVERS)/dmv.o		\
-	$(MESS_DRIVERS)/dolphin.o	\
+	$(MESS_DRIVERS)/dolphunk.o	\
 	$(MESS_DRIVERS)/dual68.o	\
 	$(MESS_DRIVERS)/eacc.o		\
 	$(MESS_DRIVERS)/elwro800.o	\
@@ -2059,7 +2059,7 @@ $(MESS_DRIVERS)/coco3.o:	$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
-$(MESS_DRIVERS)/dolphin.o:	$(MESS_LAYOUT)/dolphin.lh
+$(MESS_DRIVERS)/dolphunk.o:	$(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/e01.o:		$(MESS_LAYOUT)/e01.lh
 $(MESS_DRIVERS)/eacc.o:		$(MESS_LAYOUT)/eacc.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
