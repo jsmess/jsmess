@@ -748,14 +748,33 @@ static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
 
 static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
+	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
 	UINT16	*p = &bitmap.pix16(y);
 	int	i;
 
 //  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
 
-	for ( i = 0; i < x_count; i++ )
+	switch ( ega->m_attribute.data[ 0x12 ] & 0x0f )
 	{
-		*p = 0;
+	case 0x03:
+		for ( i = 0; i < x_count; i++ )
+		{
+			UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+			UINT8 data = ega->m_videoram[ offset ];
+
+			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+
+			data = ega->m_videoram[ offset + 1 ];
+
+			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+		}
+		break;
 	}
 }
 
