@@ -250,7 +250,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1098,7 +1098,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_ADD("pokey", POKEYN, FREQ_17_EXACT)
 	MCFG_SOUND_CONFIG(atari_pokey_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1286,7 +1286,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a5200_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_REMOVE("pokey")
-	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_ADD("pokey", POKEYN, FREQ_17_EXACT)
 	MCFG_SOUND_CONFIG(a5200_pokey_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
