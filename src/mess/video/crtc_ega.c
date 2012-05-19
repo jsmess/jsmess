@@ -702,7 +702,7 @@ void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 			crtc_ega->intf->end_update(device, bitmap, cliprect, param);
 	}
 	else
-		popmessage("Invalid crtc_ega screen parameters - display disabled!!!");
+		logerror("Invalid crtc_ega screen parameters - display disabled!!!");
 }
 
 
