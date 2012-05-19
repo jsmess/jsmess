@@ -388,7 +388,7 @@ static SCREEN_UPDATE_IND16( swyft )
 	return 0;
 }
 
-static void duart_irq_handler(device_t *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	//logerror("duart_irq_handler\n");
 }

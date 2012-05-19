@@ -956,9 +956,9 @@ static void apollo_sio_tx_data(device_t *device, int channel, UINT8 data) {
  sio configuration
  -------------------------------------------------*/
 
-static void sio_irq_handler(device_t *device, UINT8 vector) {
+static void sio_irq_handler(device_t *device, int state, UINT8 vector) {
 	DLOG2(("sio_irq_handler: vector=%02x", vector ));
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO1, 1);
+	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO1, state);
 	sio_irq_line = 1;
 }
 
@@ -1150,10 +1150,10 @@ static DEVICE_RESET(apollo_sio)
  sio2 configuration (DN3500 only)
  -------------------------------------------------*/
 
-static void sio2_irq_handler(device_t *device, UINT8 vector)
+static void sio2_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	DLOG1(("sio2_irq_handler: vector=%02x", vector ));
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO2, 1);
+	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO2, state);
 }
 
 static void sio2_tx_data(device_t *device, int channel, UINT8 data)
