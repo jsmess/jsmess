@@ -65,8 +65,6 @@ typedef struct
 	device_t *img;
 	emu_file *fd;
 
-	unsigned int ext_speed_control : 1;	/* is motor rotation controlled by external device ? */
-
 	unsigned int disk_switched : 1;	/* disk-in-place status bit */
 	unsigned int head : 1;			/* active head (-> floppy side) */
 	unsigned int step : 1;
@@ -79,6 +77,7 @@ typedef struct
 	UINT8 *loadedtrack_data;		/* pointer to track buffer */
 
 	int is_fdhd;				/* is drive an FDHD? */
+    int is_400k;                /* drive is single-sided, which means 400K */
 } floppy_t;
 
 typedef struct
@@ -178,7 +177,7 @@ UINT8 sony_read_data(device_t *device)
 	}
 
 	result = sony_fetchtrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos);
-	return result;
+    return result;
 }
 
 
@@ -227,9 +226,9 @@ static int sony_rpm(floppy_t *f, device_t *cur_image)
      * that calculates the speed; I'm not sure what units they are in
      */
 
-	if (f->ext_speed_control)
+	if ((f->is_400k) && (sony.rotation_speed))
 	{
-		/* 400k unit : rotation speed controlled by computer */
+		/* 400k unit : rotation speed should be controlled by computer */
 		result = sony.rotation_speed;
 	}
 	else
@@ -298,8 +297,8 @@ int sony_read_status(device_t *device)
 		case 0x02:	/* Disk in place */
 			result = cur_image ? 0 : 1;	/* 0=disk 1=nodisk */
 			break;
-		case 0x03:	/* Upper head activate */
-			if (f->head != 1)
+		case 0x03:	/* Upper head activate (not on 400k) */
+			if ((f->head != 1) && !(f->is_400k))
 			{
 				save_track_data(device,sony.floppy_select);
 				f->head = 1;
@@ -320,15 +319,16 @@ int sony_read_status(device_t *device)
 				result = 0;
 			break;
 		case 0x08:	/* Motor on 0=on 1=off */
-				result = f->motor_on;
+			result = f->motor_on;
 			break;
-		case 0x09:	/* Number of sides: 0=single sided, 1=double sided */
+        case 0x09:	/* Number of sides: 0=single sided, 1=double sided */
 			if (cur_image)
 			{
 				floppy_image_legacy *fimg = flopimg_get_image(&cur_image->device());
 				if (fimg)
 				{
-					result = floppy_get_heads_per_disk(fimg) - 1;
+                    result = floppy_get_heads_per_disk(fimg) - 1;
+                    f->is_400k = result ? 0 : 1;
 				}
 			}
 			break;
@@ -546,8 +546,13 @@ void sonydriv_floppy_image_device::device_start()
 
 	sony.floppy[0].is_fdhd = 0;
 	sony.floppy[1].is_fdhd = 0;
+	sony.floppy[0].is_400k = 0;
+	sony.floppy[1].is_400k = 0;
 	sony.floppy[0].loadedtrack_data = NULL;
 	sony.floppy[1].loadedtrack_data = NULL;
+    sony.floppy[0].head = 0;
+    sony.floppy[1].head = 0;
+    sony.rotation_speed = 0;
 }
 
 void sonydriv_floppy_image_device::call_unload()
