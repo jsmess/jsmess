@@ -175,8 +175,8 @@ static void pokemini_update_sound( running_machine &machine )
 	}
 	else
 	{
-		static const int levels[4] = { 0, 1, 1, 2 };
-		int level = levels[ state->m_pm_reg[0x71] & 0x03 ];
+		///static const int levels[4] = { 0, 1, 1, 2 };
+		int level; /// silence clang warning/// = levels[ state->m_pm_reg[0x71] & 0x03 ];
 
 //      if ( ( ( state->m_pm_reg[0x48] & 0x80 ) && ( state->m_pm_reg[0x4E] | ( state->m_pm_reg[0x4F] << 8 ) ) > ( state->m_pm_reg[0x4C] | ( state->m_pm_reg[0x4D] << 8 ) ) )
 //        || ( ( state->m_pm_reg[0x48] & 0x80 ) && state->m_pm_reg[0x4F] > state->m_pm_reg[0x4D] ) )

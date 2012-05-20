@@ -22,9 +22,8 @@ class c10_state : public driver_device
 public:
 	c10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_maincpu(*this, "maincpu"),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
@@ -102,20 +101,17 @@ SCREEN_UPDATE16_MEMBER( c10_state )
 					if BIT(chr, 7)  // ignore attribute bytes
 						x--;
 					else
-					{
 						gfx = m_p_chargen[(chr<<4) | ra ];
-
-						/* Display a scanline of a character */
-						*p++ = BIT(gfx, 7);
-						*p++ = BIT(gfx, 6);
-						*p++ = BIT(gfx, 5);
-						*p++ = BIT(gfx, 4);
-						*p++ = BIT(gfx, 3);
-						*p++ = BIT(gfx, 2);
-						*p++ = BIT(gfx, 1);
-						*p++ = BIT(gfx, 0);
-					}
 				}
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=96;
@@ -178,5 +174,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, c10,  0,       0,	c10,	c10,	 c10,	  "Cromemco",   "C-10",	GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1982, c10,    0,      0,       c10,     c10,    c10,     "Cromemco", "C-10", GAME_NOT_WORKING | GAME_NO_SOUND)

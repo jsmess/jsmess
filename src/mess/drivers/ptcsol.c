@@ -135,9 +135,8 @@ public:
 	m_cass1(*this, CASSETTE_TAG),
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
-	m_uart_s(*this, "uart_s")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_uart_s(*this, "uart_s"),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
@@ -638,7 +637,6 @@ SCREEN_UPDATE16_MEMBER( sol20_state )
 					inv ^= 0xff;
 
 				chr &= 0x7f;
-				gfx = 0;
 
 				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;

@@ -57,9 +57,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
 	m_pia_s(*this, "pia_s"),
-	m_pia_u(*this, "pia_u")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_pia_u(*this, "pia_u"),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -351,7 +350,6 @@ SCREEN_UPDATE16_MEMBER( pegasus_state )
 			for(x = ma; x < ma + 32; x++ )
 			{
 				inv = 0xff;
-				gfx = 0;
 				chr = m_p_videoram[x];
 
 				if (BIT(chr, 7))
@@ -575,6 +573,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,     0,      pegasus,	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
-COMP( 1981, pegasusm, pegasus, 0,    pegasusm,	pegasus, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )
-
+COMP( 1981, pegasus,  0,     0,      pegasus,   pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
+COMP( 1981, pegasusm, pegasus, 0,    pegasusm,  pegasus, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )

@@ -229,7 +229,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 WRITE8_MEMBER( kaypro_state::kaypro_baud_a_w )	/* channel A - RS232C */
 {
-	data &= 0x0f;
+//	data &= 0x0f;
 
 //  z80sio_set_rx_clock( m_sio, baud_clock[data], 0);
 //  z80sio_set_tx_clock( m_sio, baud_clock[data], 0);
@@ -237,7 +237,7 @@ WRITE8_MEMBER( kaypro_state::kaypro_baud_a_w )	/* channel A - RS232C */
 
 WRITE8_MEMBER( kaypro_state::kayproii_baud_b_w )	/* Channel B - Keyboard - only usable speed is 300 baud */
 {
-	data &= 0x0f;
+//	data &= 0x0f;
 
 //  z80sio_set_rx_clock( m_sio, baud_clock[data], 1);
 //  z80sio_set_tx_clock( m_sio, baud_clock[data], 1);
@@ -245,7 +245,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_baud_b_w )	/* Channel B - Keyboard - only 
 
 WRITE8_MEMBER( kaypro_state::kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
 {
-	data &= 0x0f;
+//	data &= 0x0f;
 
 //  z80sio_set_rx_clock( m_sio2x, baud_clock[data], 0);
 //  z80sio_set_tx_clock( m_sio2x, baud_clock[data], 0);
