@@ -124,9 +124,8 @@ MACHINE_RESET( a7800 )
 	/* pokey cartridge */
 	if (state->m_cart_type & 0x01)
 	{
-		device_t *pokey = machine.device("pokey");
-		space->install_legacy_read_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_r));
-		space->install_legacy_write_handler(*pokey, 0x4000, 0x7FFF, FUNC(pokey_w));
+		pokeyn_device *pokey = machine.device<pokeyn_device>("pokey");
+		space->install_readwrite_handler(0x4000, 0x7FFF, read8_delegate(FUNC(pokeyn_device::read),pokey), write8_delegate(FUNC(pokeyn_device::write),pokey));
 	}
 }
 
@@ -412,8 +411,8 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		}
 		else if(m_cart_type & 0x01)
 		{
-			device_t *pokey = machine().device("pokey");
-			pokey_w(pokey, offset, data);
+			pokeyn_device *pokey = machine().device<pokeyn_device>("pokey");
+			pokey->write(space, offset, data);
 		}
 		else
 		{

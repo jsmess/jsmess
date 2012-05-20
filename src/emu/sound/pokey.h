@@ -24,7 +24,7 @@
 /* uncomment the line below for MESS to avoid breaking compile
  * please migrate as soon as possible to new device so that we can get rid of the legacy */
 
-#define OLDDEVICE_FOR_MESS 1
+//#define OLDDEVICE_FOR_MESS 1
 
 //#define POKEY_EXEC_INTERFACE
 
