@@ -4,7 +4,6 @@
 
 
 TODO:
-- Verify clock
 - Keyboard LEDs
 
 ***************************************************************************/
@@ -212,7 +211,7 @@ ADDRESS_MAP_END
 *****************************************************************************/
 
 MACHINE_CONFIG_FRAGMENT( microsoft_natural )
-	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL_16MHz)		// Needs verification
+	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(microsoft_natural_io)
 MACHINE_CONFIG_END
 
