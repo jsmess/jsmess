@@ -148,8 +148,8 @@ WRITE8_MEMBER(tvc_state::tvc_vram_bank_w)
 WRITE8_MEMBER(tvc_state::tvc_palette_w)
 {
 	//  0 I 0 G | 0 R 0 B
-	//  0 0 0 0 | I R G B
-	int i = ((data&0x40)>>3) | ((data&0x10)>>3) | (data&0x04) | (data&0x01);
+	//  0 0 0 0 | I G R B
+	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
 
 	m_col[offset] = i;
 }
@@ -554,12 +554,12 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				break;
 		default:
 				// 16 colors mode
-				// IGRB IGRB
+				// IIGG RRBB
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT8 data = vram[offset + i];
-					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>4) | ((data & 0x08)>>1) | ((data & 0x02)>>1);
-					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>3) | (data & 0x04) | (data & 0x01);
+					UINT8 col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
+					UINT8 col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
 					*p++ = palette[col0];
 					*p++ = palette[col0];
 					*p++ = palette[col0];
@@ -580,18 +580,18 @@ static PALETTE_INIT( tvc )
 	{
 		{ 0x00,0x00,0x00 },
 		{ 0x00,0x00,0x7f },
-		{ 0x00,0x7f,0x00 },
-		{ 0x00,0x7f,0x7f },
 		{ 0x7f,0x00,0x00 },
 		{ 0x7f,0x00,0x7f },
+		{ 0x00,0x7f,0x00 },
+		{ 0x00,0x7f,0x7f },
 		{ 0x7f,0x7f,0x00 },
 		{ 0x7f,0x7f,0x7f },
 		{ 0x00,0x00,0x00 },
 		{ 0x00,0x00,0xff },
-		{ 0x00,0xff,0x00 },
-		{ 0x00,0xff,0xff },
 		{ 0xff,0x00,0x00 },
 		{ 0xff,0x00,0xff },
+		{ 0x00,0xff,0x00 },
+		{ 0x00,0xff,0xff },
 		{ 0xff,0xff,0x00 },
 		{ 0xff,0xff,0xff }
 	};
@@ -749,20 +749,19 @@ ROM_END
 
 ROM_START( tvc64p )
 	ROM_REGION( 0x4000, "sys", ROMREGION_ERASEFF )
-	ROM_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787))
-	ROM_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db))
+	ROM_SYSTEM_BIOS( 0, "v22", "v2.2")
+	ROMX_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787), ROM_BIOS(1) )
+	ROMX_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v21", "v2.1")
+	ROMX_LOAD( "tvc21_d6.64k", 0x0000, 0x2000, CRC(f197ffce) SHA1(7b27a91504dd864170451949ada5f938d6532cae), ROM_BIOS(2) )
+	ROMX_LOAD( "tvc21_d4.64k", 0x2000, 0x2000, CRC(b054c0b2) SHA1(c8ca8d5a4d092604de01e2cafc2a2dabe94e6380), ROM_BIOS(2) )
+
 	ROM_REGION( 0x4000, "cart", ROMREGION_ERASEFF )
 	ROM_CART_LOAD( "cart", 0, 0x4000, 0 )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc22_d7.64k", 0x2000, 0x2000, CRC(05e1c3a8) SHA1(abf119cf947ea32defd08b29a8a25d75f6bd4987))
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
-/*
-
-    ROM_LOAD( "tvcru_d4.bin", 0x0000, 0x2000, CRC(bac5dd4f) SHA1(665a1b8c80b6ad82090803621f0c73ef9243c7d4))
-    ROM_LOAD( "tvcru_d6.bin", 0x2000, 0x2000, CRC(1e0fa0b8) SHA1(9bebb6c8f03f9641bd35c9fd45ffc13a48e5c572))
-    ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
-*/
 ROM_END
 
 ROM_START( tvc64pru )
