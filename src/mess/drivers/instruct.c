@@ -4,23 +4,44 @@
 
     08/04/2010 Skeleton driver.
     20/05/2012 Connected digits, system boots. [Robbbert]
+    20/05/2012 Connected keyboard, system mostly usable. [Robbbert]
 
     The eprom and 128 bytes of ram are in a 2656 chip. There is no
-    useful info on this device on the net, particularly where in the
-    memory map the ram resides.
+    useful info on this device on the net. It does appear though,
+    that it divides the 3.58MHz crystal by 4 for the CPU.
 
-    The Instructor has 512 bytes of ram, plus the 128 bytes mentioned
-    above. The clock speed is supposedly 875kHz.
+    The system also has 512 bytes of ram in an ordinary ram chip.
 
-    There is a big lack of info on this computer. No schematics, no i/o
-    list or memory map. There is a block diagram which imparts little.
+    There are no known schematics for this computer. There is a block
+    diagram which imparts little.
+
+    From looking at a blurry picture of it, this is what I can determine:
+    - Left side: 8 toggle switches, with a round red led above each one.
+    - Below this is another toggle switch with choice of 'Extended' or 'I/O port 07'.
+    - To the right of this is another toggle switch labelled 'Interrupt', the
+      choices are 'Direct' and 'Indirect'.
+    - Above this switch are 2 more round red leds: FLAG and RUN.
+    - Middle: a 4 down x3 across keypad containing the function keys. The
+      labels (from left to right, top to bottom) seem to be:
+      SENS, WCAS, BKPT, INT, RCAS, REG, MON, STEP, MEM, RST, RUN, ENT/NXT.
+    - Right side: a 4x4 hexadecimal keypad. The keys are:
+      C, D, E, F, 8, 9, A, B, 4, 5, 6, 7, 0, 1, 2, 3
+    - Above, extending from one side to the other is a metal plate with
+      printed mnemonics. At the right edge are sockets to connect up the
+      MIC and EAR cords to a cassette player.
+    - At the back is a S100 interface.
+
+    Quick usage:
+    - Look at memory: Press minus key. Enter an address. Press UP key to see the next.
+    - Look at registers: Press R. Press 0. Press UP key to see the next.
+    - Look at PC register: Press R. Press C.
 
     ToDO:
-    - Keys are not correct. Matrix to be worked out, and the polarity.
-      So far pressing random keys results in 'Error 2' or a freeze.
-    - Key names to be found out.
-    - Connect slide switches and 8 round leds.
-    - See if it had a speaker or a cassette interface.
+    - Keys are mostly correct. It seems the SENS, INT, MON, RST keys are
+      not in the matrix, but are connected to hardware directly. This needs
+      to be emulated.
+    - Connect 10 toggle switches and 10 round red leds.
+    - Cassette interface.
 
 ****************************************************************************/
 
@@ -38,11 +59,11 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(instruct_fc_r);
-	DECLARE_READ8_MEMBER(instruct_fd_r);
+	DECLARE_READ8_MEMBER(portfc_r);
+	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
-	DECLARE_READ8_MEMBER(instruct_sense_r);
-	DECLARE_WRITE8_MEMBER(instruct_f8_w);
+	DECLARE_READ8_MEMBER(sense_r);
+	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	virtual void machine_reset();
@@ -51,11 +72,14 @@ public:
 	bool m_valid_digit;
 };
 
-WRITE8_MEMBER( instruct_state::instruct_f8_w )
+// cassette port
+// when loading, bit 7 is continuously toggled
+// saving can use bits 3,4,5
+WRITE8_MEMBER( instruct_state::portf8_w )
 {
-	printf("%X ",data);
 }
 
+// segment output
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
 	if (m_valid_digit)
@@ -63,126 +87,130 @@ WRITE8_MEMBER( instruct_state::portf9_w )
 	m_valid_digit = false;
 }
 
+// digit & keyrow-scan select
 WRITE8_MEMBER( instruct_state::portfa_w )
 {
 	m_digit = data;
 	m_valid_digit = true;
 }
 
-READ8_MEMBER( instruct_state::instruct_fc_r )
+// unknown - copied to 17E9 at boot
+READ8_MEMBER( instruct_state::portfc_r )
 {
-	return 0;
+	return 0x55;
 }
 
-READ8_MEMBER( instruct_state::instruct_fd_r )
+// unknown - copied to 17E8 at boot
+READ8_MEMBER( instruct_state::portfd_r )
 {
-	return 0;
+	return 0xAA;
 }
 
+// read keyboard
 READ8_MEMBER( instruct_state::portfe_r )
 {
-	UINT8 data = 0xff, i;
+	UINT8 i;
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 6; i++)
 	{
 		if (BIT(m_digit, i))
 		{
 			char kbdrow[6];
 			sprintf(kbdrow,"X%X",i);
-			data = ioport(kbdrow)->read();
-			break;
+			return ioport(kbdrow)->read();
 		}
 	}
 
-	return data;
+	return 0xff;
 }
 
-READ8_MEMBER( instruct_state::instruct_sense_r )
+// read SENS key and cassin
+READ8_MEMBER( instruct_state::sense_r )
 {
 	return 0;
 }
 
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("p_ram") // 512 bytes onboard ram
+	AM_RANGE(0x1780, 0x17ff) AM_RAM // 128 bytes in s2656 chip
+	AM_RANGE(0x1800, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0xf8, 0xf8) AM_WRITE(instruct_f8_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(portf9_w)
 	AM_RANGE(0xfa, 0xfa) AM_WRITE(portfa_w)
-	//AM_RANGE(0xfc, 0xfc) AM_READ(instruct_fc_r)
-	//AM_RANGE(0xfd, 0xfd) AM_READ(instruct_fd_r)
+	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
+	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
-	//AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(instruct_sense_r)
-	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( instruct )
 	PORT_START("X0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U0") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U1") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U2") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U3") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U4") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WCAS") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RCAS") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STEP") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUN") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U5") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BKPT") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENT/NXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("X6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U6") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-
-	PORT_START("X7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U7") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_START("HW")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SENS") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INT") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 INPUT_PORTS_END
 
 
 void instruct_state::machine_reset()
 {
-	// copy the roms into ram
+	// copy the roms into ram so it can boot
 	UINT8* ROM = memregion("maincpu")->base();
-	memcpy(m_p_ram, ROM, 0x0800);
-	memcpy(m_p_ram+0x1800, ROM, 0x0800);
+	memcpy(m_p_ram, ROM+0x1800, 0x0200);
 }
 
 
 static MACHINE_CONFIG_START( instruct, instruct_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
 
@@ -193,10 +221,10 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( instruct )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "instruct.rom", 0x0000, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
+	ROM_LOAD( "instruct.rom", 0x1800, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME                    FLAGS */
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, 0,    "Signetics", "Signetics Instructor 50", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1978, instruct,  0,       0,       instruct,  instruct, 0,    "Signetics", "Signetics Instructor 50", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
