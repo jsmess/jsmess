@@ -30,7 +30,7 @@
 typedef struct _i82371ab_state i82371ab_state;
 struct _i82371ab_state
 {
-	UINT32 regs[4][0x100/4];
+	UINT8 regs[4][0x100];
 };
 
 
@@ -54,7 +54,10 @@ INLINE i82371ab_state *get_safe_token(device_t *device)
 static UINT32 i82371ab_pci_isa_r(device_t *busdevice, device_t *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
-	UINT32 result = i82371ab->regs[0][offset];
+	UINT32 result = i82371ab->regs[0][offset] |
+			i82371ab->regs[0][offset+1] << 8 |
+			i82371ab->regs[0][offset+2] << 16|
+			i82371ab->regs[0][offset+3] << 24;
 
 	logerror("i82371ab_pci_isa_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
 
@@ -63,29 +66,39 @@ static UINT32 i82371ab_pci_isa_r(device_t *busdevice, device_t *device, int offs
 
 static void i82371ab_pci_isa_w(device_t *busdevice, device_t *device, int offset, UINT32 data, UINT32 mem_mask)
 {
+	UINT32 cdata = 0;
+	int i;
 	i82371ab_state *i82371ab = get_safe_token(device);
+	COMBINE_DATA(&cdata);
 
 	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
 
-	switch (offset)
+	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
-	case 0x04:
-		COMBINE_DATA(&i82371ab->regs[0][offset]);
-
-		/* clear reserved bits */
-		i82371ab->regs[0][offset] &= 0x00000005;
-
-		/* set new status */
-		i82371ab->regs[0][offset] |= 0x02800000;
-
-		break;
+		switch (offset)
+		{
+			case 0x04:
+				/* clear reserved bits */
+				i82371ab->regs[0][offset] = cdata & 0x05;
+				break;
+			case 0x06:
+				/* set new status */
+				i82371ab->regs[0][offset] |= 0x80;
+				break;
+			case 0x07:
+				i82371ab->regs[0][offset] |= 0x02;
+				break;
+		}
 	}
 }
 
 static UINT32 i82371ab_pci_ide_r(device_t *busdevice, device_t *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
-	UINT32 result = i82371ab->regs[1][offset];
+	UINT32 result = i82371ab->regs[1][offset] |
+			i82371ab->regs[1][offset+1] << 8 |
+			i82371ab->regs[1][offset+2] << 16|
+			i82371ab->regs[1][offset+3] << 24;
 
 	logerror("i82371ab_pci_ide_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
 
@@ -94,29 +107,39 @@ static UINT32 i82371ab_pci_ide_r(device_t *busdevice, device_t *device, int offs
 
 static void i82371ab_pci_ide_w(device_t *busdevice, device_t *device, int offset, UINT32 data, UINT32 mem_mask)
 {
+	UINT32 cdata = 0;
+	int i;
 	i82371ab_state *i82371ab = get_safe_token(device);
+	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_ide_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
 
-	switch (offset)
+	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
-	case 0x04:
-		COMBINE_DATA(&i82371ab->regs[1][offset]);
-
-		/* clear reserved bits */
-		i82371ab->regs[1][offset] &= 0x00000005;
-
-		/* set new status */
-		i82371ab->regs[1][offset] |= 0x02800000;
-
-		break;
+		switch (offset)
+		{
+			case 0x04:
+				/* clear reserved bits */
+				i82371ab->regs[1][offset] = cdata & 0x05;
+				break;
+			case 0x06:
+				/* set new status */
+				i82371ab->regs[1][offset] |= 0x80;
+				break;
+			case 0x07:
+				i82371ab->regs[1][offset] |= 0x02;
+				break;
+		}
 	}
 }
 
 static UINT32 i82371ab_pci_usb_r(device_t *busdevice, device_t *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
-	UINT32 result = i82371ab->regs[2][offset];
+	UINT32 result = i82371ab->regs[2][offset] |
+			i82371ab->regs[2][offset+1] << 8 |
+			i82371ab->regs[2][offset+2] << 16|
+			i82371ab->regs[2][offset+3] << 24;
 
 	logerror("i82371ab_pci_usb_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
 
@@ -125,29 +148,39 @@ static UINT32 i82371ab_pci_usb_r(device_t *busdevice, device_t *device, int offs
 
 static void i82371ab_pci_usb_w(device_t *busdevice, device_t *device, int offset, UINT32 data, UINT32 mem_mask)
 {
+	UINT32 cdata = 0;
+	int i;
 	i82371ab_state *i82371ab = get_safe_token(device);
+	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_usb_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
 
-	switch (offset)
+	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
-	case 0x04:
-		COMBINE_DATA(&i82371ab->regs[2][offset]);
-
-		/* clear reserved bits */
-		i82371ab->regs[2][offset] &= 0x00000005;
-
-		/* set new status */
-		i82371ab->regs[2][offset] |= 0x02800000;
-
-		break;
+		switch (offset)
+		{
+			case 0x04:
+				/* clear reserved bits */
+				i82371ab->regs[2][offset] = cdata & 0x05;
+				break;
+			case 0x06:
+				/* set new status */
+				i82371ab->regs[2][offset] |= 0x80;
+				break;
+			case 0x07:
+				i82371ab->regs[2][offset] |= 0x02;
+				break;
+		}
 	}
 }
 
 static UINT32 i82371ab_pci_acpi_r(device_t *busdevice, device_t *device, int offset, UINT32 mem_mask)
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
-	UINT32 result = i82371ab->regs[3][offset];
+	UINT32 result = i82371ab->regs[3][offset] |
+			i82371ab->regs[3][offset+1] << 8 |
+			i82371ab->regs[3][offset+2] << 16|
+			i82371ab->regs[3][offset+3] << 24;
 
 	logerror("i82371ab_pci_acpi_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
 
@@ -156,22 +189,29 @@ static UINT32 i82371ab_pci_acpi_r(device_t *busdevice, device_t *device, int off
 
 static void i82371ab_pci_acpi_w(device_t *busdevice, device_t *device, int offset, UINT32 data, UINT32 mem_mask)
 {
+	UINT32 cdata = 0;
+	int i;
 	i82371ab_state *i82371ab = get_safe_token(device);
+	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_acpi_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
 
-	switch (offset)
+	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
-	case 0x04:
-		COMBINE_DATA(&i82371ab->regs[3][offset]);
-
-		/* clear reserved bits */
-		i82371ab->regs[3][offset] &= 0x00000005;
-
-		/* set new status */
-		i82371ab->regs[3][offset] |= 0x02800000;
-
-		break;
+		switch (offset)
+		{
+			case 0x04:
+				/* clear reserved bits */
+				i82371ab->regs[3][offset] = cdata & 0x05;
+				break;
+			case 0x06:
+				/* set new status */
+				i82371ab->regs[3][offset] |= 0x80;
+				break;
+			case 0x07:
+				i82371ab->regs[3][offset] |= 0x02;
+				break;
+		}
 	}
 }
 
@@ -217,30 +257,31 @@ static DEVICE_START( i82371ab )
 static DEVICE_RESET( i82371ab )
 {
 	i82371ab_state *i82371ab = get_safe_token(device);
+	UINT32 (*regs32)[64] = (UINT32 (*)[64])(i82371ab->regs);
 
 	/* isa */
-	i82371ab->regs[0][0x00] = 0x71108086;
-	i82371ab->regs[0][0x04] = 0x00000000;
-	i82371ab->regs[0][0x08] = 0x06010000;
-	i82371ab->regs[0][0x0c] = 0x00800000;
+	regs32[0][0x00] = 0x71108086;
+	regs32[0][0x04] = 0x00000000;
+	regs32[0][0x08] = 0x06010000;
+	regs32[0][0x0c] = 0x00800000;
 
 	/* ide */
-	i82371ab->regs[1][0x00] = 0x71118086;
-	i82371ab->regs[1][0x04] = 0x02800000;
-	i82371ab->regs[1][0x08] = 0x01018000;
-	i82371ab->regs[1][0x0c] = 0x00000000;
+	regs32[1][0x00] = 0x71118086;
+	regs32[1][0x04] = 0x02800000;
+	regs32[1][0x08] = 0x01018000;
+	regs32[1][0x0c] = 0x00000000;
 
 	/* usb */
-	i82371ab->regs[2][0x00] = 0x71128086;
-	i82371ab->regs[2][0x04] = 0x02800000;
-	i82371ab->regs[2][0x08] = 0x0c030000;
-	i82371ab->regs[2][0x0c] = 0x00000000;
+	regs32[2][0x00] = 0x71128086;
+	regs32[2][0x04] = 0x02800000;
+	regs32[2][0x08] = 0x0c030000;
+	regs32[2][0x0c] = 0x00000000;
 
 	/* acpi */
-	i82371ab->regs[3][0x00] = 0x71138086;
-	i82371ab->regs[3][0x04] = 0x02800000;
-	i82371ab->regs[3][0x08] = 0x06800000;
-	i82371ab->regs[3][0x0c] = 0x02800000;
+	regs32[3][0x00] = 0x71138086;
+	regs32[3][0x04] = 0x02800000;
+	regs32[3][0x08] = 0x06800000;
+	regs32[3][0x0c] = 0x02800000;
 }
 
 
