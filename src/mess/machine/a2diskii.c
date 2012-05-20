@@ -57,6 +57,11 @@ MACHINE_CONFIG_FRAGMENT( diskii )
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_FRAGMENT( iwmflop )
+	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+MACHINE_CONFIG_END
+
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
     ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
@@ -70,6 +75,11 @@ ROM_END
 machine_config_constructor a2bus_floppy_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( diskii );
+}
+
+machine_config_constructor a2bus_iwmflop_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( iwmflop );
 }
 
 //-------------------------------------------------
