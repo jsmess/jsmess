@@ -818,7 +818,8 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( ega->m_frame_cnt & 0x10 ) )
+			/* Check for blinking */
+			if ( ( ega->m_attribute.data[0x10] & 0x08 ) && ( attr & 0x80 ) && ( ega->m_frame_cnt & 0x10 ) )
 			{
 				data = 0x00;
 			}
