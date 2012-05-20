@@ -183,8 +183,8 @@ SOUNDS += QSOUND
 SOUNDS += SAA1099
 #SOUNDS += IREMGA20
 SOUNDS += ES5503
-#SOUNDS += ES5505
-#SOUNDS += ES5506
+SOUNDS += ES5505
+SOUNDS += ES5506
 #SOUNDS += BSMT2000
 #SOUNDS += GAELCO_CG1V
 #SOUNDS += GAELCO_GAE1
@@ -1045,6 +1045,7 @@ $(MESSOBJ)/elektor.a:			\
 $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esq1.o		\
 	$(MESS_DRIVERS)/mirage.o    \
+	$(MESS_DRIVERS)/esq5505.o   \
 
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\

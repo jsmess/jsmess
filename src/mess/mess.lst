@@ -171,8 +171,12 @@ apollo80
 d6800		// Dream 6800
 
 // Ensoniq
-enmirage // 1985 Mirage Digital Multi-Sampler
-esq1	// 1986 ESQ-1 Digital Wave Synthesizer
+enmirage    // 1985 Mirage Digital Multi-Sampler
+esq1        // 1986 ESQ-1 Digital Wave Synthesizer
+sq80        // 1988 SQ-80 Digital Wave Synthesizer
+vfx         // 1989 VFX
+eps16       // 1990 EPS-16 Plus
+sq1         // 1990 SQ-1 
 
 // Fairchild
 channelf  // Fairchild Channel F VES - 1976
