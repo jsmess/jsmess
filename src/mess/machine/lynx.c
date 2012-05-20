@@ -421,7 +421,7 @@ static void lynx_blit_16color_line(lynx_state *state, const int y, const int xdi
 static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int xdir, const int bits_per_pixel, const int mask )
 {
 	int i;
-	int xi = state->m_blitter.x_pos - state->m_blitter.xoff;
+	int xi;
 	int buffer, bits, j;
 	int literal_data, count, color;
 	UINT16 width_accum;
