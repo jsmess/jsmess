@@ -37,15 +37,18 @@ DECLARE_LEGACY_DEVICE(MC6854, mc6854);
 typedef struct _mc6854_interface mc6854_interface;
 struct _mc6854_interface
 {
+  devcb_write_line  out_irq_func; /* interrupt request */
+
   /* low-level, bit-based interface */
-  void ( * out_tx  ) ( device_t *device, int state ); /* transmit bit */
+  devcb_read_line   in_rxd_func; /* receive bit */
+  devcb_write_line  out_txd_func; /* transmit bit */
 
   /* high-level, frame-based interface */
   void ( * out_frame ) ( device_t *device, UINT8* data, int length );
 
   /* control lines */
-  void ( * out_rts ) ( device_t *device, int state ); /* 1 = transmitting, 0 = idle */
-  void ( * out_dtr ) ( device_t *device, int state ); /* 1 = data transmit ready, 0 = busy */
+  devcb_write_line  out_rts_func; /* 1 = transmitting, 0 = idle */
+  devcb_write_line  out_dtr_func; /* 1 = data transmit ready, 0 = busy */
 };
 
 
@@ -63,13 +66,17 @@ extern READ8_DEVICE_HANDLER  ( mc6854_r );
 extern WRITE8_DEVICE_HANDLER ( mc6854_w );
 
 /* low-level, bit-based interface */
-extern void mc6854_set_rx ( device_t *device, int state );
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_rx );
 
 /* high-level, frame-based interface */
 extern int mc6854_send_frame( device_t *device, UINT8* data, int length ); /* ret -1 if busy */
 
 /* control lines */
-extern void mc6854_set_cts ( device_t *device, int state ); /* 1 = clear-to-send, 0 = busy */
-extern void mc6854_set_dcd ( device_t *device, int state ); /* 1 = carrier, 0 = no carrier */
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_cts ); /* 1 = clear-to-send, 0 = busy */
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_dcd ); /* 1 = carrier, 0 = no carrier */
+
+/* clock */
+WRITE_LINE_DEVICE_HANDLER( mc6854_rxc_w );
+WRITE_LINE_DEVICE_HANDLER( mc6854_txc_w );
 
 #endif

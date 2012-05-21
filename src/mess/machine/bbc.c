@@ -20,6 +20,7 @@
 #include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
+#include "machine/mc6854.h"
 #include "machine/ctronics.h"
 #include "imagedev/cassette.h"
 
@@ -558,6 +559,7 @@ long myo;
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
+		device_t *adlc = machine().device("mc6854");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
@@ -581,7 +583,7 @@ long myo;
 		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(space,myo-0x40);
 		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(space,myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
-		if ((myo>=0xa0) && (myo<=0xbf)) return 0xfe;
+		if ((myo>=0xa0) && (myo<=0xbf)) return mc6854_r(adlc, myo & 0x03);
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
 		if ((myo>=0xe0) && (myo<=0xff)) return 0xfe;
 	}
@@ -597,6 +599,7 @@ long myo;
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
+		device_t *adlc = machine().device("mc6854");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
@@ -620,7 +623,7 @@ long myo;
 		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(space,myo-0x40, data);
 		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(space,myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
-		//if ((myo>=0xa0) && (myo<=0xbf))
+		if ((myo>=0xa0) && (myo<=0xbf)) mc6854_w(adlc, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
 		//if ((myo>=0xe0) && (myo<=0xff))
 	}

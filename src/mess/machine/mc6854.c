@@ -59,6 +59,11 @@
 
 typedef struct
 {
+	devcb_resolved_write_line 	out_irq_func;
+	devcb_resolved_read_line 	in_rxd_func;
+	devcb_resolved_write_line 	out_txd_func;
+	devcb_resolved_write_line 	out_rts_func;
+	devcb_resolved_write_line 	out_dtr_func;
 
 	/* interface */
 	const mc6854_interface* iface;
@@ -262,10 +267,10 @@ static void mc6854_send_bits( device_t *device, UINT32 data, int len, int zi )
 		mc6854->tones = 0;
 
 	/* send bits */
-	if ( mc6854->iface->out_tx )
+	if ( !mc6854->out_txd_func.isnull() )
 	{
 		for ( i = 0; i < len; i++, data >>= 1 )
-			mc6854->iface->out_tx( device, data & 1 );
+			mc6854->out_txd_func( data & 1 );
 	}
 
 	/* schedule when to ask the MC6854 for more bits */
@@ -584,7 +589,7 @@ static UINT8 mc6854_rfifo_pop( device_t *device )
 
 
 /* MC6854 makes fields from bits */
-void mc6854_set_rx( device_t *device, int bit )
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_rx )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 	int fieldlen = ( mc6854->rstate < 6 ) ? 8 : RWL;
@@ -592,7 +597,7 @@ void mc6854_set_rx( device_t *device, int bit )
 	if ( RRESET || (mc6854->sr2 & DCD) )
 		return;
 
-	if ( bit )
+	if ( state )
 	{
 		mc6854->rones++;
 		mc6854->rreg = (mc6854->rreg >> 1) | 0x80000000;
@@ -699,12 +704,12 @@ int mc6854_send_frame( device_t *device, UINT8* data, int len )
 
 
 
-void mc6854_set_cts( device_t *device, int data )
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_cts )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
-	if ( ! mc6854->cts && data )
+	if ( ! mc6854->cts && state )
 		mc6854->sr1 |= CTS;
-	mc6854->cts = data;
+	mc6854->cts = state;
 
 	if ( mc6854->cts )
 		mc6854->sr1 |= CTS;
@@ -714,10 +719,10 @@ void mc6854_set_cts( device_t *device, int data )
 
 
 
-void mc6854_set_dcd( device_t *device, int data )
+WRITE_LINE_DEVICE_HANDLER( mc6854_set_dcd )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
-	if ( ! mc6854->dcd && data )
+	if ( ! mc6854->dcd && state )
 	{
 		mc6854->sr2 |= DCD;
 		/* partial reset */
@@ -726,7 +731,7 @@ void mc6854_set_dcd( device_t *device, int data )
 		mc6854->rsize = 0;
 		mc6854->rones = 0;
 	}
-	mc6854->dcd = data;
+	mc6854->dcd = state;
 }
 
 
@@ -788,6 +793,8 @@ static void mc6854_update_sr1( mc6854_t* mc6854 )
 		if ( mc6854->sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) )
 			mc6854->sr1 |= IRQ;
 	}
+
+	mc6854->out_irq_func((mc6854->sr1 & IRQ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -891,8 +898,7 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 			if ( TST )
 				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", cpu_get_previouspc( device->machine().firstcpu ), mc6854->cr3 );
 
-			if ( mc6854->iface->out_dtr )
-				mc6854->iface->out_dtr( device, DTR ? 1 : 0 );
+			mc6854->out_dtr_func( DTR ? 1 : 0 );
 
 		}
 		else
@@ -925,8 +931,7 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 					mc6854->sr1 |= CTS;
 			}
 
-			if ( mc6854->iface->out_rts )
-				mc6854->iface->out_rts( device, RTS ? 1 : 0 );
+			mc6854->out_rts_func( RTS ? 1 : 0 );
 		}
 		break;
 
@@ -966,7 +971,15 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 	}
 }
 
+WRITE_LINE_DEVICE_HANDLER( mc6854_rxc_w )
+{
+	// TODO
+}
 
+WRITE_LINE_DEVICE_HANDLER( mc6854_txc_w )
+{
+	// TODO
+}
 
 /************************ reset *****************************/
 
@@ -995,6 +1008,11 @@ static DEVICE_START( mc6854 )
 	mc6854_t* mc6854 = get_safe_token( device );
 
 	mc6854->iface = (const mc6854_interface*)device->static_config();
+	mc6854->out_irq_func.resolve(mc6854->iface->out_irq_func, *device);
+	mc6854->in_rxd_func.resolve(mc6854->iface->in_rxd_func, *device);
+	mc6854->out_txd_func.resolve(mc6854->iface->out_txd_func, *device);
+	mc6854->out_rts_func.resolve(mc6854->iface->out_rts_func, *device);
+	mc6854->out_dtr_func.resolve(mc6854->iface->out_dtr_func, *device);
 
 	mc6854->ttimer = device->machine().scheduler().timer_alloc(FUNC(mc6854_tfifo_cb), (void*) device );
 

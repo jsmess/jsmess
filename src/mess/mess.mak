@@ -571,7 +571,8 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_MACHINE)/bbc.o		\
 	$(MESS_DRIVERS)/bbc.o		\
 	$(MESS_DRIVERS)/bbcbc.o		\
-	$(MESS_DRIVERS)/e01.o		\
+	$(MESS_MACHINE)/econet.o	\
+	$(MESS_MACHINE)/e01.o		\
 	$(MESS_VIDEO)/electron.o	\
 	$(MESS_MACHINE)/electron.o	\
 	$(MESS_DRIVERS)/electron.o	\
@@ -2063,7 +2064,6 @@ $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/dolphunk.o:	$(MESS_LAYOUT)/dolphunk.lh
-$(MESS_DRIVERS)/e01.o:		$(MESS_LAYOUT)/e01.lh
 $(MESS_DRIVERS)/eacc.o:		$(MESS_LAYOUT)/eacc.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh

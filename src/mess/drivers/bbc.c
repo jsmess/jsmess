@@ -13,7 +13,10 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/econet.h"
+#include "machine/e01.h"
 #include "machine/mc146818.h"
+#include "machine/mc6854.h"
 #include "machine/upd7002.h"
 #include "machine/ctronics.h"
 #include "imagedev/flopdrv.h"
@@ -680,6 +683,8 @@ ROM_START(bbcm)
 	/* 34000 rom 13  ADFS */
 	/* 38000 rom 14  View */
 	/* 3c000 rom 15  Terminal */
+
+	ROM_LOAD("anfs424.ic27", 0x20000, 0x4000, CRC(1b9f75fd) SHA1(875f71edd48f87c3a55371409d0cc2015d8b5853) ) // TODO where to load this?
 ROM_END
 
 
@@ -771,6 +776,33 @@ static const saa505x_interface bbc_saa505x_intf =
 {
 	bbc_draw_RGB_in,
 };
+
+static const mc6854_interface adlc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_r),
+	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static WRITE_LINE_DEVICE_HANDLER( econet_clk_w )
+{
+	mc6854_rxc_w(device, state);
+	mc6854_txc_w(device, state);
+}
+
+static ECONET_INTERFACE( econet_intf )
+{
+	DEVCB_DEVICE_LINE("mc6854", econet_clk_w),
+	DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( econet_devices )
+	SLOT_INTERFACE("e01", E01)
+	SLOT_INTERFACE("e01s", E01S)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
@@ -950,6 +982,10 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
+
+	MCFG_MC6854_ADD("mc6854", adlc_intf)
+	MCFG_ECONET_ADD(econet_intf)
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */

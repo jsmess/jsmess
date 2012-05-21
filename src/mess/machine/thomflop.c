@@ -1687,7 +1687,7 @@ static void to7_network_got_frame( device_t *device, UINT8* data, int length )
 
 
 
-const mc6854_interface to7_network_iface = { NULL, to7_network_got_frame, NULL, NULL };
+const mc6854_interface to7_network_iface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, to7_network_got_frame, DEVCB_NULL, DEVCB_NULL };
 
 
 
