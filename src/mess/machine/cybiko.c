@@ -73,7 +73,11 @@ static emu_file *nvram_system_fopen( running_machine &machine, UINT32 openflags,
 	astring fname(machine.system().name, PATH_SEPARATOR, name, ".nv");
 	emu_file *file = global_alloc(emu_file(machine.options().nvram_directory(), openflags));
 	filerr = file->open(fname.cstr());
-	return (filerr == FILERR_NONE) ? file : NULL;
+	if (filerr == FILERR_NONE)
+		return file;
+
+	global_free(file);
+	return NULL;
 }
 
 typedef void (nvram_load_func)(running_machine &machine, emu_file *file);
