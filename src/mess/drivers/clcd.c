@@ -36,6 +36,11 @@ public:
 		SET_TILE_INFO(0, code, 0, 0);
 	}
 
+	virtual void machine_start()
+	{
+		membank("bankedroms")->configure_entries(0, 0x100, memregion("bankedroms")->base(), 0x400);
+	}
+
 	virtual void video_start()
 	{
 		m_tilemap = tilemap_create(machine(), get_clcd_tilemap_tile_info, tilemap_scan_rows, 6, 8, 80, 16);
@@ -48,14 +53,15 @@ public:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(unknown1_w)
+	DECLARE_WRITE8_MEMBER(rambank_w)
 	{
-//		printf( "UNKNOWN 1:%02x\n", data );
+//		printf( "ram bank:%02x %02x\n", offset, data );
 	}
 
-	DECLARE_WRITE8_MEMBER(unknown2_w)
+	DECLARE_WRITE8_MEMBER(rombank_w)
 	{
-//		printf( "UNKNOWN 2:%d %02x\n", offset, data );
+//		printf( "rom bank %02x\n", data);
+		membank("bankedroms")->set_entry(0);
 	}
 
 	WRITE8_MEMBER( via0_pa_w )
@@ -125,9 +131,10 @@ static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("via0", via6522_device, read, write)
 	AM_RANGE(0xf880, 0xf88f) AM_DEVREADWRITE("via1", via6522_device, read, write)
 	AM_RANGE(0xf980, 0xf981) AM_DEVREADWRITE("acia", acia6551_device, read, write)
-	AM_RANGE(0xff00, 0xff01) AM_WRITE(unknown1_w)
-	AM_RANGE(0xff80, 0xff83) AM_WRITE(unknown2_w)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(rombank_w)
+	AM_RANGE(0xff80, 0xff83) AM_WRITE(rambank_w)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -310,13 +317,16 @@ MACHINE_CONFIG_END
 ROM_START( clcd )
 
 	ROM_REGION( 0x1000, "charrom", 0 )
-	ROM_LOAD( "charrom",            0x00000, 0x1000, BAD_DUMP CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
+	ROM_LOAD( "charrom",            0x00800, 0x0800, BAD_DUMP CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
+	ROM_CONTINUE( 0x00000, 0x0800 )
 
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "kizapr.u102",        0x00000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
-	ROM_LOAD( "sizapr.u103",        0x08000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
-	ROM_LOAD( "sept-m-13apr.u104",  0x10000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
-	ROM_LOAD( "ss-calc-13apr.u105", 0x18000, 0x8000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4))
+
+	ROM_REGION( 0x40000, "bankedroms", 0 )
+	ROM_LOAD( "sizapr.u103",        0x00000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
+	ROM_LOAD( "sept-m-13apr.u104",  0x08000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
+	ROM_LOAD( "ss-calc-13apr.u105", 0x10000, 0x8000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4))
 ROM_END
 
 /* Driver */
