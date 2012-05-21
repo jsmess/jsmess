@@ -15,24 +15,24 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	
+
 	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );
 	DECLARE_READ8_MEMBER ( dm7000_iic0_r );
 	DECLARE_WRITE8_MEMBER ( dm7000_iic1_w );
 	DECLARE_READ8_MEMBER ( dm7000_iic1_r );
-	
+
 	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
 	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
 	UINT8 m_scc0_lcr;
 	UINT8 m_scc0_lsr;
-	
+
 	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
 	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );
-	
+
 	DECLARE_WRITE8_MEMBER ( dm7000_scp0_w );
 	DECLARE_READ8_MEMBER ( dm7000_scp0_r );
-	
-	UINT32			dcr[1024];	
+
+	UINT32			dcr[1024];
 };
 
 /* */

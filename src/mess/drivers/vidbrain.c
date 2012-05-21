@@ -16,9 +16,9 @@
 
     TODO:
 
-	- video interrupts
-	- R-2R ladder DAC
-	- reset on cartridge unload
+    - video interrupts
+    - R-2R ladder DAC
+    - reset on cartridge unload
     - use machine/f3853.h
     - joystick scan timer 555
     - expander 1 (cassette, RS-232)
@@ -122,8 +122,8 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
         2
         3
         4       sound clock
-        5		accessory jack pin 5
-        6		accessory jack pin 1
+        5       accessory jack pin 5
+        6       accessory jack pin 1
         7       joystick enable
 
     */
@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 		// C = 0.003uF
 		// t = 1.1 * R * C
 		double t = 1.1 * (RES_K(3.9) + RES_K(joydata)) * 3;
-		
+
 		timer_set(attotime::from_nsec(t), TIMER_JOYSTICK);
 	}
 }
@@ -494,7 +494,7 @@ void vidbrain_state::machine_start()
 {
 	// register IRQ callback
 	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
-	
+
 	// allocate timers
 	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);
 
@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 
 	// video hardware
 	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, XTAL_14_31818MHz, uv_intf)
-	
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

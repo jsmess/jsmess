@@ -1,8 +1,8 @@
 /*
 
-	T400 uController test suite for COP410/420 series CPUs
+    T400 uController test suite for COP410/420 series CPUs
 
-	http://opencores.org/project,t400
+    http://opencores.org/project,t400
 
 */
 

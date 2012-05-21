@@ -68,7 +68,7 @@ public:
 	int m_sound_clk;
 
 	// timers
-	emu_timer *m_timer_ne555;	
+	emu_timer *m_timer_ne555;
 };
 
 //----------- defined in video/vidbrain.c -----------

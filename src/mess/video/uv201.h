@@ -6,7 +6,7 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
- 
+
 **********************************************************************/
 
 #pragma once
@@ -45,7 +45,7 @@
 struct uv201_interface
 {
 	const char *m_screen_tag;
-	
+
 	devcb_write_line		m_out_ext_int_cb;
 	devcb_write_line		m_out_hblank_cb;
 	devcb_read8				m_in_db_cb;

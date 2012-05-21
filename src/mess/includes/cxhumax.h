@@ -41,7 +41,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER ( flash_w );
 	DECLARE_READ32_MEMBER ( flash_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_hsx_w );
 	DECLARE_READ32_MEMBER ( cx_hsx_r );
 
@@ -87,30 +87,30 @@ public:
 
 	DECLARE_WRITE32_MEMBER ( cx_ss_w );
 	DECLARE_READ32_MEMBER ( cx_ss_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_i2c0_w );
 	DECLARE_READ32_MEMBER ( cx_i2c0_r );
 	DECLARE_WRITE32_MEMBER ( cx_i2c1_w );
 	DECLARE_READ32_MEMBER ( cx_i2c1_r );
 	DECLARE_WRITE32_MEMBER ( cx_i2c2_w );
 	DECLARE_READ32_MEMBER ( cx_i2c2_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_mc_cfg_w );
 	DECLARE_READ32_MEMBER ( cx_mc_cfg_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_drm0_w );
 	DECLARE_READ32_MEMBER ( cx_drm0_r );
 	DECLARE_WRITE32_MEMBER ( cx_drm1_w );
 	DECLARE_READ32_MEMBER ( cx_drm1_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_hdmi_w );
 	DECLARE_READ32_MEMBER ( cx_hdmi_r );
-	
+
 	DECLARE_WRITE32_MEMBER ( cx_gxa_w );
 	DECLARE_READ32_MEMBER ( cx_gxa_r );
 
 	DECLARE_READ32_MEMBER ( dummy_flash_r );
-	
+
 	UINT32 m_romdescr_reg;
 	UINT32 m_isaromdescr_regs[0x0C/4];
 	UINT32 m_isadescr_regs[0x10/4];
@@ -129,7 +129,7 @@ public:
 	UINT32 m_pllprescale_reg;
 
 	UINT32 m_intctrl_regs[0x38/4];
-	
+
 	UINT32 m_ss_regs[0x18/4];
 	UINT8 m_ss_tx_fifo[8];				// 8 entries (size hardcoded to 8 bits per entry - TODO)
 
@@ -141,25 +141,25 @@ public:
 	UINT32 m_mccfg_regs[0x0C/4];
 
 	UINT32 m_chipcontrol_regs[0x74/4];
-	
+
 	UINT32 m_drm0_regs[0xfc/4];
 	UINT32 m_drm1_regs[0xfc/4];
-	
+
 	UINT32 m_hdmi_regs[0x400/4];
-	
+
 	UINT32 m_gxa_cmd_regs[0x130/4];
 };
 
 #define INTDEST			0	// Interrupt destination (1=IRQ, 0=FIQ)
 #define INTENABLE		1	// Enables the interrupt generation
-#define INTIRQ			2	// Normal interrupt 
+#define INTIRQ			2	// Normal interrupt
 #define INTFIQ			3	// Fast interrupt
 #define INTSTATCLR		4	// Read: interrupt status, Write: clear pending interrupt
 #define INTSTATSET		5	// Read: interrupt status, Write: sets a pending interrupt
 #define INTGROUP1		0
 #define INTGROUP2		1
 
-#define INTREG(group, index)	(((group) << 3) | (index)) 
+#define INTREG(group, index)	(((group) << 3) | (index))
 
 #define GXA_CMD_RW_REGISTER				0x00
 #define GXA_CMD_QMARK					0x02

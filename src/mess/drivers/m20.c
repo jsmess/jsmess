@@ -212,7 +212,7 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)
 
 	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
-//	AM_RANGE(0x140, 0x143) AM_DEVREADWRITE8_LEGACY("i8259", pic8259_r, pic8259_w, 0xffff)
+//  AM_RANGE(0x140, 0x143) AM_DEVREADWRITE8_LEGACY("i8259", pic8259_r, pic8259_w, 0xffff)
 
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END

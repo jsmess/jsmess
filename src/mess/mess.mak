@@ -1810,7 +1810,7 @@ $(MESSOBJ)/veb.a:				\
 
 $(MESSOBJ)/vidbrain.a:			\
 	$(MESS_DRIVERS)/vidbrain.o	\
-	$(MESS_VIDEO)/uv201.o 		\
+	$(MESS_VIDEO)/uv201.o		\
 
 $(MESSOBJ)/videoton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\

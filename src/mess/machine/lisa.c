@@ -271,7 +271,7 @@ static void COPS_queue_data(running_machine &machine, const UINT8 *data, int len
 #endif
 
 	{
-//		printf("Adding %d bytes of data to FIFO\n", len);
+//      printf("Adding %d bytes of data to FIFO\n", len);
 
 		while (len--)
 		{

@@ -156,9 +156,9 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
  400b 000x   iic
  400c 000x   scp
  400d 000x   modem
- 
+
  STBx25xx
- 
+
  4000 000x   Serial1 Controller
  4001 000x   Serial2 Controller
  4002 00xx   Smart Card Interface 0
@@ -169,9 +169,9 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
  4007 00xx   Smart Card Interface 1
  400c 000x   Serial Controller Port
  400d 00xx   Synchronous Serial Port
- 
+
  STB04xxx
- 
+
  4000 00xx   Serial1/Infrared Controller
  4001 00xx   Universal Serial Bus
  4002 00xx   Smart Card Interface 0
@@ -185,19 +185,19 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
  400d 00xx   Synchronous Serial Port
  400e 000x   Serial2/UART750 Controller
  400f 0xxx   IDE Controller
-  
+
 */
 static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM										// RAM page 0 - 32MB
 	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM										// RAM page 1 - 32MB
-	
+
 	AM_RANGE(0x40030000, 0x4003000f) AM_READWRITE8(dm7000_iic0_r, dm7000_iic0_w, 0xffffffff)
 	AM_RANGE(0x40040000, 0x40040007) AM_READWRITE8(dm7000_scc0_r, dm7000_scc0_w, 0xffffffff)
 	AM_RANGE(0x40060000, 0x40060047) AM_READWRITE8(dm7000_gpio0_r, dm7000_gpio0_w, 0xffffffff)
 	AM_RANGE(0x400b0000, 0x400b000f) AM_READWRITE8(dm7000_iic1_r, dm7000_iic1_w, 0xffffffff)
 	AM_RANGE(0x400c0000, 0x400c0007) AM_READWRITE8(dm7000_scp0_r, dm7000_scp0_w, 0xffffffff)
-	
+
 	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
 	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
@@ -211,7 +211,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(dm7000)
 {
 	dm7000_state *state = machine.driver_data<dm7000_state>();
-	
+
 	state->dcr[DCRSTB045_CICVCR] = 0x00000001;
 	state->dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
 	state->dcr[DCRSTB045_VIDEO_CNTL] = 0x00009000;
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	
+
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_VIDEO_START(dm7000)

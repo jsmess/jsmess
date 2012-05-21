@@ -39,16 +39,16 @@
 
     TODO:
 
-	- centronics strobe
-	- VIA CB2 -> econet rx/tx clock terminator
+    - centronics strobe
+    - VIA CB2 -> econet rx/tx clock terminator
     - ADLC interrupts
     - ECONET device
     - artwork
     - hard disk
 
-    	E20: Rodime RO652 (-chs 306,4,17,512)
-    	E40S:
-    	E60S:
+        E20: Rodime RO652 (-chs 306,4,17,512)
+        E40S:
+        E60S:
 
 */
 
@@ -135,9 +135,9 @@ WRITE8_MEMBER( e01_state::floppy_w )
         5       floppy master reset
         6       floppy test
         7       mode LED
-	
-	*/
-   
+
+    */
+
 	// floppy 1 select
 	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( e01_state::network_irq_enable_w )
 READ8_MEMBER( e01_state::hdc_data_r )
 {
 	UINT8 data = scsi_data_r(m_scsibus, 0);
-	
+
 	scsi_ack_w(m_scsibus, 0);
 
 	return data;
@@ -241,19 +241,19 @@ WRITE8_MEMBER( e01_state::hdc_data_w )
 READ8_MEMBER( e01_state::hdc_status_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       MSG
-	    1       BSY
-	    2       0
-	    3       0
-	    4       NIRQ
-	    5       REQ
-	    6       I/O
-	    7       C/D
-	
-	*/
+
+        bit     description
+
+        0       MSG
+        1       BSY
+        2       0
+        3       0
+        4       NIRQ
+        5       REQ
+        6       I/O
+        7       C/D
+
+    */
 
 	UINT8 data = 0;
 
@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER( e01_state::rtc_irq_w )
     update_interrupts();
 }
 
-static mc146818_interface rtc_intf = 
+static mc146818_interface rtc_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(e01_state, rtc_irq_w)
 };
@@ -535,7 +535,7 @@ static const SCSIBus_interface scsi_intf =
 //  centronics_interface e01_centronics_intf
 //-------------------------------------------------
 
-static centronics_interface e01_centronics_intf = 
+static centronics_interface e01_centronics_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER(R6522_TAG, via6522_device, write_ca1),
 	DEVCB_NULL,

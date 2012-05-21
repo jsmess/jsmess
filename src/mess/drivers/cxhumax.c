@@ -1,13 +1,13 @@
 /***************************************************************************
-	HUMAX HDCI-2000 ( Conexant CX2417x )
-	
-	http://www.humaxdigital.com/global/products/product_stb_satellite_hdci2000.asp
-	
-	Running on Nucleus PLUS - ARM7TDMI ADS v. 1.14
-	some Conexant/Nucleus goodies may be found at http://code.google.com/p/cherices/
-	
-	runs up to frame 280 or so...
-	
+    HUMAX HDCI-2000 ( Conexant CX2417x )
+
+    http://www.humaxdigital.com/global/products/product_stb_satellite_hdci2000.asp
+
+    Running on Nucleus PLUS - ARM7TDMI ADS v. 1.14
+    some Conexant/Nucleus goodies may be found at http://code.google.com/p/cherices/
+
+    runs up to frame 280 or so...
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -32,23 +32,23 @@ READ32_MEMBER ( cxhumax_state::cx_gxa_r )
 {
 	UINT32 res = m_gxa_cmd_regs[offset];
 	verboselog( machine(), 9, "(GXA) %08X -> %08X\n", 0xE0600000 + (offset << 2), res);
-/*	UINT8 gxa_command_number = (offset >> 9) & 0x7F;
-	verboselog( machine(), 9, "      Command: %08X\n", gxa_command_number);
-	switch (gxa_command_number) {
-		case GXA_CMD_RW_REGISTER:
-			switch(offset) {
-				case GXA_CFG2_REG:
-					break;
-				default:
-					verboselog( machine(), 9, "      Unimplemented register - TODO?\n");
-					break;
-			}
-			break;
-		default:
-			// do we need it?
-			verboselog( machine(), 9, "      Unimplemented read command - TODO?\n");
-			break;
-	}*/
+/*  UINT8 gxa_command_number = (offset >> 9) & 0x7F;
+    verboselog( machine(), 9, "      Command: %08X\n", gxa_command_number);
+    switch (gxa_command_number) {
+        case GXA_CMD_RW_REGISTER:
+            switch(offset) {
+                case GXA_CFG2_REG:
+                    break;
+                default:
+                    verboselog( machine(), 9, "      Unimplemented register - TODO?\n");
+                    break;
+            }
+            break;
+        default:
+            // do we need it?
+            verboselog( machine(), 9, "      Unimplemented read command - TODO?\n");
+            break;
+    }*/
 	return res;
 }
 
@@ -89,7 +89,7 @@ WRITE32_MEMBER( cxhumax_state::cx_gxa_w )
 			m_gxa_cmd_regs[GXA_CMD_REG] = (m_gxa_cmd_regs[GXA_CMD_REG] & 0x3ffff) | (data<<24) | ((data&0x10)?1<<23:0);
 
 			/* QMARK command has completed */
-			m_gxa_cmd_regs[GXA_CFG2_REG] |= (1<<IRQ_STAT_QMARK);				
+			m_gxa_cmd_regs[GXA_CFG2_REG] |= (1<<IRQ_STAT_QMARK);
 
 			// Interrupt
 			if (m_gxa_cmd_regs[GXA_CFG2_REG] & (1<<IRQ_EN_QMARK)) {
@@ -149,7 +149,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 {
 	UINT32 data = m_scratch_reg;
 	verboselog( machine(), 9, "(SCRATCH) %08X -> %08X\n", 0xE0400024 + (offset << 2), data);
-	
+
 	if((cpu_get_pc(m_maincpu)==0xF0003BB8) || (cpu_get_pc(m_maincpu)==0x01003724) || (cpu_get_pc(m_maincpu)==0x00005d8c)) { // HDCI-2000
 		//we're in disabled debug_printf
 		unsigned char* buf = (unsigned char *)alloca(200);
@@ -157,7 +157,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 		memset(buf,0,200);
-		
+
 		int i = 0;
 		while ((temp=program->read_byte(cpu_get_reg(m_maincpu, ARM7_R0)+i))) {
 			buf[i++]=temp;
@@ -379,7 +379,7 @@ WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 			case TIMER_TIMEBASE:
 				COMBINE_DATA(&m_timer_regs.timer[index].timebase); break;
 		}
-		/* A timer will hold an interrupt active until any one of that timer’s registers is written. */
+		/* A timer will hold an interrupt active until any one of that timer?s registers is written. */
 		if(m_timer_regs.timer_irq & (1<<index)) {
 			m_timer_regs.timer_irq &= ~(1<<index);
 		}
@@ -408,14 +408,14 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 			if(!(m_uart2_regs[UART_FRMC_REG]&UART_FRMC_BDS_BIT)) {
 				/* Sending byte... add logging */
 				m_terminal->write(space, 0, data);
-				
+
 				/* Transmitter Idle Interrupt Enable */
 				if(m_uart2_regs[UART_IRQE_REG]&UART_IRQE_TIDE_BIT) {
 					/* Signal pending INT */
 					m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] |= INT_UART2_BIT;
 					m_intctrl_regs[INTREG(INTGROUP1, INTSTATCLR)] |= INT_UART2_BIT;
 					m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] |= INT_UART2_BIT;
-					
+
 					/* If INT is enabled at INT Ctrl raise it */
 					if(m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]&INT_UART2_BIT) {
 						device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
@@ -494,13 +494,13 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 			switch(offset & 7) {
 				case INTSTATCLR:	// ITC_INTSTATCLR_REG Group 1
 					/*
-						Bits 15 (PWM), 14 (PIO103) of Group 1 are the logical OR of their lower level interrupt
-						status bits down within the interrupting module and are not registered.
-						
-						The source registers must be cleared to clear these interrupt bits.
-					*/
+                        Bits 15 (PWM), 14 (PIO103) of Group 1 are the logical OR of their lower level interrupt
+                        status bits down within the interrupting module and are not registered.
+
+                        The source registers must be cleared to clear these interrupt bits.
+                    */
 					data &= ~(INT_PWM_BIT|INT_PIO103_BIT);
-					
+
 					m_intctrl_regs[INTREG(INTGROUP1, INTSTATCLR)] &= ~data;
 					m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] &= ~data;
 					m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] &= ~data;
@@ -514,17 +514,17 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 			switch(offset & 7) {
 				case INTSTATCLR:	// ITC_INTSTATCLR_REG Group 2
 					/*
-						The timer interrupt service routine must write to one of the timer
-						registers before clearing the corresponding Interrupt Controller ISR timer
-						interrupt bit.
-						
-						Bit 7 (Timers) of Group 2 is the logical OR of its lower level interrupt
-						status bits down within the interrupting module and are not registered.
-						
-						The source registers must be cleared to clear these interrupt bits.
-					*/
+                        The timer interrupt service routine must write to one of the timer
+                        registers before clearing the corresponding Interrupt Controller ISR timer
+                        interrupt bit.
+
+                        Bit 7 (Timers) of Group 2 is the logical OR of its lower level interrupt
+                        status bits down within the interrupting module and are not registered.
+
+                        The source registers must be cleared to clear these interrupt bits.
+                    */
 					if(m_timer_regs.timer_irq) data &= ~INT_TIMER_BIT;
-					
+
 					m_intctrl_regs[INTREG(INTGROUP2, INTSTATCLR)] &= ~data;
 					m_intctrl_regs[INTREG(INTGROUP2, INTSTATSET)] &= ~data;
 					m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] &= ~data;
@@ -537,7 +537,7 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 		default:
 			break;
 	}
-	
+
 	if(m_i2c1_regs[I2C_STAT_REG]&I2C_INT_BIT)
 	{
 		m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] |= 1<<7;
@@ -551,7 +551,7 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 		device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	else
 		device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
-	
+
 }
 
 READ32_MEMBER( cxhumax_state::cx_ss_r )
@@ -724,11 +724,11 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
 			if(data&0x20) {// STOP
 				i2cmem_stop(machine().device("eeprom"));
 			}
-			
+
 			/* The interrupt status bit is set at the end of an I2C read or write operation. */
 			m_i2c1_regs[I2C_STAT_REG] |= I2C_INT_BIT;
 			m_i2c1_regs[I2C_STAT_REG] |= I2C_WACK_BIT;
-			
+
 			m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] |= 1<<7;
 			m_intctrl_regs[INTREG(INTGROUP1, INTSTATCLR)] |= 1<<7;
 			m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] |= 1<<7;
@@ -891,7 +891,7 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 }
 
 static SCREEN_UPDATE_RGB32( cxhumax )
-{	
+{
 	int i, j;
 
 	cxhumax_state *state = screen.machine().driver_data<cxhumax_state>();
@@ -917,16 +917,16 @@ static SCREEN_UPDATE_RGB32( cxhumax )
 		UINT32 ydisp_last = (y_position_and_region_alpha >> 12) & 0x7ff;
 		UINT32 ydisp_start = y_position_and_region_alpha & 0x7ff;
 
-	/*	UINT32 first_x = state->m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
-		UINT32 last_x = (state->m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
+	/*  UINT32 first_x = state->m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
+        UINT32 last_x = (state->m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
 
-		UINT32 first_y = state->m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
-		UINT32 last_y = (state->m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
+        UINT32 first_y = state->m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
+        UINT32 last_y = (state->m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
 		for (j=ydisp_start; j <= ydisp_last; j++)
 		{
-			UINT32 *bmp = &bitmap.pix32(j);	
-		
+			UINT32 *bmp = &bitmap.pix32(j);
+
 			for (i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
 			{
 				if ((i <= (xdisp_start + ximg_width)) && (j <= (ydisp_start + yimg_height))) {
@@ -1014,14 +1014,14 @@ static MACHINE_RESET( cxhumax )
 		0 << 30 | /* 0=using SC1 (TDA8004) 1=not using SC1 */
 		1 << 31;  /* 0=Ext clk for boot 1=Int PLL for boot OK */
 	state->m_chipcontrol_regs[SREG_MODE_REG] = 0x0000020F;
-	
+
 	memset(state->m_isaromdescr_regs,0,sizeof(state->m_isaromdescr_regs));
 	memset(state->m_isadescr_regs,0,sizeof(state->m_isadescr_regs));
 	state->m_rommode_reg=0;
 	state->m_xoemask_reg=0;
 	memset(state->m_extdesc_regs,0,sizeof(state->m_extdesc_regs));
 
-	state->m_pll_regs[SREG_MPG_0_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */; 
+	state->m_pll_regs[SREG_MPG_0_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;
 	state->m_pll_regs[SREG_MPG_1_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;
 	state->m_pll_regs[SREG_ARM_INTFRAC_REG] = (0x28 << 25) /* integer */ | 0xCEDE62 /* fraction */;
 	state->m_pll_regs[SREG_MEM_INTFRAC_REG] = (0x13 << 25) /* integer */ | 0xC9B26D /* fraction */;
@@ -1042,13 +1042,13 @@ static MACHINE_RESET( cxhumax )
 
 	// UART2
 	state->m_uart2_regs[UART_FIFC_REG] = 0x30;
-	
+
 	// Clear SS TX FIFO
 	memset(state->m_ss_tx_fifo,0,sizeof(state->m_ss_tx_fifo));
 	state->m_ss_regs[SS_BAUD_REG] = 1; // Default SS clock = 13,5MHz
 
 	memset(state->m_intctrl_regs,0,sizeof(state->m_intctrl_regs));
-	
+
 	memset(state->m_hdmi_regs,0,sizeof(state->m_hdmi_regs));
 
 	memset(state->m_gxa_cmd_regs,0,sizeof(state->m_gxa_cmd_regs));
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
     MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	
+
 	MCFG_VIDEO_START(cxhumax)
 MACHINE_CONFIG_END
 
@@ -1100,4 +1100,4 @@ ROM_START( hxhdci2k )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-SYST( 2008, hxhdci2k, 0,       0,	cxhumax, 	cxhumax, 	 0,   "HUMAX",   "HUMAX HDCI-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2008, hxhdci2k, 0,       0,	cxhumax,	cxhumax,	 0,   "HUMAX",   "HUMAX HDCI-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)

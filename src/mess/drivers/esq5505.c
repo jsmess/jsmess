@@ -4,11 +4,11 @@
 
     Ensoniq VFX, EPS-16 Plus, and SQ-1 (VFX-SD, SD-1, SQ-1 Plus, SQ-2,
     and KS-32 are known to also be this architecture).
- 
+
     The Taito sound system in taito_en.c is directly derived from the SQ-1.
- 
+
     Driver by R. Belmont
- 
+
     00 - harsh piano
     01 - bells/chimes
     04 - organ
@@ -28,7 +28,7 @@
     73 - orch hit with strings
     74 - bell tone
     80 - drums
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("osram")
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff) 
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
     AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( eps16_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("osram")
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff) 
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0x580000, 0x77ffff) AM_RAM         // sample RAM (2 MB max represented here)
     AM_RANGE(0xc00000, 0xc0ffff) AM_ROM AM_REGION("osrom", 0)
 ADDRESS_MAP_END
@@ -350,28 +350,28 @@ INPUT_PORTS_END
 
 ROM_START( vfx )
     ROM_REGION(0x20000, "osrom", 0)
-    ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000000, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) ) 
-    ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) ) 
+    ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000000, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
+    ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "vfx-waves-1.bin",  0x000000, 0x080000, NO_DUMP ) 
-    ROM_LOAD( "vfx-waves-2.bin",  0x100000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "vfx-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
+    ROM_LOAD( "vfx-waves-2.bin",  0x100000, 0x080000, NO_DUMP )
 ROM_END
 
 ROM_START( sq1 )
     ROM_REGION(0x20000, "osrom", 0)
-    ROM_LOAD16_BYTE( "esq5505lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) ) 
-    ROM_LOAD16_BYTE( "esq5505up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) ) 
+    ROM_LOAD16_BYTE( "esq5505lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
+    ROM_LOAD16_BYTE( "esq5505up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
 
     ROM_REGION(0x200000, "waverom", 0)
-    ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) ) 
-    ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) ) 
+    ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+    ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
 ROM_END
 
 ROM_START( eps16 )
     ROM_REGION(0x10000, "osrom", 0)
-    ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) ) 
-    ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) ) 
+    ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
+    ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)      // did the EPS-16 have ROM sounds or is it a pure sampler?
 ROM_END

@@ -433,7 +433,7 @@ READ8_MEMBER( vic20_state::via0_pa_r )
         PA4     JOY 2
         PA5     LITE PEN
         PA6     CASS SWITCH
-        PA7     
+        PA7
 
     */
 
@@ -468,13 +468,13 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
 
         bit     description
 
-        PA0     
-        PA1     
-        PA2     
-        PA3     
-        PA4     
-        PA5     
-        PA6     
+        PA0
+        PA1
+        PA2
+        PA3
+        PA4
+        PA5
+        PA6
         PA7     SERIAL ATN OUT
 
     */
