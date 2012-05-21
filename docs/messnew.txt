@@ -1,4 +1,111 @@
-﻿0.145u8
+﻿0.146
+
+MAMETesters Bugs Fixed
+----------------------
+- 04811: [Gameplay] (coco3.c) coco3, coco3h: RTC emulation is not working (micko)
+
+New System Drivers Supported:
+-----------------------------
+- Kristall 2 [Miodrag Milanovic]
+- Ensoniq VFX, Ensoniq EPS-16 Plus and Ensoniq SQ-1. [R. Belmont, Parduz]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Elekscmp [Robbbert]
+- PIPBUG [Robbbert]
+- Chaos [Robbbert]
+- Dolphin [Robbbert]
+- Instructor [Robbbert]
+
+Skeleton drivers:
+-----------------
+- HUMAX HDCI-2000 [Lukasz Markowski]
+- Krista 2 [Miodrag Milanovic]
+
+System Driver Changes:
+----------------------
+-votrtnt: hook up to the 'new' votrax device; produces horrible noise
+ now. [ Robbert]
+
+-tvc: Added sound. [Sandro Ronco]
+
+-apollo: Properly reset all motherboard devices on a 68k RESET
+ instruction; makes the PROM "RE" command work properly. 
+ [Hans Ostermeyer]
+
+-vidbrain: Fixed video and added sound. [Curt Coder, Kurt Woloch]
+
+-DEC Rainbow: More keyboard i8251 hookup, also assume Z80 halted on
+ boot. [R. Belmont]
+
+-tvc: added cassette load/save. [Sandro Ronco]
+
+-uk101: Added new boot rom which allows basic to work. Added the
+ missing Reset key. Added notes. [Robbbert]
+
+-More Z8001 work, M20 now passes memory test [Christian Grössler]
+
+-vic20:Implemented the user port. [Curt Coder]
+
+-m20: Add i8255 and 2x i8251 skeleton hookups.  BIOS still fails
+ because they are not connected to anything. [R. Belmont]
+
+-lisa: Fixed MMU behavior in setup mode, system runs POST again.
+ [R. Belmont]
+
+-lisa: Hooked up SCC, serial POST tests now pass [R. Belmont]
+
+-lisa: Fixed polarity of COPS handshake signal, POST now passes.
+ [R. Belmont]
+
+-m20: hook up CRTC readback, 6845 test passes. [Christian Grössler]
+
+-m20: Hooked up 8253 PIT and 179x FDC. [Christian Grössler]
+
+-m20: Hook up PIT timers 1 and 2 to clock the 8251s.  Serial data
+ written to the keyboard is weird - maybe wrong values for the PIT
+ timers? [R. Belmont]
+
+-tvc: added emulation of HBF floppy interface. [Sandro Ronco]
+
+
+Software Lists:
+----------------
+-snes.xml: added some prototypes [ReadOnly] (formerly MESSfan)
+
+-tvc_cart.xml: added a few more carts. [K1W1]
+
+-a800.xml: new entries, updates and further verifications [K1W1]
+
+-pico.xml: added new Japanese dumps [Team Europe]
+
+Source Changes:
+----------------
+-Initial work in preparation for some modernization on the whole
+ megadriv.c file, starting with better splitting of actual drivers
+ (megadriv.c, megacd.c, mega32x.c, megasvp.c and megavdp.c). 
+ [David Haywood]
+
+-8530SCC: Read back tx/rx status bits correctly [R. Belmont]
+
+-Made Z8001 I/O 16 bits wide, proper 8259 PIC hookup on M20 (no EC
+ tests fail now) [R. Belmont, Christian Grössler]
+
+-Fix *BSD compile [ElBarto]
+
+-Added Microsoft Natural Keybaord emulation.  [Wilbert Pol,kevtris]
+
+-ISA_EGA: Fixed several text mode issues identified by running AT
+ diagnostics.  [Wilbert Pol]
+
+-Fix apple2c0 and friends that assume IWM rather than Woz state machine
+ [R. Belmont]
+
+-Fixed to read tags from DiskCopy 4.2 files properly.  Lisa requires
+ this. [R. Belmont]
+
+
+0.145u8
 
 New System Drivers Supported:
 -----------------------------
