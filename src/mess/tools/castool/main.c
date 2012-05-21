@@ -40,6 +40,7 @@
 #include "formats/sord_cas.h"
 #include "formats/svi_cas.h"
 #include "formats/trs_cas.h"
+#include "formats/tvc_cas.h"
 #include "formats/tzx_cas.h"
 #include "formats/uef_cas.h"
 #include "formats/vg5k_cas.h"
@@ -86,6 +87,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"sordm5", sordm5_cassette_formats         ,"Sord M5"},
 	{"svi", svi_cassette_formats               ,"SVI"},
 	{"trs80l2", trs80l2_cassette_formats       ,"TRS-80 Level 2"},
+	{"tvc64", tvc64_cassette_formats           ,"Videoton TVC 64"},
 	{"tzx", tzx_cassette_formats               ,"ZX Spectrum"},
 	{"cdt", cdt_cassette_formats               ,"Amstrad CPC"},
 	{"uef", uef_cassette_formats               ,"Acorn Electron"},

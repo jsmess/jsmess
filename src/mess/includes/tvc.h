@@ -16,6 +16,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "formats/tvc_cas.h"
 
 #include "machine/tvcexp.h"
 #include "machine/tvc_hbf.h"

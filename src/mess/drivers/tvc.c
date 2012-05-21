@@ -5,9 +5,8 @@
         12/05/2009 Skeleton driver.
 
         TODO:
-        - floppy write doesn't work
+        - UPM crashes when formatting a floppy
         - overscan and mid-frame changes
-        - load cassette in .cas format
 
 ****************************************************************************/
 
@@ -650,7 +649,7 @@ static const mc6845_interface tvc_crtc6845_interface =
 
 static const cassette_interface tvc_cassette_interface =
 {
-	cassette_default_formats,
+	tvc64_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
 	"tvc_cass",
