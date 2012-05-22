@@ -1,0 +1,541 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pcw" description="Amstrad PCW disk images">
+
+	<software name="system">
+		<description>System Disks (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Locoscript 1.11" />
+			<dataarea name="flop" size="194816">
+				<rom name="1_locoscript_1.11.dsk" size="194816" crc="eb7eb8c9" sha1="7b72a1ecd34116afac318511e73b521214d31b71" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - C/PM Plus" />
+			<dataarea name="flop" size="194816">
+				<rom name="2_cpm_plus.dsk" size="194816" crc="00f580b6" sha1="1b34dbd3fdb598a1f48d3c0d5075cc9c794a5113" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Utilidades" />
+			<dataarea name="flop" size="194816">
+				<rom name="3_utilidades.dsk" size="194816" crc="538201b3" sha1="23cacbc81602d32267b5eb187c3b9da7be246e41" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Dr. Logo y Ayuda" />
+			<dataarea name="flop" size="194816">
+				<rom name="4_dr_logo_ayuda.dsk" size="194816" crc="af9972e0" sha1="39f5c180dfb33e7f5d6d8816122daefac39b9bab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm104">
+		<description>CP/M v1.04 (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="cpm104es.dsk" size="194816" crc="bdae6e80" sha1="a0a08c7fce2c2623214f3d963bc078f301b8695c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="007tld">
+		<description>007 The Living Daylights</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="007_tld_pcw.dsk" size="194816" crc="c174d802" sha1="dd55a7f5bf41180b4fdb796e674acfb75cdd6909" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dcchess">
+		<description>3D Clock Chess (Spa)</description>
+		<year>1985</year>
+		<publisher>ACE Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="3dclockchess_pcw.dsk" size="194816" crc="5d8ef4e6" sha1="1e98e40b01c7a2206e86bc764ebd2aa15d23249b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ace">
+		<description>ACE</description>
+		<year>1987</year>
+		<publisher>Cascade Games</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="ace_pcw.dsk" size="194816" crc="4132ae7d" sha1="1f06991a7c2730b3e7ea1c5bf8eafeeec21d7d4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nieto500">
+		<description>Angel Nieto Pole 500 (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="211712">
+				<rom name="angel_nieto_pole_500_pcw.dsk" size="211712" crc="b7fdd7e9" sha1="b204c46cb187a64899e9bacde9ce03a5826d44fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman" supported="no">
+		<description>Batman</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="batman_pcw.dsk" size="194816" crc="6499c281" sha1="af82ec95e2c1222a047b11030c822b76b2c76191" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounder">
+		<description>Bounder</description>
+		<year>1985</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="bounder_pcw.dsk" size="194816" crc="5b23dcde" sha1="f363f1d59c547551cb55f8e797c817157e25494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buran">
+		<description>Buran (Spa)</description>
+		<year>1990</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="199680">
+				<rom name="buran_pcw.dsk" size="199680" crc="c036760a" sha1="a31e465787f0d5986e582e6ae2146e8bce94f88c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catch23">
+		<description>Catch 23</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="catch23_pcw.dsk" size="194816" crc="63b12631" sha1="338c28352bb2dd3cfc5a0f241214a96276168ce9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clasgam1">
+		<description>Classic Games I</description>
+		<year>1986</year>
+		<publisher>Microvalue</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="classic1_pcw.dsk" size="194816" crc="0af09b22" sha1="5b47a59bd4eacfc0465f1db82e17a0d8193d8f1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clasgam2">
+		<description>Classic Games II</description>
+		<year>1986</year>
+		<publisher>Microvalue</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="classic_game2_pcw.dsk" size="194816" crc="e5d17f7b" sha1="39498910d6be4e2278b0882a6f2088bd6456baab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colossus">
+		<description>Colossus 4 Chess</description>
+		<year>1986</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="colossus4chess_pcw.dsk" size="194816" crc="6c97c0b0" sha1="ace59da84d671729b66ea09123e2dad5e9615256" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corsar">
+		<description>Corsarios (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="corsarios.dsk" size="213760" crc="f0c4a146" sha1="bd58e9826291b25a93a5db70a7d513916d2ba8b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- needs passwords -->
+	<software name="goldbask">
+		<description>Golden Basket (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204032">
+				<rom name="golden_basket_pcw.dsk" size="204032" crc="df3b965d" sha1="81376b2d140f5e02f476f389c714311915df69e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gonzalez">
+		<description>Gonzalezz (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="gonzalezz.dsk" size="213760" crc="a49881bc" sha1="d058bafc9bc2c1f561e3b011a2e64a55deed985b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goody">
+		<description>Goody (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="goody_pcw.dsk" size="213760" crc="9da28d34" sha1="e1b549bf2e418ff09d0712bb98bcd8e0df412b82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headover">
+		<description>Head Over Heels</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="head_over_heels_pcw.dsk" size="194816" crc="51729ff1" sha1="213252e935f4c95c9a03935390f4ca8cb720f327" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- needs passwords -->
+	<software name="jaialai">
+		<description>Jai Alai (Spa)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="jaialai_pcw.dsk" size="213760" crc="13082730" sha1="3bfbe23517a2dc831b0b18455a37f6c1bebf3b97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krom">
+		<description>Krom - El Guerrero Invencible (Spa)</description>
+		<year>1989</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="krom_pcw.dsk" size="194816" crc="f792f93d" sha1="9653c51015bb04dc9a6fac439fdead1501715666" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coronmag">
+		<description>La Corona Mágica (Spa)</description>
+		<year>1990</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="corona_magica_pcw.dsk" size="194816" crc="9dd2f301" sha1="a4a80b054076d2f36526641d73701e08a0ecb5dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livingst">
+		<description>Livingstone Supongo (Spa)</description>
+		<year>1986</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="livingstone_pcw.dsk" size="213760" crc="04600231" sha1="a738d1d8087e2c292ce1daf4f94eb7547f2eb9a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livings2">
+		<description>Livingstone II (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<info name="alt_title" value="Livingstone Supongo II (Box)"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="livingstone_supongo_2.dsk" size="213760" crc="9b77af62" sha1="17d141f9911a70131e8fc92f94f6775ba56e4d39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inhumano">
+		<description>Los Inhumanos (Spa)</description>
+		<year>1990</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="inhumanos_pcw.dsk" size="194816" crc="cb224a2d" sha1="9600a38f6a5e162e15069737669baa54d6cf0cd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="templos">
+		<description>Los Templos Sagrados (Spa)</description>
+		<year>1991</year>
+		<publisher>Aventuras AD</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Cara A" />
+			<dataarea name="flop" size="194816">
+				<rom name="templos_a_pcw.dsk" size="194816" crc="8200d140" sha1="d80aa27a5b6c97b42e09de2b6554259e4e0b240d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Cara B" />
+			<dataarea name="flop" size="194816">
+				<rom name="templos_b_pcw.dsk" size="194816" crc="b5db2478" sha1="b58f37cc55c49363fde6edd425413e1d8f563dcd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchday">
+		<description>Match Day II</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="matchday2_pcw.dsk" size="194816" crc="842dd97c" sha1="8a57456a4349997cb501a029959b83ba4dfd7886" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mortadel">
+		<description>Mortadelo y Filemón 2 (Spa)</description>
+		<year>1990</year>
+		<publisher>Drosoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="mortadeloydilemon2_pcw.dsk" size="194816" crc="54066390" sha1="c892ec5e3f671c83c8d48779ff3a21a9ecaa47d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mot">
+		<description>Mot (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="214528">
+				<rom name="mot_pcw.dsk" size="214528" crc="6cbaea6f" sha1="97605206e3f030f3cf0e3102ba8a6ad555adac97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mundial">
+		<description>Mundial de Fútbol (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="mundialfutbol_pcw.dsk" size="213760" crc="0a24d456" sha1="cceaf90d88fdb61ca3d06ecdfed40c01c625ab01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutnzone">
+		<description>Mutant Zone (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="mutan_zone_pcw.dsk" size="213760" crc="0c70b458" sha1="18b219c846ef8d889e25d15059c90827b79d3a39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mythos">
+		<description>Mythos (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<info name="alt_title" value="Mithos (Box)"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="mythos_pcw.dsk" size="213760" crc="dadb659d" sha1="f09ee1a1f0c709e1c87eeefa3bd9d1dafb40dc56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- needs passwords -->
+	<software name="polidiaz">
+		<description>Poli Díaz Boxeo (Spa)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="poli_diaz_pcw8256.dsk" size="213760" crc="0d33aa20" sha1="3134f75f127a0c061e565c8a6ad30d48eea3e94f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polidiaz9512" cloneof="polidiaz" supported="no">
+		<description>Poli Díaz Boxeo (Spa, PCW9512)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="poli_diaz_pcw9512.dsk" size="213760" crc="0236b403" sha1="2213c7f21dc2f088e85caf3a2d6a422408e4c946" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- needs passwords -->
+	<software name="rescateg">
+		<description>Rescate en el Golfo (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="rescategolfo_pcw.dsk" size="213760" crc="c8c5b133" sha1="41c856c5c58ce181a342dc0413a68918e2430f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirlance">
+		<description>Sir Lancelot (Spa)</description>
+		<year>1985</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="sirlancelot_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirperce">
+		<description>Sir Perceval (Spa)</description>
+		<year>1985</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="sirperceval_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skywarpc">
+		<description>Sky War (Spa)</description>
+		<year>1988</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="skywar_pcw.dsk" size="194816" crc="2006c1a2" sha1="250cea71302f46b54e3fcabae8ef3afbd9f9cf04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solnegro">
+		<description>Sol Negro (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="sol_negro_pcw.dsk" size="213760" crc="0166813e" sha1="fe14e9ae1a0a2b0b82aa98cb3ee3a151f2f2b52f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soviet">
+		<description>Soviet (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="soviet_pcw.dsk" size="213760" crc="b9580333" sha1="fd0c73ee1a37f60401a699afc14f2f0d775a76e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- needs passwords -->
+	<software name="starglid">
+		<description>Starglider</description>
+		<year>1986</year>
+		<publisher>Rainbird</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="starglider_pcw.dsk" size="194816" crc="83e38c0f" sha1="ead4ae2ea6f5cad45a09acaab5a88a8d2a460260" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strikefh">
+		<description>Strike Force Harrier</description>
+		<year>1986</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="strikeforceharrier_pcw.dsk" size="194816" crc="37a6b72b" sha1="002221aec914884d32c786387f50940985f03619" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1987</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194816">
+				<rom name="tetris_pcw.dsk" size="194816" crc="eb61b9cd" sha1="708bea1ab2b3deb9da9478fc46e7819578060e56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastmiss">
+		<description>The Last Mission (Spa)</description>
+		<year>1987</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="213760">
+				<rom name="lastmission_pcw.dsk" size="213760" crc="66c238a9" sha1="36c126d04b39019297c296fb9c1c0a96830587ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulises">
+		<description>Ulises</description>
+		<year>1987</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="212736">
+				<rom name="ulises_pcw.dsk" size="212736" crc="c8f31a04" sha1="5e4900b63a004e29966f01bfb9136e836bad5a1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
