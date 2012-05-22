@@ -2,11 +2,269 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pico" description="Sega Pico cartridges">
 
+<!-- 
+
+Undumped known games 
+(list based on lists at
+http://www2.plala.or.jp/master_s/pico/soft/pico_soft.html
+http://segaretro.org/ 
+with a lot of tweaks)
+
+
+Published by Sega/Sega Toys (HPC-6*** serial codes)
+
+* ハローキティのたのしいぶとうかい - Hello Kitty no Tanoshii Butoukai (Sega - 19930326 - HPC-6002)
+* ひらけ！ポンキッキ パーティをひらこう！ - Hirake! Ponkikki Paatei wo Hirakou! (Sega - 199307xx - HPC-6003)
+* ラえもん のびたとまいごのきょうりゅう - Doraemon - Nobita to Maigo no Kyouryuu (Sega - 1993xxxx - HPC-6004)
+* ドナルドのおばけたいじ - Donald no Obake Taiji (Sega - 1993xxxx - HPC-6005)
+* けろけろけろっぴのハリキリうんどうかい - Kerokero Keroppi no Harikiri Undoukai (Sega - 1993xxxx - HPC-6006)
+* ミーミとタータのワイワイおえかきどうぶつえん - Miimi to Taata no Waiwai Oekaki Doubutsuen (Sega - 1993xxxx - HPC-6007)
+* ペンギンうきうき びっくりすいぞくかん めいろ・パズル - Penguin Ukiuki Bikkuri Suizokukan Meiro Puzzle (Sega - 1994xxxx - HPC-6008)
+* ソニック☆ザ☆ヘッジホッグ ゲームワールド - Sonic the Hedgehog Gameworld (Sega - 199408xx - HPC-6010)
+* ドレミファアニマルズの たのしいえんそうかい - Doremifa Animaruzu no Tanoshiien Soukai (Sega - 1994xxxx - HPC-6011)
+* それいけ! アンパンマン えいごとなかよし ようちえんでABC - Soreike! Anpanman - Eigo to Nakayoshi Youchiende ABC (Sega - 1994 - HPC-6012)
+* ３丁目のタマ モモちゃんはどこ！ - 3-choume no Tama Momo-chan wa Doko! (Sega - 199407xx - HPC-6013)
+* 愛と夢と冒険 サンリオピューロランド - Ai to Yume to Bouken Sanrio Puroland! (Sega - 199410xx - HPC-6014)
+* スヌーピーのがくげいかい - Snoopy no Gakugeikai (Sega - 19951027 - HPC-6016)
+* それいけ! アンパンマン えいごとなかよし２ たのしいカーニバル - Soreike! Anpanman - Eigo to Nakayoshi 2 Tanoshii Kaanibaru (Sega - 1995xxxx - HPC-6017)
+* クイズにチャレンジ！ ドラえもん - Quiz ni Challenge! Doraemon (Sega - 1995xxxx - HPC-6020)
+* めざせプロ野球 - Mezase Pro Yakyuu (Sega - 1995xxxx - HPC-6021)
+* 魔法騎士 レイアース マジックナイトたんじょう - Mahou Kishi Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
+* ミッキーと大きな古時計 - Mickey To Ooki na Furudokei (Sega - 1995xxxx - HPC-6023)
+* 世界名作劇場 - Sekai Meisaku Gekijou (Sega - 19950725 - HPC-6024)
+* NHKおかあさんといっしょ げんきなこあつまれ！ - NHK Okaasan to Issho Genki na Koatsumare! (Sega - 19951125 - HPC-6025)
+* サンリオピューロランドで ダンスカーニバル みんなで おりょうり おさいほう - Sanrio Puroland de Dansukaanibaru Minna de Oryouri Osaihou (Sega - 19951027 - HPC-6026)
+* ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
+* パディントン のせかいりょこう  - Paddington no Sekai Ryokou (Sega - ???? - HPC-6029)
+* おんがくだいすきスヌーピー  - Ongaku Daisuki Snoopy (Sega - 1996xxxx - HPC-6030)
+* サンリオカーニバル たのしいカードづくり - Sanrio Carnival Tanoshii Card Dukuri (Sega - 19951130 - HPC-6031)
+* ＬＥＧＯ ＦＵＮ ＴＯ ＢＵＩＬＤ - LEGO Fun to Build (Sega - 199512xx - HPC-6032)
+* ゆかいな森のパケット - Yukai na Mori no Paketto (Sega - 199512xx - HPC-6034)
+* 怪盗セイント･テール セイントテールとワン･ツー･スリー! - Kaitou Saint Tail - Saint Tail to One, Two, Three! (Sega - ???? - HPC-6035)
+* バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
+* みんなでおどろう オズのまほうつかい  - Minna de Odorou - Ozu no Mahou Tsukai (Sega - ???? - HPC-6037)
+* 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
+* ハローキティのすてきなおたんじょうび  - Hello Kitty no Suteki nao Tanjoubi (Sega - 1997xxxx - HPC-6040)
+* よべばこたえる　ドラえもん のびたとひみつどうぐをみつけよう! - Yobeba Kotaeru Doraemon - Nobita to Himitsu Douguwomitsukeyou! (Sega - ???? - HPC-6041)
+* キーボードピコ セット かんたん わくわく キーボード<同梱> - Keyboard Pico Set with Kantan Wakuwaku Keyboard (Sega - 1997xxxx - HPC-6042)
+* レースにでようよ! ケンちゃんとペペ ぼくのクルマで大ぼうけん - Race ni de Youyo! Ken-chan to Pepe Boku no Kuruma de Daibouken (Sega - 1996xxxx - HPC-6043)
+* ぬりえだいすき! ダンボのわくわくサーカス! - Nurie Daisuki! Dumbo no Wakuwaku Saakasu! (Sega - 1997xxxx - HPC-6044)
+* あいとゆめのくに サンリオピューロランドあそびながらおぼえよう!ひらがな カタカナ - Ai to Yume no Kuni Sanrio Puroland Asobi na Garaoboeyou! Hiragana Katakana (Sega - 1997xxxx - HPC-6045)
+* もしもしピコ セット だれがでるかな?もしもしピコで テレビとおしゃべり! <同梱> - Moshimoshi Pico Set with Darega Derukana? Moshimoshi Pico de Terebi Tooshaberi! (Sega - 1997xxxx - HPC-6046)
+* パケット２ ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
+* みんなでカラオケ! うたってピコ セット いっしょにうたおう すきなうた！ <同梱> - Minna de Karaoke! Utatte Pico Set with Isshoni Utaou Sukinauta! (Sega - 1997xxxx - HPC-6049)
+* キーボードピコ２ セット さわってみよう！ よいこのはじめてキーボード <同梱> - Keyboard Pico 2 Set with Sawatte Miyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6052)
+* さわってみよう！ よいこのはじめてキーボード - Sawattemiyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6053)
+* プーさんとたのしいなかまたち - Pooh-san to Tanoshii na Kamatachi (Sega - ???? - HPC-6054)
+* スペースピコ 宇宙冒険 スペースシャトルパイロット セット - Space Pico - Uchuu Bouken Space Shuttle Pilot Set (Sega - 199712xx - HPC-6058)
+* はじめまシリーズ5 けろけろけろっぴのハリキリうんどうかい - Hajimema Series 5 - Kerokero Keroppi no Harikiri Undoukai (Sega - 1998xxxx - HPC-6059) [reprint HPC-6006]
+* はじめまシリーズ6 クイズにチャレンジ！ ドラえもん - Hajimema Series 6 - Quiz ni Challenge! Doraemon (Sega - 1998xxxx - HPC-6060) [reprint HPC-6020]
+* はじめまシリーズ2 ハローキティのたのしいぶとうかい - Hajimema Series 2 - Hello Kitty no Tanoshii Butoukai (Sega - 1998xxxx - HPC-6061) [reprint HPC-6002]
+* はじめまシリーズ2 ハローキティのたのしいぶとうかい - Hajimema Series 1 - Donald no Obake Taiji (Sega - 1998xxxx - HPC-6062) [reprint HPC-6005]
+* はじめまシリーズ3 ゴジラ どきどき怪獣島！ - Hajimema Series 3 - Godzilla Dokidoki Kaijuu Shima! (Sega - 1998xxxx - HPC-????) [reprint HPC-6027]
+* おえかきピコ <タブレットのみ> - Oekaki Pico ~Tablet no Mi~ (Sega - ???? - HPC-????)
+* ペコラのだいぼうけん まぼろしのアイスクリームをさがせ! - Pecola no Daibouken Maboroshi no Ice Cream wo Sagase! (Sega - 1998xxxx - HPC-6066)
+* NHKおかあさんといっしょ ドレミファど～なっつ! おえかき だーいすき！ おもしろ おえかき だいしゅうごう! - NHK Okaasan to Issho - Doremifa Donuts! Oekaki Daisuki! Omoshiro Oekaki Daishuugou! (Sega - 1998xxxx - HPC-6068)
+* いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
+* リズムピコ ピッピちゃん と リズム遊び - Rhythm Pico with Pippi-chan to Rhythm Asobi (Sega Toys - 1999xxxx - HPC-6074)
+* 6000人の先生たちがつくった たのしい小学校探検１ - 6000-nin no Sensei Tachiga Tsukutta Tanoshii Shougakkou Tanken 1 (Sega - 199909xx - HPC-6075)
+* クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
+* 白雪姫 ～しらゆきひめ～ - Shirayukihime (Sega Toys - 199909xx - HPC-6077)
+* 6000人の先生たちがつくった たのしい小学校探検２ - 6000-nin no Sensei Tachiga Tsukutta Tanoshii Shougakkou Tanken 2 (Sega - ???? - HPC-6078)
+* McDonald's マクドナルドであそぼ！ - McDonald's - McDonald de Asobo (Sega Toys - 2000xxxx - HPC-6079)
+* バグズ・ライフ - A Bug's Life (Sega Toys - ???? - HPC-6080)
+* いつでもいっしょ ドラえもん セット - Itsudemo Issho Doraemon Set (Sega Toys - ???? - HPC-6081)
+* フィッシングピコ ドナルドのアドベンチャーフィッシング セット - Fishing Pico - Donald no Adventure Fishing Set (Sega Toys - 2000xxxx - HPC-6082)
+* キティとみんなの キーボードピコ サンリオピューロランドにいこう！ キティとみんなのはじめてキーボード!<同梱>！ - Kitty to Minna no Keyboard Pico Sanrio Puroland ni Ikou! with Kitty to Minna no Hajimete Keyboard (Sega Toys - 2000xxxx - HPC-6084)
+* しましまとらのしまじろう たのしいいちにち - Shimashimatora no Shimajiro Tanoshii Ichi Nichi (Sega Toys - 200006xx - HPC-6085)
+* トミカピコ セット ぼくらのまちトミカタウンであそぼう! - Tomica Pico Set Bokura no Machi Tomica Town de Asobou! (Sega Toys - 200007xx - HPC-6086)
+* スージーちゃんとマービー おてつだい だ～いすき！ - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
+* トイストーリー２ ウッディ そうさく だいさくせん!! - Toy Story 2 - Woody Sousaku Daisakusen!! (Sega Toys - ???? - HPC-6090)
+* それいけ!アンパンマン アンパンマンとすうじあそび - Soreike! Anpanman - Anpanman to Suuji Asobi (Sega Toys - ???? - HPC-6091)
+* ぐ～チョコランタン みんなでおえかき！たのしいあそびも いっぱい! - Goo Choco Lantern - Minna de Oekaki! Tanoshii Asobi mo Ippai! (Sega Toys - 2001xxxx - HPC-6092)
+* コンビニでおかいもの！ - Conveni de Okaimono! (Sega Toys - ???? - HPC-6094)
+* やさしくおてあて ピコクリニック! かんごふさんピコ - Yasashiku Oteate Pico Clinic! Kangofusan Pico (Sega Toys - 2001xxxx - HPC-6095)
+* ハローキティとマクドナルドであそぼ！ - Hello Kitty to McDonald de Asobo! (Sega Toys - 20011001 - HPC-????)
+* パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
+* リカちゃんになりたい！ - Likka-chan ni Naritai! (Sega Toys - 200110xx - HPC-6098)
+* プラレール・ピコ プラレールであそぼう！ - Plarail - Pico Plarail de Asobou! (Sega Toys - 20010921 - HPC-6099)
+* とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず! - Tottoko Hamtaro Haru-Natsu-Aki-Fuyu - Tottoko Nakayoshi! Ham Chance! (Sega Toys - 200112xx - HPC-6101)
+* アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
+* ECCジュニアの はじめてえいご Vol.１ - Patty And Her Family パティちゃんファミリー - ECC Junior no Hajimete Eigo Vol. 1 - Patty And Her Family - Patty-chan Family (Sega Toys - 20020307 - HPC-6103)
+* ECCジュニアの はじめてえいご Vol.２ - Patty Goes On A Picnic パティちゃんのピクニック - ECC Junior no Hajimete Eigo Vol. 2 - Patty Goes On A Picnic - Patty-chan no Picnic (Sega Toys - 20020307 - HPC-6104)
+* ECCジュニアの はじめてえいご Vol.３ - Happy Birthday, Patty! パティちゃんのお誕生日 - ECC Junior no Hajimete Eigo Vol. 3 - Happy Birthday, Patty! - Patty-chan no Otanjoubi (Sega Toys - 20020307 - HPC-6105)
+* ECCジュニアの はじめてえいご Vol.４ - Patty Loves Animals 動物大好き、パティちゃん - ECC Junior no Hajimete Eigo Vol. 4 - Patty Loves Animals - Doubutsu Daisuki, Patty-chan (Sega Toys - 200207xx - HPC-6106)
+* ECCジュニアの はじめてえいご Vol.５ - Merry Christmas, Patty! メリークリスマス、パティちゃん - ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Sega Toys - 200207xx - HPC-6107)
+* ECCジュニアの はじめてえいご Vol.６ - Patty Goes to the Amusement Park パティちゃん遊園地に行く - ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Sega Toys - 200207xx - HPC-6108)
+* おせわしましょ！ あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
+* ミニモニ。テレビにでるんだぴょん！ - Mini Moni. Terebi ni Derundapyon! (Sega Toys - 20020613 - HPC-6110)
+* コスメピコ もっとかわいくなりたいな - Kosume Pico Motto Kawai Kunaritaina! (Sega Toys - 20020604 - HPC-6112)
+* ポケットモンスター すうじをつかまえよう！ - Pocket Monsters Suuji wo Tsukamaeyou! (Sega Toys - 200208xx - HPC-6113)
+* トミカ・ピコ レスキューパーキング きんきゅうしゅつどう！ はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
+* 学研 アンパンマンと知能アップ！ - Gakken Anpanman to Chinou Appu! (Sega Toys - 200209xx - HPC-6115)
+* ハローキティのたのしいおみせやさん - Hello Kitty no Tanoshii Omiseyasan (Sega Toys - 200211xx - HPC-6117)
+* ダンスピコ はしっておどって超ハッピー! - Dance Pico with Hashitte Odotte Chou Happy! (Sega Toys - 200302xx - HPC-6118)
+* 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
+* ミニモニ。小学校へ行くんだぴょん！ - Mini Moni. Shougakkou he Iku Ndapyon! (Sega Toys - 200303xx - HPC-6120)
+* ドライブピコ ゴーゴー!カーナビツーリング! ＜同梱＞ - Drive Pico with Go Go! Car Navi Touring! (Sega Toys - 20030620 - HPC-6121)
+* ミニモニ。えいごであそぶんだぴょん！ - Mini Moni. Eigo de Asobu Ndapyon! (Sega Toys - 200305xx - HPC-6122)
+* サンリオピューロランドで ダンスカーニバル みんなで おりょうり おさいほう<10th> - Sanrio Puroland de Dansukaanibaru Minna de Oryouri Osaihou ~10th Anniversary Edition~ (Sega Toys - 200305xx - HPC-6123) [reprint HPC-6026]
+* ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
+* McDonald's マクドナルドであそぼ！<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
+* ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
+* トイストーリー２ ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
+* それいけ! アンパンマン えいごとなかよし２ たのしいカーニバル<10th> - Soreike! Anpanman - Eigo to Nakayoshi 2 Tanoshii Kaanibaru ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6128) [reprint HPC-6017]
+* ミッキーと大きな古時計<10th> - Mickey To Ooki na Furudokei ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6129) [reprint HPC-6023]
+* プーさんのいちにち<10th> - Pooh-san no Ichi Nichi ~10th Anniversary Edition~ (Sega Toys - 200309xx - HPC-6130) [reprint HPC-6019]
+* それいけ!アンパンマン アンパンマンの知恵のワールド - Soreike! Anpanman: Anpanman no Chie no World (Sega Toys - 20030718 - HPC-6131)
+* おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
+* キキ＆ララ 星のかずあそび - Kiki & Lala: Hoshi no Kazu Asobi (Sega Toys - 20030912 - HPC-6133)
+* それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
+* ディズニープリンセス　プリンセスになりたい! - Disney Princesses - Princesses ni Naritai (Sega Toys - 20031209 - HPC-6136)
+* くまのプーさん たのしいたしざんひきざん - Kuma no Pooh-san Tanoshii Tashizan Hikizan (Sega Toys - 20040311 - HPC-6137)
+* ディズニープリンセス アリエル - Disney Princesses - Ariel (Sega Toys - 20040426 - HPC-6138)
+* ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
+* 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS Best Selection (Sega Toys - 2004xxxx - HPC-????)
+* 七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream Best Selection (Sega Toys - 2004xxxx - HPC-????)
+* とっとこハム太郎 とっとこたのしく あいうえお ～まぼろしの ひかるたねを みつけるのだっ!～ - Tottoko Hamtaro Tottoko Tanoshi Kuaiueo ~Maboroshi no Hikaru Tane wo Mitsukerunodatsu!~ (Sega Toys - 20040514 - HPC-6142)
+* ペットといっしょに たのしくあそぼ♪ パソコンピコ - Pet to Issho ni Tanoshiku Asobo (kigou) Pasokon Pico (Sega Toys - 200408xx - HPC-6144)
+* ディズニープリンセス すてきにレッスン！ ひらがな･カタカナ - Disney Princess Suteki ni Ressun! Hiragana-Katakana (Sega Toys - 20041018 - HPC-6145)
+* それいけ! アンパンマン アンパンマンのひとりでできちゃった！ - Soreike! Anpanman: Anpanman no Hitori de Dekichatta! (Sega Toys - 20050204 - HPC-6146)
+* マルチドライブ エキサイティング！ はたらくのりものたち <同梱> - Maruchi Drive with Exciting! Hataraku Norimono-tachi (Sega - ???? - HPC-????)
+
+to be verified
+* アンパンマンのもしもしピコ セット それいけ!アンパンマン アンパンマンとでんわであそぼう！<同梱> - Anpanman no Moshimoshi Pico Set with Soreike! Anpanman - Anpanman to Denwa de Asobou! (Sega - 199712xx - HPC-6050) [is the serial correct, or is it 6051 like reported for the single cart?]
+* ドラえもんのうたってピコ セット いっしょにうたおう! ドラえもん わくわくカラオケ <同梱> - Doraemon no Utatte Pico Set with Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega - 1999xxxx - HPC-6072) [is the serial correct, or is it 6073 like reported for the single cart?]
+
+Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
+
+* 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS (Pony Canyon - ???? - T-75010)
+* 黄金勇者ゴルドラン ひみつ大百科 - Ougon Yuusha Gorudoran Himitsu Daihyakka (Takara - 19950825 - T-103020)
+* 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
+* クレヨンしんちゃんのオラといっしょにあそぼうよ! - Crayon Shin-chan no Ora to Issho ni Asobou yo! (Bandai - ???? - T-133020)
+* それいけ! アンパンマンのおはなしだいすきアンパンマン - Soreike! Anpanman no Ohanashi Daisuki Anpanman (Bandai - 1994xxxx - T-133030)
+* 美少女戦士セーラームーンＳ - Bishoujo Senshi Sailor Moon S (Bandai - ???? - T-133040)
+* 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
+* きかんしゃトーマスにのって - Kikansha Thomas ni Notte (Bandai - 1994xxxx - T-133060)
+* ウルトラマン VSかいじゅうぐんだん!! - Ultraman vs. Kaijuu Gundan (Bandai - ???? - T-133070)
+* クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
+* NHKおかあさんといっしょドレミファど～なっつ！ あそびいっぱい うたいっぱい! - NHK Okaasan to Issho Doremifa Donuts! Asobi Ippai Utaippai! (Bandai - ???? - T-133090)
+* 楽しく遊んで能力アップ!! たのしい幼稚園 '95年度版 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien '95-nendo Han (Bandai - 19950725 - T-133100)
+* ウルトラヒーロー - UltraHero (Bandai - 1995xxxx - T-133110)
+* それいけ!アンパンマンのメダリンピックワールド - Soreike! Anpanman no Medarin Pikku World (Bandai - 19951117 - T-133120)
+* 美少女戦士セーラームーンスーパーズ - Bishoujo Senshi Sailor Moon SuperS (Bandai - 19951019 - T-133130)
+* いっしょにはしろうきかんしゃトーマス - Issho ni Hashirou Kikansha Thomas (Bandai - ???? - T-133140)
+* 忍たま乱太郎 - Nintama Rantarou (Bandai - ???? - T-133150)
+* BFビーファイターカブト - BF B-Fighter Kabuto (Bandai - 1996xxxx - T-133170)
+* ゲゲゲの鬼太郎 - Gegege no Kitarou (Bandai - ???? - T-133180)
+* ウルトラマンティガ - Ultraman Tiga (Bandai - 1997xxxx - T-133200)
+* ゴー！ゴー！コニーちゃん！ ドキドキワールド！ - Go! Go! Koni-chan! Dokidoki World (Bandai - ???? - T-133210)
+* 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
+* キューティーハニー - Cutey Honey (Bandai - 1997xxxx - T-133230)
+* ビーロボカブタック - Bi-Robo Kabutakku (Bandai - 1997xxxx - T-133240)
+* それいけ！アンパンマンのみんなできょうそうアンパンマン！ - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
+* ウルトラマンダイナ - Ultraman Dyna (Bandai - 1998xxxx - T-133260)
+* 夢のクレヨン王国 - Yume no Crayon Oukoku (Bandai - 1998xxxx - T-133270)
+* 新ウルトラヒーロー - Shin Ultrahero (Bandai - 1998xxxx - T-133280)
+* おえかきロボコン!! - Oekaki Robokon!! (Bandai - 1999xxxx - T-133290)
+* それいけ!アンパンマンのメダリンピックワールド２ - Soreike! Anpanman no Medarin Pikku World 2 (Bandai - ???? - T-133300)
+* おじゃる丸 - Ojarumaru (Bandai - 1999xxxx - T-133310)
+* おジャ魔女どれみ＃ - Ojamajo Doremi# (Bandai - 2000xxxx - T-133330)
+* うんてんトーマス　デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
+* ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
+* アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
+* 仮面ライダーアギト&クウガワイルドバトル - Kamen Rider Agito & Kuuga Wild Battle (Bandai - 200104xx - T-133360)
+* も～っと！おジャ魔女どれみ - Mo~tto! Ojamajo Doremi (Bandai - 200106xx - T-133370)
+* 新ウルトラマンピコ ウルトラファイティングベース - Shin Ultraman Pico Ultraman Fighting Best (Bandai - 200110xx - T-133380)
+* どうぶつピコ ハムスターランド <初回限定･ハムスター人形付属> - Doubutsu Pico Hamster Land ~Shokai Gentei-Hamster Ningyou Fuzoku~ (Bandai - 20020315 - T-133390)
+* 忍者戦隊ハリケンジャー&百獣戦隊ガオレンジャー 超戦隊スーパーバトル - Ninja Sentai Hurricanger & Hyakujuu Sentai Gaoranger Chou Sentai Super Battle (Bandai - 200204xx - T-133400)
+* おジャ魔女どれみ ドッカ～ン！ - Ojamajo Doremi Dokka~n! (Bandai - 200205xx - T-133410)
+* 新世紀ウルトラマン伝説 - Shinseiki Ultraman Densetsu (Bandai - 200209xx - T-133420)
+* 明日のナージャ - Ashita no Nadja (Bandai - 200303xx - T-133430)
+* 爆竜戦隊アバレンジャー - Bakuryuu Sentai Abaranger (Bandai - 200304xx - T-133440)
+* 仮面ライダーファイズ555 - Kamen Rider Fives 555 (Bandai - 200305xx - T-133450)
+* それいけ!アンパンマンの メダリンピックワールド２ <Best Selection> - Soreike! Anpanman no Medarin Pikku World 2 Best Selection (Bandai - 20040713 - T-133460) [reprint T-133300]
+* 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
+* ふたりはプリキュア - Futari wa Pretty Cure (Bandai - 200406xx - T-133480)
+* いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
+* 学研のおべんきょうソフト かんじ - Gakken no Obenkyou Soft - Kanji (Gakken - ???? - T-169010)
+* 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
+* 学研のおべんきょうソフト かけざん 九九 - Gakken no Obenkyou Soft - Kakezan Kuku (Gakken - ???? - T-169040)
+* 学研のおべんきょうソフト かず･すうじ - Gakken no Obenkyou Soft - Kazu-Suuji (Gakken - 199512xx - T-169050)
+* 学研のおべんきょうソフト えいご ＡＢＣ - Gakken no Obenkyou Soft - Eigo ABC (Gakken - ???? - T-169060)
+* はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
+* 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
+* 学研ピコで科学1 はっけんむしのひみつ - Gakken Pico de Kagaku 1 Hakken Mushi no Himitsu (Gakken - ???? - T-169090)
+* 学研ピコで学習 １年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
+* 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
+* ウルトラマンキッズ とびだせ！スペースピクニック - Ultraman Kids Tobidase! Space Picnic (GE - 199511xx - T-170020)
+* 児童英検対応ソフト ムーミンとえいご たんじょうびのおくりもの - Jidou Eiken Taiou Soft Muumin to Eigo Tanjoubi no Okurimono (Obunsha - 19950624 - T-181010)
+* はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
+* でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
+* そだててまなぶ どうぶつ王国! - Sodate te Manabu Doubutsu Oukoku (Yonezawa - 1996xxxx - T-193030)
+* ガブッチョつりがっこう やったね!ぼくはつりめいじん - Gabucho Tsuri Gakkou Yatta ne! Boku Hatsuri Meijn (Yonezawa - 1998xxxx - T-193050)
+* シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
+* がんばれ!ぼくらのコンパチヒーローズ - Ganbare! Bokura no Compati Heroes (Banpresto - 1996xxxx - T-206010)
+* ドラえもん タイムマシンで大冒険! - Doraemon Time Machine de Daibouken! (Shogakukan - 19951027 - T-226010)
+* ドラえもん ようちえんはたのしいな - Doraemon Youchien Hata no Shiina (Shogakukan - ???? - T-226020)
+* ドラえもん えんそく･いもほり･うんどうかい - Doraemon Ensoku-Imohori-Undoukai (Shogakukan - ???? - T-226030)
+* ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
+* ドラえもん かぞえて･かんたん かず とけい - Doraemon Kazoete-Kanzan Kazu Tokei (Shogakukan - ???? - T-226050)
+* ドラえもん えいごであそぼう ＡＢＣ - Doraemon Eigo de Asobou ABC (Shogakukan - ???? - T-226060)
+* のりものスタジオ ゴーゴー！のりスタ あそびマッチョ！ - Norimo no Stage - Go Go! Noristar Asobi Maccho (Shogakukan - 200211xx - T-226070)
+* とっとこハム太郎 おえかきいっぱい! ハムちゃんず! - Tottoko Hamtaro Oekaki Ippai! Ham Chance! (Shogakukan - ???? - T-226080)
+* ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
+* ドラえもん 知育あそび ドラランド - Doraemon Chiiku Asobi Dorarando (Shogakukan - 20030718 - T-226100)
+* ドラえもん ようちえんはたのしいな<Best Selection> - Doraemon Youchien Hata no Shiina ~Best Selection~ (Shogakukan - 20040213 - T-226110)
+* 里中満智子のたのしいおりがみ - Satonaka Machiko no Tanoshii Origami (Nayuta - 199511xx - T-227010)
+* ミッキーの東京ディズニーランド・スタンプラリー - Mickey no Tokyo Disneyland Stamp Rally (Kodansha - ???? - T-255010)
+* 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu (Kodansha - ???? - T-255020)
+* プーさんの はじめてのえいご - Pooh-san no Hajimete no Eigo (Kodansha - 2001xxxx - T-255060)
+* 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ<10th> - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu ~10th Anniversary Edition~ (Kodansha - 200305xx - T-255080)
+* くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
+* くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
+* 右脳開発シリーズ8 ドラッキーのおえかきハウス - Unou Kaihatsu Series 8 Dolucky no Oekaki House (Imagineer - 19951205 - T-150030)
+* 右脳開発シリーズ9 日本昔ばなし - Unou Kaihatsu Series 9 Nihon Mukashi Banashi (Imagineer - 19951205 - T-150040)
+* 右脳開発シリーズ7 Tails and the Music Maker - Unou Kaihatsu Series 7 Tails and the Music Maker (Imagineer - 19951205 - T-150050)
+* 右脳開発シリーズ2 ＥＣＣＯ Ｊｒ - Unou Kaihatsu Series 2 ECCO Jr (Imagineer - 19951031 - T-150060)
+* 右脳開発シリーズ1 Richard Scarry's ハックルとローリー - Unou Kaihatsu Series 1 Richard Scarry's Huckle to Lowly (Imagineer - 19951031 - T-150070)
+* 右脳開発シリーズ3 ハローキティのまちへおでかけ - Unou Kaihatsu Series 3 Hello Kitty no Machi he Odekake (Imagineer - 19951031 - T-150080)
+* 右脳開発シリーズ4 けろけろけろっぴのいろかたち - Unou Kaihatsu Series 4 Kerokero Keroppi no Irokatachi (Imagineer - 19951104 - T-150100)
+* 右脳開発シリーズ6 アヒルのペックルのかぞえてみよう - Unou Kaihatsu Series 6 Ahiru no Pekkle no Kazoete Miyou (Imagineer - 19951104 - T-150110)
+* 右脳開発シリーズ11 平成教育委員会Jr. - Unou Kaihatsu Series 11 Heisei Kyouikuiinkai Jr. (Imagineer - 19960102 - T-150130)
+* 右脳開発シリーズ5 ハローキティのすてきなたからもの - Unou Kaihatsu Series 5 Hello Kitty no Suteki na Takaramono (Imagineer - 19951104 - T-150???)
+* 右脳開発シリーズ10 ノンタンといっしょ わいわいにっぽん - Unou Kaihatsu Series 10 Nontan to Issho Waiwai Nihon (Imagineer - 19960102 - T-150???)
+* 左脳開発シリーズ1 図形認識 - Sanou Kaihatsu Series 1 Zukei Ninshiki (Imagineer - 19950831 - T-150210)
+* 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
+* 左脳開発シリーズ5 迷路・記憶 (CD付き) - Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Imagineer - 19951208 - T-150240)
+* 左脳開発シリーズ4 推理・構成 - Sanou Kaihatsu Series 4 Suiri - Kousei (Imagineer - 19951208 - T-150250)
+* 左脳開発シリーズ6 応用問題 - Sanou Kaihatsu Series 6 Ouyoumondai (Imagineer - 19951208 - T-150260)
+* 平成教育委員会Jr. めざせ優等生 - Heisei Kyouikuiinkai Jr. Mezase Yuutousei (Imagineer - 19951201 - T-150270)
+* 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
+
+
+Games for the MIXT BOOK PLAYER COPERA
+
+* メロディランド - Melody Land (Yamaha - 199312xx - MMGS-1)
+* ドレミファ伝説 - Doremifa Densetsu (Yamaha - 199312xx - MMGS-2)
+* コペラのタイムマシン - Copera no Time Machine (Yamaha - ???? - MMGS-3)
+* おっとカタチッチ - Otto Katachicchi (Yamaha - ???? - MMGS-4)
+* おうたのキャンバス - Outa no Kyanbasu (Yamaha - ???? - MMGS-5)
+* コペラのこのおとなあに - Copera no Kono Otonaani (Yamaha - 1994xxxx - MMGS-6)
+* マイクとあそぼう とびだせミルキーウェイ - Maiku to Asobou Tobidase Milky Way (Yamaha - 1994xxxx - MMGS-7)
+* おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
+* コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
+* 冒険！メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
+
+-->
+
 <!-- Releases -->
 	<software name="101dalmaj" cloneof="101dalma">
-		<description>101piki Wanchan Daikoushin (Jpn)</description>
+		<description>101piki Wanchan - Wanchan Dai Koushin (Jpn)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6039"/>
+		<info name="alt_title" value="101匹わんちゃん わんちゃんだいこうしん!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="101piki wanchan daikoushin (japan).bin" size="1048576" crc="27bb0b0a" sha1="f9e2bde5351f34cd565c03a1cad3d1baedd8c7c3" offset="000000" loadflag="load16_word_swap" />
@@ -38,9 +296,11 @@
 	</software>
 
 	<software name="poohcornj" cloneof="poohcorn">
-		<description>Pooh no Ichi Nichi (Jpn)</description>
+		<description>Pooh-san no Ichi Nichi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6019"/>
+		<info name="alt_title" value="プーさんのいちにち"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="a year at pooh corner (japan).bin" size="524288" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" loadflag="load16_word_swap" />
@@ -50,8 +310,10 @@
 
 	<software name="sanriocd">
 		<description>Ai to Yume no Kuni - Sanrio Puroland - Chanto Dekirukana? Minna to Tanoshii Oyuugikai (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6056"/>
+		<info name="alt_title" value="あいとゆめのくに サンリオピューロランド ちゃんと できるかな? みんなと たのしい おゆうぎかい"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ai to yume no kuni sanrio pyuurorando chanto dekirukana minna to tanoshii oyuugikai (japan).bin" size="1048576" crc="0087112a" sha1="ce47f2a5d941597475ea1565d76d7d6c0fbf1338" offset="000000" loadflag="load16_word_swap" />
@@ -72,8 +334,11 @@
 
 	<software name="chibim">
 		<description>Chibi Maruko-chan - Issho ni Asobou yo (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="T-103010"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="ちびまる子ちゃん いっしょにあそぼうよ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="chibi maruko chan issho ni asobouyo (japan).bin" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
@@ -82,9 +347,12 @@
 	</software>
 
 	<software name="donaldts">
-		<description>Donald no Terebi Shou (Jpn)</description>
+		<description>Donald no Terebi Show (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6033"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="ドナルドのテレビショー"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="donald no terebi shou (japan).bin" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
@@ -96,9 +364,24 @@
 		<description>Doraemon - Nobita no Machinaka Dokidoki Tanken! (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6009"/>
+		<info name="alt_title" value="ドラえもん のびたのまちなか ドキドキ たんけん!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="doraemon - nobita no machinaka dokidoki tanken! (japan).bin" size="524288" crc="314f6cb4" sha1="69d3c5754ccbcde0737455bf7bf0eee4ec610972" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpwdrive">
+		<description>Saa Shuppatsuda! Ken-chan to Pepe no Wanpaku Drive (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6033"/>
+		<info name="alt_title" value="ドライブピコ さあしゅっぱつだ! ケンちゃんとペペのわんぱくドライブ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="saashuppatsuda! ken-chan to pepe no wanpaku drive (japan).bin" size="1048576" crc="1eb9b7f6" sha1="bed4ce255b139f0e71eb3197a058075e0c051aa1" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -130,6 +413,8 @@
 		<description>Gakken no Obenkyou Soft - Hiragana (Jpn)</description>
 		<year>199?</year>
 		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169020"/>
+		<info name="alt_title" value="学研のおべんきょうソフト ひらがな"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gakken no obenkyou soft - hiragana (japan).bin" size="1048576" crc="1eb0ba1c" sha1="8ab5239a99ce2c97cfe0c4ec786538c8a153a71d" offset="0" loadflag="load16_word_swap" />
@@ -139,8 +424,10 @@
 
 	<software name="carrangr">
 		<description>Gekisou Sentai CarRanger (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133160"/>
+		<info name="alt_title" value="激走戦隊カーレンジャー"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gekisou sentai carranger (japan).bin" size="524288" crc="8ed536bc" sha1="b4f276d4ecc300b38b73bf1d7030f6820786fe55" offset="000000" loadflag="load16_word_swap" />
@@ -148,10 +435,13 @@
 		</part>
 	</software>
 
-	<software name="gojirado">
-		<description>Gojira Dokidoki Kaijuu Shima (Jpn)</description>
+	<software name="godzilla">
+		<description>Godzilla - Dokidoki Kaijuu Shima (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6027"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="ゴジラ どきどき怪獣島"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gojira dokidoki kaijuu shima (japan).bin" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
@@ -185,7 +475,10 @@
 	<software name="hkittymo">
 		<description>Hello Kitty no Machi he Odekake (Jpn)</description>
 		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150080"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ3 ハローキティのまちへおでかけ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hello kitty no machiheodekake (japan).bin" size="1048576" crc="3f336747" sha1="28e866688fed6e7c0a82c3f1e91f205600afcf68" offset="000000" loadflag="load16_word_swap" />
@@ -195,11 +488,14 @@
 
 	<software name="kanshuno">
 		<description>Kanshuu Unou Image Training - Hiragana - Katakana (Jpn)</description>
-		<year>2004</year>
-		<publisher>Sega Toys</publisher>
+		<year>2000</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="T-075020"/>
+		<info name="release" value="200004xx"/>
+		<info name="alt_title" value="七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム (Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream)"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="shichi ta makoto kanshuu unou imeejitoreeningu hiragana - katakana kajino de mojabegasudoriimu (japan).bin" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
+				<rom name="shichida makoto kanshuu unou image training hiragana - katakana kajino de mojabegasudoriimu (japan).bin" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -208,6 +504,8 @@
 		<description>Kawaii Nakama wo Sodate you! 3-tsu no Shippo (Jpn)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6055"/>
+		<info name="alt_title" value="かわいいなかまを育てよう! ３つのしっぽ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="kawaii nakama wo sodate you! 3-tsu no shippo (japan).bin" size="2097152" crc="a6dea807" sha1="0a5cb3a917880b755465d3bd9d110dffcb52a2a3" offset="000000" loadflag="load16_word_swap" />
@@ -219,6 +517,8 @@
 		<description>Kiteretsu Daihyakka - Edo ni Itte Kiteretsu Saisamaniau Nari (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6015"/>
+		<info name="alt_title" value="キテレツ大百科 えどにいってキテレツさいさまにあうナリ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kiteretsu daihyakka edoniitte kiteretsu saisamaniau nari (japan).bin" size="524288" crc="85f80871" sha1="e13ad62f7dbd270f74a4dbbe881d1ca619899d31" offset="000000" loadflag="load16_word_swap" />
@@ -228,8 +528,10 @@
 
 	<software name="kumapooh">
 		<description>Kuma no Pooh-san - Christopher Robin wo Sagase (Jpn)</description>
-		<year>1999</year>
-		<publisher>Disney?</publisher>
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255040"/>
+		<info name="alt_title" value="くまのプーさん クリストファー･ロビンを さがせ!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="kuma no pooh-san christfer robin wo sagase (japan).bin" size="1048576" crc="40e2cdfc" sha1="14f757263f138cbe02e03c48748935224805edf1" offset="000000" loadflag="load16_word_swap" />
@@ -251,7 +553,9 @@
 	<software name="mickbmt">
 		<description>Mickey no Boku wa Meitantei (Jpn)</description>
 		<year>2000</year>
-		<publisher>Disney</publisher>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255050"/>
+		<info name="alt_title" value="ミッキーのぼくはめいたんてい"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mickey no boku wa meitantei (japan).bin" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
@@ -263,6 +567,9 @@
 		<description>Mickey no Yukai na Bouken (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6001"/>
+		<info name="release" value="19930626"/>
+		<info name="alt_title" value="ミッキーのゆかいなぼうけん"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mickey no yukai na bouken (japan).bin" size="524288" crc="5a6767a9" sha1="bb35a699c883121dbe5b16877531c2ba8e1d2242" offset="000000" loadflag="load16_word_swap" />
@@ -273,7 +580,9 @@
 	<software name="mickuts">
 		<description>Mickey to Utau Tori no Shima (Jpn)</description>
 		<year>1998</year>
-		<publisher>Disney</publisher>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255030"/>
+		<info name="alt_title" value="ミッキーとうたうとりのしま ミニーをさがしてわくわくだいぼうけん! (Mickey to Utau Tori no Shima - Minnie wo Sagashite Wakuwaku Daibouken!)"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mickey toutautorino shima minnie wo sagashite wakuwaku daibouken! (japan).bin" size="1048576" crc="643700aa" sha1="d47298e7dab451218cede56fd758401e356e6b2b" offset="000000" loadflag="load16_word_swap" />
@@ -307,7 +616,10 @@
 	<software name="mushikin">
 		<description>Mushiking Atsumete Asobou Kouchuu Zukan (Jpn)</description>
 		<year>2005</year>
-		<publisher>Sega</publisher>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6147"/>
+		<info name="release" value="20050428"/>
+		<info name="alt_title" value="甲虫王者ムシキング あつめてあそぼう甲虫図鑑"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mushiking atsumete asobou kouchuu zukan (japan).bin" size="2097152" crc="37c59a71" sha1="2ba57037e9155d3537c2d204de5f873f67a8a3a6" offset="000000" loadflag="load16_word_swap" />
@@ -318,10 +630,40 @@
 	<software name="hairsaln">
 		<description>Oshare Pico Suteki ni Henshin! Naruchan no Oshare Hair Salon (Jpn)</description>
 		<year>2000</year>
-		<publisher>Sega</publisher>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6088"/>
+		<info name="release" value="200008xx"/>
+		<info name="alt_title" value="おしゃれピコ すてきにへんしん！ るなちゃんのおしゃれヘアサロン"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="oshare pico suteki ni henshin! naruchan no oshare hair salon (japan).bin" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peterpan">
+		<description>Peter Pan - Neverland e Ikou! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6047"/>
+		<info name="release" value="199709xx"/>
+		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="peter pan - neverland e ikou! (japan).bin" size="1048576" crc="e91ef80a" sha1="68acb94634912e38d3d25385bd00b3832042eedc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psoccer">
+		<description>Pico Soccer - Mezase Soccer Senshu (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6018"/>
+		<info name="alt_title" value="ピコサッカー めざせサッカーせんしゅ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico soccer - mezase soccer senshu (japan).bin" size="1048576" crc="02c3c4fd" sha1="94a10f18bcf6bea864f8223638850a55aa2be285" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -341,6 +683,9 @@
 		<description>Pocket Monsters Advance Generation - Minna De Pico - Pokemon Waiwai Battle! (Jpn)</description>
 		<year>2004</year>
 		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6143"/>
+		<info name="release" value="20040713"/>
+		<info name="alt_title" value="ポケットモンスター アドバンスジェネレーション みんなでピコ ポケモンわいわいバトル!"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket monsters advance generation minna de pico pokemon waiwai battle! (japan).bin" size="2097152" crc="c3b77d13" sha1="97b88d0b09376b108d611e036e415c37d67bb943" offset="000000" loadflag="load16_word_swap" />
@@ -383,9 +728,11 @@
 	</software>
 
 	<software name="sailortp">
-		<description>Sailor Stars Tokimeki Party (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Bishoujou Senshi Sailor Moon - Sailor Stars Tokimeki Party (Jpn)</description>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133190"/>
+		<info name="alt_title" value="美少女戦士セーラームーン セーラースターズ ときめきパーティ"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sailor stars tokimeki party (japan).bin" size="524288" crc="a503503d" sha1="6737ba2590e6dc48b125ff9725a55430465f707c" offset="000000" loadflag="load16_word_swap" />
@@ -395,8 +742,11 @@
 
 	<software name="sanouk3">
 		<description>Sanou Kaihatsu Series 3 Hikaku - Bunrui (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150220"/>
+		<info name="release" value="19951002"/>
+		<info name="alt_title" value="左脳開発シリーズ3 比較・分類"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sanou kaihatsu series 3 hikaku - bunrui (japan).bin" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
@@ -405,9 +755,12 @@
 	</software>
 
 	<software name="shimayum">
-		<description>Shimajirou to Yume no Kunihe Daibouken! (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shimajiro to Yume no Kuni he Daibouken! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6116"/>
+		<info name="release" value="200210xx"/>
+		<info name="alt_title" value="しまじろうと ゆめのくにへ だいぼうけん！"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shimajirou to yume no kunihe daibouken! (japan).bin" size="4194304" crc="00239298" sha1="606f6794cc18120684eff36f06e29a3d2f373b93" offset="000000" loadflag="load16_word_swap" />
@@ -417,8 +770,11 @@
 
 	<software name="anpanman">
 		<description>Soreike! Anpanman - Anpanman to Denwa de Asobou! (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6051"/>
+		<info name="release" value="199712xx"/>
+		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとでんわであそぼう！"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="anpanman no moshimoshi pico set with soreike! anpanman anpanman to denwa de asobou! (japan).bin" size="2097152" crc="f2e1d899" sha1="b5b06d19a41c677afa046e47ad674242c765de06" offset="000000" loadflag="load16_word_swap" />
@@ -428,8 +784,10 @@
 
 	<software name="anpanmka">
 		<description>Soreike! Anpanman - Anpanman to Kotoba Asobi (Jpn)</description>
-		<year>199?</year>
-		<publisher>Bandai?</publisher>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6071"/>
+		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとことばあそび"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="anpanman to kotobaasobi (japan).bin" size="2097152" crc="9ccd5cae" sha1="99bcf3eb0ca4671629739bd575e2356634cee466" offset="000000" loadflag="load16_word_swap" />
@@ -439,8 +797,10 @@
 
 	<software name="anpanmtd">
 		<description>Soreike! Anpanman - Anpanman to Tanoshii Drive! (Jpn)</description>
-		<year>199?</year>
-		<publisher>Bandai?</publisher>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6067"/>
+		<info name="alt_title" value="アンパンマンのドライブピコ それいけ!アンパンマン アンパンマンとたのしいドライブ！ (Anpanman no Drive Pico with Soreike! Anpanman - Anpanman to Tanoshii Drive!)"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="anpanman to tanoshii drive! (japan).bin" size="1048576" crc="ad3ef418" sha1="000808ad7fa7120976f2d579c23ce8662e721b92" offset="000000" loadflag="load16_word_swap" />
@@ -452,6 +812,8 @@
 		<description>Soreike! Anpanman no Game de Asobou Anpanman (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133010"/>
+		<info name="alt_title" value="それいけ! アンパンマンのｹﾞｰﾑであそぼうアンパンマン"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="game de asobou! anpanman.bin" size="524288" crc="75bd0685" sha1="bd721f6aa96d1c258019b93cf041354887cae389" offset="000000" loadflag="load16_word_swap" />
@@ -484,8 +846,10 @@
 
 	<software name="tanoyouc">
 		<description>4 5 6 Tanoshii Youchien (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133050"/>
+		<info name="alt_title" value="楽しく遊んで能力アップ!!たのしい幼稚園"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tanoshi ku asonde nouryoku appu!! tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
@@ -494,9 +858,12 @@
 	</software>
 
 	<software name="tokyosea">
-		<description>Tokyo Disney Sea Mickey to Asobou! (Jpn)</description>
+		<description>Tokyo DisneySea - Mickey to Asobou! (Jpn)</description>
 		<year>2002</year>
-		<publisher>Disney</publisher>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255070"/>
+		<info name="release" value="200210xx"/>
+		<info name="alt_title" value="東京ディズニーシー ミッキーとあそぼう！"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tokyo disney sea mickey to asobou! (japan).bin" size="2097152" crc="38b713b3" sha1="ad29728e7421d4b7505159dc69ba5978964c6c35" offset="000000" loadflag="load16_word_swap" />
@@ -783,7 +1150,7 @@
 	</software>
 
 	<software name="heiseite">
-		<description>Heisei Ten Sai Baka Bon Minna de Famiri-Restutoranni-Kun (Jpn, Prototype)</description>
+		<description>Heisei Tensai Bakabon - Minna de Family Resturant ni Ikunoda (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pico_cart">
@@ -1037,7 +1404,7 @@
 	</software>
 
 	<software name="kikansha">
-		<description>Kikansha Thomas Ni Notte (Jpn, Prototype)</description>
+		<description>Kikansha Thomas ni Notte (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="pico_cart">
@@ -1379,7 +1746,7 @@
 	</software>
 
 	<software name="nipponmb">
-		<description>Nippon no Mukasi Banasi (Jpn, Prototype)</description>
+		<description>Nihon no Mukashi Banashi (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="pico_cart">
@@ -1401,7 +1768,7 @@
 	</software>
 
 	<software name="penguki">
-		<description>Pengin Ukiuki Bi Kkurisuizokukan Meiropazuru (Jpn, Prototype, 19950210)</description>
+		<description>Penguin Ukiuki Bikkuri Suizokukan Meiro Puzzle (Jpn, Prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
@@ -1555,7 +1922,7 @@
 		</part>
 	</software>
 
-	<software name="psoccer">
+	<software name="psoccerp" cloneof="psoccer">
 		<description>Pico Soccer Mezase Soccer Senshu (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
