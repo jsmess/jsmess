@@ -205,6 +205,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2ssc.h"
 #include "machine/a2swyft.h"
 #include "machine/a2themill.h"
+#include "machine/a2sam.h"
 
 /***************************************************************************
     PARAMETERS
@@ -621,6 +622,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
     SLOT_INTERFACE("swyft", A2BUS_SWYFT)    /* IAI SwyftCard */
     SLOT_INTERFACE("themill", A2BUS_THEMILL)    /* Stellation Two The Mill (6809 card) */
+    SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
@@ -721,6 +723,26 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
     MCFG_A2EAUXSLOT_BUS_ADD(AUXSLOT_TAG, "maincpu", a2eauxbus_intf)
     MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "slaux", apple2eaux_cards, NULL, NULL)
 
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
+    MCFG_VIDEO_START(apple2e)
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+
+    // TK2000 doesn't have slots, and it doesn't emulate a language card
+    // C05A maps RAM from C100-FFFF, C05B maps ROM
+    MCFG_A2BUS_SLOT_REMOVE("sl0")
+    MCFG_A2BUS_SLOT_REMOVE("sl1")
+    MCFG_A2BUS_SLOT_REMOVE("sl2")
+    MCFG_A2BUS_SLOT_REMOVE("sl3")
+    MCFG_A2BUS_SLOT_REMOVE("sl4")
+    MCFG_A2BUS_SLOT_REMOVE("sl5")
+    MCFG_A2BUS_SLOT_REMOVE("sl6")
+    MCFG_A2BUS_SLOT_REMOVE("sl7")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
@@ -949,6 +971,15 @@ ROM_START(apple2c)
 	ROM_LOAD ( "a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729))
 ROM_END
 
+ROM_START(tk2000)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+
+	ROM_REGION(0x4000,"maincpu",0)
+    ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) ) 
+ROM_END
+
 ROM_START(prav8c)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
@@ -1036,6 +1067,7 @@ COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multit
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,	  apple2c,	   apple2e,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
+COMP( 1984, tk2000,   apple2c,  0,   	  tk2000,	   apple2e,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,	   apple2p,  0,        "Video Technology",  "Laser 3000",	GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        apple2c,	   apple2e,  0,        "Video Technology",  "Laser 128 (rev 4)", GAME_NOT_WORKING )
