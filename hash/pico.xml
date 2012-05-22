@@ -161,7 +161,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * ゴー！ゴー！コニーちゃん！ ドキドキワールド！ - Go! Go! Koni-chan! Dokidoki World (Bandai - ???? - T-133210)
 * 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
 * キューティーハニー - Cutey Honey (Bandai - 1997xxxx - T-133230)
-* ビーロボカブタック - Bi-Robo Kabutakku (Bandai - 1997xxxx - T-133240)
 * それいけ！アンパンマンのみんなできょうそうアンパンマン！ - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
 * ウルトラマンダイナ - Ultraman Dyna (Bandai - 1998xxxx - T-133260)
 * 夢のクレヨン王国 - Yume no Crayon Oukoku (Bandai - 1998xxxx - T-133270)
@@ -328,6 +327,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="un giorno di scuola degli orsi berenstain (italy).bin" size="1048576" crc="61b889a2" sha1="64b537616207b3e98dfb700f98b63e61284ced13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biroboka">
+		<description>Bi-Robo Kabutakku (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133240"/>
+		<info name="alt_title" value="ビーロボカブタック"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bi-robo kabutakku (japan).bin" size="524288" crc="df504ee6" sha1="392128b92f38b7aabb59c0253bc2a85b34ab677c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
