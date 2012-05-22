@@ -10,7 +10,7 @@
 #include "crtc_ega.h"
 
 
-#define LOG		(0)
+#define LOG		(1)
 
 
 /* device types */
@@ -261,6 +261,11 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 		if (vsync_off_pos > vert_pix_total)
 			vsync_off_pos = vert_pix_total;
 
+		if ( vsync_on_pos >= vsync_off_pos )
+		{
+			vsync_on_pos = vsync_off_pos - 2;
+		}
+
 		/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 		if (postload ||
 		    (horiz_pix_total != crtc_ega->horiz_pix_total) || (vert_pix_total != crtc_ega->vert_pix_total) ||
@@ -286,7 +291,12 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 				crtc_ega->has_valid_parameters = TRUE;
 			}
 			else
+			{
 				crtc_ega->has_valid_parameters = FALSE;
+				if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
+				                   horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
+
+			}
 
 			crtc_ega->horiz_pix_total = horiz_pix_total;
 			crtc_ega->vert_pix_total = vert_pix_total;
@@ -702,7 +712,7 @@ void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 			crtc_ega->intf->end_update(device, bitmap, cliprect, param);
 	}
 	else
-		logerror("Invalid crtc_ega screen parameters - display disabled!!!");
+		logerror("Invalid crtc_ega screen parameters - display disabled!!!\n");
 }
 
 
