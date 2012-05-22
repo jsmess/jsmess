@@ -65,6 +65,8 @@
 #include "machine/a2memexp.h"
 #include "machine/a2scsi.h"
 #include "machine/a2softcard.h"
+#include "machine/a2sam.h"
+#include "machine/a2alfam2.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -223,6 +225,8 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
     SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
     SLOT_INTERFACE("ramfactor", A2BUS_RAMFACTOR)    /* Applied Engineering RamFactor */
+    SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
+    SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
 //    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
