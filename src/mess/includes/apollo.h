@@ -49,7 +49,7 @@
 // * the 3c505 emulation will be connected with the real ethernet at ETH0
 //
 // Enabling this is >NOT< supported by MESSdev and this code will be removed.
-// Do *not* report any issues on MESS Bugzilla if this is enabled!
+// Do *not* report any issues on Mametesters if this is enabled!
 
 #if defined(__linux__)
 //#define APOLLO_FOR_LINUX
