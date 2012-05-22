@@ -1041,7 +1041,6 @@ $(MESSOBJ)/elektrka.a:			\
 $(MESSOBJ)/elektor.a:			\
 	$(MESS_DRIVERS)/ec65.o		\
 	$(MESS_DRIVERS)/elekscmp.o	\
-	$(MESS_DRIVERS)/elektor.o	\
 	$(MESS_DRIVERS)/junior.o	\
 
 $(MESSOBJ)/ensoniq.a:			\

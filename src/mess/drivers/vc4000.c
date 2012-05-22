@@ -44,6 +44,17 @@ The Cartridge is called Hobby Module and the Rom is probably the same as used in
 elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
+
+Elektor TV Games Computer - this is much the same as the vc4000, however it has
+its own ROM (with inbuilt monitor program similar to the Signetics Intructor 50),
+and 2K of ram. No cart slot, but has a cassette interface.  ToDo:
+- Memory addresses to the 2636 to be confirmed
+- Keys to confirm
+- Cassette interface
+- Quickload files load but don't run.
+When booted you get the familiar 00 00 pattern. Pressing 1 gives a display of
+IIII. Nothing else happens.
+
 ******************************************************************************/
 
 #include "includes/vc4000.h"
@@ -96,6 +107,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vc4000_io, AS_IO, 8, vc4000_state )
 	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ(vc4000_vsync_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+	AM_RANGE(0x1680, 0x16ff) AM_READWRITE(vc4000_key_r, vc4000_sound_ctl) AM_MIRROR(0x0800)
+	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vc4000 )
@@ -277,6 +297,10 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vc4000")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( elektor, vc4000 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(elektor_mem)
+MACHINE_CONFIG_END
 
 ROM_START( vc4000 )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
@@ -370,6 +394,11 @@ ROM_START( mpt05 )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
 ROM_END
 
+ROM_START( elektor )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "elektor.rom", 0x0000, 0x0800, CRC(e6ef1ee1) SHA1(6823b5a22582344016415f2a37f9f3a2dc75d2a7))
+ROM_END
+
 QUICKLOAD_LOAD(vc4000)
 {
 	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -409,30 +438,31 @@ QUICKLOAD_LOAD(vc4000)
 }
 
 
-/*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY         FULLNAME */
-CONS(1978, vc4000,   0,         0,        vc4000,    vc4000,      0,        "Interton",         "VC 4000",          GAME_IMPERFECT_GRAPHICS )					/* Germany, Austria, UK, Australia */
-CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000,      0,        "Grundig",          "Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )			/* Germany, Austria */
-CONS(1979, cx3000tc, vc4000,    0,        vc4000,    vc4000,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )			/* Spain */
-CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000,      0,        "Koerting",         "TVC-4000",         GAME_IMPERFECT_GRAPHICS )					/* Argentina */
-CONS(1976, 1292apvs, 0,         vc4000,   vc4000,    vc4000,      0,        "Radofin",          "1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
-CONS(1976, 1392apvs, 1292apvs,  0,        vc4000,    vc4000,      0,        "Radofin",          "1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
-CONS(1979, mpu1000,  1292apvs,  0,        vc4000,    vc4000,      0,        "Acetronic",        "MPU-1000",         GAME_IMPERFECT_GRAPHICS )					/* Europe */
-CONS(1979, mpu2000,  1292apvs,  0,        vc4000,    vc4000,      0,        "Acetronic",        "MPU-2000",         GAME_IMPERFECT_GRAPHICS )					/* Europe */
-CONS(1978, pp1292,   1292apvs,  0,        vc4000,    vc4000,      0,        "Audio Sonic",      "PP-1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
-CONS(1978, pp1392,   1292apvs,  0,        vc4000,    vc4000,      0,        "Audio Sonic",      "PP-1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
-CONS(1979, f1392,    1292apvs,  0,        vc4000,    vc4000,      0,        "Fountain",         "Fountain 1392",    GAME_IMPERFECT_GRAPHICS )				/* New Zealand */
-CONS(1979, fforce2,  1292apvs,  0,        vc4000,    vc4000,      0,        "Fountain",         "Fountain Force 2", GAME_IMPERFECT_GRAPHICS )				/* New Zealand, Australia */
-CONS(1979, hmg1292,  1292apvs,  0,        vc4000,    vc4000,      0,        "Hanimex",          "HMG 1292",         GAME_IMPERFECT_GRAPHICS )					/* Europe */
-CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000,      0,        "Hanimex",          "HMG 1392",         GAME_IMPERFECT_GRAPHICS )					/* Europe */
-CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000,      0,        "Lansay",           "Lansay 1392",      GAME_IMPERFECT_GRAPHICS )				/* Europe */
-CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000,      0,        "Prinztronic",      "VC 6000",          GAME_IMPERFECT_GRAPHICS )					/* UK */
-CONS(1979, database, 0,         vc4000,   vc4000,    vc4000,      0,        "Voltmace",         "Voltmace Database", GAME_IMPERFECT_GRAPHICS )				/* UK */
-CONS(1979, vmdtbase, database,  0,        vc4000,    vc4000,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )		/* UK */
-CONS(1979, rwtrntcs, 0,         vc4000,   vc4000,    vc4000,      0,        "Rowtron",          "Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
-CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000,      0,        "Teleng",           "Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
-CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )				/* France */
-CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )					/* France */
-CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )					/* France */
+/*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY             FULLNAME */
+CONS(1978, vc4000,   0,         0,        vc4000,    vc4000,      0,        "Interton",         "VC 4000",          GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
+CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000,      0,        "Grundig",          "Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )  /* Germany, Austria */
+CONS(1979, cx3000tc, vc4000,    0,        vc4000,    vc4000,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )     /* Spain */
+CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000,      0,        "Koerting",         "TVC-4000",         GAME_IMPERFECT_GRAPHICS )          /* Argentina */
+CONS(1976, 1292apvs, 0,         vc4000,   vc4000,    vc4000,      0,        "Radofin",          "1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
+CONS(1976, 1392apvs, 1292apvs,  0,        vc4000,    vc4000,      0,        "Radofin",          "1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
+CONS(1979, mpu1000,  1292apvs,  0,        vc4000,    vc4000,      0,        "Acetronic",        "MPU-1000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, mpu2000,  1292apvs,  0,        vc4000,    vc4000,      0,        "Acetronic",        "MPU-2000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1978, pp1292,   1292apvs,  0,        vc4000,    vc4000,      0,        "Audio Sonic",      "PP-1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
+CONS(1978, pp1392,   1292apvs,  0,        vc4000,    vc4000,      0,        "Audio Sonic",      "PP-1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
+CONS(1979, f1392,    1292apvs,  0,        vc4000,    vc4000,      0,        "Fountain",         "Fountain 1392",    GAME_IMPERFECT_GRAPHICS )          /* New Zealand */
+CONS(1979, fforce2,  1292apvs,  0,        vc4000,    vc4000,      0,        "Fountain",         "Fountain Force 2", GAME_IMPERFECT_GRAPHICS )          /* New Zealand, Australia */
+CONS(1979, hmg1292,  1292apvs,  0,        vc4000,    vc4000,      0,        "Hanimex",          "HMG 1292",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000,      0,        "Hanimex",          "HMG 1392",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000,      0,        "Lansay",           "Lansay 1392",      GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000,      0,        "Prinztronic",      "VC 6000",          GAME_IMPERFECT_GRAPHICS )          /* UK */
+CONS(1979, database, 0,         vc4000,   vc4000,    vc4000,      0,        "Voltmace",         "Voltmace Database", GAME_IMPERFECT_GRAPHICS )         /* UK */
+CONS(1979, vmdtbase, database,  0,        vc4000,    vc4000,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, rwtrntcs, 0,         vc4000,   vc4000,    vc4000,      0,        "Rowtron",          "Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000,      0,        "Teleng",           "Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )    /* France */
+CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )          /* France */
+CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )          /* France */
+COMP(1979, elektor,  0,         0,        elektor,   vc4000,      0,        "Elektor",          "Elektor TV Games Computer", GAME_NOT_WORKING )
 
 /*  Game List and Emulation Status
 
