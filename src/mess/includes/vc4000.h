@@ -11,6 +11,8 @@
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys
@@ -70,7 +72,8 @@ class vc4000_state : public driver_device
 {
 public:
 	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+	m_cass(*this, CASSETTE_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
@@ -78,6 +81,8 @@ public:
 	DECLARE_READ8_MEMBER(vc4000_video_r);
 	DECLARE_WRITE8_MEMBER(vc4000_video_w);
 	DECLARE_READ8_MEMBER(vc4000_vsync_r);
+	DECLARE_READ8_MEMBER(elektor_cass_r);
+	DECLARE_WRITE8_MEMBER(elektor_cass_w);
 	vc4000_video_t m_video;
 	UINT8 m_sprite_collision[0x20];
 	UINT8 m_background_collision[0x20];
@@ -88,6 +93,7 @@ public:
 	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
 	bitmap_ind16 *m_bitmap;
+	optional_device<cassette_image_device> m_cass;
 };
 
 

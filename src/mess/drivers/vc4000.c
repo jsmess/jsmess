@@ -45,15 +45,46 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
 
-Elektor TV Games Computer - this is much the same as the vc4000, however it has
-its own ROM (with inbuilt monitor program similar to the Signetics Intructor 50),
-and 2K of ram. No cart slot, but has a cassette interface.  ToDo:
-- Memory addresses to the 2636 to be confirmed
-- Keys to confirm
-- Cassette interface
-- Quickload files load but don't run.
-When booted you get the familiar 00 00 pattern. Pressing 1 gives a display of
-IIII. Nothing else happens.
+******************************************************************************
+
+Elektor TV Games Computer
+This is much the same as the vc4000, however it has its own ROM (with inbuilt
+monitor program similar to the Signetics Instructor 50), and 2K of ram. No cart
+slot, no joystick, but has a cassette interface.
+
+ToDo:
+- Most quickloads don't work too well
+- Might need to rework keyboard, again
+
+When booted you get the familiar 00 00 pattern. Pressing Q gives a display of
+IIII. Now, you enter a command.
+
+Key   Command    Purpose
+------------------------
+Q     Start      Boot up system
+L     RCAS       Load a tape
+S     WCAS       Save a tape
+W     BP1/2      Set a breakpoint
+R     REG        View/Set registers
+X     PC         Go
++pad  +          Enter data and do next thing
+-pad  -          Decrement
+-     MEM        Specify an address
+0-9   0-9        Hex digits
+A-F   A-F        Hex digits
+
+Keyboard layout when using the Monitor on real hardware (n/a = key not assigned)
+
+n/a    RCAS  WCAS  C    D  E  F
+Start  BP1/2 REG   8    9  A  B
+n/a    PC    MEM   4    5  6  7
+Reset  -     +     0    1  2  3
+
+This wouldn't fit too well on our keyboard with any chance of remembering
+it, so I've hooked it much the same as the Instructor.
+
+The Select key (Z) and the joystick don't actually exist, but I've left them
+in the keyboard matrix for now.
 
 ******************************************************************************/
 
@@ -96,6 +127,17 @@ WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
+// Write cassette - Address 0x1DFF
+WRITE8_MEMBER( vc4000_state::elektor_cass_w )
+{
+	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+}
+
+// Read cassette - Address 0x1DBF
+READ8_MEMBER( vc4000_state::elektor_cass_r )
+{
+	return (m_cass->input() > 0.03) ? 0xff : 0x7f;
+}
 
 static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -114,8 +156,10 @@ static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1680, 0x16ff) AM_READWRITE(vc4000_key_r, vc4000_sound_ctl) AM_MIRROR(0x0800)
-	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
+	//AM_RANGE(0x1000, 0x15ff) AM_RAM  ram extension area
+	AM_RANGE(0x1d80, 0x1dff) AM_MIRROR(0x400) AM_READWRITE(elektor_cass_r,elektor_cass_w)
+	AM_RANGE(0x1e80, 0x1e8f) AM_MIRROR(0x800) AM_READWRITE(vc4000_key_r,vc4000_sound_ctl)
+	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x800) AM_READWRITE(vc4000_video_r, vc4000_video_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vc4000 )
@@ -158,6 +202,74 @@ static INPUT_PORTS_START( vc4000 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 6") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad Clear") PORT_CODE(KEYCODE_R)
+#ifndef ANALOG_HACK
+    // auto centering too slow, so only using 5 bits, and scaling at videoside
+    PORT_START("JOY1_X")
+PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
+    PORT_START("JOY1_Y")
+PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(1)
+    PORT_START("JOY2_X")
+PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_DEL) PORT_CODE_INC(KEYCODE_PGDN) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
+    PORT_START("JOY2_Y")
+PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2)
+#else
+	PORT_START("JOYS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CODE(KEYCODE_DEL) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CODE(KEYCODE_PGDN) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CODE(KEYCODE_END) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CODE(KEYCODE_HOME) PORT_PLAYER(2)
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Treat Joystick as...")
+	PORT_CONFSETTING(    0x00, "Buttons")
+	PORT_CONFSETTING(    0x01, "Paddle")
+#endif
+INPUT_PORTS_END
+
+INPUT_PORTS_START( elektor )
+	PORT_START("PANEL")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Game Select") PORT_CODE(KEYCODE_Z)
+
+	PORT_START("KEYPAD1_1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("RCAS") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("BP1/2") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("PC") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS_PAD)
+
+	PORT_START("KEYPAD1_2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("WCAS") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
+
+	PORT_START("KEYPAD1_3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+
+	PORT_START("KEYPAD2_1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("D") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+
+	PORT_START("KEYPAD2_2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("E") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("A") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+
+	PORT_START("KEYPAD2_3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("F") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 #ifndef ANALOG_HACK
     // auto centering too slow, so only using 5 bits, and scaling at videoside
     PORT_START("JOY1_X")
@@ -300,6 +412,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( elektor, vc4000 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(elektor_mem)
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 ROM_START( vc4000 )
@@ -404,6 +519,7 @@ QUICKLOAD_LOAD(vc4000)
 	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
+	int exec_addr;
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
@@ -421,6 +537,7 @@ QUICKLOAD_LOAD(vc4000)
 		return IMAGE_INIT_FAIL;
 
 	quick_addr = quick_data[1] * 256 + quick_data[2];
+	exec_addr = quick_data[3] * 256 + quick_data[4];
 
 	//if ((quick_addr + quick_length - 5) > 0x1000)
 	//  return IMAGE_INIT_FAIL;
@@ -433,7 +550,11 @@ QUICKLOAD_LOAD(vc4000)
 			space->write_byte(i + quick_addr, quick_data[i+5]);
 	}
 
-	logerror("quick loading at %.4x size:%.4x\n", quick_addr, (quick_length-5));
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+
+	// Start the quickload (only does something on Elektor)
+	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
 	return IMAGE_INIT_PASS;
 }
 
@@ -462,7 +583,7 @@ CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000,      0,        "Tel
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )    /* France */
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )          /* France */
-COMP(1979, elektor,  0,         0,        elektor,   vc4000,      0,        "Elektor",          "Elektor TV Games Computer", GAME_NOT_WORKING )
+COMP(1979, elektor,  0,         0,        elektor,   elektor,     0,        "Elektor",          "Elektor TV Games Computer", GAME_IMPERFECT_GRAPHICS )
 
 /*  Game List and Emulation Status
 
