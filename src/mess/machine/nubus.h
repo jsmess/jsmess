@@ -25,7 +25,7 @@
 
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	nubus_slot_device::static_set_nubus_slot(*device, _nbtag, _tag); \
 
 #define MCFG_NUBUS_SLOT_REMOVE(_tag)    \

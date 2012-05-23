@@ -43,6 +43,8 @@ Games on this system include....
 | |Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega, 2005            | GDROM GDX-0017B |              |
 | |Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega, 2005            | GDROM GDX-0017C |              |
 |*|Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega, 2005            | GDROM GDX-0017D |              |
+| |Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega, 2005            | GDROM GDX-0017E |              |
+|*|Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega, 2005            | GDROM GDX-0017F | 317-0414-JPN |
 | |Sega Club Golf 2006: Next Tours                    | Sega, 2005            | GDROM GDX-0018  |              |
 |*|Sega Club Golf 2006: Next Tours (Rev A)            | Sega, 2005            | GDROM GDX-0018A |              |
 | |Sega Network Taisen Mahjong MJ 3 Evolution         | Sega, 2006            | GDROM GDX-0021  |              |
@@ -1177,7 +1179,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL)
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL, true)
 	MCFG_IDE_BUS_MASTER_SPACE( "ide", "maincpu", PROGRAM )
 
 	/* video hardware */

@@ -29,7 +29,6 @@
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
 
-
  ***********************************************************************/
 
 #include "emu.h"
@@ -328,6 +327,77 @@ static INPUT_PORTS_START( cprogolf )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cdsteljn )
+	PORT_INCLUDE( decocass )
+
+	PORT_START("P1_MP0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1_MP1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+
+	PORT_START("P1_MP2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1_MP3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_MP0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_MP1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_MP2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_MP3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cexplore )
@@ -1052,14 +1122,14 @@ ROM_END
 
 /* 13 */
 /* Photo of Dongle shows DP-1130B (the "B" is in a seperate white box then the DP-1130 label) */
-ROM_START( cprogolf )
+ROM_START( cprogolf ) // version 9-B-0
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "dp-1130_b.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cprogolf.cas",  0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
+	ROM_LOAD( "dt-1130_9b.cas",  0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
 ROM_START( cprogolfj ) // version 1-A
@@ -1069,7 +1139,7 @@ ROM_START( cprogolfj ) // version 1-A
 	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* Should be dp-1130a?? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) ) /* Should be dt-1130?? */
+	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
 ROM_END
 
 /* 14 */
@@ -1224,14 +1294,14 @@ ROM_END
 
 /* 26 Hamburger / Burger Time */
 /* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a seperate white box then the DP-126 label) */
-ROM_START( cbtime )
+ROM_START( cbtime ) // version 7-B-0
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "dp-126_b.dgl", 0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) ) /* Is this the 7B version? */
+	ROM_LOAD( "dt-126_7b.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
 ROM_END
 
 ROM_START( chamburger ) // version 0-A-0
@@ -1551,6 +1621,43 @@ static DRIVER_INIT( decocrom )
 	state->save_pointer(NAME(state->m_decrypted2), romlength);
 }
 
+static READ8_HANDLER( cdsteljn_input_r )
+{
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+	UINT8 res;
+	static const char *const portnames[2][4] = {
+		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
+		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}		 };
+
+	if(offset & 6)
+		return decocass_input_r(space,offset);
+
+	res = space->machine().root_device().ioport(portnames[offset & 1][state->m_mux_data])->read();
+
+	return res;
+}
+
+static WRITE8_HANDLER( cdsteljn_mux_w )
+{
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+
+	state->m_mux_data = (data & 0xc) >> 2;
+	/* bit 0 and 1 are p1/p2 lamps */
+
+	if(data & ~0xf)
+		printf("%02x\n",data);
+}
+
+static DRIVER_INIT( cdsteljn )
+{
+	/* standard init */
+	DRIVER_INIT_CALL(decocass);
+
+	/* install custom mahjong panel */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
+}
+
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
@@ -1567,7 +1674,7 @@ static DRIVER_INIT( decocrom )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
          GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0)
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0 )
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
          GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )

@@ -231,11 +231,11 @@ protected:
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, NULL)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, NULL, false)
 
 #define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, NULL)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, NULL, false)
 
 /*
     The following defines are required because the WD17xx DEVICE_START implementation

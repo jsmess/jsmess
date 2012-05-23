@@ -25,7 +25,7 @@ set the data line and then set the clock line.
 
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot, _def_inp ) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	pc_kbdc_slot_device::static_set_pc_kbdc_slot(*device, _kbdc_tag ); \
 
 

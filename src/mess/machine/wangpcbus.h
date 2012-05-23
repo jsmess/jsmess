@@ -42,7 +42,7 @@
 
 #define MCFG_WANGPC_BUS_SLOT_ADD(_tag, _sid, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, WANGPC_BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	wangpcbus_slot_device::static_set_wangpcbus_slot(*device, _sid);
 
 

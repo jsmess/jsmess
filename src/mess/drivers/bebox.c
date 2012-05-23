@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_CDROM_ADD( "cdrom",bebox_cdrom )
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL )	/* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL, false )	/* FIXME */
 
 	MCFG_MPC105_ADD("mpc105","ppc1",0)
 	MCFG_CIRRUS_ADD("cirrus")

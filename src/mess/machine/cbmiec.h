@@ -39,7 +39,7 @@
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	cbm_iec_slot_device::static_set_slot(*device, _num);
 
 
