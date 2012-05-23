@@ -16,6 +16,7 @@ public:
 		: spectrum_state(mconfig, type, tag) { }
 
 	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
+	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 };
 
 DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
@@ -80,19 +81,17 @@ static void pentagon_update_memory(running_machine &machine)
 	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 }
 
-static WRITE8_HANDLER(pentagon_port_7ffd_w)
+WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-
 	/* disable paging */
-	if (state->m_port_7ffd_data & 0x20)
+	if (m_port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	state->m_port_7ffd_data = data;
+	m_port_7ffd_data = data;
 
 	/* update memory */
-	pentagon_update_memory(space->machine());
+	pentagon_update_memory(machine());
 }
 
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
@@ -103,7 +102,7 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(pentagon_port_7ffd_w)  AM_MIRROR(0x3ffd)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END

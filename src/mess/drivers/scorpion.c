@@ -162,6 +162,9 @@ public:
 		: spectrum_state(mconfig, type, tag) { }
 
 	DECLARE_DIRECT_UPDATE_MEMBER(scorpion_direct);
+	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
+	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
+	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
 };
 
 /****************************************************************************************************/
@@ -223,17 +226,15 @@ static void scorpion_update_memory(running_machine &machine)
 
 }
 
-static WRITE8_HANDLER( scorpion_0000_w )
+WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 {
-	scorpion_state *state = space->machine().driver_data<scorpion_state>();
-
-	if ( ! state->m_ram_0000 )
+	if ( ! m_ram_0000 )
 		return;
 
-	if ((state->m_port_1ffd_data & 0x01)==0x01)
+	if ((m_port_1ffd_data & 0x01)==0x01)
 	{
-		if ( ! state->m_ram_disabled_by_beta )
-			state->m_ram_0000[offset] = data;
+		if ( ! m_ram_disabled_by_beta )
+			m_ram_0000[offset] = data;
 	}
 }
 
@@ -281,30 +282,26 @@ static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 	}
 }
 
-static WRITE8_HANDLER(scorpion_port_7ffd_w)
+WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-
 	/* disable paging */
-	if (state->m_port_7ffd_data & 0x20)
+	if (m_port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	state->m_port_7ffd_data = data;
+	m_port_7ffd_data = data;
 
 	/* update memory */
-	scorpion_update_memory(space->machine());
+	scorpion_update_memory(machine());
 }
 
-static WRITE8_HANDLER(scorpion_port_1ffd_w)
+WRITE8_MEMBER(scorpion_state::scorpion_port_1ffd_w)
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-
 	/* if paging not disabled */
-	if ((state->m_port_7ffd_data & 0x20)==0)
+	if ((m_port_7ffd_data & 0x20)==0)
 	{
-		state->m_port_1ffd_data = data;
-		scorpion_update_memory(space->machine());
+		m_port_1ffd_data = data;
+		scorpion_update_memory(machine());
 	}
 }
 
@@ -316,10 +313,10 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 
@@ -332,7 +329,7 @@ static MACHINE_RESET( scorpion )
 
 	state->m_ram_0000 = NULL;
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	space->install_legacy_write_handler(0x0000, 0x3fff, FUNC(scorpion_0000_w));
+	space->install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),state));
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
