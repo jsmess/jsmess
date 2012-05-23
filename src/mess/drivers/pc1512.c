@@ -1364,9 +1364,9 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1408,9 +1408,9 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", NULL)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

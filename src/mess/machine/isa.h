@@ -77,24 +77,19 @@
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
     MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
 	isa8_slot_device::static_set_isa8_slot(*device, _isatag); \
-
-#define MCFG_ISA_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_isa8_card_interface::static_set_isabus_tag(*device, _isatag); \
 
 #define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
     MCFG_DEVICE_ADD(_tag, ISA16, 0) \
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
     MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
 	isa16_slot_device::static_set_isa16_slot(*device, _isatag); \
 
 //**************************************************************************
