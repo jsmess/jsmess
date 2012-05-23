@@ -3151,6 +3151,18 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
+<!-- reported as not working on the real hardware... bad dump? -->
+	<software name="gloverp" cloneof="glover">
+		<description>Glover (Prototype)</description>
+		<year>1998</year>
+		<publisher>Hasbro Interactive</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="glover (prototype).bin" size="67108864" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="glover2">
 		<description>Glover 2 (Prototype)</description>
 		<year>1999</year>
