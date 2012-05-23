@@ -15,7 +15,7 @@ APB notes:
 Error codes:
 Triangle    Test CPU registers and instructions
 Square      Test ROM
-4 vertical lines    Test CPU call and trap instructions
+4 vertical lines    CPU call or trap instructions failed
 Diamond     Test system RAM
 EC0     8255 parallel interface IC test failed
 EC1     6845 CRT controller IC test failed
@@ -46,6 +46,8 @@ EI1     Vectored interrupt error
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
+#include "machine/keyboard.h"
+
 class m20_state : public driver_device
 {
 public:
@@ -72,8 +74,16 @@ public:
     DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
     DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
     DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
+    DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
+	DECLARE_WRITE_LINE_MEMBER(kbd_rxrdy_int);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+
+private:
+	bool m_kbrecv_in_progress;
+	int m_kbrecv_bitcount;
+	UINT16 m_kbrecv_data;
 };
 
 
@@ -117,15 +127,34 @@ static SCREEN_UPDATE_RGB32( m20 )
 // these two i8251 callbacks will ask for/send 1 bit at a time.
 READ_LINE_MEMBER(m20_state::kbd_rx)
 {
-//    printf("read keyboard\n");
+	/* TODO: correct hookup for keyboard, keyboard uses 8048 */
     return 0x00;
 }
 
-// this should send 0-0-0-0-0-0-1-1 after the BIOS writes 0x03 to the data port.
-// it comes back 0-1-1-0-0-0-0-0-0-1-1 instead, with 3 leading extraneous bits.  why?
 WRITE_LINE_MEMBER(m20_state::kbd_tx)
 {
-    printf("%d to keyboard\n", state);
+	UINT8 data;
+
+	if (m_kbrecv_in_progress) {
+		m_kbrecv_bitcount++;
+		m_kbrecv_data = (m_kbrecv_data >> 1) | (state ? (1<<10) : 0);
+		if (m_kbrecv_bitcount == 11) {
+			data = (m_kbrecv_data >> 1) & 0xff;
+			printf ("0x%02X received by keyboard\n", data);
+			switch (data) {
+				case 0x03: m_kbdi8251->receive_character(2); printf ("sending 2 back from kb...\n"); break;
+				case 0x0a: break;
+				case 0x80: m_kbdi8251->receive_character(0x80); printf ("sending 0x80 back from kb...\n");break;
+				default: abort();
+			}
+			m_kbrecv_in_progress = 0;
+		}
+	}
+	else {
+		m_kbrecv_in_progress = 1;
+		m_kbrecv_bitcount = 1;
+		m_kbrecv_data = state ? (1<<10) : 0;
+	}
 }
 
 READ16_MEMBER(m20_state::m20_i8259_r)
@@ -142,11 +171,13 @@ WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
 {
     if (state)
     {
-        // PIC raised IRQ line
+		//printf ("PIC raised VI\n");
+		device_set_input_line(m_maincpu, 1, ASSERT_LINE);
     }
     else
     {
-        // PIC lowered IRQ line
+		//printf ("PIC lowered VI\n");
+		device_set_input_line(m_maincpu, 1, CLEAR_LINE);
     }
 }
 
@@ -160,6 +191,19 @@ WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 {
     m_kbdi8251->transmit_clock();
     m_kbdi8251->receive_clock();
+}
+
+WRITE_LINE_MEMBER( m20_state::timer_tick_w )
+{
+	/* Using HOLD_LINE is not completely correct:
+	 * The output of the 8253 is connected to a 74LS74 flop chip.
+	 * The output of the flop chip is connected to NVI CPU input.
+	 * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
+	 * outputs to detect an interrupt acknowledge transaction.
+	 * 8253 is programmed in square wave mode, not rate
+	 * generator mode.
+	 */
+	device_set_input_line(m_maincpu, 0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
 /* from the M20 hardware reference manual:
@@ -206,13 +250,13 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 
     AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
     AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+
     AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
     AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)
 
 	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
-//  AM_RANGE(0x140, 0x143) AM_DEVREADWRITE8_LEGACY("i8259", pic8259_r, pic8259_w, 0xffff)
 
 	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
@@ -240,6 +284,14 @@ static DRIVER_INIT( m20 )
 {
 }
 
+static IRQ_CALLBACK( m20_irq_callback )
+{
+	if (! irqline)
+		return 0xff; // NVI, value ignored
+	else
+        return pic8259_acknowledge(device->machine().device("i8259"));
+}
+
 void m20_state::machine_reset()
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
@@ -247,7 +299,9 @@ void m20_state::machine_reset()
 
     ROM += 0x10000; // don't know why they load at an offset, but let's go with it
 
-    memcpy(RAM, ROM, 256);  // should be more than sufficient to boot
+	device_set_irq_callback(m_maincpu, m20_irq_callback);
+
+    memcpy(RAM, ROM, 8);  // we need only the reset vector
     m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
 }
 
@@ -275,6 +329,11 @@ static I8255A_INTERFACE( ppi_interface )
     DEVCB_NULL      // port C write
 };
 
+static WRITE_LINE_DEVICE_HANDLER(kbd_rxrdy_int)
+{
+        pic8259_ir4_w(device->machine().device("i8259"), state);
+}
+
 static const i8251_interface kbd_i8251_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rx),
@@ -282,7 +341,7 @@ static const i8251_interface kbd_i8251_intf =
 	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
-	DEVCB_NULL,         // rx ready
+	DEVCB_LINE(kbd_rxrdy_int),  // rx ready
 	DEVCB_NULL,         // tx ready
 	DEVCB_NULL,         // tx empty
 	DEVCB_NULL          // syndet
@@ -312,7 +371,7 @@ const wd17xx_interface m20_wd17xx_interface =
 static LEGACY_FLOPPY_OPTIONS_START(m20)
 	LEGACY_FLOPPY_OPTION(m20, "img", "M20 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
-		TRACKS([80])
+		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
@@ -325,29 +384,43 @@ static const floppy_interface m20_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(m20),
 	NULL,
 	NULL
+};
+
+WRITE8_MEMBER( m20_state::kbd_put )
+{
+	if (data) {
+		printf("kbd_put called with 0%02X\n", data);
+		i8251_device *uart = machine().device<i8251_device>("i8251_1");
+		uart->receive_character(data);
+	}
+}
+
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DRIVER_MEMBER(m20_state, kbd_put)
 };
 
 const struct pit8253_config pit8253_intf =
 {
 	{
 		{
-			1000000,
+			1230782,
 			DEVCB_NULL,
             DEVCB_DRIVER_LINE_MEMBER(m20_state, tty_clock_tick_w)
 		},
 		{
-			1000000,
+			1230782,
 			DEVCB_NULL,
             DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_clock_tick_w)
 		},
 		{
-			1000000,
+			1230782,
 			DEVCB_NULL,
-			DEVCB_NULL
+            DEVCB_DRIVER_LINE_MEMBER(m20_state, timer_tick_w)
 		}
 	}
 };
@@ -391,6 +464,8 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
 	MCFG_PIC8259_ADD("i8259", pic_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(m20_floppy_interface)
+
+	 MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 ROM_START(m20)
