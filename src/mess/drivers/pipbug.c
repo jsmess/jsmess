@@ -28,12 +28,17 @@
         The Baby 2650 (featured in Electronics Australia magazine in
         March 1977) has 256 bytes of RAM.
 
+        The terminal is expected to have a papertape device attached, and
+        use it to save and load programs. PIPBUG still thinks it is talking
+        to the terminal, when in fact the data is flowing to the papertape
+        reader and punch.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"
+#include "imagedev/snapquik.h"
 
 
 class pipbug_state : public driver_device
@@ -85,6 +90,76 @@ static const serial_terminal_interface terminal_intf =
 	DEVCB_NULL
 };
 
+QUICKLOAD_LOAD( pipbug )
+{
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	int i;
+	int quick_addr = 0x0440;
+	int exec_addr;
+	int quick_length;
+	UINT8 *quick_data;
+	int read_;
+
+	quick_length = image.length();
+	quick_data = (UINT8*)malloc(quick_length);
+	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_data[0] != 0xc4)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+		image.message(" Invalid header");
+		return IMAGE_INIT_FAIL;
+	}
+
+	exec_addr = quick_data[1] * 256 + quick_data[2];
+
+	if (exec_addr >= quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+		image.message(" Exec address beyond end of file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length < 0x444)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.message(" File too short");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length > 0x8000)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.message(" File too long");
+		return IMAGE_INIT_FAIL;
+	}
+
+	for (i = quick_addr; i < quick_length; i++)
+	{
+		space->write_byte(i, quick_data[i]);
+	}
+
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+	// Start the quickload
+	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( pipbug, pipbug_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
@@ -93,7 +168,11 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 
 	/* video hardware */
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 110)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", pipbug, "pgm", 0)
 MACHINE_CONFIG_END
+
 
 /* ROM definition */
 ROM_START( pipbug )
