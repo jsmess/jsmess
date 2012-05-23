@@ -795,6 +795,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_4dxh.o	\
 	$(MESS_MACHINE)/c64_4ksa.o	\
 	$(MESS_MACHINE)/c64_4tba.o	\
+	$(MESS_MACHINE)/c64_16kb.o	\
 	$(MESS_MACHINE)/c64_bn1541.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
 	$(MESS_MACHINE)/c64_cpm.o	\

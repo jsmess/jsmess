@@ -7,6 +7,7 @@
 #include "machine/c64_4dxh.h"
 #include "machine/c64_4ksa.h"
 #include "machine/c64_4tba.h"
+#include "machine/c64_16kb.h"
 #include "machine/c64_bn1541.h"
 #include "machine/c64_comal80.h"
 #include "machine/c64_cpm.h"
