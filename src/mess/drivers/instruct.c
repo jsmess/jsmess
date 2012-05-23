@@ -41,12 +41,15 @@
       not in the matrix, but are connected to hardware directly. This needs
       to be emulated.
     - Connect 10 toggle switches and 10 round red leds.
-    - Cassette interface.
+    - Cassette interface not working.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "instruct.lh"
 
 class instruct_state : public driver_device
@@ -55,10 +58,10 @@ public:
 	instruct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "p_ram")
+	m_p_ram(*this, "p_ram"),
+	m_cass(*this, CASSETTE_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
@@ -67,9 +70,11 @@ public:
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	virtual void machine_reset();
-	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_digit;
 	bool m_valid_digit;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_ram;
+	required_device<cassette_image_device> m_cass;
 };
 
 // cassette port
@@ -77,6 +82,7 @@ public:
 // saving can use bits 3,4,5
 WRITE8_MEMBER( instruct_state::portf8_w )
 {
+	m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
 }
 
 // segment output
@@ -124,15 +130,17 @@ READ8_MEMBER( instruct_state::portfe_r )
 	return 0xff;
 }
 
-// read SENS key and cassin
+
+// Read cassette and SENS key
 READ8_MEMBER( instruct_state::sense_r )
 {
-	return 0;
+	return ( (m_cass->input() > 0.03) ? 1 : 0) | (ioport("HW")->read() & 1);
 }
 
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("p_ram") // 512 bytes onboard ram
+	AM_RANGE(0x0200, 0x177f) AM_RAM // expansion ram needed by quickloads
 	AM_RANGE(0x1780, 0x17ff) AM_RAM // 128 bytes in s2656 chip
 	AM_RANGE(0x1800, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -207,6 +215,75 @@ void instruct_state::machine_reset()
 	memcpy(m_p_ram, ROM+0x1800, 0x0200);
 }
 
+QUICKLOAD_LOAD( instruct )
+{
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	int i;
+	int quick_addr = 0x0100;
+	int exec_addr;
+	int quick_length;
+	UINT8 *quick_data;
+	int read_;
+
+	quick_length = image.length();
+	quick_data = (UINT8*)malloc(quick_length);
+	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_data[0] != 0xc5)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+		image.message(" Invalid header");
+		return IMAGE_INIT_FAIL;
+	}
+
+	exec_addr = quick_data[1] * 256 + quick_data[2];
+
+	if (exec_addr >= quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+		image.message(" Exec address beyond end of file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length < 0x104)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.message(" File too short");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length > 0x17c0)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.message(" File too long");
+		return IMAGE_INIT_FAIL;
+	}
+
+	for (i = quick_addr; i < quick_length; i++)
+	{
+		space->write_byte(i, quick_data[i]);
+	}
+
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+	// Start the quickload
+	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+	return IMAGE_INIT_PASS;
+}
 
 static MACHINE_CONFIG_START( instruct, instruct_state )
 	/* basic machine hardware */
@@ -216,6 +293,15 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", instruct, "pgm", 1)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -227,4 +313,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME                    FLAGS */
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, 0,    "Signetics", "Signetics Instructor 50", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1978, instruct,  0,       0,       instruct,  instruct, 0,    "Signetics", "Signetics Instructor 50", 0 )

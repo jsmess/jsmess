@@ -170,7 +170,7 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 110)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", pipbug, "pgm", 0)
+	MCFG_QUICKLOAD_ADD("quickload", pipbug, "pgm", 1)
 MACHINE_CONFIG_END
 
 
