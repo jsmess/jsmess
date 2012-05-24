@@ -65588,7 +65588,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mstrfgt6" supported="no">
+	<software name="mstrfgt6" supported="partial">
 		<description>Master Fighter VI' (Asia)</description>
 		<year>1993</year>
 		<publisher>Yoko</publisher>
@@ -65851,7 +65851,7 @@ be better to redump them properly. -->
 	</software>
 
 <!-- These carts use the same prg/chr but different dip settings, to choose between the two games -->
-	<software name="mk2y" supported="no">
+	<software name="mk2y">
 		<description>Mortal Kombat II ~ Mortal Kombat V Pro (Asia)</description>
 		<year>1994</year>
 		<publisher>Yoko</publisher>
@@ -67913,7 +67913,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
 				<rom name="4-in-1 (bs-8088)[p1][!].chr" size="1048576" crc="ff3e4986" sha1="c5f683398ad56d6d0f622d680150ed2b2cb6819e" offset="0" status="baddump" />
 			</dataarea>
@@ -67928,7 +67928,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23CA" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (fk-8008)[p1][!].chr" size="524288" crc="728641c2" sha1="af719cb6687e29935a8e11bc1046fbc2868f9c0f" offset="0" status="baddump" />
 			</dataarea>
@@ -67943,7 +67943,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
 				<rom name="4-in-1 (fk-8050)[p1][!].chr" size="1048576" crc="31c94555" sha1="225eba69706605525bf7f26ee7487ec0311327af" offset="0" status="baddump" />
 			</dataarea>
@@ -67958,7 +67958,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (kt-3445ab)[p1].chr" size="524288" crc="b2ca3bbc" sha1="84bff553437983a5b06c4e145d0fe1629aab99dc" offset="0" status="baddump" />
 			</dataarea>
@@ -68254,7 +68254,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
 				<rom name="5-in-1 (k5003)[p1][!].chr" size="1048576" crc="f3cf76f3" sha1="8bd4bddc62116f857c19c3ce90af509ca5f0f621" offset="0" status="baddump" />
 			</dataarea>
@@ -68335,7 +68335,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
 				<rom name="6-in-1 (fk-3004)[p1][!].chr" size="1048576" crc="04ce4569" sha1="c3c29c70a99d5db56574b1e15c666329c8a55d88" offset="0" />
 			</dataarea>

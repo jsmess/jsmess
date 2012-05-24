@@ -475,7 +475,7 @@ static const nes_pcb pcb_list[] =
 	{ "SUBOR-BOARD-1",    SUBOR_TYPE1 },
 	{ "SOMERITEAM-SL-12", SOMERI_SL12 }, // mapper 116
 	{ "UNL-CONY",         CONY_BOARD },
-	{ "UNL-YOKO",         CONY_BOARD },	// not exactly the same, needs better support
+	{ "UNL-YOKO",         YOKO_BOARD },
 	{ "UNL-GOUDER",       GOUDER_37017 },
 	{ "UNL-NITRA",        NITRA_TDA },
 	{ "UNL-HOSENKAN",     HOSENKAN_BOARD },
@@ -4897,6 +4897,114 @@ static WRITE8_HANDLER( cony_w )
 		case 0x0318:
 			state->m_mapper83_reg[9] = data;
 			cony_set_prg(space->machine());
+			break;
+	}
+}
+
+/*************************************************************
+ 
+ Yoko Bootleg Board
+ 
+ Games: Mortal Kombat II, Master Figther VI'
+ 
+ 
+ Very similar to Cony board
+ 
+ In MESS: Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( yoko_l_w )
+{
+	nes_state *state = space->machine().driver_data<nes_state>();
+	LOG_MMC(("cony_l_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset >= 0x1300) // from 0x5400
+		state->m_mapper83_low_reg[offset & 0x03] = data;
+}
+
+static READ8_HANDLER( yoko_l_r )
+{
+	nes_state *state = space->machine().driver_data<nes_state>();
+	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
+	
+	if (offset >= 0x0f00 && offset < 0x1300)	// 0x5000
+	{
+		// read dipswitch bit! - currently unimplemented
+	}
+	if (offset >= 0x1300) // from 0x5400
+		return state->m_mapper83_low_reg[offset & 0x03];
+	else
+		return 0x00;
+}
+
+static void yoko_set_prg( running_machine &machine )
+{
+	nes_state *state = machine.driver_data<nes_state>();
+	if (state->m_mmc_reg[0] & 0x10)
+	{
+		int base = (state->m_mmc_reg[1] & 0x08) << 1;
+		prg8_89(machine, base | (state->m_mapper83_reg[0] & 0x0f));
+		prg8_ab(machine, base | (state->m_mapper83_reg[1] & 0x0f));
+		prg8_cd(machine, base | (state->m_mapper83_reg[2] & 0x0f));
+		prg8_ef(machine, base | 0x0f);
+	}
+	else if (state->m_mmc_reg[0] & 0x08)
+		prg32(machine, state->m_mmc_reg[1] >> 1);
+	else
+	{
+		prg16_89ab(machine, state->m_mmc_reg[1]);
+		prg16_cdef(machine, 0xff);
+	}
+}
+
+static void yoko_set_chr( running_machine &machine )
+{
+	nes_state *state = machine.driver_data<nes_state>();
+	chr2_0(machine, state->m_mapper83_reg[4], CHRROM);
+	chr2_2(machine, state->m_mapper83_reg[5], CHRROM);
+	chr2_4(machine, state->m_mapper83_reg[6], CHRROM);
+	chr2_6(machine, state->m_mapper83_reg[7], CHRROM);
+}
+
+static WRITE8_HANDLER( yoko_w )
+{
+	nes_state *state = space->machine().driver_data<nes_state>();
+	LOG_MMC(("yoko_w, offset: %04x, data: %02x\n", offset, data));
+	
+	switch (offset & 0x0c17)
+	{
+		case 0x0000:
+			state->m_mmc_reg[1] = data;
+			yoko_set_prg(space->machine());
+			break;
+		case 0x400:
+			state->m_mmc_reg[0] = data;
+			if (data & 1)
+				set_nt_mirroring(space->machine(), PPU_MIRROR_HORZ);
+			else
+				set_nt_mirroring(space->machine(), PPU_MIRROR_VERT);
+			yoko_set_prg(space->machine());
+			break;
+		case 0x0800:
+			state->m_IRQ_count = (state->m_IRQ_count & 0xff00) | data;
+			break;
+		case 0x0801:
+			state->m_IRQ_enable = state->m_mmc_reg[0] & 0x80;
+			state->m_IRQ_count = (data << 8) | (state->m_IRQ_count & 0xff);
+			break;
+		case 0x0c00:
+		case 0x0c01:
+		case 0x0c02:
+			state->m_mapper83_reg[offset & 3] = data;
+			yoko_set_prg(space->machine());
+			break;
+		case 0x0c10:
+		case 0x0c11:
+		case 0x0c16:
+		case 0x0c17:
+			state->m_mapper83_reg[4 + (offset & 3)] = data;
+			yoko_set_chr(space->machine());
 			break;
 	}
 }
@@ -11904,6 +12012,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(bf9096_w), NES_WRITEONLY(bf9096_w),   NULL, NULL, NULL },
 	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(golden5_w),             NULL, NULL, NULL },
 	{ CONY_BOARD,           {FUNC(cony_l_w), FUNC(cony_l_r)}, NES_NOACCESS, NES_WRITEONLY(cony_w),        NULL, NULL, sunsoft3_irq },
+	{ YOKO_BOARD,           {FUNC(yoko_l_w), FUNC(yoko_l_r)}, NES_NOACCESS, NES_WRITEONLY(yoko_w),        NULL, NULL, sunsoft3_irq },
 	{ DREAMTECH_BOARD,      NES_WRITEONLY(dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
 	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(futuremedia_w),         NULL, NULL, futuremedia_irq },
 	{ FUKUTAKE_BOARD,       {FUNC(fukutake_l_w), FUNC(fukutake_l_r)}, NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
@@ -12624,6 +12733,7 @@ static int pcb_initialize( running_machine &machine, int idx )
 
 			// mapper 83
 		case CONY_BOARD:
+		case YOKO_BOARD:
 			state->m_mapper83_reg[9] = 0x0f;
 			prg8_cd(machine, 0x1e);
 			prg8_ef(machine, 0x1f);
