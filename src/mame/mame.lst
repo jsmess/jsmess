@@ -1665,8 +1665,8 @@ bchopper		// (c) 1987
 mrheli			// (c) 1987 (Japan)
 nspirit			// (c) 1988
 nspiritj		// (c) 1988 (Japan)
-imgfight		// (c) 1988 (Japan)
-imgfighto		// (c) 1988 (Japan)
+imgfight		// (c) 1988 (World)
+imgfightj		// (c) 1988 (Japan)
 loht			// (c) 1989
 lohtj			// (c) 1989 (Japan)
 lohtb			// (c) 1989 (bootleg)
@@ -3518,6 +3518,7 @@ gunbalina		// 2000.12 Gunbalina (GNN1 Ver.A)
 				// 2001.02 Taiko no Tatsujin
 				// 2001.03 Gahaha Ippatsudou
 mrdrilrg		// 2001.03 Mr. Driller G (DRG1 Ver.A)
+mrdrilrga		// 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
 				// 2001.07 Golgo 13 Juusei no Requiem
 				// 2001.08 Taiko no Tatsujin 2
 				// 2001.09 Gahaha Ippatsudou 2
@@ -4342,7 +4343,7 @@ abcop			// 1990.?? A.B.Cop (World, FD1094, decrypted)
 				// 1991.01 A.B.Cop (Japan)
 				// 1990.10 GP Rider (Japan)
 gprider			// 1990.?? GP Rider (World, protected)
-gprider1		// 1990.12 GP Rider (US, FD1094, decrypted)
+gprideru		// 1990.12 GP Rider (US, FD1094, decrypted)
 
 // Y-Board
 				// 1988.05 Galaxy Force (Japan)
@@ -19856,7 +19857,9 @@ rgum
 // Extrema Systems International Ltd.
 poker72
 
+// Peni Soft, actually an hack on modified Time Pilot HW
 chkun
+bikkuric
 
 // Blitz System Inc.
 megadpkr		// (c) 1990 Blitz System Inc
@@ -21476,4 +21479,5 @@ caspoker		// 1987, PM / Beck Elektronik.
 
 manohman		// 199?, Merkur.
 jankenmn		// 1985, Sunwise.
-bikkuric
+
+flipjack
