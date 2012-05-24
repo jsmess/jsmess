@@ -6097,40 +6097,67 @@ static WRITE8_HANDLER( ntdec_fh_m_w )
 
  In MESS: Supported.
 
+ Notes: Metal Force and Buzz & Waldog only use the the first
+ 4 regs and no mirroring. Janggun ui Adeul uses all features
+
  *************************************************************/
 
 static WRITE8_HANDLER( daou306_w )
 {
+	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("daou306_w, offset: %04x, data: %02x\n", offset, data));
+	int reg = BIT(offset, 2) ? 8 : 0;
 
 	switch (offset)
 	{
 		case 0x4000:
-			chr1_0(space->machine(), data, CHRROM);
+		case 0x4004:
+			state->m_mmc_reg[reg + 0] = data;
+			chr1_0(space->machine(), state->m_mmc_reg[0] | (state->m_mmc_reg[8] << 8), CHRROM);
 			break;
 		case 0x4001:
-			chr1_1(space->machine(), data, CHRROM);
+		case 0x4005:
+			state->m_mmc_reg[reg + 1] = data;
+			chr1_1(space->machine(), state->m_mmc_reg[1] | (state->m_mmc_reg[9] << 8), CHRROM);
 			break;
 		case 0x4002:
-			chr1_2(space->machine(), data, CHRROM);
+		case 0x4006:
+			state->m_mmc_reg[reg + 2] = data;
+			chr1_2(space->machine(), state->m_mmc_reg[2] | (state->m_mmc_reg[10] << 8), CHRROM);
 			break;
 		case 0x4003:
-			chr1_3(space->machine(), data, CHRROM);
+		case 0x4007:
+			state->m_mmc_reg[reg + 3] = data;
+			chr1_3(space->machine(), state->m_mmc_reg[3] | (state->m_mmc_reg[11] << 8), CHRROM);
 			break;
 		case 0x4008:
-			chr1_4(space->machine(), data, CHRROM);
+		case 0x400c:
+			state->m_mmc_reg[reg + 4] = data;
+			chr1_4(space->machine(), state->m_mmc_reg[4] | (state->m_mmc_reg[12] << 8), CHRROM);
 			break;
 		case 0x4009:
-			chr1_5(space->machine(), data, CHRROM);
+		case 0x400d:
+			state->m_mmc_reg[reg + 5] = data;
+			chr1_5(space->machine(), state->m_mmc_reg[5] | (state->m_mmc_reg[13] << 8), CHRROM);
 			break;
 		case 0x400a:
-			chr1_6(space->machine(), data, CHRROM);
+		case 0x400e:
+			state->m_mmc_reg[reg + 6] = data;
+			chr1_6(space->machine(), state->m_mmc_reg[6] | (state->m_mmc_reg[14] << 8), CHRROM);
 			break;
 		case 0x400b:
-			chr1_7(space->machine(), data, CHRROM);
+		case 0x400f:
+			state->m_mmc_reg[reg + 7] = data;
+			chr1_7(space->machine(), state->m_mmc_reg[7] | (state->m_mmc_reg[15] << 8), CHRROM);
 			break;
 		case 0x4010:
 			prg16_89ab(space->machine(), data);
+			break;
+		case 0x4014:
+			if (data & 1)
+				set_nt_mirroring(space->machine(), PPU_MIRROR_HORZ);
+			else
+				set_nt_mirroring(space->machine(), PPU_MIRROR_VERT);
 			break;
 	}
 }
