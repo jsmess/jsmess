@@ -62965,6 +62965,22 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
+<!-- BTANB: All story text has been removed by the bootleggers (too lazy to translate it?) -->
+	<software name="lionkccm" cloneof="wackyrac">
+		<description>The Lion King (Chiki Chiki Machine Mou Race pirate)</description>
+		<year>1995</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="lion king, the (chiki-chiki dog)(unl)[!].chr" size="131072" crc="9e39c7e1" sha1="1433874a4ea685a75c8b1da34eb372036947df77" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="lion king, the (chiki-chiki dog)(unl)[!].prg" size="131072" crc="9e4e5230" sha1="6b45e76df36bde569dd7ede6b2d3b5cd7f464ca1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkjb" cloneof="jungle">
 		<description>The Lion King (The Jungle Book pirate)</description>
 		<year>1995</year>
@@ -66105,8 +66121,24 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- FIXME: Mapper hardware for this cart is MMC3 with bit 0 of address line moved to bit 1, so it can't be played as mapper 4 -->
+	<software name="sf6c" cloneof="sf6" supported="no">
+		<description>Street Fighter VI (Asia, 8 characters)</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="street fighter vi (8 peoples)(unl)[!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street fighter vi (8 peoples)(unl)[!].prg" size="131072" crc="488ab51a" sha1="ee466c9f7ba24dfa1b68e7b27134ffa4dc5fcb2b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf6">
-		<description>Street Fighter VI  16 People (Asia, 16 characters)</description>
+		<description>Street Fighter VI 16 People (Asia, 16 characters)</description>
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66121,8 +66153,8 @@ be better to redump them properly. -->
 	</software>
 
 <!-- FIXME: Mapper hardware for this cart is MMC3 with bit 0 of address line moved to bit 1, so it can't be played as mapper 4 -->
-	<software name="sf6b" cloneof="sf6">
-		<description>Street Fighter VI  16 People (Asia, 16 characters, Alt)</description>
+	<software name="sf6b" cloneof="sf6" supported="no">
+		<description>Street Fighter VI 16 People (Asia, 16 characters, Alt)</description>
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66207,6 +66239,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="super blaster vii turbo 28 (unl).prg" size="262144" crc="045cb9ec" sha1="1152c91c62e971492c7466067a88692b6b11602c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supfght2">
+		<description>Super Fighter II' (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TXC-TW" />
+			<dataarea name="chr" size="131072">
+				<rom name="super fighter ii' (unl)[!].chr" size="131072" crc="5e2d1acf" sha1="f787f9bc0edc73ab76cf82a43d92ce6d61b45504" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="super fighter ii' (unl)[!].prg" size="131072" crc="eb56a3ea" sha1="fa4e3774860e2fa26968c602bc73ad83ec354f95" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67167,6 +67214,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_2hikg">
+		<description>2 in 1 1996 Super HIK Gold Card (NT-803)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].chr" size="524288" crc="2847abcc" sha1="69f2c63ab1c9f2dbca4b42e93c2e4f6ddfea3bf4" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].prg" size="524288" crc="c0d460ef" sha1="aa33965c25c259152d77a0d7eaf426ebc703ffea" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- JP Ronny (Unl) [headerless crc: a9c69118] has been ripped from this multicart -->
 	<software name="mc_20asd">
 		<description>ASDER 20 in 1</description>
@@ -67357,6 +67419,66 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="3-in-1 [p1].prg" size="524288" crc="97cdf080" sha1="e2e2c32d94f4e9e8413767c005b795bd7074bc56" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_3bn96" supported="partial">
+		<description>3 in 1 (BN096)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="3-in-1 (bn096)[p1][!].chr" size="524288" crc="0a0e2cee" sha1="a7fcd8f1e5bbcb66ea9dfaaa3e718a74734382bb" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="3-in-1 (bn096)[p1][!].prg" size="524288" crc="4f4b13e4" sha1="4c88ddf9fe96219eba92bdabefb2608994aa90e2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_3k311">
+		<description>3 in 1 (K3011)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="3-in-1 (k3011)[p1][!].chr" size="524288" crc="c889ef91" sha1="9133dc92fbfce54c55727ac8ce46c254d870627f" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="3-in-1 (k3011)[p1][!].prg" size="524288" crc="0ac22fdc" sha1="be8d3cf7bf71db7e09e91e2b616cfe6fa819148c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_3mr28" supported="partial">
+		<description>3 in 1 (MR028)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="3-in-1 (mr028)[p1][!].chr" size="524288" crc="95bacc6b" sha1="06d25e9568c371700fbcec35827f1d56acbae618" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="3-in-1 (mr028)[p1][!].prg" size="524288" crc="5c296341" sha1="fe8566facb6978508663b4ddbc56fcb1118f6b57" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_3mr29" supported="partial">
+		<description>3 in 1 (MR029)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="3-in-1 (mr029)[p1][!].chr" size="524288" crc="613639e5" sha1="1159f62640059c5af676d035be345830295dac8e" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="3-in-1 (mr029)[p1][!].prg" size="524288" crc="2fc793d6" sha1="b924fea9fb1f65d6ab5b8cc1b535736197cea6a4" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67756,6 +67878,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4fkxx" supported="no">
+		<description>4 in 1 (FK23Cxxxx, S-0210A pcb)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="1048576">
+				<rom name="4-in-1 (fk23cxxxx, s-0210a pcb)[p1][!].chr" size="524288" crc="ffb23418" sha1="d3a028dc1f6df4fc82039bcf5281bf13183a1fd5" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="4-in-1 (fk23cxxxx, s-0210a pcb)[p1][!].prg" size="524288" crc="7b6a9dd2" sha1="93f62f1c80004c1e32bc9b1a35f0b68d9ee3ca3d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4bs88" supported="no">
 		<description>4 in 1 (BS-8088)</description>
 		<year>19??</year>
@@ -67763,10 +67900,10 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
-				<rom name="4-in-1 (bs-8088)[p1][!].chr" size="1048576" crc="ff3e4986" sha1="c5f683398ad56d6d0f622d680150ed2b2cb6819e" offset="0" />
+				<rom name="4-in-1 (bs-8088)[p1][!].chr" size="1048576" crc="ff3e4986" sha1="c5f683398ad56d6d0f622d680150ed2b2cb6819e" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="4-in-1 (bs-8088)[p1][!].prg" size="1048576" crc="82872d67" sha1="10567ba5848c1ca8821a3815b91537e4101eb05f" offset="0" />
+				<rom name="4-in-1 (bs-8088)[p1][!].prg" size="1048576" crc="82872d67" sha1="10567ba5848c1ca8821a3815b91537e4101eb05f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67778,10 +67915,10 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (fk-8008)[p1][!].chr" size="524288" crc="728641c2" sha1="af719cb6687e29935a8e11bc1046fbc2868f9c0f" offset="0" />
+				<rom name="4-in-1 (fk-8008)[p1][!].chr" size="524288" crc="728641c2" sha1="af719cb6687e29935a8e11bc1046fbc2868f9c0f" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (fk-8008)[p1][!].prg" size="524288" crc="cde95a72" sha1="71cdd444d98a25ae030e0e40446492ff7cbe0c08" offset="0" />
+				<rom name="4-in-1 (fk-8008)[p1][!].prg" size="524288" crc="cde95a72" sha1="71cdd444d98a25ae030e0e40446492ff7cbe0c08" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67793,10 +67930,10 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
-				<rom name="4-in-1 (fk-8050)[p1][!].chr" size="1048576" crc="31c94555" sha1="225eba69706605525bf7f26ee7487ec0311327af" offset="0" />
+				<rom name="4-in-1 (fk-8050)[p1][!].chr" size="1048576" crc="31c94555" sha1="225eba69706605525bf7f26ee7487ec0311327af" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="4-in-1 (fk-8050)[p1][!].prg" size="1048576" crc="e326ebe1" sha1="31e40a7daa78ea80fe791c5e95070d78c6876351" offset="0" />
+				<rom name="4-in-1 (fk-8050)[p1][!].prg" size="1048576" crc="e326ebe1" sha1="31e40a7daa78ea80fe791c5e95070d78c6876351" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67808,25 +67945,70 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (kt-3445ab)[p1].chr" size="524288" crc="b2ca3bbc" sha1="84bff553437983a5b06c4e145d0fe1629aab99dc" offset="0" />
+				<rom name="4-in-1 (kt-3445ab)[p1].chr" size="524288" crc="b2ca3bbc" sha1="84bff553437983a5b06c4e145d0fe1629aab99dc" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (kt-3445ab)[p1].prg" size="524288" crc="ec34291b" sha1="7d8919948f98f6933f771b1bedd1a18ab9fe8e68" offset="0" />
+				<rom name="4-in-1 (kt-3445ab)[p1].prg" size="524288" crc="ec34291b" sha1="7d8919948f98f6933f771b1bedd1a18ab9fe8e68" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_6f004" supported="no">
-		<description>6 in 1 (FK-3004)</description>
+	<software name="mc_4vt87" supported="no">
+		<description>4 in 1 (VT087)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
-			<dataarea name="chr" size="1048576">
-				<rom name="6-in-1 (fk-3004)[p1][!].chr" size="1048576" crc="04ce4569" sha1="c3c29c70a99d5db56574b1e15c666329c8a55d88" offset="0" />
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (vt087)[p1][!].chr" size="524288" crc="8390138a" sha1="86cc9e94e5a990d9a188f6c28b62d656758043d2" offset="00000" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="1048576">
-				<rom name="6-in-1 (fk-3004)[p1][!].prg" size="1048576" crc="8317dedb" sha1="f78b573248c29d0e11ce4b59d93a69ba127e6621" offset="0" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (vt087)[p1][!].prg" size="524288" crc="11d1ee10" sha1="75935e95e2c18657f801c0c6cb8ba6812fd88151" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4vt89" supported="no">
+		<description>4 in 1 (VT089)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (vt089)[p1][!].chr" size="524288" crc="462e5ee1" sha1="c74473ae4b1906eec23ad6a31c9f8c3aee6bffdc" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (vt089)[p1][!].prg" size="524288" crc="02d9355e" sha1="58e3a61b2ea6029990d1599c6a8d30cd2e78fde0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4vtxx" supported="no">
+		<description>4 in 1 (VTxxx, 0208 pcb)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (vtxxx, 0208 pcb)[p1][!].chr" size="524288" crc="e2a40dad" sha1="8cd91cf4da7c0c83186c48816d7f1cab0d025f4a" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (vtxxx, 0208 pcb)[p1][!].prg" size="524288" crc="6dc6b294" sha1="66c0dd962bf18ba41d513bf9c1200584d61a549f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4y441" supported="partial">
+		<description>4 in 1 (YH441)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (yh441)[p1][!].chr" size="524288" crc="7163d09f" sha1="73b3e3339a01dc07fb0521d564e774dd9243fbba" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (yh441)[p1][!].prg" size="524288" crc="c4e0a3df" sha1="deb18537765e32de3074d6816c5236a9bdf68a6c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -68049,6 +68231,36 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_5k03" supported="no">
+		<description>5 in 1 (K5003)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="1048576">
+				<rom name="5-in-1 (k5003)[p1][!].chr" size="1048576" crc="f3cf76f3" sha1="8bd4bddc62116f857c19c3ce90af509ca5f0f621" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="5-in-1 (k5003)[p1][!].prg" size="1048576" crc="a5597469" sha1="6347771fccc1ad7d7b43b1c61785fcc8a894ab2c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_5spc5" supported="no">
+		<description>5 in 1 (SPC005)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<dataarea name="chr" size="1048576">
+				<rom name="5-in-1 (spc005)[p1][!].chr" size="1048576" crc="28197d63" sha1="8d11188e5cde7cb9e604db1525502f1f09ce1f3c" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="5-in-1 (spc005)[p1][!].prg" size="1048576" crc="02e417c2" sha1="6a9244f56e72ebbf5feb5f48df3246ac3beb2eb6" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_52gam">
 		<description>52 Games</description>
 		<year>19??</year>
@@ -68096,6 +68308,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="58-in-1 [p1].prg" size="1048576" crc="0d0ef5dd" sha1="d0b0fcc55d33aeb72625dd918636506bd07ad70d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_6f004" supported="no">
+		<description>6 in 1 (FK-3004)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="1048576">
+				<rom name="6-in-1 (fk-3004)[p1][!].chr" size="1048576" crc="04ce4569" sha1="c3c29c70a99d5db56574b1e15c666329c8a55d88" offset="0" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="6-in-1 (fk-3004)[p1][!].prg" size="1048576" crc="8317dedb" sha1="f78b573248c29d0e11ce4b59d93a69ba127e6621" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -68298,6 +68525,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="68 in 1 (game star - hkx5268).prg" size="131072" crc="0183c386" sha1="25c28238a0102ed76085f05da17a5b20f3593b31" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7k603">
+		<description>7 in 1 (K7603)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="7-in-1 (k7603)[p1][!].chr" size="524288" crc="ab3f1aef" sha1="d39144159d92ad204362737c9fea7f95079356d6" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="7-in-1 (k7603)[p1][!].prg" size="524288" crc="d34a7815" sha1="5bdaa47849484ecb14d2fb1889db94f9133812d6" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -69196,6 +69438,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super 3 in 1 (multicart k3m07).prg" size="524288" crc="e0dd259d" sha1="6e306204e8611cdd5ce79dc7b5d3b21722104aa7" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_s3nt3" supported="partial">
+		<description>Super 3 in 1 (NT-903)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="super 3-in-1 (nt-903)[p1][!].chr" size="524288" crc="12c44fb3" sha1="a16f98308430daf5e58fbee4e005078b5eb90c23" offset="0" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="super 3-in-1 (nt-903)[p1][!].prg" size="524288" crc="e253a02e" sha1="c244d1593b3ba4af2ec9f453a5441fe88271adaf" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
