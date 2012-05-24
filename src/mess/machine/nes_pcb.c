@@ -530,6 +530,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-AX5705",       UNL_AX5705 },
 	{ "UNL-CC-21",        UNL_CC21 },
 	{ "UNL-KOF97",        UNL_KOF97 },
+	{ "UNL-KS7057",       UNL_KS7057 },	// mapper 196 alt (for Street Fighter VI / Fight Street VI)
 	{ "UNL-T-230",        UNL_T230 },
 	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
 	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
@@ -8440,6 +8441,25 @@ static WRITE8_HANDLER( unl_kof97_w )
 }
 
 /*************************************************************
+ 
+ Board UNL-KS7057
+ 
+ Games: Street Fighter VI / Fight Street VI
+ 
+ MMC3 clone (identical, but for switched address lines)
+ 
+ In MESS: Supported
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( ks7057_w )
+{
+	LOG_MMC(("ks7057_w, offset: %04x, data: %02x\n", offset, data));
+	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
+	txrom_w(space, offset, data);
+}
+
+/*************************************************************
 
  Board UNL-T-230
 
@@ -11932,6 +11952,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_ax5705_w),          NULL, NULL, NULL },
 	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_cc21_w),            NULL, NULL, NULL },
 	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_kof97_w),           NULL, NULL, mmc3_irq },
+	{ UNL_KS7057,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks7057_w),              NULL, NULL, mmc3_irq },
 	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_t230_w),            NULL, NULL, konami_irq },
 	{ UNL_KOF96,            {FUNC(kof96_l_w), FUNC(kof96_l_r)}, NES_NOACCESS, NES_WRITEONLY(kof96_w),     NULL, NULL, mmc3_irq },
 	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
@@ -12358,6 +12379,7 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case WAIXING_TYPE_E:	// mapper 195
 		case WAIXING_TYPE_H:	// mapper 245
 		case BTL_SUPERBROS11:	// mapper 196
+		case UNL_KS7057:		// mapper 196 alt (for Street Fighter VI / Fight Street VI)
 		case UNL_H2288:		// mapper 123
 		case UNL_KOF97:
 		case UNL_603_5052:

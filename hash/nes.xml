@@ -65250,6 +65250,66 @@ be better to redump them properly. -->
 
 <!-- Pirate fighting games -->
 
+	<software name="fs6">
+		<description>Fight Street VI (Asia, 16 characters)</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-KS7057" />
+			<dataarea name="chr" size="262144">
+				<rom name="street fighter vi 16 peoples (unl) [!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street fighter vi 16 peoples (unl) [!].prg" size="131072" crc="f7b93e43" sha1="462780b4cbb84364a107b1b37a6a5278eefc6cbf" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs6a" cloneof="fs6">
+		<description>Fight Street VI (Asia, 8 characters)</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-KS7057" />
+			<dataarea name="chr" size="262144">
+				<rom name="street fighter vi (8 peoples)(unl)[!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street fighter vi (8 peoples)(unl)[!].prg" size="131072" crc="488ab51a" sha1="ee466c9f7ba24dfa1b68e7b27134ffa4dc5fcb2b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf6">
+		<description>Fighter Street VI 16 Peoples (Asia)</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="street blaster ii pro (unl) [p1].chr" size="262144" crc="6ac703e2" sha1="84ddd2a816f873f2d50827282eba9da27db6f36e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street blaster ii pro (unl) [p1].prg" size="131072" crc="a255a52f" sha1="f2702ef773820dd7c349e64b9abc5fc4e1b0ffa1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf6a" cloneof="sf6">
+		<description>Fighter Street VI 12 Peoples (Asia)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="street fighter vi 12 peoples (unl).chr" size="131072" crc="10f7cdfc" sha1="e0581b0f2aeb3a02a9f4faa3543221e3976fb542" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street fighter vi 12 peoples (unl).prg" size="131072" crc="a9e00b91" sha1="a393e36b4511066eeba913b302e829ca49ba6cb8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="garousp2" cloneof="garousp">
 		<description>Garou Densetsu Special (Asia, Alt 2)</description>
 		<year>19??</year>
@@ -66117,68 +66177,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="street fighter v turbo 60 (unl).prg" size="262144" crc="dd53a3fe" sha1="55106ccd26a34b49c873251920471087f9980655" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- FIXME: Mapper hardware for this cart is MMC3 with bit 0 of address line moved to bit 1, so it can't be played as mapper 4 -->
-	<software name="sf6c" cloneof="sf6" supported="no">
-		<description>Street Fighter VI (Asia, 8 characters)</description>
-		<year>1993</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="street fighter vi (8 peoples)(unl)[!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="street fighter vi (8 peoples)(unl)[!].prg" size="131072" crc="488ab51a" sha1="ee466c9f7ba24dfa1b68e7b27134ffa4dc5fcb2b" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sf6">
-		<description>Street Fighter VI 16 People (Asia, 16 characters)</description>
-		<year>1993</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="street blaster ii pro (unl) [p1].chr" size="262144" crc="6ac703e2" sha1="84ddd2a816f873f2d50827282eba9da27db6f36e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="street blaster ii pro (unl) [p1].prg" size="131072" crc="a255a52f" sha1="f2702ef773820dd7c349e64b9abc5fc4e1b0ffa1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- FIXME: Mapper hardware for this cart is MMC3 with bit 0 of address line moved to bit 1, so it can't be played as mapper 4 -->
-	<software name="sf6b" cloneof="sf6" supported="no">
-		<description>Street Fighter VI 16 People (Asia, 16 characters, Alt)</description>
-		<year>1993</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="street fighter vi 16 peoples (unl) [!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="street fighter vi 16 peoples (unl) [!].prg" size="131072" crc="f7b93e43" sha1="462780b4cbb84364a107b1b37a6a5278eefc6cbf" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sf6a" cloneof="sf6">
-		<description>Street Fighter VI 12 Peoples (Asia)</description>
-		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="street fighter vi 12 peoples (unl).chr" size="131072" crc="10f7cdfc" sha1="e0581b0f2aeb3a02a9f4faa3543221e3976fb542" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="street fighter vi 12 peoples (unl).prg" size="131072" crc="a9e00b91" sha1="a393e36b4511066eeba913b302e829ca49ba6cb8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
