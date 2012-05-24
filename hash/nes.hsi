@@ -36739,12 +36739,12 @@
 	</hash>
 	<hash crc32="68fe207f" sha1="7f73fe27b4b6f49099f1bb4170abe04c394991cd" name="Mario 7-in-1 [p1]">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>52 2 64 128</extrainfo>
+		<extrainfo>52 130 64 128</extrainfo>
 
 	</hash>
 	<hash crc32="31298ed8" sha1="8c0f64f82ef31cc25795e885927d8f58f02cc67f" name="Mario 7-in-1 [p1]">
 		<status>Known Bad Image</status>
-		<extrainfo>52 2 64 128</extrainfo>
+		<extrainfo>52 130 64 128</extrainfo>
 
 	</hash>
 	<hash crc32="b5a75244" sha1="f914fac311bb93630a67b0f1429269c917e7d6a0" name="Mario 7-in-1 [p1][hM04]">
