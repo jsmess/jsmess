@@ -35,13 +35,14 @@
     - Look at memory: Press minus key. Enter an address. Press UP key to see the next.
     - Look at registers: Press R. Press 0. Press UP key to see the next.
     - Look at PC register: Press R. Press C.
+    - Load a tape: Press L, enter file number (1 digit), press UP. On
+      completion of a successful load, HELLO will be displayed.
 
     ToDO:
     - Keys are mostly correct. It seems the SENS, INT, MON, RST keys are
       not in the matrix, but are connected to hardware directly. This needs
-      to be emulated.
+      to be emulated. (SENS key done)
     - Connect 10 toggle switches and 10 round red leds.
-    - Cassette interface not working.
 
 ****************************************************************************/
 
@@ -201,7 +202,7 @@ static INPUT_PORTS_START( instruct )
 	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("HW")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SENS") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SENS") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INT") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_P) PORT_CHAR('P')

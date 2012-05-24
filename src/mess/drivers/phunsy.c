@@ -11,8 +11,8 @@
         W command to save data, eg 800-8FFW
         R command to read data, eg 1100R to load the file at 1100,
                or R to load the file where it came from.
-        Problem is the tape must already be in the leader when you press
-        the Enter key, or it errors immediately.
+        The tape must already be playing the leader when you press the Enter
+        key, or it errors immediately.
 
 ****************************************************************************/
 
