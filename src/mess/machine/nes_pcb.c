@@ -9556,8 +9556,8 @@ static void fk23c_set_prg( running_machine &machine )
 			prg8_cd(machine, state->m_mmc_reg[4]);
 			prg8_ef(machine, state->m_mmc_reg[5]);
 		}
-
-		mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
+		else
+			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
 	}
 }
 
@@ -9575,8 +9575,8 @@ static void fk23c_set_chr( running_machine &machine )
 			chr1_x(machine, 1, base | state->m_mmc_reg[6], state->m_mmc_chr_source);
 			chr1_x(machine, 3, base | state->m_mmc_reg[7], state->m_mmc_chr_source);
 		}
-
-		mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+		else
+			mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
 	}
 }
 
@@ -12184,6 +12184,7 @@ void pcb_handlers_setup( running_machine &machine )
 			state->m_mmc3_chr_cb = kay_pp_chr_cb;
 			break;
 		case BMC_FK23C:
+		case BMC_FK23CA:
 			state->m_mmc3_prg_cb = fk23c_prg_cb;
 			state->m_mmc3_chr_cb = fk23c_chr_cb;
 			break;
