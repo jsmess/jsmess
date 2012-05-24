@@ -534,7 +534,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-T-230",        UNL_T230 },
 	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
 	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
-	{ "UNL-FS304",        UNSUPPORTED_BOARD },	// used in Zelda 3 by Waixing (support missing atm)
+	{ "UNL-FS304",        UNL_FS304 },	// used in Zelda 3 by Waixing
 	{ "UNL-43272",        UNSUPPORTED_BOARD },	// used in Gaau Hok Gwong Cheung (support missing atm)
 	{ "UNL-LH10",         UNSUPPORTED_BOARD },	// used in Fuuun Shaolin Kyo (FDS Conversion) (support missing atm)
 //
@@ -9101,6 +9101,36 @@ static WRITE8_HANDLER( unl_racmate_w )
 	}
 }
 
+
+/*************************************************************
+ 
+ Board UNL-FS304
+ 
+ Games: A Link to the Past by Waixing
+  
+ iNES: mapper 162? (only found in UNIF format)
+ 
+ In MESS: Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( unl_fs304_l_w )
+{
+	nes_state *state = space->machine().driver_data<nes_state>();
+	LOG_MMC(("unl_fs304_l_w, offset: %04x, data: %02x\n", offset, data));
+	int bank;
+	offset += 0x100;
+
+	if (offset >= 0x1000)
+	{
+		state->m_mmc_reg[(offset >> 8) & 3] = data;
+		bank = ((state->m_mmc_reg[2] & 0x0f) << 4) | BIT(state->m_mmc_reg[1], 1) | (state->m_mmc_reg[0] & 0x0e);
+		prg32(space->machine(), bank);
+		chr8(space->machine(), 0, CHRRAM);
+	}
+}
+
+
 /*************************************************************
 
         BOOTLEG CART VERSIONS OF FDS GAMES
@@ -11967,6 +11997,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),               NULL, NULL, NULL },
 	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(shjy3_w),               NULL, NULL, shjy3_irq },
 	{ UNL_H2288,            {FUNC(h2288_l_w), FUNC(h2288_l_r)}, NES_NOACCESS, NES_WRITEONLY(h2288_w),     NULL, NULL, mmc3_irq },
+	{ UNL_FS304,            NES_WRITEONLY(unl_fs304_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
 	//
 	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_mariobaby_w),       NULL, NULL, NULL },
 	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_dn_w),              NULL, NULL, btl_dn_irq },

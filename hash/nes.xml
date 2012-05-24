@@ -50689,8 +50689,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- TODO: Add support for proper pcb type -->
-	<software name="zelda3c" supported="no">
+	<software name="zelda3c">
 		<description>Zelda - A Link to the Past (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50703,6 +50702,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
