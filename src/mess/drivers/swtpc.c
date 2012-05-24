@@ -21,6 +21,21 @@
 
         - Finish conversion to modern.
 
+Commands:
+B Breakpoint
+C Clear screen
+D Disk boot
+E End of tape
+F Find a byte
+G Goto
+J Jump
+L Ascii Load
+M Memory change (enter to quit, - to display next byte)
+O Optional Port
+P Ascii Punch
+R Register dump
+Z Goto Prom (0xC000)
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -66,18 +81,10 @@ READ8_MEMBER( swtpc_state::swtpc_tricky_r )
 	return ret;
 }
 
-// SWTBUG sends lots of nulls for slow terminals
-WRITE8_MEMBER(swtpc_state::swtpc_terminal_w)
-{
-	if (data)
-		m_terminal->write(space, 0, data);
-}
-
-
 static ADDRESS_MAP_START(swtpc_mem, AS_PROGRAM, 8, swtpc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x8004, 0x8004 ) AM_READ(swtpc_status_r)
-	AM_RANGE( 0x8005, 0x8005 ) AM_READWRITE(swtpc_terminal_r,swtpc_terminal_w)
+	AM_RANGE( 0x8005, 0x8005 ) AM_READ(swtpc_terminal_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE( 0x8007, 0x8007 ) AM_READ(swtpc_tricky_r)
 	AM_RANGE( 0xa000, 0xa07f ) AM_RAM
 	AM_RANGE( 0xe000, 0xe3ff ) AM_MIRROR(0x1c00) AM_ROM
