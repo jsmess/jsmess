@@ -4,12 +4,24 @@
 
         04/11/2010 Skeleton driver.
 
+        http://www.tubedata.info/phunsy/index.html
+
+        Cassette added 2012-05-24
+        Baud Rate ~ 6000 baud
+        W command to save data, eg 800-8FFW
+        R command to read data, eg 1100R to load the file at 1100,
+               or R to load the file where it came from.
+        Problem is the tape must already be in the leader when you press
+        the Enter key, or it errors immediately.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/keyboard.h"
 #include "sound/speaker.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -23,19 +35,18 @@ class phunsy_state : public driver_device
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, SPEAKER_TAG),
-		m_videoram(*this, "videoram") { }
+	m_maincpu(*this, "maincpu"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_cass(*this, CASSETTE_TAG),
+	m_videoram(*this, "videoram") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
 	DECLARE_READ8_MEMBER( phunsy_data_r );
-	DECLARE_READ8_MEMBER( phunsy_sense_r );
 	DECLARE_WRITE8_MEMBER( phunsy_1800_w );
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	required_shared_ptr<UINT8> m_videoram;
+	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
 	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
 	UINT8		m_keyboard_input;
@@ -45,6 +56,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_speaker;
+	required_device<cassette_image_device> m_cass;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 
@@ -54,6 +69,15 @@ WRITE8_MEMBER( phunsy_state::phunsy_1800_w )
 		m_ram_1800[offset] = data;
 }
 
+WRITE8_MEMBER( phunsy_state::cass_w )
+{
+	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+}
+
+READ8_MEMBER( phunsy_state::cass_r )
+{
+	return (m_cass->input() > 0.03) ? 0 : 1;
+}
 
 static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -148,17 +172,11 @@ READ8_MEMBER( phunsy_state::phunsy_data_r )
 }
 
 
-READ8_MEMBER( phunsy_state::phunsy_sense_r )
-{
-	return 0;
-}
-
-
 static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( S2650_CTRL_PORT, S2650_CTRL_PORT ) AM_WRITE( phunsy_ctrl_w )
 	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )
-	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( phunsy_sense_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r, cass_w)
 ADDRESS_MAP_END
 
 
@@ -295,13 +313,14 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -325,6 +344,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy,   0, "J.F.P. Philipse",   "PHUNSY", GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
+COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy,   0, "J.F.P. Philipse", "PHUNSY", GAME_NOT_WORKING )
 
