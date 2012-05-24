@@ -86,6 +86,22 @@ it, so I've hooked it much the same as the Instructor.
 The Select key (Z) and the joystick don't actually exist, but I've left them
 in the keyboard matrix for now.
 
+
+Quickloads
+----------
+You can load pgm and tvc files with the quickload facility. The quickloads
+are meant for the ElektorTVGC, however with a bit a trickery they can be made
+to work on the vc4000 as well. Procedure:
+
+- Get a copy of the Elektor bios and rename it to ELEKTOR.BIN then save it
+  with the rest of your vc4000 carts.
+
+- Start vc4000, and load ELEKTOR.BIN into the cartslot. Now your vc4000
+  thinks it is an Elektor.
+
+- Load a quickload file. Some of them will work, and in some cases, better
+  than on the Elektor system.
+
 ******************************************************************************/
 
 #include "includes/vc4000.h"
@@ -396,7 +412,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", vc4000, "tvc", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vc4000, "pgm,tvc", 0)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -527,35 +543,93 @@ QUICKLOAD_LOAD(vc4000)
 	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
 	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
 		return IMAGE_INIT_FAIL;
+	}
 
 	read_ = image.fread( quick_data, quick_length);
 	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
 		return IMAGE_INIT_FAIL;
-
-	if (quick_data[0] != 2)
-		return IMAGE_INIT_FAIL;
-
-	quick_addr = quick_data[1] * 256 + quick_data[2];
-	exec_addr = quick_data[3] * 256 + quick_data[4];
-
-	//if ((quick_addr + quick_length - 5) > 0x1000)
-	//  return IMAGE_INIT_FAIL;
-
-	space->write_byte(0x08be, quick_data[3]);
-	space->write_byte(0x08bf, quick_data[4]);
-
-	for (i = 0; i < quick_length - 5; i++)
-	{	if ((quick_addr + i) < 0x1000)
-			space->write_byte(i + quick_addr, quick_data[i+5]);
 	}
 
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+	if (mame_stricmp(image.filetype(), "tvc")==0)
+	{
+		if (quick_data[0] != 2)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.message(" Invalid header");
+			return IMAGE_INIT_FAIL;
+		}
 
-	// Start the quickload (only does something on Elektor)
-	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
-	return IMAGE_INIT_PASS;
+		quick_addr = quick_data[1] * 256 + quick_data[2];
+		exec_addr = quick_data[3] * 256 + quick_data[4];
+
+		space->write_byte(0x08be, quick_data[3]);
+		space->write_byte(0x08bf, quick_data[4]);
+
+		for (i = 0; i < quick_length - 5; i++)
+			if ((quick_addr + i) < 0x1600)
+				space->write_byte(i + quick_addr, quick_data[i+5]);
+
+		/* display a message about the loaded quickload */
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+
+		// Start the quickload
+		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+		return IMAGE_INIT_PASS;
+	}
+	else
+	if (mame_stricmp(image.filetype(), "pgm")==0)
+	{
+		if (quick_data[0] != 0)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.message(" Invalid header");
+			return IMAGE_INIT_FAIL;
+		}
+
+		exec_addr = quick_data[1] * 256 + quick_data[2];
+
+		if (exec_addr >= quick_length)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+			image.message(" Exec address beyond end of file");
+			return IMAGE_INIT_FAIL;
+		}
+
+		if (quick_length < 0x904)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.message(" File too short");
+			return IMAGE_INIT_FAIL;
+		}
+
+		// some programs store data in PVI memory and other random places. This is not supported.
+		if (quick_length > 0x1600)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.message(" File too long");
+			return IMAGE_INIT_FAIL;
+		}
+
+		for (i = quick_addr; i < quick_length; i++)
+			if (i < 0x1600)
+				space->write_byte(i, quick_data[i]);
+
+		/* display a message about the loaded quickload */
+		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+		// Start the quickload
+		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+		return IMAGE_INIT_PASS;
+	}
+	else
+		return IMAGE_INIT_FAIL;
 }
 
 
