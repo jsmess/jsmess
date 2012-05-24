@@ -305,6 +305,7 @@ void wangpcbus_device::tc_w(int state)
 device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
+	m_slot = dynamic_cast<wangpcbus_slot_device *>(device.owner());
 }
 
 

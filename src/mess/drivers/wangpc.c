@@ -16,6 +16,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
+#define LOG 1
+
 enum
 {
 	LED_DIAGNOSTIC = 0
@@ -47,6 +49,9 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 	m_fdc_tc_enable = BIT(data, 0);
 	m_fdc_dma_enable = BIT(data, 1);
 
+    if (LOG) logerror("Enable /EOP %u\n", m_fdc_tc_enable);
+    if (LOG) logerror("Disable /DREQ2 %u\n", m_fdc_dma_enable);
+
 	update_fdc_tc();
 	update_fdc_drq();
 }
@@ -54,7 +59,9 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
 READ8_MEMBER( wangpc_state::deselect_drive1_r )
 {
-	m_ds1 = 1;
+    if (LOG) logerror("Deselect drive 1\n");
+
+   	m_ds1 = 1;
 
 	return 0;
 }
@@ -62,12 +69,16 @@ READ8_MEMBER( wangpc_state::deselect_drive1_r )
 
 WRITE8_MEMBER( wangpc_state::deselect_drive1_w )
 {
+    if (LOG) logerror("Deselect drive 1\n");
+
 	m_ds1 = 1;
 }
 
 
 READ8_MEMBER( wangpc_state::select_drive1_r )
 {
+    if (LOG) logerror("Select drive 1\n");
+
 	m_ds1 = 0;
 
 	return 0;
@@ -76,12 +87,16 @@ READ8_MEMBER( wangpc_state::select_drive1_r )
 
 WRITE8_MEMBER( wangpc_state::select_drive1_w )
 {
+    if (LOG) logerror("Select drive 1\n");
+
 	m_ds1 = 0;
 }
 
 
 READ8_MEMBER( wangpc_state::deselect_drive2_r )
 {
+    if (LOG) logerror("Deselect drive 2\n");
+
 	m_ds2 = 1;
 
 	return 0;
@@ -90,12 +105,16 @@ READ8_MEMBER( wangpc_state::deselect_drive2_r )
 
 WRITE8_MEMBER( wangpc_state::deselect_drive2_w )
 {
+    if (LOG) logerror("Deselect drive 2\n");
+
 	m_ds2 = 1;
 }
 
 
 READ8_MEMBER( wangpc_state::select_drive2_r )
 {
+    if (LOG) logerror("Select drive 2\n");
+
 	m_ds2 = 0;
 
 	return 0;
@@ -104,12 +123,16 @@ READ8_MEMBER( wangpc_state::select_drive2_r )
 
 WRITE8_MEMBER( wangpc_state::select_drive2_w )
 {
+    if (LOG) logerror("Select drive 2\n");
+
 	m_ds2 = 0;
 }
 
 
 READ8_MEMBER( wangpc_state::motor1_off_r )
 {
+    if (LOG) logerror("Motor 1 off\n");
+	
 	floppy_mon_w(m_floppy0, 1);
 
 	return 0;
@@ -118,12 +141,16 @@ READ8_MEMBER( wangpc_state::motor1_off_r )
 
 WRITE8_MEMBER( wangpc_state::motor1_off_w )
 {
+    if (LOG) logerror("Motor 1 off\n");
+
 	floppy_mon_w(m_floppy0, 1);
 }
 
 
 READ8_MEMBER( wangpc_state::motor1_on_r )
 {
+    if (LOG) logerror("Motor 1 on\n");
+
 	floppy_mon_w(m_floppy0, 0);
 
 	return 0;
@@ -132,12 +159,16 @@ READ8_MEMBER( wangpc_state::motor1_on_r )
 
 WRITE8_MEMBER( wangpc_state::motor1_on_w )
 {
+    if (LOG) logerror("Motor 1 on\n");
+
 	floppy_mon_w(m_floppy0, 0);
 }
 
 
 READ8_MEMBER( wangpc_state::motor2_off_r )
 {
+    if (LOG) logerror("Motor 2 off\n");
+
 	floppy_mon_w(m_floppy1, 1);
 
 	return 0;
@@ -146,12 +177,16 @@ READ8_MEMBER( wangpc_state::motor2_off_r )
 
 WRITE8_MEMBER( wangpc_state::motor2_off_w )
 {
+    if (LOG) logerror("Motor 2 off\n");
+
 	floppy_mon_w(m_floppy1, 1);
 }
 
 
 READ8_MEMBER( wangpc_state::motor2_on_r )
 {
+    if (LOG) logerror("Motor 2 on\n");
+
 	floppy_mon_w(m_floppy1, 0);
 
 	return 0;
@@ -160,12 +195,16 @@ READ8_MEMBER( wangpc_state::motor2_on_r )
 
 WRITE8_MEMBER( wangpc_state::motor2_on_w )
 {
+    if (LOG) logerror("Motor 2 on\n");
+
 	floppy_mon_w(m_floppy1, 0);
 }
 
 
 READ8_MEMBER( wangpc_state::fdc_reset_r )
 {
+    if (LOG) logerror("FDC reset\n");
+
 	upd765_reset_w(m_fdc, 1);
 	upd765_reset_w(m_fdc, 0);
 
@@ -175,6 +214,8 @@ READ8_MEMBER( wangpc_state::fdc_reset_r )
 
 WRITE8_MEMBER( wangpc_state::fdc_reset_w )
 {
+    if (LOG) logerror("FDC reset\n");
+
 	upd765_reset_w(m_fdc, 1);
 	upd765_reset_w(m_fdc, 0);
 }
@@ -182,6 +223,8 @@ WRITE8_MEMBER( wangpc_state::fdc_reset_w )
 
 READ8_MEMBER( wangpc_state::fdc_tc_r )
 {
+    if (LOG) logerror("FDC TC\n");
+
 	upd765_tc_w(m_fdc, 1);
 	upd765_tc_w(m_fdc, 0);
 
@@ -191,6 +234,8 @@ READ8_MEMBER( wangpc_state::fdc_tc_r )
 
 WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 {
+    if (LOG) logerror("FDC TC\n");
+
 	upd765_tc_w(m_fdc, 1);
 	upd765_tc_w(m_fdc, 0);
 }
@@ -203,6 +248,8 @@ WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 
 WRITE8_MEMBER( wangpc_state::dma_page_w )
 {
+    if (LOG) logerror("DMA page %u: %01x\n", offset, data & 0x0f);
+
 	m_dma_page[offset] = data & 0x0f;
 }
 
@@ -243,6 +290,8 @@ READ8_MEMBER( wangpc_state::status_r )
 
 WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 {
+    if (LOG) logerror("Timer 0 IRQ clear\n");
+
 	pic8259_ir0_w(m_pic, CLEAR_LINE);
 }
 
@@ -253,6 +302,8 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 
 READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 {
+    if (LOG) logerror("Timer 2 IRQ clear\n");
+
 	m_timer2_irq = 1;
 	check_level1_interrupts();
 
@@ -266,6 +317,7 @@ READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 
 WRITE8_MEMBER( wangpc_state::nmi_mask_w )
 {
+    if (LOG) logerror("NMI mask %02x\n", data);
 }
 
 
@@ -275,6 +327,8 @@ WRITE8_MEMBER( wangpc_state::nmi_mask_w )
 
 READ8_MEMBER( wangpc_state::led_on_r )
 {
+    if (LOG) logerror("LED on\n");
+
 	output_set_led_value(LED_DIAGNOSTIC, 1);
 
 	return 0;
@@ -287,6 +341,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 
 WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 {
+    if (LOG) logerror("FPU mask %02x\n", data);
 }
 
 
@@ -296,6 +351,8 @@ WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 
 WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 {
+    if (LOG) logerror("TBRE clear\n");
+
 	m_uart_tbre = 0;
 	check_level2_interrupts();
 }
@@ -320,6 +377,28 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 WRITE8_MEMBER( wangpc_state::uart_w  )
 {
+    if (LOG) logerror("UART write %02x\n", data);
+
+    switch (data)
+    {
+    case 0x10: m_led[0] = 1; break;
+    case 0x11: m_led[0] = 0; break;
+    case 0x12: m_led[1] = 1; break;
+    case 0x13: m_led[1] = 0; break;
+    case 0x14: m_led[2] = 1; break;
+    case 0x15: m_led[2] = 0; break;
+    case 0x16: m_led[3] = 1; break;
+    case 0x17: m_led[3] = 0; break;
+    case 0x18: m_led[4] = 1; break;
+    case 0x19: m_led[4] = 0; break;
+    case 0x1a: m_led[5] = 1; break;
+    case 0x1b: m_led[5] = 0; break;
+    case 0x1c: m_led[0] = m_led[1] = m_led[2] = m_led[3] = m_led[4] = m_led[5] = 1; break;
+    case 0x1d: m_led[0] = m_led[1] = m_led[2] = m_led[3] = m_led[4] = m_led[5] = 0; break;
+    }
+
+    popmessage("%u%u%u%u%u%u", m_led[0], m_led[1], m_led[2], m_led[3], m_led[4], m_led[5]);
+
 	m_uart_tbre = 0;
 	check_level2_interrupts();
 
@@ -362,6 +441,8 @@ WRITE8_MEMBER( wangpc_state::centronics_w )
 
 READ8_MEMBER( wangpc_state::busy_clr_r )
 {
+    if (LOG) logerror("BUSY clear\n");
+
 	m_busy = 1;
 	check_level1_interrupts();
 
@@ -375,6 +456,8 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 
 WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 {
+    if (LOG) logerror("ACKNLG clear\n");
+
 	m_acknlg = 1;
 	check_level1_interrupts();
 }
@@ -386,6 +469,8 @@ WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 
 READ8_MEMBER( wangpc_state::led_off_r )
 {
+    if (LOG) logerror("LED off\n");
+
 	output_set_led_value(LED_DIAGNOSTIC, 0);
 
 	return 0;
@@ -398,6 +483,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 
 WRITE8_MEMBER( wangpc_state::parity_nmi_clr_w )
 {
+    if (LOG) logerror("Parity NMI clear\n");
 }
 
 
@@ -651,7 +737,7 @@ void wangpc_state::check_level1_interrupts()
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | upd765_int_r(m_fdc) | m_fpu_irq;
+	int state = !m_dma_eop | m_uart_dr /*| m_uart_tbre*/ | upd765_int_r(m_fdc) | m_fpu_irq;
 
 	pic8259_ir2_w(m_pic, state);
 }
@@ -840,6 +926,8 @@ WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
 {
 	if (state)
 	{
+	    if (LOG) logerror("DR set\n");
+
 		m_uart_dr = 1;
 		check_level2_interrupts();
 	}
@@ -849,6 +937,8 @@ WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 {
 	if (state)
 	{
+	    if (LOG) logerror("TBRE set\n");
+
 		m_uart_tbre = 1;
 		check_level2_interrupts();
 	}
@@ -885,11 +975,15 @@ static const floppy_interface floppy_intf =
 
 WRITE_LINE_MEMBER( wangpc_state::fdc_int_w )
 {
+    if (LOG) logerror("FDC INT %u\n", state);
+
 	check_level2_interrupts();
 }
 
 WRITE_LINE_MEMBER( wangpc_state::fdc_drq_w )
 {
+    if (LOG) logerror("FDC DRQ %u\n", state);
+
 	m_fdc_drq = state;
 	update_fdc_drq();
 }
@@ -928,12 +1022,16 @@ static const upd765_interface fdc_intf =
 
 WRITE_LINE_MEMBER( wangpc_state::ack_w )
 {
+    if (LOG) logerror("ACKNLG %u\n", state);
+
 	m_acknlg = state;
 	check_level1_interrupts();
 }
 
 WRITE_LINE_MEMBER( wangpc_state::busy_w )
 {
+    if (LOG) logerror("BUSY %u\n", state);
+
 	m_busy = state;
 	check_level1_interrupts();
 }
@@ -962,6 +1060,8 @@ static WANGPC_KEYBOARD_INTERFACE( kb_intf )
 
 WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 {
+    if (LOG) logerror("Bus IRQ2 %u\n", state);
+
 	check_level2_interrupts();
 }
 
@@ -980,7 +1080,13 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 };
 
 static SLOT_INTERFACE_START( wangpc_cards )
-	SLOT_INTERFACE("lores", WANGPC_LORES_VIDEO)
+	SLOT_INTERFACE("lic", WANGPC_LIC) // local interconnect option card
+	SLOT_INTERFACE("lvc", WANGPC_LVC) // low-resolution video controller
+	SLOT_INTERFACE("rtc", WANGPC_RTC) // remote telecommunications controller
+	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
+	//SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
+	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
+	//SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
 SLOT_INTERFACE_END
 
 
@@ -1047,7 +1153,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	// bus
 	MCFG_WANGPC_BUS_ADD(bus_intf)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL, NULL)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "lores", NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "lvc", NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, NULL, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, NULL, NULL)
@@ -1069,20 +1175,8 @@ MACHINE_CONFIG_END
 
 ROM_START( wangpc )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "motherboard-l94.bin", 0x0001, 0x2000, CRC(f9f41304) SHA1(1815295809ef11573d724ede47446f9ac7aee713) )
-	ROM_LOAD16_BYTE( "motherboard-l115.bin", 0x0000, 0x2000, CRC(67b37684) SHA1(70d9f68eb88cc2bc9f53f949cc77411c09a4266e) )
-
-	ROM_REGION( 0x1000, "remotecomms", 0 )
-	ROM_LOAD( "remotecomms-l28.bin", 0x0000, 0x1000, CRC(c05a1bee) SHA1(6b3f0d787d014b1fd3925812c905ddb63c5055f1) )
-
-	ROM_REGION( 0x1000, "network", 0 )
-	ROM_LOAD( "network-l22.bin", 0x0000, 0x1000, CRC(487e5f04) SHA1(81e52e70e0c6e34715119b121ec19a7758cd6772) )
-
-	ROM_REGION( 0x1000, "hdc1", 0 )
-	ROM_LOAD( "hdc-l54.bin", 0x0000, 0x1000, CRC(94e9a17d) SHA1(060c576d70069ece2d0dbce86ffc448df2b169e7) )
-
-	ROM_REGION( 0x1000, "hdc2", 0 )
-	ROM_LOAD( "hdc-l19.bin", 0x0000, 0x1000, CRC(282770d2) SHA1(a0e3bad5041e0dfd6087907015b07a093b576bc0) )
+	ROM_LOAD16_BYTE( "0001 r2.l94", 0x0001, 0x2000, CRC(f9f41304) SHA1(1815295809ef11573d724ede47446f9ac7aee713) )
+	ROM_LOAD16_BYTE( "379-0000 r2.l115", 0x0000, 0x2000, CRC(67b37684) SHA1(70d9f68eb88cc2bc9f53f949cc77411c09a4266e) )
 ROM_END
 
 

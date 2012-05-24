@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-#include "wangpc_lores.h"
+#include "wangpc_lvc.h"
 
 
 
@@ -28,14 +28,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LORES_VIDEO = &device_creator<wangpc_lores_video_device>;
+const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 
 
 //-------------------------------------------------
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void wangpc_lores_video_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 /*  const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
     for (int column = 0; column < x_count; column++)
@@ -61,13 +61,13 @@ void wangpc_lores_video_device::crtc_update_row(mc6845_device *device, bitmap_rg
     }*/
 }
 
-static MC6845_UPDATE_ROW( wangpc_lores_video_update_row )
+static MC6845_UPDATE_ROW( wangpc_lvc_update_row )
 {
-	wangpc_lores_video_device *lores = downcast<wangpc_lores_video_device *>(device->owner());
+	wangpc_lvc_device *lores = downcast<wangpc_lvc_device *>(device->owner());
 	lores->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 
-WRITE_LINE_MEMBER( wangpc_lores_video_device::vsync_w )
+WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 {
 	if (BIT(m_option, 3) && state)
 	{
@@ -81,27 +81,29 @@ static const mc6845_interface crtc_intf =
 	SCREEN_TAG,
 	8,
 	NULL,
-	wangpc_lores_video_update_row,
+	wangpc_lvc_update_row,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lores_video_device, vsync_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lvc_device, vsync_w),
 	NULL
 };
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_lores_video )
+//  MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_lores_video )
+static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 25*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*9-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
+
+	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz, crtc_intf)
 MACHINE_CONFIG_END
@@ -112,9 +114,9 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor wangpc_lores_video_device::device_mconfig_additions() const
+machine_config_constructor wangpc_lvc_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( wangpc_lores_video );
+	return MACHINE_CONFIG_NAME( wangpc_lvc );
 }
 
 
@@ -124,11 +126,11 @@ machine_config_constructor wangpc_lores_video_device::device_mconfig_additions()
 //**************************************************************************
 
 //-------------------------------------------------
-//  wangpc_lores_video_device - constructor
+//  wangpc_lvc_device - constructor
 //-------------------------------------------------
 
-wangpc_lores_video_device::wangpc_lores_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WANGPC_LORES_VIDEO, "Wang PC Low Resolution Video Card", tag, owner, clock),
+wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, WANGPC_LVC, "Wang PC Low Resolution Video Card", tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_option(0),
@@ -141,10 +143,9 @@ wangpc_lores_video_device::wangpc_lores_video_device(const machine_config &mconf
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void wangpc_lores_video_device::device_start()
+void wangpc_lvc_device::device_start()
 {
-	m_slot = dynamic_cast<wangpcbus_slot_device *>(owner());
-
+	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT16, RAM_SIZE);
 
 	// state saving
@@ -156,7 +157,7 @@ void wangpc_lores_video_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void wangpc_lores_video_device::device_reset()
+void wangpc_lvc_device::device_reset()
 {
 }
 
@@ -165,7 +166,7 @@ void wangpc_lores_video_device::device_reset()
 //  wangpcbus_mrdc_r - memory read
 //-------------------------------------------------
 
-UINT16 wangpc_lores_video_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+UINT16 wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 data = 0xffff;
 
@@ -182,7 +183,7 @@ UINT16 wangpc_lores_video_device::wangpcbus_mrdc_r(address_space &space, offs_t 
 //  wangpcbus_amwc_w - memory write
 //-------------------------------------------------
 
-void wangpc_lores_video_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
 {
 	if (BIT(m_option, 0) && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
@@ -195,14 +196,12 @@ void wangpc_lores_video_device::wangpcbus_amwc_w(address_space &space, offs_t of
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-UINT16 wangpc_lores_video_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+UINT16 wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 data = 0xffff;
 
 	if (sad(offset))
 	{
-		logerror("Lores read %04x %04x\n", offset << 1, mem_mask);
-
 		switch (offset & 0x7f)
 		{
 		case 0x02/2:
@@ -220,6 +219,8 @@ UINT16 wangpc_lores_video_device::wangpcbus_iorc_r(address_space &space, offs_t 
 			data = 0xff00 | (m_irq3 << 7) | OPTION_ID;
 			break;
 		}
+
+		logerror("Lores read %04x %04x %04x\n", offset << 1, mem_mask, data);
 	}
 
 	return data;
@@ -230,11 +231,11 @@ UINT16 wangpc_lores_video_device::wangpcbus_iorc_r(address_space &space, offs_t 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lores_video_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
+void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (sad(offset))
 	{
-		logerror("Lores write %04x %04x\n", offset << 1, mem_mask);
+		logerror("Lores write %04x %04x %04x\n", offset << 1, mem_mask, data);
 
 		switch (offset & 0x7f)
 		{

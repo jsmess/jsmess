@@ -186,6 +186,8 @@ public:
 	virtual bool wangpcbus_have_dack(int line) { return false; }
 
 	wangpcbus_device  *m_bus;
+	wangpcbus_slot_device *m_slot;
+
 	int m_sid;
 	device_wangpcbus_card_interface *m_next;
 };

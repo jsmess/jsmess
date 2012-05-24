@@ -16,7 +16,10 @@
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
-#include "machine/wangpc_lores.h"
+#include "machine/wangpc_lic.h"
+#include "machine/wangpc_lvc.h"
+#include "machine/wangpc_rtc.h"
+#include "machine/wangpc_wdc.h"
 
 #define I8086_TAG		"i8086"
 #define AM9517A_TAG		"am9517a"
@@ -170,6 +173,8 @@ public:
 	int m_fdc_drq;
 	int m_ds1;
 	int m_ds2;
+
+	int m_led[6];
 };
 
 
