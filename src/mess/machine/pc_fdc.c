@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 #include "machine/upd765.h"
-#include "memconv.h"
 
 
 /* if not 1, DACK and TC inputs to FDC are disabled, and DRQ and IRQ are held

@@ -13,7 +13,6 @@
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "memconv.h"
 
 /***************************************************************************
 
@@ -920,12 +919,6 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 	pic8259_ir5_w(device->machine().device("pic8259"), state);
 }
 
-READ16_HANDLER( pc_t1t_videoram16le_r )	{ return read16le_with_read8_handler(pc_t1t_videoram_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc_t1t_videoram16le_w )	{ write16le_with_write8_handler(pc_t1t_videoram_w, space, offset, data, mem_mask); }
-
-READ16_HANDLER( pc_T1T16le_r )	{ return read16le_with_read8_handler(pc_T1T_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc_T1T16le_w )	{ write16le_with_write8_handler(pc_T1T_w, space, offset, data, mem_mask); }
-
 static VIDEO_START( pc_t1t )
 {
 	int buswidth;
@@ -946,8 +939,8 @@ static VIDEO_START( pc_t1t )
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram16le_r), FUNC(pc_t1t_videoram16le_w) );
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T16le_r),FUNC(pc_T1T16le_w) );
+			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w), 0xffff );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w), 0xffff );
 			break;
 
 		default:

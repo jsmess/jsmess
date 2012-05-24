@@ -40,7 +40,6 @@
 
 #include "machine/ram.h"
 
-#include "memconv.h"
 #include "imagedev/cassette.h"
 #include "machine/pit8253.h"
 #include "machine/pcshare.h"
@@ -1085,8 +1084,8 @@ DRIVER_INIT( pc1640 )
 {
 	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
 
-	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_16le_port278_r) );
-	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_16le_port4278_r) );
+	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
+	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }

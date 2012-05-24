@@ -9,7 +9,6 @@
 #include "machine/upd765.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
-#include "memconv.h"
 
 static READ8_DEVICE_HANDLER ( pc_fdc_r );
 static WRITE8_DEVICE_HANDLER ( pc_fdc_w );

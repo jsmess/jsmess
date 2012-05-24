@@ -5,7 +5,6 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "video/pc_aga.h"
 #include "video/pc_cga.h"
 #include "includes/amstr_pc.h"
@@ -667,14 +666,6 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 	}
 }
 
-
-static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, space, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, space, offset, data, mem_mask); }
-static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, space, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, space, offset, data, mem_mask); }
-
-
-
 /*************************************/
 
 void pc_aga_set_mode(running_machine &machine, AGA_MODE mode)
@@ -710,9 +701,9 @@ VIDEO_START( pc_aga )
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram16le_r), FUNC(pc200_videoram16le_w) );
-			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc16le_aga_mda_r), FUNC(pc16le_aga_mda_w) );
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc16le_aga_cga_r), FUNC(pc16le_aga_cga_w) );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w), 0xffff );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w), 0xffff );
 			break;
 
 		default:
@@ -726,9 +717,6 @@ VIDEO_START( pc_aga )
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
-
-READ16_HANDLER( pc_aga_videoram16le_r )	{ return read16le_with_read8_handler(pc_aga_videoram_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc_aga_videoram16le_w )	{ write16le_with_write8_handler(pc_aga_videoram_w, space, offset, data, mem_mask); }
 
 VIDEO_START( pc200 )
 {
@@ -744,9 +732,9 @@ VIDEO_START( pc200 )
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram16le_r), FUNC(pc_aga_videoram16le_w) );
-			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc16le_aga_mda_r), FUNC(pc16le_aga_mda_w) );
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga16le_r), FUNC(pc200_cga16le_w) );
+			space->install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w), 0xffff );
+			spaceio->install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
+			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w), 0xffff );
 			break;
 
 		default:
@@ -817,10 +805,6 @@ WRITE8_HANDLER ( pc200_videoram_w )
 			break;
 	}
 }
-
-READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, space, offset, data, mem_mask); }
-
 
 static struct {
 	UINT8 port8, portd, porte;
@@ -893,6 +877,3 @@ READ8_HANDLER ( pc200_cga_r )
 	}
 	return result;
 }
-
-READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, space, offset, data, mem_mask); }

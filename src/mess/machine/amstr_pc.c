@@ -6,7 +6,6 @@
 #include "includes/amstr_pc.h"
 #include "includes/pc.h"
 #include "video/pc_vga.h"
-#include "memconv.h"
 
 
 /* pc20 (v2)
@@ -175,7 +174,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 }
 
 
- READ8_HANDLER( pc1640_port60_r )
+READ8_HANDLER( pc1640_port60_r )
 {
 	int data=0;
 	switch (offset) {
@@ -212,7 +211,7 @@ READ8_HANDLER( pc200_port378_r )
 	return data;
 }
 
-static READ8_HANDLER( pc200_port278_r )
+READ8_HANDLER( pc200_port278_r )
 {
 	device_t *lpt = space->machine().device("lpt_2");
 	UINT8 data = pc_lpt_r(lpt, offset);
@@ -252,13 +251,13 @@ READ8_HANDLER( pc1640_port378_r )
 	return data;
 }
 
- READ8_HANDLER( pc1640_port3d0_r )
+READ8_HANDLER( pc1640_port3d0_r )
 {
 	if (offset==0xa) pc1640.dipstate=0;
 	return space->read_byte(0x3d0+offset);
 }
 
- READ8_HANDLER( pc1640_port4278_r )
+READ8_HANDLER( pc1640_port4278_r )
 {
 	if (offset==2) pc1640.dipstate=1;
 	// read parallelport
@@ -272,30 +271,25 @@ READ8_HANDLER( pc1640_port278_r )
 	return 0;
 }
 
-static READ8_HANDLER( pc1640_mouse_x_r )
+READ8_HANDLER( pc1640_mouse_x_r )
 {
 	return pc1640.mouse.x - space->machine().root_device().ioport("pc_mouse_x")->read();
 }
 
-static READ8_HANDLER( pc1640_mouse_y_r )
+READ8_HANDLER( pc1640_mouse_y_r )
 {
 	return pc1640.mouse.y - space->machine().root_device().ioport("pc_mouse_y")->read();
 }
 
-static WRITE8_HANDLER( pc1640_mouse_x_w )
+WRITE8_HANDLER( pc1640_mouse_x_w )
 {
 	pc1640.mouse.x = data + space->machine().root_device().ioport("pc_mouse_x")->read();
 }
 
-static WRITE8_HANDLER( pc1640_mouse_y_w )
+WRITE8_HANDLER( pc1640_mouse_y_w )
 {
 	pc1640.mouse.y = data + space->machine().root_device().ioport("pc_mouse_y")->read();
 }
-
-READ16_HANDLER( pc1640_16le_mouse_x_r )	 { return read16le_with_read8_handler(pc1640_mouse_x_r, space, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_mouse_y_r )  { return read16le_with_read8_handler(pc1640_mouse_y_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_mouse_x_w ) { write16le_with_write8_handler(pc1640_mouse_x_w, space, offset, data, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_mouse_y_w ) { write16le_with_write8_handler(pc1640_mouse_y_w, space, offset, data, mem_mask); }
 
 INPUT_PORTS_START( amstrad_keyboard )
 
@@ -424,14 +418,3 @@ INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END
-
-
-READ16_HANDLER( pc1640_16le_port60_r ) { return read16le_with_read8_handler(pc1640_port60_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_port60_w ) { write16le_with_write8_handler(pc1640_port60_w, space, offset, data, mem_mask); }
-
-READ16_HANDLER( pc200_16le_port278_r ) { return read16le_with_read8_handler(pc200_port278_r, space, offset, mem_mask); }
-READ16_HANDLER( pc200_16le_port378_r ) { return read16le_with_read8_handler(pc200_port378_r, space, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port378_r ) { return read16le_with_read8_handler(pc1640_port378_r, space, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port3d0_r ) { return read16le_with_read8_handler(pc1640_port3d0_r, space, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port4278_r ) { return read16le_with_read8_handler(pc1640_port4278_r, space, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port278_r ) { return read16le_with_read8_handler(pc1640_port278_r, space, offset, mem_mask); }

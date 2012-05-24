@@ -83,7 +83,6 @@ TODO:
 #include "emu.h"
 #include "video/mc6845.h"
 #include "video/isa_cga.h"
-#include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
 

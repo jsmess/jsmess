@@ -186,7 +186,7 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(pc_nmi_enable_w, 0x00ff )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc16le_JOY_r,				pc16le_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r,	pc_JOY_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,				pc_rtc_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_READWRITE8(unk_r, pc_nmi_enable_w, 0x00ff )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc16le_JOY_r,				pc16le_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,				pc_rtc_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx

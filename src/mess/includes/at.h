@@ -45,7 +45,6 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/isa.h"
-#include "memconv.h"
 
 #include "machine/isa_adlib.h"
 #include "machine/isa_com.h"

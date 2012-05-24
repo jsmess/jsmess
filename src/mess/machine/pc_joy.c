@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "pc_joy.h"
-#include "memconv.h"
 
 
 static attotime JOY_time;
@@ -53,13 +52,6 @@ WRITE8_HANDLER ( pc_JOY_w )
 {
 	JOY_time = space->machine().time();
 }
-
-
-
-READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, space, offset, mem_mask); }
-WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, space, offset, data, mem_mask); }
-
-
 
 INPUT_PORTS_START( pc_joystick_none )
 	PORT_START("pc_joy")

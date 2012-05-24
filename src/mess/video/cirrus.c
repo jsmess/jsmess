@@ -62,7 +62,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "cirrus.h"
 #include "video/pc_vga.h"
 
