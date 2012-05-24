@@ -906,7 +906,11 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					if (state->m_crc_hack)
 						state->m_pcb_id = WAIXING_DQ8;	// Mapper 242 is used for 2 diff boards
 					break;
-				//FIXME: we also have to fix Action 52 PRG loading somewhere...
+				case BMC_GOLD_7IN1:
+					if (state->m_crc_hack)
+						state->m_pcb_id = BMC_MARIOPARTY_7IN1;	// Mapper 52 is used for 2 diff boards
+					break;
+					//FIXME: we also have to fix Action 52 PRG loading somewhere...
 			}
 
 			/* Allocate internal Mapper RAM for boards which require it */

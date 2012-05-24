@@ -235,7 +235,7 @@ static const nes_mmc mmc_list[] =
 	{ 49, BMC_SUPERHIK_4IN1 },
 	{ 50, BTL_SMB2B },
 	{ 51, BMC_BALLGAMES_11IN1 },
-	{ 52, BMC_MARIOPARTY_7IN1 },
+	{ 52, BMC_GOLD_7IN1 },
 	// 53 Supervision 16-in-1 - Unsupported
 	{ 54, BMC_NOVELDIAMOND },
 	// 55 Genius SMB - No info (nor images) available

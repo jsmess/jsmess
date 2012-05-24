@@ -568,6 +568,7 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-SUPERHIK-4IN1",   BMC_SUPERHIK_4IN1 },
 	{ "BMC-BALLGAMES-11IN1", BMC_BALLGAMES_11IN1 },
 	{ "BMC-MARIOPARTY-7IN1", BMC_MARIOPARTY_7IN1 },
+	{ "BMC-GOLD-7IN1",       BMC_GOLD_7IN1 },
 	{ "BMC-GKA",             BMC_GKA },
 	{ "BMC-GKB",             BMC_GKB },
 	{ "BMC-SUPER700IN1",     BMC_SUPER_700IN1 },
@@ -10670,7 +10671,7 @@ static WRITE8_HANDLER( bmc_mario7in1_m_w )
 	LOG_MMC(("bmc_mario7in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* mid writes only work when WRAM is enabled. not sure if I should
-     change the condition to state->m_mmc_latch2==0x80 (i.e. what is the effect of
+     change the condition to state->m_map52_reg_written == 0x80 (i.e. what is the effect of
      the read-only bit?) and it only can happen once! */
 	if ((state->m_mmc3_wram_protect & 0x80) && !state->m_map52_reg_written)
 	{
@@ -10685,6 +10686,46 @@ static WRITE8_HANDLER( bmc_mario7in1_m_w )
 		mmc3_set_chr(space->machine(), state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
 
 		state->m_map52_reg_written = 1;
+	}
+	else
+		state->m_wram[offset] = data;
+}
+
+/*************************************************************
+
+ BMC-GOLD-7IN1
+
+ Known Boards: Unknown Multigame Bootleg Board
+ Games: Super HIK Gold 7 in 1, Golden 7 in 1 and many more
+
+ MMC3 clone, same as BMC-MARIOPARTY-7IN1 but with switched CHR
+ bank lines
+
+ iNES: mapper 52
+
+ In MESS: Supported.
+
+ *************************************************************/
+
+static WRITE8_HANDLER( bmc_gold7in1_m_w )
+{
+	nes_state *state = space->machine().driver_data<nes_state>();
+	UINT8 map52_helper1, map52_helper2;
+	LOG_MMC(("bmc_gold7in1_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	if ((state->m_mmc3_wram_protect & 0x80) && !state->m_map52_reg_written)
+	{
+		map52_helper1 = (data & 0x08);
+		map52_helper2 = (data & 0x40);
+
+		state->m_mmc_prg_base = map52_helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
+		state->m_mmc_prg_mask = map52_helper1 ? 0x0f : 0x1f;
+		state->m_mmc_chr_base = ((data & 0x20) << 3) | ((data & 0x04) << 7) | (map52_helper2 ? ((data & 0x10) << 3) : 0);
+		state->m_mmc_chr_mask = map52_helper2 ? 0x7f : 0xff;
+		mmc3_set_prg(space->machine(), state->m_mmc_prg_base, state->m_mmc_prg_mask);
+		mmc3_set_chr(space->machine(), state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+
+		state->m_map52_reg_written = BIT(data, 7);	// mc_2hikg & mc_s3nt3 write here multiple time
 	}
 	else
 		state->m_wram[offset] = data;
@@ -11949,6 +11990,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_SUPERHIK_4IN1,    NES_NOACCESS, NES_WRITEONLY(bmc_hik4in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_SUPERBIG_7IN1,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_sbig7_w),           NULL, NULL, mmc3_irq },
 	{ BMC_MARIOPARTY_7IN1,  NES_NOACCESS, NES_WRITEONLY(bmc_mario7in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_GOLD_7IN1,        NES_NOACCESS, NES_WRITEONLY(bmc_gold7in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_FAMILY_4646B,     NES_NOACCESS, NES_WRITEONLY(bmc_family4646_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(bmc_15in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(bmc_ball11_m_w), NES_WRITEONLY(bmc_ball11_w), NULL, NULL, NULL },
@@ -12493,6 +12535,7 @@ static int pcb_initialize( running_machine &machine, int idx )
 			break;
 			// mapper 52
 		case BMC_MARIOPARTY_7IN1:
+		case BMC_GOLD_7IN1:
 			state->m_map52_reg_written = 0;
 			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
 			break;

@@ -67219,12 +67219,15 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].chr" size="524288" crc="2847abcc" sha1="69f2c63ab1c9f2dbca4b42e93c2e4f6ddfea3bf4" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].prg" size="524288" crc="c0d460ef" sha1="aa33965c25c259152d77a0d7eaf426ebc703ffea" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -67423,17 +67426,20 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_3bn96" supported="partial">
+	<software name="mc_3bn96">
 		<description>3 in 1 (BN096)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="3-in-1 (bn096)[p1][!].chr" size="524288" crc="0a0e2cee" sha1="a7fcd8f1e5bbcb66ea9dfaaa3e718a74734382bb" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="3-in-1 (bn096)[p1][!].prg" size="524288" crc="4f4b13e4" sha1="4c88ddf9fe96219eba92bdabefb2608994aa90e2" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -67453,32 +67459,38 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_3mr28" supported="partial">
+	<software name="mc_3mr28">
 		<description>3 in 1 (MR028)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="3-in-1 (mr028)[p1][!].chr" size="524288" crc="95bacc6b" sha1="06d25e9568c371700fbcec35827f1d56acbae618" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="3-in-1 (mr028)[p1][!].prg" size="524288" crc="5c296341" sha1="fe8566facb6978508663b4ddbc56fcb1118f6b57" offset="0" status="baddump" />
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_3mr29" supported="partial">
+	<software name="mc_3mr29">
 		<description>3 in 1 (MR029)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="3-in-1 (mr029)[p1][!].chr" size="524288" crc="613639e5" sha1="1159f62640059c5af676d035be345830295dac8e" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="3-in-1 (mr029)[p1][!].prg" size="524288" crc="2fc793d6" sha1="b924fea9fb1f65d6ab5b8cc1b535736197cea6a4" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -67518,12 +67530,15 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="3-in-1 (8096 pcb)[p1][!].chr" size="524288" crc="430c6871" sha1="d317c2fe4c2cee10928a4ffbf110ca6ee128bb21" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="3-in-1 (8096 pcb)[p1][!].prg" size="524288" crc="bdf37c73" sha1="236391a1c462c5e6ff51def11b69319d0a7751cf" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -67998,17 +68013,20 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4y441" supported="partial">
+	<software name="mc_4y441">
 		<description>4 in 1 (YH441)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="4-in-1 (yh441)[p1][!].chr" size="524288" crc="7163d09f" sha1="73b3e3339a01dc07fb0521d564e774dd9243fbba" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 (yh441)[p1][!].prg" size="524288" crc="c4e0a3df" sha1="deb18537765e32de3074d6816c5236a9bdf68a6c" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -69105,32 +69123,38 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_gold7" supported="partial">
+	<software name="mc_gold7">
 		<description>Gold 7 in 1 HIK (AK456, 8195 PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
 				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].chr" size="1048576" crc="8c897546" sha1="6d073abe9747890e334c789b4f8d874449723c00" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].prg" size="1048576" crc="8bfc64ce" sha1="1d9f7cf20036ba353f244b65a4d5938cda649360" offset="0" status="baddump" />
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_goln7" supported="partial">
+	<software name="mc_goln7">
 		<description>Golden 7 in 1 (ML-600)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
 				<rom name="golden 7-in-1 (ml-600)[p1][!].chr" size="1048576" crc="bf2df909" sha1="9d4dd01af6bc05765421ce1abf24069e5b85eb32" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="golden 7-in-1 (ml-600)[p1][!].prg" size="1048576" crc="61b7ee16" sha1="bacf75f4f0b210f4c5b85f269b04088fe582d276" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -69191,6 +69215,9 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="mario 7-in-1 [p1].prg" size="1048576" crc="c021a8b9" sha1="4fe43bef9d9217881b7c8ece0007dc4cd830fbec" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -69338,27 +69365,33 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].chr" size="524288" crc="992e0196" sha1="9bea118f9d076affad778ef11ed71023ae46fbb9" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].prg" size="524288" crc="80e778b7" sha1="2eeaaa87213a962a046a8a3b5e677ac1f5333ace" offset="0" status="baddump" />
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_s98vt" supported="partial">
+	<software name="mc_s98vt">
 		<description>Super 1998 3 in 1 (VT-850, NT-008 PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].chr" size="524288" crc="dcb6ee22" sha1="8a3ee636efd849c4a99bd5d85aad10c308e9051d" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].prg" size="524288" crc="78a0ff55" sha1="99d1c96eef9129218d395bfbf3aa708291b4d691" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -69442,17 +69475,20 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3nt3" supported="partial">
+	<software name="mc_s3nt3">
 		<description>Super 3 in 1 (NT-903)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
 				<rom name="super 3-in-1 (nt-903)[p1][!].chr" size="524288" crc="12c44fb3" sha1="a16f98308430daf5e58fbee4e005078b5eb90c23" offset="0" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super 3-in-1 (nt-903)[p1][!].prg" size="524288" crc="e253a02e" sha1="c244d1593b3ba4af2ec9f453a5441fe88271adaf" offset="0" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
