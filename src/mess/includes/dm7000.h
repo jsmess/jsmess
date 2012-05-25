@@ -23,14 +23,21 @@ public:
 
 	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
 	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_scc0_lcr;
 	UINT8 m_scc0_lsr;
+	UINT8 m_term_data;
+	
 
 	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
 	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );
 
 	DECLARE_WRITE8_MEMBER ( dm7000_scp0_w );
 	DECLARE_READ8_MEMBER ( dm7000_scp0_r );
+
+	DECLARE_WRITE16_MEMBER ( dm7000_enet_w );
+	DECLARE_READ16_MEMBER ( dm7000_enet_r );
+	UINT16			m_enet_regs[32];
 
 	UINT32			dcr[1024];
 };

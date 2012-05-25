@@ -39,7 +39,7 @@
 #include "emu.h"
 #include "includes/dm7000.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL ( 9 )
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
 {
@@ -56,37 +56,46 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 
 READ8_MEMBER( dm7000_state::dm7000_iic0_r )
 {
-	UINT32 data = 0; // dummy
-	verboselog( machine(), 9, "(IIC0) %08X -> %08X (PC %08X)\n", 0x40030000 + offset, data, cpu_get_pc(m_maincpu));
+	UINT8 data = 0; // dummy
+	verboselog( machine(), 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_iic0_w )
 {
-	verboselog( machine(), 9, "(IIC0) %08X <- %08X (PC %08X)\n", 0x40030000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(IIC0) %08X <- %08X\n", 0x40030000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_iic1_r )
 {
-	UINT32 data = 0; // dummy
-	verboselog( machine(), 9, "(IIC1) %08X -> %08X (PC %08X)\n", 0x400b0000 + offset, data, cpu_get_pc(m_maincpu));
+	UINT8 data = 0; // dummy
+	verboselog( machine(), 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
 {
-	verboselog( machine(), 9, "(IIC1) %08X <- %08X (PC %08X)\n", 0x400b0000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(IIC1) %08X <- %08X\n", 0x400b0000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 {
-	UINT32 data = 0; // dummy
+	UINT8 data = 0;
 	switch(offset) {
+		case UART_THR:
+			data = m_term_data;
+			if(m_term_data == 0xd) {
+				m_term_data = 0xa;
+			} else {
+				m_term_data = 0;
+				m_scc0_lsr = 0;
+			}
+			break;
 		case UART_LSR:
-			data = UART_LSR_THRE | UART_LSR_TEMT;
+			data = UART_LSR_THRE | UART_LSR_TEMT | m_scc0_lsr;
 			break;
 	}
-	verboselog( machine(), 9, "(SCC0) %08X -> %08X (PC %08X)\n", 0x40040000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(SCC0) %08X -> %08X\n", 0x40040000 + offset, data);
 	return data;
 }
 
@@ -96,47 +105,75 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 		case UART_THR:
 			if(!(m_scc0_lcr & UART_LCR_DLAB)) {
 				m_terminal->write(space, 0, data);
+				m_scc0_lsr = 1;
 			}
 			break;
 		case UART_LCR:
 			m_scc0_lcr = data;
 			break;
 	}
-	verboselog( machine(), 9, "(SCC0) %08X <- %08X (PC %08X)\n", 0x40040000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(SCC0) %08X <- %08X\n", 0x40040000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_gpio0_r )
 {
-	UINT32 data = 0; // dummy
-	verboselog( machine(), 9, "(GPIO0) %08X -> %08X (PC %08X)\n", 0x40060000 + offset, data, cpu_get_pc(m_maincpu));
+	UINT8 data = 0; // dummy
+	verboselog( machine(), 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
 {
-	verboselog( machine(), 9, "(GPIO0) %08X <- %08X (PC %08X)\n", 0x40060000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(GPIO0) %08X <- %08X\n", 0x40060000 + offset, data);
 }
 
 READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 {
-	UINT32 data = 0; // dummy
+	UINT8 data = 0; // dummy
 	switch(offset) {
 		case SCP_STATUS:
 			data = SCP_STATUS_RXRDY;
 			break;
 	}
-	verboselog( machine(), 9, "(SCP0) %08X -> %08X (PC %08X)\n", 0x400c0000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(SCP0) %08X -> %08X\n", 0x400c0000 + offset, data);
 	return data;
 }
 
 WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
 {
-	verboselog( machine(), 9, "(SCP0) %08X <- %08X (PC %08X)\n", 0x400c0000 + offset, data, cpu_get_pc(m_maincpu));
+	verboselog( machine(), 9, "(SCP0) %08X <- %08X\n", 0x400c0000 + offset, data);
 	switch(offset) {
 		case SCP_TXDATA:
 			//printf("%02X ", data);
 			break;
 	}
+}
+
+READ16_MEMBER( dm7000_state::dm7000_enet_r )
+{
+	UINT16 data;
+	switch (offset) {
+		case 0x01:
+			data = 0x1801;
+			break;
+		case 0x05:
+			data = 0x3330;
+			break;
+		case 0x07:
+			data = 0x3300;
+			break;
+		default:
+			data = m_enet_regs[offset];
+			break;
+	}
+	verboselog( machine(), 9, "(ENET) %08X -> %08X\n", 0x72000600 + (offset), data);
+	return data;
+}
+
+WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
+{
+	verboselog( machine(), 9, "(ENET) %08X <- %08X\n", 0x72000600 + (offset), data);
+	COMBINE_DATA(&m_enet_regs[offset]);
 }
 
 /*
@@ -198,6 +235,9 @@ static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 	AM_RANGE(0x400b0000, 0x400b000f) AM_READWRITE8(dm7000_iic1_r, dm7000_iic1_w, 0xffffffff)
 	AM_RANGE(0x400c0000, 0x400c0007) AM_READWRITE8(dm7000_scp0_r, dm7000_scp0_w, 0xffffffff)
 
+	/* ENET - ASIX AX88796 */
+	AM_RANGE(0x72000300, 0x720003ff) AM_READWRITE16(dm7000_enet_r, dm7000_enet_w, 0xffffffff)
+	
 	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
 	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
@@ -232,6 +272,7 @@ static SCREEN_UPDATE_IND16( dm7000 )
 static READ32_DEVICE_HANDLER( dcr_r )
 {
 	dm7000_state *state = device->machine().driver_data<dm7000_state>();
+	mame_printf_debug("DCR %03X read\n", offset);
 	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
@@ -244,14 +285,22 @@ static READ32_DEVICE_HANDLER( dcr_r )
 
 static WRITE32_DEVICE_HANDLER( dcr_w )
 {
+	mame_printf_debug("DCR %03X write = %08X\n", offset, data);
 	dm7000_state *state = device->machine().driver_data<dm7000_state>();
 	if(offset>=1024) {printf("get %04X\n", offset); } else
 	state->dcr[offset] = data;
 }
 
+WRITE8_MEMBER( dm7000_state::kbd_put )
+{
+	//printf("%02X\n", data);
+	m_term_data = data;
+	m_scc0_lsr = 1;
+}
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(dm7000_state, kbd_put)
 };
 
 static const powerpc_config ppc405_config =
@@ -263,7 +312,8 @@ static const powerpc_config ppc405_config =
 
 static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000) // Should be PPC405D4?
+	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4? 
+	// Slowed down 10 times in order to get normal response for now
 	MCFG_CPU_CONFIG(ppc405_config)
 	MCFG_CPU_PROGRAM_MAP(dm7000_mem)
 
