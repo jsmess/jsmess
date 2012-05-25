@@ -64709,10 +64709,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="balloon fight (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="8511096a" sha1="33d70fb4aafae1b3f9d7bd8f5e97ecac647f1f2c" offset="00000" status="baddump" />
+				<rom name="balloon fight (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="8511096a" sha1="33d70fb4aafae1b3f9d7bd8f5e97ecac647f1f2c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="balloon fight (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="27f19afb" sha1="336bb90684599fe1ccf4d38275415bffb573bb99" offset="00000" status="baddump" />
+				<rom name="balloon fight (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="27f19afb" sha1="336bb90684599fe1ccf4d38275415bffb573bb99" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64725,10 +64725,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="clu clu land (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="a63b8b98" sha1="8ddf97dcc8e28f2218c4a4c8b3d9d527fa0525fb" offset="00000" status="baddump" />
+				<rom name="clu clu land (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="a63b8b98" sha1="8ddf97dcc8e28f2218c4a4c8b3d9d527fa0525fb" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="clu clu land (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="852debb4" sha1="26a0e4b76d6cb2d0cdfb7fa41772830aaa4aa701" offset="00000" status="baddump" />
+				<rom name="clu clu land (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="852debb4" sha1="26a0e4b76d6cb2d0cdfb7fa41772830aaa4aa701" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64741,10 +64741,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="donkey kong (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="a21d7c2e" sha1="97c16cd6b1f3656428b682a23e6e4248c1ca3607" offset="00000" status="baddump" />
+				<rom name="donkey kong (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="a21d7c2e" sha1="97c16cd6b1f3656428b682a23e6e4248c1ca3607" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="donkey kong (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="25f7ee6b" sha1="14ffedffc67c5dba89b4426c7ee6ebaa69dab1df" offset="00000" status="baddump" />
+				<rom name="donkey kong (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="25f7ee6b" sha1="14ffedffc67c5dba89b4426c7ee6ebaa69dab1df" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64757,10 +64757,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
-				<rom name="donkey kong jr. no sansuu asobi (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="8975b3c2" sha1="0d3d182d4c200015630937b72bf9d11b504e5179" offset="00000" status="baddump" />
+				<rom name="donkey kong jr. no sansuu asobi (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="8975b3c2" sha1="0d3d182d4c200015630937b72bf9d11b504e5179" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="donkey kong jr. no sansuu asobi (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="af5d7a25" sha1="41af323d23c44b174a0dd99d9365f6f0d3aa891a" offset="00000" status="baddump" />
+				<rom name="donkey kong jr. no sansuu asobi (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="af5d7a25" sha1="41af323d23c44b174a0dd99d9365f6f0d3aa891a" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64773,10 +64773,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="golf (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="7dfa75a8" sha1="ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3" offset="00000" status="baddump" />
+				<rom name="golf (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="7dfa75a8" sha1="ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="golf (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="3f14c055" sha1="abc677cfd6529fffb2ceea431fbe95c34ea078e5" offset="00000" status="baddump" />
+				<rom name="golf (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="3f14c055" sha1="abc677cfd6529fffb2ceea431fbe95c34ea078e5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64789,10 +64789,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="gomoku narabe (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="97ea7144" sha1="47d354c654285275d0a9420cc6eb3564f0453eb0" offset="00000" status="baddump" />
+				<rom name="gomoku narabe (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="97ea7144" sha1="47d354c654285275d0a9420cc6eb3564f0453eb0" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="gomoku narabe (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="2b1b7a5e" sha1="2b63e3d83e6f19dbb5eae6f0541d4ed1da5bbc85" offset="00000" status="baddump" />
+				<rom name="gomoku narabe (200x)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="2b1b7a5e" sha1="2b63e3d83e6f19dbb5eae6f0541d4ed1da5bbc85" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64805,10 +64805,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
-				<rom name="mahjong (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="6bb45576" sha1="5974787496dfa27a4b7fe6023473fae930ea41dc" offset="00000" status="baddump" />
+				<rom name="mahjong (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="6bb45576" sha1="5974787496dfa27a4b7fe6023473fae930ea41dc" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="mahjong (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="ac42eaad" sha1="c89e0b52ee6be4ce6492cae56d0008ee29d32cee" offset="00000" status="baddump" />
+				<rom name="mahjong (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="ac42eaad" sha1="c89e0b52ee6be4ce6492cae56d0008ee29d32cee" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64821,10 +64821,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="pinball (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" status="baddump" />
+				<rom name="pinball (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="pinball (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="c2824eec" sha1="faa9d55a64c280f8cd5f5991f9b4c56c675bfffa" offset="00000" status="baddump" />
+				<rom name="pinball (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="c2824eec" sha1="faa9d55a64c280f8cd5f5991f9b4c56c675bfffa" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64837,10 +64837,10 @@ We include them here as reference if they should coincide with later revisions o
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
-				<rom name="tennis (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="3a34c45b" sha1="2cc26a01c38ead50503dccb3ee929ba7a2b6772c" offset="00000" status="baddump" />
+				<rom name="tennis (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].chr" size="8192" crc="3a34c45b" sha1="2cc26a01c38ead50503dccb3ee929ba7a2b6772c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="tennis (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].prg" size="32768" crc="0012a6a2" sha1="c4b009a815a3fa13a5eae7b12b4f2d8cafb6e5a7" offset="00000" status="baddump" />
+				<rom name="tennis (2002)(nintendo)(jp)[h][ripped from animal crossing jpn for gamecube].prg" size="32768" crc="0012a6a2" sha1="c4b009a815a3fa13a5eae7b12b4f2d8cafb6e5a7" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -69204,8 +69204,10 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed 
+to check why this is different -->
 	<software name="mc_mario">
-		<description>Mario 7 in 1</description>
+		<description>Mario 7 in 1 (Bad Dump)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">

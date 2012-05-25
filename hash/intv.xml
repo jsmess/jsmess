@@ -151,7 +151,7 @@
 
 	<software name="beauty">
 		<description>Beauty &amp; the Beast</description>
-		<year>1978</year>
+		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720007"/>
 		<part name="cart" interface="intv_cart">
@@ -1869,7 +1869,7 @@
 	</software>
 
 	<software name="sshuttle">
-		<description>Space Shuttel (Prototype)</description>
+		<description>Space Shuttle (Prototype)</description>
 		<year>1981</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
