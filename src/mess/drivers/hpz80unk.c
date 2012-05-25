@@ -81,14 +81,13 @@ READ8_MEMBER( hpz80unk_state::portfc_r )
 	return 0xfe; // or it halts
 }
 
-static ADDRESS_MAP_START(hpz80unk_mem, AS_PROGRAM, 8, hpz80unk_state)
+static ADDRESS_MAP_START( hpz80unk_mem, AS_PROGRAM, 8, hpz80unk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("p_rom")
-	//AM_RANGE(0x0000, 0xffff) AM_ROM //AM_RAM AM_SHARE("ccs_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hpz80unk_io, AS_IO, 8, hpz80unk_state)
+static ADDRESS_MAP_START( hpz80unk_io, AS_IO, 8, hpz80unk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
@@ -103,7 +102,7 @@ static INPUT_PORTS_START( hpz80unk )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(hpz80unk_state)
+MACHINE_RESET_MEMBER( hpz80unk_state )
 {
 	UINT8* user1 = memregion("user1")->base();
 	memcpy((UINT8*)m_p_rom, user1, 0x4000);
