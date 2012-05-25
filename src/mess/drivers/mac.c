@@ -1946,6 +1946,11 @@ ROM_START( mac512k )
 	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 ROM_END
 
+ROM_START( unitron )
+	ROM_REGION16_BE(0x20000, "bootrom", 0)
+    ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) ) 
+ROM_END
+
 ROM_START( mac512ke )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
@@ -2140,6 +2145,7 @@ ROM_END
 COMP( 1984, mac128k,  0,		0,	mac128k,  macplus,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	  "Apple Computer", "Macintosh 512ke", 0 )
+COMP( 1985, unitron,  macplus,  0,	mac512ke, macplus,  mac512ke,     "bootleg (Unitron)", "Mac 512",  GAME_NOT_WORKING )
 COMP( 1986, macplus,  0,		0,	macplus,  macplus,  macplus,	  "Apple Computer", "Macintosh Plus",  0 )
 COMP( 1987, macse,    0,		0,	macse,    macadb,   macse,	      "Apple Computer", "Macintosh SE",  0 )
 COMP( 1987, macsefd,  0,		0,	macse,    macadb,   macse,	      "Apple Computer", "Macintosh SE (FDHD)",  0 )
