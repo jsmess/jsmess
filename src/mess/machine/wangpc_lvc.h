@@ -52,14 +52,15 @@ protected:
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 
 private:
+	inline void set_irq(int state);
+
 	// internal state
 	required_device<mc6845_device> m_crtc;
 
 	UINT16 *m_video_ram;
-	UINT8 m_attr[16];
 	UINT8 m_option;
 	UINT16 m_scroll;
-	int m_irq3;
+	int m_irq;
 };
 
 

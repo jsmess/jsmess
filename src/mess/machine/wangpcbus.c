@@ -162,7 +162,7 @@ READ16_MEMBER( wangpcbus_device::mrdc_r )
 
 	while (entry)
 	{
-		data |= entry->wangpcbus_mrdc_r(space, offset, mem_mask);
+		data &= entry->wangpcbus_mrdc_r(space, offset + 0x40000/2, mem_mask);
 		entry = entry->next();
 	}
 
@@ -180,7 +180,7 @@ WRITE16_MEMBER( wangpcbus_device::amwc_w )
 
 	while (entry)
 	{
-		entry->wangpcbus_amwc_w(space, offset, mem_mask, data);
+		entry->wangpcbus_amwc_w(space, offset + 0x40000/2, mem_mask, data);
 		entry = entry->next();
 	}
 }
@@ -198,7 +198,7 @@ READ16_MEMBER( wangpcbus_device::sad_r )
 
 	while (entry)
 	{
-		data |= entry->wangpcbus_iorc_r(space, offset + 0x880, mem_mask);
+		data &= entry->wangpcbus_iorc_r(space, offset + 0x1100/2, mem_mask);
 		entry = entry->next();
 	}
 
@@ -216,7 +216,7 @@ WRITE16_MEMBER( wangpcbus_device::sad_w )
 
 	while (entry)
 	{
-		entry->wangpcbus_aiowc_w(space, offset + 0x880, mem_mask, data);
+		entry->wangpcbus_aiowc_w(space, offset + 0x1100/2, mem_mask, data);
 		entry = entry->next();
 	}
 }

@@ -146,7 +146,7 @@ UINT16 wangpc_lic_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lic_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
+void wangpc_lic_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
 {
 	if (sad(offset))
 	{

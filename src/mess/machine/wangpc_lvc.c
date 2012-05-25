@@ -22,6 +22,10 @@
 
 #define RAM_SIZE		0x8000
 
+#define OPTION_VRAM		BIT(m_option, 0)
+#define OPTION_80_COL	BIT(m_option, 2)
+#define OPTION_VSYNC	BIT(m_option, 3)
+
 
 
 //**************************************************************************
@@ -37,42 +41,60 @@ const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 
 void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-/*  const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-    for (int column = 0; column < x_count; column++)
-    {
-        UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
-        UINT16 addr = (code << 3) | (ra & 0x07);
-        UINT8 data = m_char_rom[addr & 0x7ff];
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-        if (column == cursor_x)
-        {
-            data = 0xff;
-        }
+	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x140;
 
-        for (int bit = 0; bit < 8; bit++)
-        {
-            int x = (column * 8) + bit;
-            int color = BIT(data, 7) ? 7 : 0;
+	if (OPTION_80_COL)
+	{
+	    for (int column = 0; column < x_count; column++)
+	    {
+	    	offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 80) * 0x140) + (((ra & 0x0f) << 8) | ((column & 0x7f) << 1));
+	        UINT16 data = m_video_ram[addr & 0x7fff];
 
-            bitmap.pix32(y, x) = palette[color];
+	        for (int bit = 0; bit < 8; bit++)
+	        {
+	            int x = (column * 8) + bit;
+	            int color = (BIT(data, 15) << 1) | BIT(data, 7);
 
-            data <<= 1;
-        }
-    }*/
+	            bitmap.pix32(y, x) = palette[color];
+
+	            data <<= 1;
+	        }
+	    }
+	}
+	else
+	{
+	    for (int column = 0; column < x_count; column++)
+	    {
+	    	offs_t addr = scroll_y + ((m_scroll & 0x3f) << 2) + ((ma / 40) * 0x140) + (((ra & 0x0f) << 8) | ((column & 0x3f) << 2));
+	        UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
+
+	        for (int bit = 0; bit < 8; bit++)
+	        {
+	            int x = (column * 8) + bit;
+	            int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
+
+	            bitmap.pix32(y, x) = palette[color];
+
+	            data <<= 1;
+	        }
+	    }
+	}
 }
 
 static MC6845_UPDATE_ROW( wangpc_lvc_update_row )
 {
 	wangpc_lvc_device *lores = downcast<wangpc_lvc_device *>(device->owner());
+
 	lores->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 
 WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 {
-	if (BIT(m_option, 3) && state)
+	if (OPTION_VSYNC && state)
 	{
-		m_irq3 = ASSERT_LINE;
-		m_bus->irq3_w(m_irq3);
+		set_irq(ASSERT_LINE);
 	}
 }
 
@@ -87,7 +109,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lvc_device, vsync_w),
-	NULL
+	NULL 
 };
 
 
@@ -122,6 +144,23 @@ machine_config_constructor wangpc_lvc_device::device_mconfig_additions() const
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  set_irq2 -
+//-------------------------------------------------
+
+inline void wangpc_lvc_device::set_irq(int state)
+{
+	m_irq = state;
+
+	m_bus->irq3_w(m_irq);
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -134,7 +173,7 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_option(0),
-	m_irq3(CLEAR_LINE)
+	m_irq(CLEAR_LINE)
 {
 }
 
@@ -150,6 +189,9 @@ void wangpc_lvc_device::device_start()
 
 	// state saving
 	save_pointer(NAME(m_video_ram), RAM_SIZE);
+	save_item(NAME(m_option));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_irq));
 }
 
 
@@ -159,6 +201,9 @@ void wangpc_lvc_device::device_start()
 
 void wangpc_lvc_device::device_reset()
 {
+	m_option = 0;
+
+	set_irq(CLEAR_LINE);
 }
 
 
@@ -170,9 +215,11 @@ UINT16 wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, 
 {
 	UINT16 data = 0xffff;
 
-	if (BIT(m_option, 0) && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
+	if (OPTION_VRAM && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
-		data = m_video_ram[offset];
+		offs_t addr = offset & 0x7fff;
+
+		data = m_video_ram[addr];
 	}
 
 	return data;
@@ -185,9 +232,11 @@ UINT16 wangpc_lvc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, 
 
 void wangpc_lvc_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
 {
-	if (BIT(m_option, 0) && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
+	if (OPTION_VRAM && (offset >= 0xe0000/2) && (offset < 0xf0000/2))
 	{
-		m_video_ram[offset] = data;
+		offs_t addr = offset & 0x7fff;
+
+		m_video_ram[addr] = data;
 	}
 }
 
@@ -216,11 +265,9 @@ UINT16 wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 			break;
 
 		case 0xfe/2:
-			data = 0xff00 | (m_irq3 << 7) | OPTION_ID;
+			data = 0xff00 | (m_irq << 7) | OPTION_ID;
 			break;
 		}
-
-		logerror("Lores read %04x %04x %04x\n", offset << 1, mem_mask, data);
 	}
 
 	return data;
@@ -231,36 +278,55 @@ UINT16 wangpc_lvc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
+void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
 {
 	if (sad(offset))
 	{
-		logerror("Lores write %04x %04x %04x\n", offset << 1, mem_mask, data);
+		logerror("Lores write %06x: %04x\n", offset, data);
 
 		switch (offset & 0x7f)
 		{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
+			{
 				m_crtc->address_w(space, 0, data & 0xff);
+			}
 			break;
 
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
+			{
 				m_crtc->register_w(space, 0, data & 0xff);
+			}
 			break;
 
 		case 0x10/2:
 			if (ACCESSING_BITS_0_7)
+			{
 				m_option = data & 0xff;
+			}
 			break;
 
 		case 0x20/2:
 			m_scroll = data;
 			break;
 
+		case 0x40/2: case 0x42/2: case 0x44/2: case 0x46/2: case 0x48/2: case 0x4a/2: case 0x4c/2: case 0x4e/2:
+		case 0x50/2: case 0x52/2: case 0x55/2: case 0x56/2: case 0x58/2: case 0x5a/2: case 0x5c/2: case 0x5e/2:
+			{
+				offs_t index = offset & 0x0f;
+
+				int i = BIT(data, 15);
+				int r = BIT(data, 11) ? (i ? 0xff : 0x80) : 0;
+				int g = BIT(data, 7) ? (i ? 0xff : 0x80) : 0;
+				int b = BIT(data, 3) ? (i ? 0xff : 0x80) : 0;
+
+				palette_set_color_rgb(machine(), index, r, g, b);
+			}
+			break;
+
 		case 0x70/2:
-			m_irq3 = CLEAR_LINE;
-			m_bus->irq3_w(m_irq3);
+			set_irq(CLEAR_LINE);
 			break;
 		}
 	}

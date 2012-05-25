@@ -8,6 +8,18 @@
 
 */
 
+/*
+
+	TODO:
+
+	- boot
+	- keyboard
+	- floppy
+	- serial
+	- hard disk
+
+*/
+
 #include "includes/wangpc.h"
 
 
@@ -28,6 +40,54 @@ enum
 //**************************************************************************
 //  DIRECT MEMORY ACCESS
 //**************************************************************************
+
+void wangpc_state::select_drive(int drive, bool select)
+{
+	if (LOG) logerror("%sselect drive %u\n", select ? "" : "De", drive + 1);
+
+	int state = select ? 0 : 1;
+
+	if (!drive)
+	{
+		m_ds1 = state;
+	}
+	else
+	{
+		m_ds2 = state;
+	}
+}
+
+void wangpc_state::set_motor(int drive, bool motor)
+{
+	if (LOG) logerror("Motor %u %s\n", drive + 1, motor ? "on" : "off");
+
+	int state = motor ? 0 : 1;
+
+	if (!drive)
+	{
+		floppy_mon_w(m_floppy0, state);
+	}
+	else
+	{
+		floppy_mon_w(m_floppy1, state);
+	}
+}
+
+void wangpc_state::fdc_reset()
+{
+    if (LOG) logerror("FDC reset\n");
+
+	upd765_reset_w(m_fdc, 1);
+	upd765_reset_w(m_fdc, 0);
+}
+
+void wangpc_state::fdc_tc()
+{
+    if (LOG) logerror("FDC TC\n");
+
+	upd765_tc_w(m_fdc, 1);
+	upd765_tc_w(m_fdc, 0);
+}
 
 WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 {
@@ -59,185 +119,141 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
 READ8_MEMBER( wangpc_state::deselect_drive1_r )
 {
-    if (LOG) logerror("Deselect drive 1\n");
+	select_drive(0, false);
 
-   	m_ds1 = 1;
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::deselect_drive1_w )
 {
-    if (LOG) logerror("Deselect drive 1\n");
-
-	m_ds1 = 1;
+	select_drive(0, false);
 }
 
 
 READ8_MEMBER( wangpc_state::select_drive1_r )
 {
-    if (LOG) logerror("Select drive 1\n");
+	select_drive(0, true);
 
-	m_ds1 = 0;
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::select_drive1_w )
 {
-    if (LOG) logerror("Select drive 1\n");
-
-	m_ds1 = 0;
+	select_drive(0, true);
 }
 
 
 READ8_MEMBER( wangpc_state::deselect_drive2_r )
 {
-    if (LOG) logerror("Deselect drive 2\n");
+	select_drive(1, false);
 
-	m_ds2 = 1;
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::deselect_drive2_w )
 {
-    if (LOG) logerror("Deselect drive 2\n");
-
-	m_ds2 = 1;
+	select_drive(1, false);
 }
 
 
 READ8_MEMBER( wangpc_state::select_drive2_r )
 {
-    if (LOG) logerror("Select drive 2\n");
+	select_drive(1, true);
 
-	m_ds2 = 0;
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::select_drive2_w )
 {
-    if (LOG) logerror("Select drive 2\n");
-
-	m_ds2 = 0;
+	select_drive(1, true);
 }
 
 
 READ8_MEMBER( wangpc_state::motor1_off_r )
 {
-    if (LOG) logerror("Motor 1 off\n");
-	
-	floppy_mon_w(m_floppy0, 1);
+	set_motor(0, false);
 
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::motor1_off_w )
 {
-    if (LOG) logerror("Motor 1 off\n");
-
-	floppy_mon_w(m_floppy0, 1);
+	set_motor(0, false);
 }
 
 
 READ8_MEMBER( wangpc_state::motor1_on_r )
 {
-    if (LOG) logerror("Motor 1 on\n");
+	set_motor(0, true);
 
-	floppy_mon_w(m_floppy0, 0);
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::motor1_on_w )
 {
-    if (LOG) logerror("Motor 1 on\n");
-
-	floppy_mon_w(m_floppy0, 0);
+	set_motor(0, true);
 }
 
 
 READ8_MEMBER( wangpc_state::motor2_off_r )
 {
-    if (LOG) logerror("Motor 2 off\n");
+	set_motor(1, false);
 
-	floppy_mon_w(m_floppy1, 1);
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::motor2_off_w )
 {
-    if (LOG) logerror("Motor 2 off\n");
-
-	floppy_mon_w(m_floppy1, 1);
+	set_motor(1, false);
 }
 
 
 READ8_MEMBER( wangpc_state::motor2_on_r )
 {
-    if (LOG) logerror("Motor 2 on\n");
+	set_motor(1, true);
 
-	floppy_mon_w(m_floppy1, 0);
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::motor2_on_w )
 {
-    if (LOG) logerror("Motor 2 on\n");
-
-	floppy_mon_w(m_floppy1, 0);
+	set_motor(1, true);
 }
 
 
 READ8_MEMBER( wangpc_state::fdc_reset_r )
 {
-    if (LOG) logerror("FDC reset\n");
+	fdc_reset();
 
-	upd765_reset_w(m_fdc, 1);
-	upd765_reset_w(m_fdc, 0);
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::fdc_reset_w )
 {
-    if (LOG) logerror("FDC reset\n");
-
-	upd765_reset_w(m_fdc, 1);
-	upd765_reset_w(m_fdc, 0);
+	fdc_reset();
 }
 
 
 READ8_MEMBER( wangpc_state::fdc_tc_r )
 {
-    if (LOG) logerror("FDC TC\n");
+	fdc_tc();
 
-	upd765_tc_w(m_fdc, 1);
-	upd765_tc_w(m_fdc, 0);
-
-	return 0;
+	return 0xff;
 }
 
 
 WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 {
-    if (LOG) logerror("FDC TC\n");
-
-	upd765_tc_w(m_fdc, 1);
-	upd765_tc_w(m_fdc, 0);
+	fdc_tc();
 }
 
 
@@ -290,7 +306,7 @@ READ8_MEMBER( wangpc_state::status_r )
 
 WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 {
-    if (LOG) logerror("Timer 0 IRQ clear\n");
+    //if (LOG) logerror("Timer 0 IRQ clear\n");
 
 	pic8259_ir0_w(m_pic, CLEAR_LINE);
 }
@@ -302,12 +318,12 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 
 READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 {
-    if (LOG) logerror("Timer 2 IRQ clear\n");
+    //if (LOG) logerror("Timer 2 IRQ clear\n");
 
 	m_timer2_irq = 1;
 	check_level1_interrupts();
 
-	return 0;
+	return 0xff;
 }
 
 
@@ -331,7 +347,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 
 	output_set_led_value(LED_DIAGNOSTIC, 1);
 
-	return 0;
+	return 0xff;
 }
 
 
@@ -397,7 +413,7 @@ WRITE8_MEMBER( wangpc_state::uart_w  )
     case 0x1d: m_led[0] = m_led[1] = m_led[2] = m_led[3] = m_led[4] = m_led[5] = 0; break;
     }
 
-    popmessage("%u%u%u%u%u%u", m_led[0], m_led[1], m_led[2], m_led[3], m_led[4], m_led[5]);
+    if (LOG) popmessage("%u%u%u%u%u%u", m_led[0], m_led[1], m_led[2], m_led[3], m_led[4], m_led[5]);
 
 	m_uart_tbre = 0;
 	check_level2_interrupts();
@@ -446,7 +462,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 	m_busy = 1;
 	check_level1_interrupts();
 
-	return 0;
+	return 0xff;
 }
 
 
@@ -473,7 +489,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 
 	output_set_led_value(LED_DIAGNOSTIC, 0);
 
-	return 0;
+	return 0xff;
 }
 
 
@@ -527,8 +543,9 @@ READ8_MEMBER( wangpc_state::option_id_r )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_mem, AS_PROGRAM, 16, wangpc_state )
-//  AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mrdc_r, amwc_c)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x40000, 0xf3fff) AM_DEVREADWRITE(WANGPC_BUS_TAG, wangpcbus_device, mrdc_r, amwc_w)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -538,6 +555,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_WRITE8(fdc_ctrl_w, 0x00ff)
 	AM_RANGE(0x1004, 0x1005) AM_READWRITE8(deselect_drive1_r, deselect_drive1_w, 0x00ff)
 	AM_RANGE(0x1006, 0x1007) AM_READWRITE8(select_drive1_r, select_drive1_w, 0x00ff)
@@ -545,8 +563,8 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x100a, 0x100b) AM_READWRITE8(select_drive2_r, select_drive2_w, 0x00ff)
 	AM_RANGE(0x100c, 0x100d) AM_READWRITE8(motor1_off_r, motor1_off_w, 0x00ff)
 	AM_RANGE(0x100e, 0x100f) AM_READWRITE8(motor1_on_r, motor1_on_w, 0x00ff)
-	AM_RANGE(0x1010, 0x1011) AM_READWRITE8(motor1_off_r, motor1_off_w, 0x00ff)
-	AM_RANGE(0x1012, 0x1013) AM_READWRITE8(motor1_on_r, motor1_on_w, 0x00ff)
+	AM_RANGE(0x1010, 0x1011) AM_READWRITE8(motor2_off_r, motor2_off_w, 0x00ff)
+	AM_RANGE(0x1012, 0x1013) AM_READWRITE8(motor2_on_r, motor2_on_w, 0x00ff)
 	AM_RANGE(0x1014, 0x1015) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0x1016, 0x1017) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0x1018, 0x1019) AM_MIRROR(0x0002) AM_READWRITE8(fdc_reset_r, fdc_reset_w, 0x00ff)
@@ -584,18 +602,23 @@ static INPUT_PORTS_START( wangpc )
 	// keyboard defined in machine/wangpckb.c
 
 	PORT_START("SW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "CPU Baud Rate" )	PORT_DIPLOCATION("SW:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "19200" )
+	PORT_DIPSETTING(    0x0e, "9600" )
+	PORT_DIPSETTING(    0x0d, "7200" )
+	PORT_DIPSETTING(    0x0c, "4800" )
+	PORT_DIPSETTING(    0x0b, "3600" )
+	PORT_DIPSETTING(    0x0a, "2400" )
+	PORT_DIPSETTING(    0x09, "2000" )
+	PORT_DIPSETTING(    0x08, "1800" )
+	PORT_DIPSETTING(    0x07, "1200" )
+	PORT_DIPSETTING(    0x06, "600" )
+	PORT_DIPSETTING(    0x05, "300" )
+	PORT_DIPSETTING(    0x04, "150" )
+	PORT_DIPSETTING(    0x03, "134.5" )
+	PORT_DIPSETTING(    0x02, "110" )
+	PORT_DIPSETTING(    0x01, "75" )
+	PORT_DIPSETTING(    0x00, "50 (Loop on Power-Up)" )
 INPUT_PORTS_END
 
 
@@ -737,7 +760,7 @@ void wangpc_state::check_level1_interrupts()
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = !m_dma_eop | m_uart_dr /*| m_uart_tbre*/ | upd765_int_r(m_fdc) | m_fpu_irq;
+	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | upd765_int_r(m_fdc) | m_fpu_irq | m_bus_irq2;
 
 	pic8259_ir2_w(m_pic, state);
 }
@@ -1012,7 +1035,7 @@ static const upd765_interface fdc_intf =
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, fdc_drq_w),
 	wangpc_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+	{ NULL, NULL, NULL, NULL }
 };
 
 
@@ -1062,6 +1085,7 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 {
     if (LOG) logerror("Bus IRQ2 %u\n", state);
 
+	m_bus_irq2 = state;
 	check_level2_interrupts();
 }
 
@@ -1087,6 +1111,7 @@ static SLOT_INTERFACE_START( wangpc_cards )
 	//SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
 	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
 	//SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
+	//SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
 SLOT_INTERFACE_END
 
 
@@ -1106,6 +1131,25 @@ void wangpc_state::machine_start()
 
 	// connect serial keyboard
 	m_uart->connect(m_kb);
+
+	// state saving
+	save_item(NAME(m_dma_page));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_timer2_irq));
+	save_item(NAME(m_ecpi_irq));
+	save_item(NAME(m_acknlg));
+	save_item(NAME(m_dav));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_dma_eop));
+	save_item(NAME(m_uart_dr));
+	save_item(NAME(m_uart_tbre));
+	save_item(NAME(m_fpu_irq));
+	save_item(NAME(m_bus_irq2));
+	save_item(NAME(m_fdc_tc_enable));
+	save_item(NAME(m_fdc_dma_enable));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_ds1));
+	save_item(NAME(m_ds2));
 }
 
 
@@ -1185,4 +1229,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

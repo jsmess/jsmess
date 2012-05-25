@@ -59,6 +59,7 @@ public:
 		  m_uart_dr(0),
 		  m_uart_tbre(0),
 		  m_fpu_irq(0),
+		  m_bus_irq2(0),
 		  m_fdc_tc_enable(0),
 		  m_fdc_dma_enable(1),
 		  m_fdc_drq(1),
@@ -83,6 +84,10 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	void select_drive(int drive, bool select);
+	void set_motor(int drive, bool motor);
+	void fdc_reset();
+	void fdc_tc();
 	void check_level1_interrupts();
 	void check_level2_interrupts();
 	void update_fdc_drq();
@@ -167,6 +172,7 @@ public:
 	int m_uart_dr;
 	int m_uart_tbre;
 	int m_fpu_irq;
+	int m_bus_irq2;
 
 	int m_fdc_tc_enable;
 	int m_fdc_dma_enable;
@@ -174,7 +180,7 @@ public:
 	int m_ds1;
 	int m_ds2;
 
-	int m_led[6];
+	int m_led[6]; // HACK until keyboard works
 };
 
 

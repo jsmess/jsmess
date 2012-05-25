@@ -41,6 +41,14 @@ Notes:
 
 */
 
+/*
+
+    TODO:
+
+    - mcs51.c does not support 9-bit serial I/O
+
+*/
+
 #include "wangpckb.h"
 
 
