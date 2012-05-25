@@ -1918,6 +1918,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/fk1.o		\
 	$(MESS_DRIVERS)/fidelz80.o	\
 	$(MESS_DRIVERS)/horizon.o	\
+	$(MESS_DRIVERS)/hpz80unk.o	\
 	$(MESS_DRIVERS)/ht68k.o		\
 	$(MESS_DRIVERS)/if800.o		\
 	$(MESS_DRIVERS)/indiana.o	\
