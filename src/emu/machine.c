@@ -120,7 +120,19 @@
 #include <time.h>
 
 #ifdef SDLMAME_EMSCRIPTEN
-void jsmess_set_main_loop(device_scheduler &sched);
+#include <emscripten.h>
+
+static device_scheduler * scheduler;
+
+void jsmess_main_loop() {
+	scheduler->timeslice();
+}
+
+void jsmess_set_main_loop(device_scheduler &sched) {
+	scheduler = &sched;
+	emscripten_set_main_loop(&jsmess_main_loop, 0);
+	abort();
+}
 #endif
 
 
