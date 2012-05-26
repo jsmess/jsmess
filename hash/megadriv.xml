@@ -5,51 +5,50 @@
 
     2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
     2IN1 (PSYCHIC PINBALL MICRO MACHINES)	PAL
-    ADVANCED DAISENRYAKU					JAPAN		we have Rev A, Rev 0 needed
-    ARNOLD PALMER TOURNAMENT GOLF			PAL
-    AWESOME POSSUM							JAPAN
-    BATTLE SQUADRON							PAL
-    BEAVIS & BUTTHEAD						PAL
-    CAPTAIN LANG							JAPAN
-    CAPTAIN PLANET							ASIA
-    CENTURION								USA/PAL		needs proper dump
-    DAVIS CUP TENNIS						JAPAN
-    DYNAMITE HEADDY SAMPLE					JAPAN
-    ECCO JR									USA/PAL		graphic corruption on later revision
-    F-22 (JUNE 1992)						USA/PAL		needs proper dump
-    FAERY TALE ADVENTURE					PAL
-    FATAL FURY 2							PAL			Australia-only PAL release
-    FERRARI GRAND PRIX CHALLENGE			PAL			we have Rev A, Rev 0 needed
-    FIFA SOCCER								JAPAN
-    FIRE SHARK								PAL			dump check
-    GAIN GROUND								PAL			revision order check
-    GALAXY FORCE II							ALL			we have Rev B, Rev 0 and Rev A needed
-    GO NET									JAPAN
-    HOOK									PAL
-    INTERNATIONAL SUPERSTAR SOCCER			BRAZIL
-    JEWEL MASTER							USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
-    MARBLE MADNESS							JAPAN
-    NBA PLAYOFFS - BULLS VS BLAZERS			JAPAN		conflict in current info
-    NFL PRO FOOTBALL '94					JAPAN
-    OSAKA BANK MY LINE						JAPAN
-    OSAKA BANK MY LINE DEMO					JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER         ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-    PAC-PANIC								PAL
-    PAPERBOY 2								PAL
-    PGA TOUR GOLF							USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
-    PHANTASY STAR IV						PAL
-    ROAD RASH								JAPAN
-    ROAD RASH								USA/PAL		needs proper dump
-    SHINING FORCE							PAL
-    SIDE POCKET								JAPAN/USA	conflict in current info
-    SMURFS									PAL			we have Rev A, Rev 0 needed
-    SUMISEI HOME TANMATSU					JAPAN
-    SUPER DAISENRYAKU						JAPAN		we have Rev 0, Rev A needed (confirmed by Ototo)
-    TOM & JERRY								JAPAN
-    VALIS III								JAPAN		we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-    WONDER MIDI								JAPAN
-    WORLD CUP SOCCER						JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-    WORLD OF ILLUSION						JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+    ADVANCED DAISENRYAKU			JAPAN		we have Rev A, Rev 0 needed (does it exist?)
+    ARNOLD PALMER TOURNAMENT GOLF		PAL
+    AWESOME POSSUM				JAPAN
+    BATTLE SQUADRON				PAL
+    BEAVIS & BUTTHEAD				PAL
+    CAPTAIN LANG				JAPAN
+    CAPTAIN PLANET				ASIA
+    CENTURION					USA/PAL		needs proper dump
+    DAVIS CUP TENNIS				JAPAN
+    DYNAMITE HEADDY SAMPLE			JAPAN
+    ECCO JR					USA/PAL		graphic corruption on later revision
+    F-22 (JUNE 1992)				USA/PAL		needs proper dump
+    FAERY TALE ADVENTURE			PAL
+    FATAL FURY 2				PAL		Australia-only PAL release
+    FERRARI GRAND PRIX CHALLENGE		PAL		we have Rev A, Rev 0 needed (does it exist?)
+    FIFA SOCCER					JAPAN
+    FIRE SHARK					PAL		dump check
+    GAIN GROUND					PAL		revision order check
+    GALAXY FORCE II				ALL		we have Rev B, Rev 0 and Rev A needed (does it exist?)
+    GO NET					JAPAN
+    HOOK					PAL
+    INTERNATIONAL SUPERSTAR SOCCER		BRAZIL
+    JEWEL MASTER				USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
+    MARBLE MADNESS				JAPAN
+    NBA PLAYOFFS - BULLS VS BLAZERS		JAPAN		(alt) version contain a checksum check which have been wiped out of the non-alt revision
+    NFL PRO FOOTBALL '94			JAPAN
+    OSAKA BANK MY LINE				JAPAN
+    OSAKA BANK MY LINE DEMO			JAPAN
+    OUTBACK JOEY - PERSONAL TRAINER		???		http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
+    PAC-PANIC					PAL
+    PGA TOUR GOLF				USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
+    PHANTASY STAR IV				PAL
+    ROAD RASH					JAPAN
+    ROAD RASH					USA/PAL		needs proper dump
+    SHINING FORCE				PAL
+    SIDE POCKET					JAPAN/USA	conflict in current info
+    SMURFS					PAL		we have Rev A, Rev 0 needed (does it exist?)
+    SUMISEI HOME TANMATSU			JAPAN
+    SUPER DAISENRYAKU				JAPAN		we have Rev 0, Rev A needed (confirmed by Ototo)
+    TOM & JERRY					JAPAN
+    VALIS III					JAPAN		we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+    WONDER MIDI					JAPAN
+    WORLD CUP SOCCER				JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+    WORLD OF ILLUSION				JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
 <!--
@@ -211,8 +210,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G" />
 			<dataarea name="rom" size="4194304">
-				<rom name="lotus_turbo_lot03" size="1048576" crc="b83ccb7a" sha1="922c29fd0195e3e0f72f6fc803d3d5c7299d9f0d" offset="000000" />
+				<rom name="lotus_turbo_lot03.u1" size="1048576" crc="b83ccb7a" sha1="922c29fd0195e3e0f72f6fc803d3d5c7299d9f0d" offset="000000" />
 			</dataarea>
 		</part>
 <!--
@@ -574,6 +574,19 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic5" value="AT24C01" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16211.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="havoc">
+		<!-- Alt. Title: Havoc (Box) -->
+		<description>Capt'n Havoc (Euro)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SR16V4-0" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mdch 9642.bin" size="1048576" crc="76e6d20d" sha1="6e0344aace03b703cb05a9a0e10c47ebe404a247" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1193,6 +1206,221 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="shinobi3">
+		<description>Shinobi III - Return of the Ninja Master (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="ic1" value="MPR-15798 T57" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-15798.ic1" size="1048576" crc="0b6d3eb5" sha1="23579c8f7e2396080b478b113aff36d2382395a3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tf2">
+		<description>Thunder Force II (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12559 T87" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12559.ic1" size="524288" crc="9b1561b3" sha1="b81e7ebc4ceb6c1ae2975d27e0a78ba1e8546b5f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- According to Elbarto:
+		On the Quackshot PCB there is a 512Kb rom.
+		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
+		But here we have the megadrive A18 line tied to the A20 pin of the rom.
+		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data
+		then again the last 256Kb of the game.
+		I think they did that for a crappy (really crappy) copy protection.
+	-->
+	<software name="quacksht">
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4054 (JPN)"/>
+		<info name="release" value="19911220 (JPN)"/>
+		<info name="alt_title" value="アイラブ ドナルドダック グルジア王の秘宝"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6206A" />
+			<feature name="ic1" value="MPR-14371-F" />
+			<dataarea name="rom" size="1310720">
+				<rom name="mpr-14371.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
+				<rom size="262144" offset="0x100000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only Euro confirmed -->
+	<software name="herzog">
+		<description>Herzog Zwei (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12929 S19" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12929.ic1" size="524288" crc="a605b65b" sha1="8f7262102c2b2334f0bc88ee6fd6b08797919176" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="landstlkf" cloneof="landstlk">
+		<description>Landstalker - Le Tresor du Roi Nole (Fra)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="pcb" value="171-6278A" />
+			<feature name="ic1" value="MPR-15976-S" />
+			<feature name="ic2" value="MB8464A-10LL" />
+			<feature name="ic3" value="HD74HC00P" />
+			<feature name="ic4" value="BA6162" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-15976.ic1" size="2097152" crc="5de7d917" sha1="86db4b22b54e8583e35717927ad66b7535bf33b4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic">
+		<description>Sonic the Hedgehog (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13913-F" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13913.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aero2">
+		<description>Aero the Acro-Bat 2 (Euro)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-17303" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-17303.ic1" size="2097152" crc="a451f9a1" sha1="529200d5cea7a5560debd42b547631e7cef38b8b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmanrn">
+		<description>Batman Returns (World)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4092 (JPN)"/>
+		<info name="release" value="19930226 (JPN)"/>
+		<info name="alt_title" value="バットマン・リターンズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="ic1" value="MPR-14998 T02" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14998.ic1" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stblad">
+		<description>Super Thunder Blade (World)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4003 (JPN)"/>
+		<info name="release" value="19881029 (JPN)"/>
+		<info name="alt_title" value="スーパーサンダーブレード"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12354 W54" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12354.bin" size="524288" crc="b13087ee" sha1="21810b4a309a5b9a70965dd440e9aeed0b6ca4c5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa95">
+		<description>FIFA Soccer 95 (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="pcb" value="P10002 REV J" />
+			<feature name="u1" value="FIFA95B1 SOCCER" />
+			<feature name="u2" value="GM76C88ALK-15" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="1026B" />
+			<dataarea name="rom" size="2097152">
+				<rom name="fifa95b1.bin" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only Euro is confirmed -->
+	<software name="skitchin">
+		<description>Skitchin (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="P10001 REV J" />
+			<dataarea name="rom" size="2097152">
+				<rom name="skitchin skit09.bin" size="2097152" crc="f785f9d7" sha1="98be93964c14ebc91727b429dd7a7a563b4e2e9f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only Euro is confirmed -->
+	<software name="paperbo2">
+		<description>Paperboy 2 (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-15320 T15" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-15320.ic1" size="1048576" crc="1de28bb1" sha1="6421c26000bec21d0c808252c5d9ce75b75cb8a4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only Euro is confirmed -->
+	<software name="jewelms">
+		<description>Jewel Master (Euro, USA, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-14118A-F" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14118a.ic1" size="524288" crc="cee98813" sha1="9a6e4ca71546e798e1c98e78c4ab72aba46374c5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidepocku" cloneof="sidepock">
+		<description>Side Pocket (USA)</description>
+		<year>1992</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-15008-F" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-15008.ic1" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Old scrambled/interleaved dumps -->
 
 	<software name="13mahjan">
@@ -1626,17 +1854,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="aero the acro-bat (usa).bin" size="1048576" crc="a3a7a8b5" sha1="438fec09e05337a063f986632b52c9d60dd03ba1" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aero2">
-		<description>Aero the Acro-Bat 2 (Euro)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-17303.bin" size="2097152" crc="a451f9a1" sha1="529200d5cea7a5560debd42b547631e7cef38b8b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2900,20 +3117,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="batman forever (world).bin" size="3145728" crc="8b723d01" sha1="6e6776b2c9d0f74e8497287b946ead7f630a35ce" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batmanrn">
-		<description>Batman Returns (World)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4092 (JPN)"/>
-		<info name="release" value="19930226 (JPN)"/>
-		<info name="alt_title" value="バットマン・リターンズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14998.bin" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8179,20 +8382,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fifa95">
-		<description>FIFA Soccer 95 (Euro, USA)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="SEGA-SRAM" />
-			<dataarea name="rom" size="2097152">
-				<rom name="fifa95b1.bin" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="futbol" cloneof="fifa95">
 		<description>Futbol Argentino 98 - Pasion de Multitudes (Pirate)</description>
 		<year>199?</year>
@@ -9473,18 +9662,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="havoc">
-		<!-- Alt. Title: Havoc (Box) -->
-		<description>Capt'n Havoc (Euro)</description>
-		<year>1994</year>
-		<publisher>Codemasters</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="capt'n havoc (euro).bin" size="1048576" crc="76e6d20d" sha1="6e0344aace03b703cb05a9a0e10c47ebe404a247" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="havocu" cloneof="havoc">
 		<description>High Seas Havoc (USA)</description>
 		<year>1993</year>
@@ -9564,17 +9741,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="hellfire (usa).bin" size="524288" crc="184018f9" sha1="9a91bef8a07f709e1f79f8519da79eac34d1796d" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="herzog">
-		<description>Herzog Zwei (Euro, USA)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="herzog zwei (euro, usa).bin" size="524288" crc="a605b65b" sha1="8f7262102c2b2334f0bc88ee6fd6b08797919176" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10353,17 +10519,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="jerry glanville's pigskin footbrawl (usa).bin" size="1048576" crc="e7f48d30" sha1="fbcd0e7cb8dfc327b6d019afbdde9728f656957a" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jewelms">
-		<description>Jewel Master (Euro, USA, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14118a.bin" size="524288" crc="cee98813" sha1="9a6e4ca71546e798e1c98e78c4ab72aba46374c5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11150,20 +11305,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker - the treasures of king nole (euro).bin" size="2097152" crc="e3c65277" sha1="9fbadc86319936855831ecd096d82d716b304215" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="landstlkf" cloneof="landstlk">
-		<description>Landstalker - Le Tresor du Roi Nole (Fra)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="SEGA-SRAM" />
-			<dataarea name="rom" size="2097152">
-				<rom name="landstalker - le tresor du roi nole (france).bin" size="2097152" crc="5de7d917" sha1="86db4b22b54e8583e35717927ad66b7535bf33b4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -15613,17 +15754,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="paperbo2">
-		<description>Paperboy 2 (Euro, USA)</description>
-		<year>1992</year>
-		<publisher>Tengen</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="paperboy 2 (euro, usa).bin" size="1048576" crc="1de28bb1" sha1="6421c26000bec21d0c808252c5d9ce75b75cb8a4" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="partyq">
 		<description>Party Quiz Mega Q (Jpn)</description>
 		<year>1993</year>
@@ -16873,29 +17003,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="pyramid magic special (jpn) (sn).bin" size="262144" crc="153a3afa" sha1="010a336bedc1022846f3498693cd6b5218a05b4c" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- According to Elbarto:
-		On the Quackshot PCB there is a 512Kb rom.
-		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
-		But here we have the megadrive A18 line tied to the A20 pin of the rom.
-		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data
-		then again the last 256Kb of the game.
-		I think they did that for a crappy (really crappy) copy protection.
-	-->
-	<software name="quacksht">
-		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4054 (JPN)"/>
-		<info name="release" value="19911220 (JPN)"/>
-		<info name="alt_title" value="アイラブ ドナルドダック グルジア王の秘宝"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="mpr-14371.bin" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
-				<rom size="262144" offset="0x100000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
@@ -18690,17 +18797,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shinobi3">
-		<description>Shinobi III - Return of the Ninja Master (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="shinobi iii - return of the ninja master (euro).bin" size="1048576" crc="0b6d3eb5" sha1="23579c8f7e2396080b478b113aff36d2382395a3" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shinobi3u" cloneof="shinobi3">
 		<description>Shinobi III - Return of the Ninja Master (USA)</description>
 		<year>1993</year>
@@ -18894,17 +18990,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sidepocku" cloneof="sidepock">
-		<description>Side Pocket (USA)</description>
-		<year>1992</year>
-		<publisher>Data East</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="side pocket (usa).bin" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bartvssm">
 		<description>The Simpsons - Bart Vs The Space Mutants (Euro, USA, Rev. A)</description>
 		<year>1992</year>
@@ -18956,17 +19041,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="skeleton krew (usa).bin" size="2097152" crc="c2e05acb" sha1="2a6f6ea7d2fc1f3a396269f9455011ef95266ffc" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skitchin">
-		<description>Skitchin (Euro, USA)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="skitchin (euro, usa).bin" size="2097152" crc="f785f9d7" sha1="98be93964c14ebc91727b429dd7a7a563b4e2e9f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19593,17 +19667,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="sonic spinball (usa) (alt).bin" size="1048576" crc="e9960371" sha1="8f372e3552e309d3462adeb700242b251f59def1" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonic">
-		<description>Sonic the Hedgehog (Euro, USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13913.bin" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21493,20 +21556,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="stblad">
-		<description>Super Thunder Blade (World)</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4003 (JPN)"/>
-		<info name="release" value="19881029 (JPN)"/>
-		<info name="alt_title" value="スーパーサンダーブレード"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-12354.bin" size="524288" crc="b13087ee" sha1="21810b4a309a5b9a70965dd440e9aeed0b6ca4c5" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stbladj" cloneof="stblad">
 		<description>Super Thunder Blade (Jpn, Launch Cart)</description>
 		<year>1988</year>
@@ -22367,17 +22416,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="thomas the tank engine &amp; friends (usa).bin" size="1048576" crc="1a406299" sha1="e714e9faa9c1687a2dfcb0ada22a75c7a4ee01a6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tf2">
-		<description>Thunder Force II (Euro, USA)</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-12559.bin" size="524288" crc="9b1561b3" sha1="b81e7ebc4ceb6c1ae2975d27e0a78ba1e8546b5f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
