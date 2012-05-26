@@ -32,13 +32,3 @@ function _SDL_LockTexture() {}
 function _SDL_UnlockTexture() {}
 function _SDL_RenderCopy() {}
 function _SDL_RenderPresent() {}
-
-function __Z20jsmess_set_main_loopR16device_scheduler($this) {
-  jsmess_main_loop($this);
-  _abort(0);
-}
-
-function jsmess_main_loop($this) {
-  __ZN16device_scheduler9timesliceEv($this);
-  setTimeout(function() { jsmess_main_loop($this) }, 1);
-}
