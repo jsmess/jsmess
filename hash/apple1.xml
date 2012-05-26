@@ -28,6 +28,18 @@
 		</part>
 	</software>
 
+	<software name="adventur">
+		<description>Adventure</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.30FFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="12990288">
+				<rom name="adventure.wav" size="12990288" crc="21d4f61d" sha1="c62ab301ebc9fe6984d6707ab4cda903992fc8a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aslite">
 		<description>Applesoft Lite</description>
 		<year>19??</year>
@@ -59,6 +71,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="4117948">
 				<rom name="asmmchess.wav" size="4117948" crc="72a2127c" sha1="6abb19063981426efebe9a6ea048146808cb0be4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codebrkr">
+		<description>Codebreaker</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.BFFRE000.EFFFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9793532">
+				<rom name="codebreaker.wav" size="9793532" crc="f461367a" sha1="7833cc84f4579f3d975bd8f6c9c9d5ede1863feb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,6 +147,18 @@
 		</part>
 	</software>
 
+	<software name="typtutor">
+		<description>TypingTutor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.15FFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6446872">
+				<rom name="typingtutor.wav" size="6446872" crc="296a327d" sha1="d89e95b710833697eaddb5badc16be6c2e29e726" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Other games require BASIC to be loaded first -->
 
 	<software name="aceyduc">
@@ -181,6 +217,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6824368">
 				<rom name="buzzword.wav" size="6824368" crc="2c040f8e" sha1="5811e662672be7f3a0b757ec129e896c53da6d6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columns">
+		<description>Columns</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10948604">
+				<rom name="columns.wav" size="10948604" crc="6122e49e" sha1="50161f6707b63c6579ccd30cfe5537dc2852ae11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -337,6 +385,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18338436">
 				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stopwtch">
+		<description>Stopwatch</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.0FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4191014">
+				<rom name="stopwatch.wav" size="4191014" crc="4a3d6dde" sha1="980ff8a49db18f52a852aafc75e6e831580bf79f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
