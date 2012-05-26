@@ -1,4 +1,4 @@
-﻿# ====== MESS System Information File ======
+# ====== MESS System Information File ======
 # 
 # This file contains the basic system information for most of the drivers presented in the MESS distribution. The most current copy of this file resides at [[http://mess.redump.net/sysinfo]] and is also available in the MESS SVN repository.
 # 
@@ -37522,6 +37522,30 @@ MESS emulates the following systems
 
 
 For all these drivers, MESS supports two floppy drives, "floppydisk1" (flop1) and "floppydisk2" (flop2). These devices expect disk images in one of the following formats: .dsk, .ima, .img, .ufi.
+
+
+
+== Disks requiring CP/M ==
+
+
+
+Some disks for Amstrad PCW8xxx and PCW9xxx are bootable disks, so they start automatically when you turn on the machine with the disk inserted. Other disks require CP/M to be mounted first: to start programs and games contained in such disks, just start the system with a CP/M disk inserted in the first floppy drive. When CP/M has been loaded into memory and you are at the A> prompt, then you can switch disk from the File Manager in the Internal UI, to insert the disk you want to launch. Once you have mounted the disk and you are back to the emulation, just type
+
+
+
+  DIR
+
+
+
+to list the content of the disk and to search for the executable file you want to start (the executable files are the COM ones). When you find it, just type its name to start it: e.g. to start MENU.COM just type
+
+  
+
+  MENU
+
+
+
+and wait for the program to load.
 
 
 
