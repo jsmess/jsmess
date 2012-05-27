@@ -37,7 +37,7 @@ READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)
 
 READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
 {
-	UINT8 ret = m_term_data;
+	UINT8 ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
