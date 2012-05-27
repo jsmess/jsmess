@@ -1049,6 +1049,7 @@ $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esq1.o		\
 	$(MESS_DRIVERS)/mirage.o    \
 	$(MESS_DRIVERS)/esq5505.o   \
+    $(MESS_MACHINE)/esqvfd.o    \
 
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
@@ -2073,6 +2074,7 @@ $(MESS_DRIVERS)/dolphunk.o:	$(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:		$(MESS_LAYOUT)/eacc.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh
 $(MESS_DRIVERS)/elekscmp.o:	$(MESS_LAYOUT)/elekscmp.lh
+$(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh
 $(MESS_DRIVERS)/et3400.o:	$(MESS_LAYOUT)/et3400.lh
 $(MESS_DRIVERS)/ex800.o:	$(MESS_LAYOUT)/ex800.lh
 $(MESS_DRIVERS)/fidelz80.o:	$(MESS_LAYOUT)/fidelz80.lh \
