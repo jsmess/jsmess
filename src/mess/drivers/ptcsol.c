@@ -68,8 +68,7 @@
       - Most files are simple ascii which can be loaded via the Paste handler.
         These are ASC, ENT, BAS, ROM, BS5 and ECB. Most files require that the
         correct version of BASIC be loaded first. Paste works, but it is very
-        very slow, and has a noticeable buffer limitation. Perhaps we need
-        something faster such as what Solace has.
+        very slow. Perhaps we need something faster such as what Solace has.
       - SVT (Solace Virtual Tape) files are a representation of a cassette,
         usually holding about 4 games, just like a multifile tape. It will
         need a 'format' program to be written to convert it to be loadable
@@ -136,13 +135,15 @@ public:
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s"),
-	m_p_videoram(*this, "p_videoram"){ }
+	m_p_videoram(*this, "p_videoram"),
+	m_iop_arrows(*this, "ARROWS"),
+	m_iop_config(*this, "CONFIG"),
+	m_iop_s1(*this, "S1"),
+	m_iop_s2(*this, "S2"),
+	m_iop_s3(*this, "S3"),
+	m_iop_s4(*this, "S4")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass1;
-	required_device<cassette_image_device> m_cass2;
-	required_device<device_t> m_uart;
-	required_device<device_t> m_uart_s;
 	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_f9_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
@@ -157,17 +158,30 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_sol20_fa;
-	UINT8 m_sol20_fc;
-	UINT8 m_sol20_fe;
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
-	UINT8 m_framecnt;
-	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass1;
+	required_device<cassette_image_device> m_cass2;
+	required_device<device_t> m_uart;
+	required_device<device_t> m_uart_s;
+	required_shared_ptr<const UINT8> m_p_videoram;
+	required_ioport m_iop_arrows;
+	required_ioport m_iop_config;
+	required_ioport m_iop_s1;
+	required_ioport m_iop_s2;
+	required_ioport m_iop_s3;
+	required_ioport m_iop_s4;
+
+private:
+	UINT8 m_sol20_fc;
+	UINT8 m_sol20_fe;
+	const UINT8 *m_p_chargen;
+	UINT8 m_framecnt;
+	emu_timer *m_cassette_timer;
 };
 
 
@@ -311,7 +325,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
 	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
 
-	bool arrowkey = ioport("ARROWS")->read() ? 0 : 1;
+	bool arrowkey = m_iop_arrows->read() ? 0 : 1;
 	bool keydown = m_sol20_fa & 1;
 
 	return data | (arrowkey & keydown);
@@ -327,7 +341,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	UINT8 data = ioport("ARROWS")->read();
+	UINT8 data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -400,7 +414,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sol20_io , AS_IO, 8, sol20_state)
+static ADDRESS_MAP_START( sol20_io, AS_IO, 8, sol20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(sol20_f8_r,sol20_f8_w)
@@ -555,7 +569,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
 
 	// set switched uart pins
-	data = ioport("S4")->read();
+	data = m_iop_s4->read();
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
 	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
 	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
@@ -565,7 +579,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
 
 	// set rs232 baud rate
-	data = ioport("S3")->read();
+	data = m_iop_s3->read();
 
 	if (data > 1)
 		do
@@ -575,7 +589,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (ioport("CONFIG")->read()&1)) // if highest, look at jumper
+	if ( (s_count == 7) & BIT(m_iop_config->read(), 0) ) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
@@ -607,8 +621,8 @@ SCREEN_UPDATE16_MEMBER( sol20_state )
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = ioport("S1")->read();
-	UINT16 which = (ioport("CONFIG")->read() & 2) << 10;
+	UINT16 which = (m_iop_config->read() & 2) << 10;
+	UINT8 s1 = m_iop_s1->read();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;

@@ -22,7 +22,8 @@
 #include "machine/micropolis.h"
 
 #define SORCERER_USING_RS232 0
-
+#define SCREEN_UPDATE_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define VIDEO_START_MEMBER(name) void name::video_start()
 
 typedef struct {
 	struct {
@@ -51,18 +52,11 @@ public:
 	m_dac(*this, "dac"),
 	m_uart(*this, "uart"),
 	m_centronics(*this, "centronics"),
-	m_ram(*this, RAM_TAG)
+	m_ram(*this, RAM_TAG),
+	m_iop_config(*this, "CONFIG"),
+	m_iop_vs(*this, "VS")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass1;
-	required_device<cassette_image_device> m_cass2;
-	required_device<device_t> m_wave1;
-	required_device<device_t> m_wave2;
-	required_device<device_t> m_dac;
-	required_device<device_t> m_uart;
-	required_device<centronics_device> m_centronics;
-	required_device<ram_device> m_ram;
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
 	DECLARE_READ8_MEMBER(sorcerer_fe_r);
@@ -73,9 +67,23 @@ public:
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
 	UINT8 m_fe;
 	UINT8 m_keyboard_line;
+	const UINT8 *m_p_videoram;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
+	virtual void video_start();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass1;
+	required_device<cassette_image_device> m_cass2;
+	required_device<device_t> m_wave1;
+	required_device<device_t> m_wave2;
+	required_device<device_t> m_dac;
+	required_device<device_t> m_uart;
+	required_device<centronics_device> m_centronics;
+	required_device<ram_device> m_ram;
+	required_ioport m_iop_config;
+	required_ioport m_iop_vs;
 };
 
 

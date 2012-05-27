@@ -176,13 +176,13 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		m_serial_timer->adjust(attotime::zero);
 #endif
 
-		UINT8 sound = ioport("CONFIG")->read() & 8;
+		bool sound = BIT(m_iop_config->read(), 3);
 
 		m_cass1->change_state(
-			((BIT(data,4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			(BIT(data,4) & sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 		m_cass2->change_state(
-			((BIT(data,5)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			(BIT(data,5) & sound) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 		/* cassette 1 motor */
 		m_cass1->change_state(
@@ -216,7 +216,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 {
 	/* reading the config switch */
-	switch (ioport("CONFIG")->read() & 0x06)
+	switch (m_iop_config->read() & 0x06)
 	{
 		case 0: /* speaker */
 			dac_data_w(m_dac, data);
@@ -269,16 +269,15 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	UINT8 data = 0xc0;
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
-	};
+	char kbdrow[6];
 
-	/* bit 5 - vsync (inverted) */
-	data |= (((~ioport("VS")->read()) & 0x01)<<5);
+	sprintf(kbdrow,"X%X",m_keyboard_line);
+
+	/* bit 5 - vsync */
+	data |= m_iop_vs->read();
 
 	/* bits 4..0 - keyboard data */
-	data |= (ioport(keynames[m_keyboard_line])->read() & 0x1f);
+	data |= ioport(kbdrow)->read();
 
 	return data;
 }
