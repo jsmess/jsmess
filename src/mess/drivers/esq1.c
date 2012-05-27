@@ -2,8 +2,9 @@
 
     drivers/esq1.c
 
-    Ensoniq ESQ-1, ESQ-m, and SQ-80 Digital Wave Synthesizers
-    Preliminary driver by R. Belmont
+    Ensoniq ESQ-1 Digital Wave Synthesizer
+    Ensoniq SQ-80 Cross Wave Synthesizer
+    Driver by R. Belmont
 
     Map for ESQ-1 and ESQ-m:
     0000-1fff: OS RAM
@@ -56,6 +57,11 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/68681.h"
+#include "machine/wd1772.h"
+
+#include "machine/esqvfd.h"
+
+#define WD1772_TAG		"wd1772"
 
 #define KEYBOARD_HACK   (0)
 
@@ -64,11 +70,27 @@ class esq1_state : public driver_device
 public:
 	esq1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-        m_duart(*this, "duart")
+        m_maincpu(*this, "maincpu"),
+        m_duart(*this, "duart"),
+        m_fdc(*this, WD1772_TAG),
+        m_vfd(*this, "vfd")
     { }
 
+    required_device<device_t> m_maincpu;
     required_device<device_t> m_duart;
+    optional_device<wd1772_t> m_fdc;
+    optional_device<esq2x40_t> m_vfd;
 
+    DECLARE_READ8_MEMBER(wd1772_r);
+    DECLARE_WRITE8_MEMBER(wd1772_w);
+    DECLARE_READ8_MEMBER(seqdosram_r);
+    DECLARE_WRITE8_MEMBER(seqdosram_w);
+    DECLARE_WRITE8_MEMBER(mapper_w);
+
+    int m_mapper_state;
+    int m_seq_bank;
+    UINT8 m_seqram[0x10000];
+    UINT8 m_dosram[0x2000];
 };
 
 
@@ -81,20 +103,55 @@ static UINT8 esq1_adc_read(device_t *device)
 	return 0x80;
 }
 
-static VIDEO_START( esq1 )
-{
-}
-
-static SCREEN_UPDATE_RGB32( esq1 )
-{
-	return 0;
-}
-
 static MACHINE_RESET( esq1 )
 {
 	// set default OSROM banking
 	esq1_state *state = machine.driver_data<esq1_state>();
 	state->membank("osbank")->set_base(machine.root_device().memregion("osrom")->base() );
+
+    state->m_mapper_state = 0;
+    state->m_seq_bank = 0;
+}
+
+READ8_MEMBER(esq1_state::wd1772_r)
+{
+    return m_fdc->read(space, offset&3);
+}
+
+WRITE8_MEMBER(esq1_state::wd1772_w)
+{
+    m_fdc->write(space, offset&3, data);
+}
+
+WRITE8_MEMBER(esq1_state::mapper_w)
+{
+    m_mapper_state = (data & 1) ^ 1;
+
+//    printf("mapper_state = %d\n", data ^ 1);
+}
+
+READ8_MEMBER(esq1_state::seqdosram_r)
+{
+    if (m_mapper_state)
+    {
+        return m_dosram[offset];
+    }
+    else
+    {
+        return m_seqram[offset + m_seq_bank];
+    }
+}
+
+WRITE8_MEMBER(esq1_state::seqdosram_w)
+{
+    if (m_mapper_state)
+    {
+        m_dosram[offset] = data;
+    }
+    else
+    {
+        m_seqram[offset + m_seq_bank] = data;
+    }
 }
 
 static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
@@ -102,6 +159,18 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
+	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
+//	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
+    AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
+    AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
 ADDRESS_MAP_END
@@ -137,13 +206,20 @@ static void duart_output(device_t *device, UINT8 data)
 	esq1_state *state = device->machine().driver_data<esq1_state>();
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
 //  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine().firstcpu));
-	state->membank("osbank")->set_base(state->memregion("osrom")->base() + (bank * 0x1000) );
+    state->membank("osbank")->set_base(state->memregion("osrom")->base() + (bank * 0x1000) );
+
+    state->m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
+    state->m_seq_bank += ((data>>1) & 3) * 0x2000;
+//    printf("seqram_bank = %x\n", state->m_seq_bank);
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
+    esq1_state *state = device->machine().driver_data<esq1_state>();
+
 	if (channel == 1)
     {
+        #if 0
         if (data >= 0x20 && data <= 0x7f)
         {
             printf("%c", data);
@@ -152,6 +228,9 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
         {
             printf("[%02x]", data);
         }
+        #endif
+
+        state->m_vfd->write_char(data);
     }
 }
 
@@ -192,18 +271,19 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 
 	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(esq1)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-	MCFG_VIDEO_START(esq1)
+    MCFG_ESQ2x40_ADD("vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_ES5503_ADD("es5503", 7000000, esq1_doc_irq, esq1_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(sq80, esq1)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(sq80_map)
+
+	MCFG_WD1772x_ADD(WD1772_TAG, 4000000)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( esq1 )
@@ -250,4 +330,20 @@ ROM_START( esq1 )
     ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
 ROM_END
 
-CONS( 1986, esq1, 0, 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
+ROM_START( sq80 )
+    ROM_REGION(0x10000, "osrom", 0)
+    ROM_LOAD( "sq80rom.low",  0x0000, 0x008000, CRC(97ecd9a0) SHA1(cadff16ebbc15b52cf1d3335d22dc930d430a058) ) 
+    ROM_LOAD( "sq80rom.hig",  0x8000, 0x008000, CRC(f83962b1) SHA1(e3e5cf41f15a37f8bf29b88fb1c85c0fca9ea912) ) 
+
+    ROM_REGION(0x40000, "es5503", 0)
+    ROM_LOAD( "2202.bin",     0x0000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) ) 
+    ROM_LOAD( "2203.bin",     0x0000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) ) 
+    ROM_LOAD( "2204.bin",     0x0000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) ) 
+    ROM_LOAD( "2205.bin",     0x0000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) ) 
+
+    ROM_REGION(0x8000, "kpc", 0)    // 68HC11 keyboard/front panel processor
+    ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) ) 
+ROM_END
+
+CONS( 1986, esq1, 0   , 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, 0, "Ensoniq", "SQ-80", GAME_NOT_WORKING )
