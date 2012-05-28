@@ -95,10 +95,11 @@ const rom_entry *wangpc_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
+    AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY(SN76496_TAG, sn76496_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(kb_p1_r) AM_WRITENOP
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
-	AM_RANGE(0x0000, 0xfeff) AM_NOP
+	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -393,6 +394,8 @@ void wangpc_keyboard_device::device_start()
 
 void wangpc_keyboard_device::device_reset()
 {
+    transmit_register_reset();
+    receive_register_reset();
 }
 
 
@@ -402,26 +405,6 @@ void wangpc_keyboard_device::device_reset()
 
 void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// receive
-	int bit = get_in_data_bit();
-	receive_register_update_bit(bit);
-	/*
-    if (start bit)
-    {
-        m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-    }
-    */
-	if (is_receive_register_full())
-	{
-		receive_register_extract();
-	}
-
-	// transmit
-	if (!is_transmit_register_empty())
-	{
-		transmit_register_get_data_bit();
-		serial_connection_out();
-	}
 }
 
 
@@ -431,6 +414,27 @@ void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 void wangpc_keyboard_device::input_callback(UINT8 state)
 {
+    //logerror("input %02x\n", state);
+
+    // receive
+    int bit = (state & SERIAL_STATE_RX_DATA) ? 1 : 0;
+
+    //logerror("inbit %u \n", bit);
+    receive_register_update_bit(bit);
+
+    if (is_receive_register_full())
+    {
+        m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+        receive_register_extract();
+        logerror("Wang PC keyboard receive data %02x\n", get_received_char());
+    }
+
+    // transmit
+    if (!is_transmit_register_empty())
+    {
+        transmit_register_get_data_bit();
+        serial_connection_out();
+    }
 }
 
 
@@ -453,6 +457,8 @@ int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
 void wangpc_keyboard_device::mcs51_tx_callback(device_t *device, int data)
 {
 	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
+
+    logerror("Wang PC keyboard transmit data %02x\n", data);
 
 	kb->transmit_register_setup(data);
 }
@@ -510,7 +516,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
         P2.7
 
     */
-
+//logerror("P2 %02x\n", data);
 	m_y = data;
 }
 
@@ -535,4 +541,5 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
         P3.7
 
     */
+//logerror("P3 %02x\n", data);
 }

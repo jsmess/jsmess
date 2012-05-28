@@ -572,8 +572,8 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x1020, 0x1027) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x1040, 0x1047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
-//  AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, scn2661_device, read, 0x00ff)
-//  AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, scn2661_device, write, 0x00ff)
+	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, scn2661_device, read, 0x00ff)
+	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, scn2661_device, write, 0x00ff)
 	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8_LEGACY(AM9517A_TAG, i8237_r, i8237_w, 0x00ff)
 	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
@@ -753,7 +753,7 @@ static I8237_INTERFACE( dmac_intf )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq | !m_ecpi_irq | !m_acknlg | !m_dav | !m_busy;
+	int state = !m_timer2_irq | m_epci->rxrdy_r() | m_epci->txemt_r() | !m_acknlg | !m_dav | !m_busy;
 
 	pic8259_ir1_w(m_pic, state);
 }
@@ -835,7 +835,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	data |= m_timer2_irq;
 
 	// serial interrupt
-	data |= m_ecpi_irq << 1;
+	data |= (m_epci->rxrdy_r() | m_epci->txemt_r()) << 1;
 
 	// parallel port interrupt
 	data |= m_acknlg << 2;
@@ -975,6 +975,31 @@ static IM6402_INTERFACE( uart_intf )
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_dr_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tbre_w),
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  SCN2661_INTERFACE( epci_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
+{
+	check_level1_interrupts();
+}
+
+static SCN2661_INTERFACE( epci_intf )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1136,7 +1161,6 @@ void wangpc_state::machine_start()
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dma_channel));
 	save_item(NAME(m_timer2_irq));
-	save_item(NAME(m_ecpi_irq));
 	save_item(NAME(m_acknlg));
 	save_item(NAME(m_dav));
 	save_item(NAME(m_busy));
@@ -1188,7 +1212,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
-	// SCN2661 for RS-232
+	MCFG_SCN2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)

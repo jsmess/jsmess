@@ -285,8 +285,6 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 {
 	if (sad(offset))
 	{
-		logerror("Lores write %06x: %04x\n", offset, data);
-
 		switch (offset & 0x7f)
 		{
 		case 0x00/2:

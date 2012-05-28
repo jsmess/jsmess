@@ -13,6 +13,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/scn2661.h"
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
@@ -43,6 +44,7 @@ public:
 		  m_ppi(*this, I8255A_TAG),
 		  m_pit(*this, I8253_TAG),
 		  m_uart(*this, IM6402_TAG),
+		  m_epci(*this, SCN2661_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
@@ -51,7 +53,6 @@ public:
 		  m_kb(*this, WANGPC_KEYBOARD_TAG),
 		  m_bus(*this, WANGPC_BUS_TAG),
 		  m_timer2_irq(1),
-		  m_ecpi_irq(1),
 		  m_acknlg(1),
 		  m_dav(1),
 		  m_busy(1),
@@ -73,6 +74,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pit;
 	required_device<im6402_device> m_uart;
+	required_device<scn2661_device> m_epci;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
@@ -154,6 +156,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
+	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
@@ -164,7 +167,6 @@ public:
 	int m_dma_channel;
 
 	int m_timer2_irq;
-	int m_ecpi_irq;
 	int m_acknlg;
 	int m_dav;
 	int m_busy;
