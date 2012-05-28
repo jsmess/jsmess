@@ -279,14 +279,16 @@ static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT1
 	ptr = apple3_bankaddr(machine,bank, offset);
 	state->membank(mame_bank)->set_base(ptr);
 
+    #if 0
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
 		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
 		#else
-		logerror("\tbank %s --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
+		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
 		#endif
 	}
+    #endif
 }
 
 
