@@ -86,7 +86,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="drgnatck">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dragon Attack</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
@@ -98,10 +97,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="tankbtl">
-		<!-- Serial: 2 - Release Date:  - Alternative Title:  -->
 		<description>Tank Battalion</description>
 		<year>1980</year>
 		<publisher>Namco</publisher>
+		<info name="serial" value="2" />
+		<info name="alt_title" value="タンクバタリアン" />
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
@@ -111,10 +111,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="scobra">
-		<!-- Serial: 7 - Release Date:  - Alternative Title:  -->
 		<description>Super Cobra</description>
 		<year>1981</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="7" />
+		<info name="alt_title" value="スーパーコブラ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="super cobra (1981)(konami)(jp).bin" size="8192" crc="55cbd90b" sha1="d29f1d1d88a0b6738b68cf8d2406fbf1f05ba39b" offset="00000" status="baddump" />
@@ -123,10 +124,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="gutangtn">
-		<!-- Serial: 8 - Release Date:  - Alternative Title:  -->
 		<description>Guttang Gottong</description>
 		<year>1981</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="8" />
+		<info name="alt_title" value="ガッタンゴットン" />
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8448">
@@ -136,10 +138,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="stepup">
-		<!-- Serial: 10 - Release Date:  - Alternative Title:  -->
 		<description>Step Up</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
+		<info name="serial" value="10" />
+		<info name="alt_title" value="ステップアップ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="step up (1983)(takara)(jp).bin" size="8192" crc="942cc7e8" sha1="9f61df71b6080c8ef5085b659179a10e2777a957" offset="00000" status="baddump" />
@@ -148,10 +151,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="pooyan">
-		<!-- Serial: 11 - Release Date:  - Alternative Title:  -->
 		<description>Pooyan</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="11" />
+		<info name="alt_title" value="プーヤン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="pooyan (1982)(konami)(jp).bin" size="8192" crc="ded8b4f4" sha1="4c9e58e52d336b4c01a24e3ca2e62fb7757407fd" offset="00000" status="baddump" />
@@ -160,10 +164,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="heavybox">
-		<!-- Serial: 12 - Release Date:  - Alternative Title:  -->
 		<description>Heavy Boxing</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
+		<info name="serial" value="12" />
+		<info name="alt_title" value="ヘビーボクシング" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="heavy boxing (1983)(takara)(jp).bin" size="8192" crc="19540dce" sha1="388838ed501bcc3a9fd18e32488f13a6ce6a0689" offset="00000" status="baddump" />
@@ -172,10 +177,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="rtennis">
-		<!-- Serial: 14 - Release Date:  - Alternative Title:  -->
 		<description>Real Tennis</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
+		<info name="serial" value="14" />
+		<info name="alt_title" value="リアルテニス" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="real tennis (1983)(takara)(jp).bin" size="8192" crc="ed80d6c9" sha1="03f3385b360c3573edab1fca53f82b4d6a4f8736" offset="00000" status="baddump" />
@@ -184,10 +190,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="wordmaze">
-		<!-- Serial: 15 - Release Date:  - Alternative Title:  -->
 		<description>Word Maze</description>
 		<year>1983</year>
 		<publisher>Sord</publisher>
+		<info name="serial" value="15" />
+		<info name="alt_title" value="ワードメイズ" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="word maze (19xx)(sord)(jp).bin" size="8192" crc="fda88e0d" sha1="a0fbe727bfca773d3cc193eb7a9c77e7b418b0a2" offset="00000" status="baddump" />
@@ -196,10 +203,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="wondhole">
-		<!-- Serial: 16 - Release Date:  - Alternative Title:  -->
 		<description>Wonder Hole</description>
 		<year>1982</year>
 		<publisher>Irem</publisher>
+		<info name="serial" value="16" />
+		<info name="alt_title" value="ワンダーホール" />
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8320">
@@ -209,10 +217,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="upupball" supported="no">
-		<!-- Serial: 18 - Release Date:  - Alternative Title:  -->
 		<description>Up Up Balloon</description>
 		<year>1983</year>
 		<publisher>Takara ~ Monkey Punch</publisher>
+		<info name="serial" value="18" />
+		<info name="alt_title" value="アップアップバルーン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8320">
 				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
@@ -221,10 +230,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="eskimon">
-		<!-- Serial: 22 - Release Date:  - Alternative Title:  -->
 		<description>Eskimon</description>
 		<year>1984</year>
 		<publisher>Takara</publisher>
+		<info name="serial" value="22" />
+		<info name="alt_title" value="エスキモン" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="eskimon (1984)(takara)(jp).bin" size="8192" crc="96931021" sha1="115eee645e5213c16ad4a27bbeed5e2f3fa4be22" offset="00000" status="baddump" />
@@ -233,10 +243,11 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="funnym">
-		<!-- Serial: 23 - Release Date:  - Alternative Title:  -->
 		<description>Funny Mouse</description>
 		<year>1983</year>
 		<publisher>Takara</publisher>
+		<info name="serial" value="23" />
+		<info name="alt_title" value="ファニーマウス" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="funny mouse (1983)(takara)(jp).bin" size="8192" crc="94145074" sha1="43c2a1a5959ab8057c7d149472512a0c7996c798" offset="00000" status="baddump" />
@@ -246,7 +257,6 @@ and why some of the dumps below have weird size?
 
 <!-- Program + Languages -->
 	<software name="basicf">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>BASIC-F</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -258,7 +268,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="basicg">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>BASIC-G</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -270,7 +279,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="basici">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>BASIC-I</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -282,7 +290,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="falc">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>FALC</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -295,7 +302,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="peditor">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>P-Editor</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -332,7 +338,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="zacbanic">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Zac Banic</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -344,7 +349,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="baseball">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Baseball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -357,7 +361,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="drops">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Drops</description>
 		<year>1986</year>
 		<publisher>SPC</publisher>
@@ -370,7 +373,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="jumpjack">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Jumping Jack</description>
 		<year>1986</year>
 		<publisher>SPC</publisher>
@@ -383,7 +385,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="mchess">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Masterchess</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -396,7 +397,6 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="reversi">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Reversi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
