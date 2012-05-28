@@ -78,6 +78,38 @@ static const UINT16 font[]=
     0x0226, // 0000 0010 0010 0110 ].
     0x0810, // 0000 1000 0001 0000 ^.
     0x0200, // 0000 0010 0000 0000 _
+    0x0040, // 0000 0000 0100 0000 `
+	0xE027, // 1110 0000 0010 0111 A.
+	0x462E, // 0100 0110 0010 1110 B.
+	0x2205, // 0010 0010 0000 0101 C.
+	0x062E, // 0000 0110 0010 1110 D.
+	0xA205, // 1010 0010 0000 0101 E.
+	0xA005, // 1010 0000 0000 0101 F.
+	0x6225, // 0110 0010 0010 0101 G.
+	0xE023, // 1110 0000 0010 0011 H.
+	0x060C, // 0000 0110 0000 1100 I.
+	0x2222, // 0010 0010 0010 0010 J.
+	0xA881, // 1010 1000 1000 0001 K.
+	0x2201, // 0010 0010 0000 0001 L.
+	0x20E3, // 0010 0000 1110 0011 M.
+	0x2863, // 0010 1000 0110 0011 N.
+	0x2227, // 0010 0010 0010 0111 O.
+	0xE007, // 1110 0000 0000 0111 P.
+	0x2A27, // 0010 1010 0010 0111 Q.
+	0xE807, // 1110 1000 0000 0111 R.
+	0xC225, // 1100 0010 0010 0101 S.
+	0x040C, // 0000 0100 0000 1100 T.
+	0x2223, // 0010 0010 0010 0011 U.
+	0x2091, // 0010 0000 1001 0001 V.
+	0x2833, // 0010 1000 0011 0011 W.
+	0x08D0, // 0000 1000 1101 0000 X.
+	0x04C0, // 0000 0100 1100 0000 Y.
+	0x0294, // 0000 0010 1001 0100 Z.
+	0x2205, // 0010 0010 0000 0101 [.
+    0x0408, // 0000 0100 0000 1000 |
+	0x0226, // 0000 0010 0010 0110 ].
+	0x0810, // 0000 1000 0001 0000 ~.
+    0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
 esqvfd_t::esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
@@ -273,7 +305,20 @@ machine_config_constructor esq2x40_sq1_t::device_mconfig_additions() const
 
 void esq2x40_sq1_t::write_char(int data)
 {
-    if ((data >= 0x20) && (data <= 0x5f))
+    if (m_Wait87Shift)
+    {
+//        printf("87Shift got %02x\n", data);
+        if (data == 0x00)   // clear
+        {
+            m_cursx = m_cursy = 0;
+            memset(m_chars, 0, sizeof(m_chars));
+            memset(m_attrs, 0, sizeof(m_attrs));
+            memset(m_dirty, 1, sizeof(m_dirty));
+        }
+
+        m_Wait87Shift = false;
+    }
+    else if ((data >= 0x20) && (data <= 0x7f))
     {
         m_chars[m_cursy][m_cursx] = data - ' ';
         m_attrs[m_cursy][m_cursx] = m_curattr;
@@ -287,6 +332,17 @@ void esq2x40_sq1_t::write_char(int data)
 
         update_display();
     }
+    else if (data == 0x83)
+    {
+        m_cursx = m_cursy = 0;
+        memset(m_chars, 0, sizeof(m_chars));
+        memset(m_attrs, 0, sizeof(m_attrs));
+        memset(m_dirty, 1, sizeof(m_dirty));
+    }
+    else if (data == 0x87)
+    {
+        m_Wait87Shift = true;
+    }
     else
     {
 //        printf("SQ-1 unhandled display char %02x\n", data);
@@ -297,5 +353,6 @@ esq2x40_sq1_t::esq2x40_sq1_t(const machine_config &mconfig, const char *tag, dev
 {
     m_rows = 2;
     m_cols = 40;
+    m_Wait87Shift = false;
 }
 
