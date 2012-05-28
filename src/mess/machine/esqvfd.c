@@ -4,9 +4,12 @@
 */
 
 #include "esqvfd.h"
+#include "esq1by22.lh"
 #include "esq2by40.lh"
 
+const device_type ESQ1x22 = &device_creator<esq1x22_t>;
 const device_type ESQ2x40 = &device_creator<esq2x40_t>;
+const device_type ESQ2x40_SQ1 = &device_creator<esq2x40_sq1_t>;
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const UINT16 font[]=
@@ -89,8 +92,10 @@ void esqvfd_t::device_start()
 void esqvfd_t::device_reset()
 {
     m_cursx = m_cursy = 0;
-    memset(m_chars, ' ', sizeof(m_chars));
+    m_curattr = AT_NORMAL;
+    memset(m_chars, 0, sizeof(m_chars));
     memset(m_attrs, 0, sizeof(m_attrs));
+    memset(m_dirty, 1, sizeof(m_attrs));
 }
 
 void esqvfd_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -121,6 +126,27 @@ UINT32 esqvfd_t::conv_segments(UINT16 segin)
     return segout;
 }
 
+// generic display update; can override from child classes if not good enough
+void esqvfd_t::update_display()
+{
+    for (int row = 0; row < m_rows; row++)
+    {
+        for (int col = 0; col < m_cols; col++)
+        {
+            if (m_dirty[row][col])
+            {
+                UINT32 segdata = conv_segments(font[m_chars[row][col]]);
+
+                output_set_indexed_value("vfd", (row*m_cols) + col, segdata);
+
+                m_dirty[row][col] = 0;
+            }
+        }
+    }
+}
+
+/* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
+
 static MACHINE_CONFIG_FRAGMENT(esq2x40)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by40)
 MACHINE_CONFIG_END
@@ -141,6 +167,14 @@ void esq2x40_t::write_char(int data)
     {
         switch (data)
         {
+            case 0xd0:  // blink start
+                m_curattr = AT_BLINK;
+                break;
+
+            case 0xd1:  // blink stop
+                m_curattr &= ~AT_BLINK;
+                break;
+
             case 0xd6:  // clear screen
                 m_cursx = m_cursy = 0;
                 memset(m_chars, 0, sizeof(m_chars));
@@ -155,16 +189,10 @@ void esq2x40_t::write_char(int data)
     }
     else
     {
-        if (data == 'f')    // EPS-16 clear screen (HACK!)
-        {
-            m_cursx = m_cursy = 0;
-            memset(m_chars, 0, sizeof(m_chars));
-            memset(m_attrs, 0, sizeof(m_attrs));
-            memset(m_dirty, 1, sizeof(m_dirty));
-        }
-        else if ((data >= 0x20) && (data <= 0x5f))
+        if ((data >= 0x20) && (data <= 0x5f))
         {
             m_chars[m_cursy][m_cursx] = data - ' ';
+            m_attrs[m_cursy][m_cursx] = m_curattr;
             m_dirty[m_cursy][m_cursx] = 1;
             m_cursx++;
 
@@ -178,26 +206,96 @@ void esq2x40_t::write_char(int data)
     update_display();
 }
 
-void esq2x40_t::update_display()
+esq2x40_t::esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : esqvfd_t(mconfig, ESQ2x40, "Ensoniq 2x40 VFD", tag, owner, clock)
 {
-    for (int row = 0; row < 2; row++)
+    m_rows = 2;
+    m_cols = 40;
+}
+
+/* 1x22 display from the VFX (not right, but it'll do for now) */
+
+static MACHINE_CONFIG_FRAGMENT(esq1x22)
+	MCFG_DEFAULT_LAYOUT(layout_esq1by22)
+MACHINE_CONFIG_END
+
+machine_config_constructor esq1x22_t::device_mconfig_additions() const
+{
+    return MACHINE_CONFIG_NAME( esq1x22 );
+}
+
+void esq1x22_t::write_char(int data)
+{
+    if (data >= 0x60)
     {
-        for (int col = 0; col < 40; col++)
+        switch (data)
         {
-            if (m_dirty[row][col])
+            case 'f':   // clear screen
+                m_cursx = m_cursy = 0;
+                memset(m_chars, 0, sizeof(m_chars));
+                memset(m_attrs, 0, sizeof(m_attrs));
+                memset(m_dirty, 1, sizeof(m_dirty));
+                break;
+
+            default:
+                printf("Unhandled control code %02x\n", data);
+                break;
+        }
+    }
+    else
+    {
+        if ((data >= 0x20) && (data <= 0x5f))
+        {
+            m_chars[0][m_cursx] = data - ' ';
+            m_dirty[0][m_cursx] = 1;
+            m_cursx++;
+
+            if (m_cursx >= 23)
             {
-                UINT32 segdata = conv_segments(font[m_chars[row][col]]);
-
-                output_set_indexed_value("vfd", (row*40) + col, segdata);
-
-                m_dirty[row][col] = 0;
+                m_cursx = 23;
             }
         }
     }
+
+    update_display();
 }
 
-esq2x40_t::esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : esqvfd_t(mconfig, ESQ2x40, "Ensoniq 2x40 VFD", tag, owner, clock)
+esq1x22_t::esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : esqvfd_t(mconfig, ESQ1x22, "Ensoniq 1x22 VFD", tag, owner, clock)
 {
+    m_rows = 1;
+    m_cols = 22;
 }
 
+/* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
+machine_config_constructor esq2x40_sq1_t::device_mconfig_additions() const
+{
+    return MACHINE_CONFIG_NAME( esq2x40 );  // we use the normal 2x40 layout
+}
+
+void esq2x40_sq1_t::write_char(int data)
+{
+    if ((data >= 0x20) && (data <= 0x5f))
+    {
+        m_chars[m_cursy][m_cursx] = data - ' ';
+        m_attrs[m_cursy][m_cursx] = m_curattr;
+        m_dirty[m_cursy][m_cursx] = 1;
+        m_cursx++;
+
+        if (m_cursx >= 39)
+        {
+            m_cursx = 39;
+        }
+
+        update_display();
+    }
+    else
+    {
+//        printf("SQ-1 unhandled display char %02x\n", data);
+    }
+}
+
+esq2x40_sq1_t::esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : esqvfd_t(mconfig, ESQ2x40_SQ1, "Ensoniq 2x40 VFD (SQ-1 variant)", tag, owner, clock)
+{
+    m_rows = 2;
+    m_cols = 40;
+}
 

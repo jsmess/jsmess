@@ -12,7 +12,7 @@
     Memory map:
  
     0x000000-0x00ffff   work RAM low
-    0x200000-0x20001f   OTTO (5505) regs
+    0x200000-0x20001f   OTTO(5505) regs
     0x240000-0x24003f   ??? regs
     0x260000-0x2601ff   ESP (5510) regs
     0x280000-0x28001f   DUART (68681) regs
@@ -40,6 +40,10 @@
 
 #include "machine/esqvfd.h"
 
+#define GENERIC (0)
+#define EPS16   (1)
+#define SQ1     (2)
+
 class esq5505_state : public driver_device
 {
 public:
@@ -48,12 +52,16 @@ public:
         m_maincpu(*this, "maincpu"),
         m_duart(*this, "duart"),
         m_fdc(*this, "wd1772"),
+        m_epsvfd(*this, "epsvfd"),
+        m_sq1vfd(*this, "sq1vfd"),
         m_vfd(*this, "vfd")
     { }
 
     required_device<device_t> m_maincpu;
     required_device<device_t> m_duart;
     optional_device<wd1772_t> m_fdc;
+    optional_device<esq1x22_t> m_epsvfd;
+    optional_device<esq2x40_sq1_t> m_sq1vfd;
     optional_device<esq2x40_t> m_vfd;
 
     virtual void machine_reset();
@@ -63,7 +71,7 @@ public:
     DECLARE_READ16_MEMBER(mc68681_r);
     DECLARE_WRITE16_MEMBER(mc68681_w);
 
-    bool  m_bIsEPS16;
+    int m_system_type;
     UINT8 m_duart_io;
     bool  m_bCalibSecondByte;
 
@@ -185,12 +193,12 @@ WRITE16_MEMBER(esq5505_state::es5510_dsp_w)
 }
 
 static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("osram")
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
-    AM_RANGE(0xfc0000, 0xffffff) AM_RAM AM_SHARE("osram")
+    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
@@ -264,37 +272,48 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 {
     esq5505_state *state = device->machine().driver_data<esq5505_state>();
 
-//    printf("ch %d: [%02x]\n", channel, data);
-
     if (channel == 1)
     {
-        state->m_vfd->write_char(data);
+//        printf("ch %d: [%02x] (PC=%x)\n", channel, data, cpu_get_pc(state->m_maincpu));
+        switch (state->m_system_type)
+        {
+            case GENERIC:
+                state->m_vfd->write_char(data);
+                break;
 
-        // c023ea = Rx B on vfxsd calib at c033ba
+            case EPS16:
+                state->m_epsvfd->write_char(data);
+                break;
+
+            case SQ1:
+                state->m_sq1vfd->write_char(data);
+                break;
+        }
+
         if (state->m_bCalibSecondByte)
         {
-//            printf("Calibrate second byte %02x\n", data);
-            duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
+//            printf("KPC second byte %02x\n", data);
+            if (data == 0xfd)   // calibration request
+            {
+                duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
+            }
             state->m_bCalibSecondByte = false;
         }
         else if (data == 0xfb)   // request calibration
         {
-//            printf("KPC command, waiting on second byte (PC=%x)\n", cpu_get_pc(state->m_maincpu));
             state->m_bCalibSecondByte = true;
         }
         else
         {
             // EPS-16+ wants a throwaway reply byte for each byte sent to the KPC
             // VFX-SD and SD-1 definitely don't :)
-            if (state->m_bIsEPS16)
+            if (state->m_system_type == EPS16)
             {
                 // 0xe7 must respond with any byte that isn't 0xc8 or the ROM dies.
                 // 0x71 must respond with anything (return not checked)
-
                 duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
             }
         }
-
     }
 }
 
@@ -318,7 +337,7 @@ static const es5505_interface es5505_config =
 };
 
 static MACHINE_CONFIG_START( vfx, esq5505_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 
     MCFG_ESQ2x40_ADD("vfd")
@@ -332,9 +351,17 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED(sq1, vfx)
+    MCFG_ESQ2x40_REMOVE("vfd")
+    MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED(eps16, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps16_map)
+
+    MCFG_ESQ2x40_REMOVE("vfd")
+    MCFG_ESQ1x22_ADD("epsvfd")
 
     MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
@@ -406,14 +433,14 @@ ROM_START( eps16 )
     ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
     ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
 
-    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)      // did the EPS-16 have ROM sounds or is it a pure sampler?
+    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 has no ROM sounds
 ROM_END
 
 static DRIVER_INIT(common)
 {
     esq5505_state *state = machine.driver_data<esq5505_state>();
 
-    state->m_bIsEPS16 = false;
+    state->m_system_type = GENERIC;
     state->m_duart_io = 0;
 
 	floppy_connector *con = machine.device<floppy_connector>("fd0");
@@ -430,13 +457,21 @@ static DRIVER_INIT(eps16)
     esq5505_state *state = machine.driver_data<esq5505_state>();
 
     DRIVER_INIT_CALL(common);
-    state->m_bIsEPS16 = true;
+    state->m_system_type = EPS16;
+}
+
+static DRIVER_INIT(sq1)
+{
+    esq5505_state *state = machine.driver_data<esq5505_state>();
+
+    DRIVER_INIT_CALL(common);
+    state->m_system_type = SQ1;
 }
 
 CONS( 1989, vfx,   0, 0, vfx,   vfx, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
 CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
 CONS( 1990, sd1,   0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD 
 CONS( 1990, sd132, 0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
-CONS( 1990, sq1,   0, 0, vfx,   vfx, common, "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
-CONS( 1990, eps16, 0, 0, eps16, vfx, eps16,  "Ensoniq", "EPS-16 Plus", GAME_NOT_WORKING )   // 1x40? (20? 32?) VFD
+CONS( 1990, sq1,   0, 0, sq1,   vfx, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
+CONS( 1990, eps16, 0, 0, eps16, vfx, eps16,  "Ensoniq", "EPS-16 Plus", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 
