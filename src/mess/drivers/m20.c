@@ -58,6 +58,7 @@ public:
         m_ttyi8251(*this, "i8251_2"),
         m_i8255(*this, "ppi8255"),
         m_i8259(*this, "i8259"),
+		m_wd177x(*this, "fd1797"),
 		m_p_videoram(*this, "p_videoram"){ }
 
     required_device<device_t> m_maincpu;
@@ -65,25 +66,31 @@ public:
     required_device<i8251_device> m_ttyi8251;
     required_device<i8255_device> m_i8255;
     required_device<device_t> m_i8259;
+    required_device<device_t> m_wd177x;
+
 	required_shared_ptr<UINT16> m_p_videoram;
 
     virtual void machine_reset();
 
     DECLARE_READ16_MEMBER(m20_i8259_r);
     DECLARE_WRITE16_MEMBER(m20_i8259_w);
+    DECLARE_READ16_MEMBER(port21_r);
+    DECLARE_WRITE16_MEMBER(port21_w);
     DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
     DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
     DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
     DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
-	DECLARE_WRITE_LINE_MEMBER(kbd_rxrdy_int);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+
+	bool m_port21_sd;
 
 private:
 	bool m_kbrecv_in_progress;
 	int m_kbrecv_bitcount;
 	UINT16 m_kbrecv_data;
+	UINT8 m_port21;
 };
 
 
@@ -157,6 +164,68 @@ WRITE_LINE_MEMBER(m20_state::kbd_tx)
 	}
 }
 
+
+/*
+port21		=	0x21		!TTL latch
+!	(see hw1 document, fig 2-33, pg 2-47)
+!		Output						Input
+!		======						=====
+!	B0	0 selects floppy 0
+!		1 deselects floppy 0
+!	B1	0 selects floppy 1
+!		1 deselects floppy 1
+!	B2	Motor On (Not Used)
+!	B3	0 selects double density	0 => Skip basic tests
+!		1 selects single density	1 => Perform basic tests
+!									Latched copy when B7 is written to Port21
+!	B4	Uncommitted output			0 => 128K card(s) present
+!									1 => 32K(s) card present
+!									Cannot mix types!
+!	B5	Uncommitted output			0 => 8-colour card present
+!									1 => 4-colour card present
+!	B6	Uncommitted output			0 => RAM
+!									1 => ROM (???)
+!	B7	See B3 input				0 => colour card present
+*/
+
+READ16_MEMBER(m20_state::port21_r)
+{
+	//printf("port21 read: offset 0x%x\n", offset);
+	return m_port21;
+}
+
+WRITE16_MEMBER(m20_state::port21_w)
+{
+	printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
+	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
+	m_port21_sd = (data & 8) ? 1 : 0;
+	//printf("port21: sd = %d\n", m_port21_sd);
+
+	// floppy drive select
+	if (data & 1) {
+		wd17xx_set_drive(m_wd177x, 0);
+		floppy_mon_w(floppy_get_device(machine(), 0) , 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 0);
+	}
+	else {
+		floppy_mon_w(floppy_get_device(machine(), 0) , 1);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 0, 0);
+	}
+
+	if (data & 2) {
+		wd17xx_set_drive(m_wd177x, 1);
+		floppy_mon_w(floppy_get_device(machine(), 1) , 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 0);
+	}
+	else {
+		floppy_mon_w(floppy_get_device(machine(), 1) , 1);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 0, 0);
+	}
+
+	// density select 1 - sd, 0 - dd
+	wd17xx_dden_w(m_wd177x, m_port21_sd);
+}
+
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
     return pic8259_r(m_i8259, offset)<<1;
@@ -226,6 +295,7 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
     AM_RANGE( 0x44000, 0x4bfff ) AM_RAM
     AM_RANGE( 0x50000, 0x5bfff ) AM_RAM
     AM_RANGE( 0x60000, 0x67fff ) AM_RAM
+    AM_RANGE( 0x70000, 0x77fff ) AM_RAM
     AM_RANGE( 0x80000, 0x8ffff ) AM_RAM
     AM_RANGE( 0x90000, 0x9ffff ) AM_RAM
     AM_RANGE( 0xa0000, 0xaffff ) AM_RAM
@@ -238,10 +308,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8_LEGACY("wd177x", wd17xx_command_w, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_track_r, wd17xx_track_w, 0x00ff)
-	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_sector_r, wd17xx_sector_w, 0x00ff)
-	AM_RANGE(0x06, 0x07) AM_DEVREADWRITE8_LEGACY("wd177x", wd17xx_data_r, wd17xx_data_w, 0x00ff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_status_r, wd17xx_command_w, 0x00ff)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_track_r, wd17xx_track_w, 0x00ff)
+	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_sector_r, wd17xx_sector_w, 0x00ff)
+	AM_RANGE(0x06, 0x07) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_data_r, wd17xx_data_w, 0x00ff)
+
+	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
 	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
@@ -299,7 +371,13 @@ void m20_state::machine_reset()
 
     ROM += 0x10000; // don't know why they load at an offset, but let's go with it
 
+	m_port21 = 0xff;
+	m_port21_sd = 1;
+
 	device_set_irq_callback(m_maincpu, m20_irq_callback);
+
+	wd17xx_mr_w(m_wd177x, 0);
+	//wd17xx_mr_w(m_wd177x, 1);
 
     memcpy(RAM, ROM, 8);  // we need only the reset vector
     m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
@@ -331,7 +409,21 @@ static I8255A_INTERFACE( ppi_interface )
 
 static WRITE_LINE_DEVICE_HANDLER(kbd_rxrdy_int)
 {
-        pic8259_ir4_w(device->machine().device("i8259"), state);
+	pic8259_ir4_w(device->machine().device("i8259"), state);
+}
+
+#if 0
+static READ_LINE_DEVICE_HANDLER( wd177x_dden_r )
+{
+	m20_state *state = device->machine().driver_data<m20_state>();
+	printf ("wd177x_dden_r called, returning %d\n", !state->m_port21_sd);
+	return !state->m_port21_sd;
+}
+#endif
+
+static WRITE_LINE_DEVICE_HANDLER( wd177x_intrq_w )
+{
+	pic8259_ir0_w(device->machine().device("i8259"), state);
 }
 
 static const i8251_interface kbd_i8251_intf =
@@ -362,19 +454,19 @@ static const i8251_interface tty_i8251_intf =
 
 const wd17xx_interface m20_wd17xx_interface =
 {
+	DEVCB_NULL, //DEVCB_LINE(wd177x_dden_r),
+	DEVCB_LINE(wd177x_intrq_w),
 	DEVCB_NULL,
-	DEVCB_NULL, //DEVCB_LINE(bbc_wd177x_intrq_w),
-	DEVCB_NULL, //DEVCB_LINE(bbc_wd177x_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static LEGACY_FLOPPY_OPTIONS_START(m20)
 	LEGACY_FLOPPY_OPTION(m20, "img", "M20 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
-		TRACKS([40])
+		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
+		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface m20_floppy_interface =
@@ -393,9 +485,9 @@ static const floppy_interface m20_floppy_interface =
 WRITE8_MEMBER( m20_state::kbd_put )
 {
 	if (data) {
-		printf("kbd_put called with 0%02X\n", data);
-		i8251_device *uart = machine().device<i8251_device>("i8251_1");
-		uart->receive_character(data);
+        if (data == 0xd) data = 0xc1;
+		printf("kbd_put called with 0x%02X\n", data);
+		m_kbdi8251->receive_character(data);
 	}
 }
 
@@ -456,7 +548,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PALETTE_LENGTH(4)
 
 	/* Devices */
-	MCFG_WD1770_ADD("wd177x", m20_wd17xx_interface )
+	MCFG_FD1797_ADD("fd1797", m20_wd17xx_interface )
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
@@ -465,7 +557,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PIC8259_ADD("i8259", pic_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(m20_floppy_interface)
 
-	 MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 ROM_START(m20)
