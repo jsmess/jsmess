@@ -20,7 +20,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="0" right="455" bottom="23" />
+			<bounds left="0" top="0" right="417" bottom="23" />
 		</backdrop>
 
 		<!-- VFDs -->
@@ -89,12 +89,6 @@
 		</bezel>
 		<bezel name="vfd21" element="vfd0">
 			<bounds left="399" top="0" right="417" bottom="23" />
-		</bezel>
-		<bezel name="vfd22" element="vfd0">
-			<bounds left="418" top="0" right="436" bottom="23" />
-		</bezel>
-		<bezel name="vfd23" element="vfd0">
-			<bounds left="437" top="0" right="455" bottom="23" />
 		</bezel>
 	</view>
 

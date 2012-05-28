@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 
     MCFG_ESQ2x40_ADD("vfd")
 
-	MCFG_DUART68681_ADD("duart", 2000000, duart_config)
+	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, 30476100/2)
