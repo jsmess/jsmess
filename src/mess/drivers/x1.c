@@ -1171,7 +1171,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-    			gfx_element_mark_dirty(machine().gfx[1], pcg_offset >> 3);
+   			gfx_element_mark_dirty(machine().gfx[1], pcg_offset >> 3);
 		}
 		else // Compatible Mode
 		{
