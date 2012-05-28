@@ -12,17 +12,17 @@ Currently, only reading of disks is supported.
 
 ToDo:
 - Rewrite to be a standard device able to be used in a general way
-- Support the ability to write to disk.
+- Fix bug where if you run a program on drive B,C,D then exit, you
+  get a disk error.
+- Enable the ability to write to disk when above bug gets fixed.
+- When the controller is reset via command 5, what exactly gets reset?
 
 
 Ports:
 BE00 and BE01 can be used as command registers (they are identical),
               and they are also used as status registers (different).
 
-BE02 - read data
-BE03 - unknown
-
-Write data is unknown but could either be BE02 or BE03.
+BE02 and BE03 - read data, write data
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@ Write data is unknown but could either be BE02 or BE03.
 ***************************************************************************/
 
 
-#define STAT_MOTOR_ON   0x20
+#define STAT_RFC   0x20
 #define STAT_TRACK0     0x08
 #define STAT_READY      0x80
 
@@ -158,7 +158,7 @@ static void micropolis_write_sector(device_t *device)
     INTERFACE
 ***************************************************************************/
 
-/* use this to determine which drive is controlled by WD */
+/* select a drive */
 void micropolis_set_drive(device_t *device, UINT8 drive)
 {
 	micropolis_state *w = get_safe_token(device);
@@ -166,17 +166,8 @@ void micropolis_set_drive(device_t *device, UINT8 drive)
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
 
-	if (w->intf->floppy_drive_tags[drive] != NULL)
-	{
-		if (device->owner() != NULL) {
-			w->drive = device->owner()->subdevice(w->intf->floppy_drive_tags[drive]);
-			if (w->drive == NULL) {
-				w->drive = device->machine().device(w->intf->floppy_drive_tags[drive]);
-			}
-		}
-		else
-			w->drive = device->machine().device(w->intf->floppy_drive_tags[drive]);
-	}
+	if (w->intf->floppy_drive_tags[drive])
+		w->drive = device->siblingdevice(w->intf->floppy_drive_tags[drive]);
 }
 
 
@@ -195,6 +186,7 @@ READ8_DEVICE_HANDLER( micropolis_status_r )
 		return w->status | w->drive_num;
 	else
 	{
+		// FIXME - find out what controls current sector
 		w->sector = (w->sector + 3 + inv) & 15;
 		micropolis_read_sector(device);
 		inv ^= 1;
@@ -217,41 +209,62 @@ READ8_DEVICE_HANDLER( micropolis_data_r )
 /* write the FDC command register */
 WRITE8_DEVICE_HANDLER( micropolis_command_w )
 {
+/* List of commands:
+Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
+0    Not used
+1    Drive/head select    bits 0,1 select drive 0-3; bit 4 chooses a side
+2    INT sector control   bit 0 LO = disable; HI = enable
+3    Step                 bit 0 LO step out; HI = step in (increment track number)
+4    Set Write
+5    Reset controller
+6    Not used
+7    Not used */
+
 	micropolis_state *w = get_safe_token(device);
 	int direction = 0;
 
-	if ((data & 0x60)==0x20)
+	switch (data >> 5)
 	{
+	case 1:
 		w->drive_num = data & 3;
-		floppy_mon_w(w->drive, ASSERT_LINE); // turn off the old drive
+		floppy_mon_w(w->drive, 1); // turn off the old drive
 		micropolis_set_drive(device, w->drive_num); // select new drive
-		floppy_mon_w(w->drive, CLEAR_LINE); // turn it on
+		floppy_mon_w(w->drive, 0); // turn it on
+		break;
+	case 2:  // not emulated, not used in sorcerer
+		break;
+	case 3:
+		if (BIT(data, 0))
+		{
+			if (w->track < 77)
+			{
+				w->track++;
+				direction = 1;
+			}
+		}
+		else
+		{
+			if (w->track)
+			{
+				w->track--;
+				direction = -1;
+			}
+		}
+		break;
+	case 4: // not emulated, to be done
+		break;
+	case 5: // not emulated, to be done
+		break;
 	}
 
-	w->status = 0;
+
+	w->status = STAT_RFC;
 
 	if (BIT(data, 5))
-		w->status = STAT_MOTOR_ON | STAT_READY;
+		w->status |= STAT_READY;
 
 	floppy_drive_set_ready_state(w->drive, 1,0);
 
-	if ((data & 0x41) == 0x41)
-	{
-		if (w->track < 77)
-		{
-			w->track++;
-			direction = 1;
-		}
-	}
-	else
-	if ((data & 0x41) == 0x40)
-	{
-		if (w->track)
-		{
-			w->track--;
-			direction = -1;
-		}
-	}
 
 	if (!w->track)
 		w->status |= STAT_TRACK0;
@@ -296,8 +309,8 @@ READ8_DEVICE_HANDLER( micropolis_r )
 	{
 	case 0: data = micropolis_status_r(device, 0); break;
 	case 1:	data = micropolis_status_r(device, 1); break;
-	case 2:	data = micropolis_data_r(device, 0); break;
-	case 3:	data = 0; break;
+	case 2:
+	case 3:	data = micropolis_data_r(device, 0); break;
 	}
 
 	return data;
@@ -307,9 +320,9 @@ WRITE8_DEVICE_HANDLER( micropolis_w )
 {
 	switch (offset & 0x03)
 	{
-	case 0: micropolis_command_w(device, 0, data); break;
-	case 1:	micropolis_command_w(device, 1, data); break;
-	case 2:     break;
+	case 0:
+	case 1:	micropolis_command_w(device, 0, data); break;
+	case 2:
 	case 3: micropolis_data_w(device, 0, data);    break;
 	}
 }
@@ -333,23 +346,18 @@ static DEVICE_RESET( micropolis )
 	micropolis_state *w = get_safe_token(device);
 	int i;
 
-	/* set the default state of some input lines */
 	for (i = 0; i < 4; i++)
 	{
-		if(w->intf->floppy_drive_tags[i]!=NULL) {
+		if(w->intf->floppy_drive_tags[i])
+		{
 			device_t *img = NULL;
 
-			if (device->owner() != NULL)
-				img = device->owner()->subdevice(w->intf->floppy_drive_tags[i]);
-				if (img == NULL) {
-					img = device->machine().device(w->intf->floppy_drive_tags[i]);
-				}
+			img = device->siblingdevice(w->intf->floppy_drive_tags[i]);
 
-			else
-				img = device->machine().device(w->intf->floppy_drive_tags[i]);
-
-			if (img!=NULL) {
+			if (img)
+			{
 				floppy_drive_set_controller(img,device);
+				//floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
 				floppy_drive_set_rpm( img, 300.);
 			}
 		}
@@ -361,7 +369,7 @@ static DEVICE_RESET( micropolis )
 	w->sector = 0;
 	w->track = 0;
 	w->sector_length = 270;
-	w->status = 0;
+	w->status = STAT_TRACK0;
 }
 
 void micropolis_reset(device_t *device)
