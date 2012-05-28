@@ -97,6 +97,13 @@ class mpu4_state : public driver_device
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_6840ptm(*this, "ptm_ic2"),
+		  m_pia3(*this, "pia_ic3"),
+		  m_pia4(*this, "pia_ic4"),
+		  m_pia5(*this, "pia_ic5"),
+		  m_pia6(*this, "pia_ic6"),
+		  m_pia7(*this, "pia_ic7"),
+		  m_pia8(*this, "pia_ic8"),
 		  m_vid_vidram(*this, "vid_vidram"),
 		  m_vid_mainram(*this, "vid_mainram"),
 		  m_dealem_videoram(*this, "dealem_videoram")
@@ -107,6 +114,13 @@ public:
 		return 0;
 	}
 
+	optional_device<ptm6840_device> m_6840ptm;
+	optional_device<pia6821_device> m_pia3;
+	optional_device<pia6821_device> m_pia4;
+	optional_device<pia6821_device> m_pia5;
+	optional_device<pia6821_device> m_pia6;
+	optional_device<pia6821_device> m_pia7;
+	optional_device<pia6821_device> m_pia8;
 	int m_mod_number;
 	int m_mmtr_data;
 	int m_alpha_data_line;
@@ -250,13 +264,49 @@ public:
 	DECLARE_READ8_MEMBER(crystal_sound_r);
 	DECLARE_WRITE8_MEMBER(crystal_sound_w);
 	DECLARE_WRITE8_MEMBER(ic3ss_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
+	DECLARE_WRITE8_MEMBER(ic2_o1_callback);
+	DECLARE_WRITE8_MEMBER(ic2_o2_callback);
+	DECLARE_WRITE8_MEMBER(ic2_o3_callback);
+	DECLARE_WRITE8_MEMBER(pia_ic3_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic3_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic4_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic4_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic4_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	DECLARE_READ8_MEMBER(pia_ic5_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic5_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic5_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic5_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
+	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic6_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic6_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic7_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic7_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic7_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic7_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic7_cb2_w);
+	DECLARE_READ8_MEMBER(pia_ic8_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic8_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_gb_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_gb_portb_w);
+	DECLARE_READ8_MEMBER(pia_gb_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+	DECLARE_WRITE8_MEMBER(ic3ss_o1_callback);
+	DECLARE_WRITE8_MEMBER(ic3ss_o2_callback);
+	DECLARE_WRITE8_MEMBER(ic3ss_o3_callback);
 };
 
 /* mpu4.c, used by mpu4vid.c */
-extern READ8_DEVICE_HANDLER( pia_ic5_portb_r );
-extern WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w );
-extern WRITE_LINE_DEVICE_HANDLER( pia_ic5_cb2_w );
-extern WRITE_LINE_DEVICE_HANDLER( cpu0_irq );
 extern void mpu4_config_common(running_machine &machine);
 extern void mpu4_stepper_reset(mpu4_state *state);
 

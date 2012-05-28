@@ -29,7 +29,6 @@ TODO:
 
 WRITE8_MEMBER(laserbat_state::laserbat_videoram_w)
 {
-
 	if (m_video_page == 0)
 	{
 		m_videoram[offset] = data;
@@ -44,7 +43,6 @@ WRITE8_MEMBER(laserbat_state::laserbat_videoram_w)
 
 WRITE8_MEMBER(laserbat_state::video_extra_w)
 {
-
 	m_video_page = (data & 0x10) >> 4;
 	m_sprite_enable = (data & 1) ^ 1;
 	m_sprite_code = (data & 0xe0) >> 5;
@@ -53,7 +51,6 @@ WRITE8_MEMBER(laserbat_state::video_extra_w)
 
 WRITE8_MEMBER(laserbat_state::sprite_x_y_w)
 {
-
 	if (offset == 0)
 		m_sprite_x = 256 - data;
 	else
@@ -62,7 +59,6 @@ WRITE8_MEMBER(laserbat_state::sprite_x_y_w)
 
 WRITE8_MEMBER(laserbat_state::laserbat_input_mux_w)
 {
-
 	m_input_mux = (data & 0x30) >> 4;
 
 	flip_screen_set_no_update(data & 0x08);
@@ -185,6 +181,7 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
@@ -197,6 +194,7 @@ static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
@@ -256,10 +254,10 @@ static INPUT_PORTS_START( laserbat )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPSETTING(    0x40, "Infinites" )
-//  PORT_DIPSETTING(    0x50, "Infinites" )
-//  PORT_DIPSETTING(    0x60, "Infinites" )
-//  PORT_DIPSETTING(    0x70, "Infinites" )
+	PORT_DIPSETTING(    0x40, "Infinite" )
+//  PORT_DIPSETTING(    0x50, "Infinite" )
+//  PORT_DIPSETTING(    0x60, "Infinite" )
+//  PORT_DIPSETTING(    0x70, "Infinite" )
 	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -409,10 +407,10 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPSETTING(    0x40, "Infinites" )
-//  PORT_DIPSETTING(    0x50, "Infinites" )
-//  PORT_DIPSETTING(    0x60, "Infinites" )
-//  PORT_DIPSETTING(    0x70, "Infinites" )
+	PORT_DIPSETTING(    0x40, "Infinite" )
+//  PORT_DIPSETTING(    0x50, "Infinite" )
+//  PORT_DIPSETTING(    0x60, "Infinite" )
+//  PORT_DIPSETTING(    0x70, "Infinite" )
 	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -573,76 +571,71 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
+WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0a)
 {
-	laserbat_state *laserbat = device->machine().driver_data<laserbat_state>();
-	device_set_input_line(laserbat->m_audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
+WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0b)
 {
-	laserbat_state *laserbat = device->machine().driver_data<laserbat_state>();
-	device_set_input_line(laserbat->m_audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
+READ8_MEMBER(laserbat_state::zaccaria_port0a_r)
 {
-	laserbat_state *state = device->machine().driver_data<laserbat_state>();
-	device_t *ay = (state->m_active_8910 == 0) ? state->m_ay1 : state->m_ay2;
+	device_t *ay = (m_active_8910 == 0) ? m_ay1 : m_ay2;
 	return ay8910_r(ay, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
+WRITE8_MEMBER(laserbat_state::zaccaria_port0a_w)
 {
-	laserbat_state *state = device->machine().driver_data<laserbat_state>();
-	state->m_port0a = data;
+	m_port0a = data;
 }
 
-static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
+WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 {
-	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 	/* bit 1 goes to 8910 #0 BDIR pin  */
-	if ((state->m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
+	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(state->m_ay1, state->m_last_port0b >> 0, state->m_port0a);
+		ay8910_data_address_w(m_ay1, m_last_port0b >> 0, m_port0a);
 	}
-	else if ((state->m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
+	else if ((m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (state->m_last_port0b & 0x01)
-			state->m_active_8910 = 0;
+		if (m_last_port0b & 0x01)
+			m_active_8910 = 0;
 	}
 	/* bit 3 goes to 8910 #1 BDIR pin  */
-	if ((state->m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
+	if ((m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(state->m_ay2, state->m_last_port0b >> 2, state->m_port0a);
+		ay8910_data_address_w(m_ay2, m_last_port0b >> 2, m_port0a);
 	}
-	else if ((state->m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
+	else if ((m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (state->m_last_port0b & 0x04)
-			state->m_active_8910 = 1;
+		if (m_last_port0b & 0x04)
+			m_active_8910 = 1;
 	}
 
-	state->m_last_port0b = data;
+	m_last_port0b = data;
 }
 
 static const pia6821_interface pia_intf =
 {
-	DEVCB_HANDLER(zaccaria_port0a_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zaccaria_port0a_w),		/* port A out */
-	DEVCB_HANDLER(zaccaria_port0b_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0b_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(zaccaria_irq0a),		/* IRQA */
-	DEVCB_LINE(zaccaria_irq0b)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0a),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0b)		/* IRQB */
 };
 
 static const ay8910_interface ay8910_config =
@@ -698,7 +691,6 @@ static MACHINE_START( laserbat )
 {
 	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
 	state->m_s2636_1 = machine.device("s2636_1");
 	state->m_s2636_2 = machine.device("s2636_2");
 	state->m_s2636_3 = machine.device("s2636_3");

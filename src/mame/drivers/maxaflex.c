@@ -55,6 +55,8 @@ public:
 	DECLARE_READ8_MEMBER(mcu_tcr_r);
 	DECLARE_WRITE8_MEMBER(mcu_tcr_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
+	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
 };
 
 
@@ -275,7 +277,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, maxaflex_state )
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
     AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -366,24 +368,23 @@ static const pokey_interface pokey_config = {
 	{ DEVCB_NULL },
 	DEVCB_NULL,
 	DEVCB_NULL,DEVCB_NULL,
-	atari_interrupt_cb
 };
 
-READ8_DEVICE_HANDLER(maxaflex_atari_pia_pa_r)
+READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pa_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
-READ8_DEVICE_HANDLER(maxaflex_atari_pia_pb_r)
+READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 
 const pia6821_interface maxaflex_atarixl_pia_interface =
 {
-	DEVCB_HANDLER(maxaflex_atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(maxaflex_atari_pia_pb_r),	/* port B in */
+	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pa_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -427,8 +428,10 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEYN, FREQ_17_EXACT)
-	MCFG_SOUND_CONFIG(pokey_config)
+	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
+	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

@@ -421,7 +421,7 @@ static void add_serout(device_t *device,int expect_data)
 static void clr_serin(device_t *device, int ser_delay)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	pokeyn_device *pokey = device->machine().device<pokeyn_device>("pokey");
+	pokey_device *pokey = device->machine().device<pokey_device>("pokey");
 	fdc->serin_chksum = 0;
 	fdc->serin_offs = 0;
 	fdc->serin_count = 0;
@@ -706,7 +706,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 	if (fdc->serin_count)
 	{
-		pokeyn_device *pokey = device->machine().device<pokeyn_device>("pokey");
+		pokey_device *pokey = device->machine().device<pokey_device>("pokey");
 
 		data = fdc->serin_buff[fdc->serin_offs];
 		ser_delay = 2 * 40;

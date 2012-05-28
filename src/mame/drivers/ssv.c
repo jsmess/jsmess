@@ -453,21 +453,21 @@ ADDRESS_MAP_END
                      Mobil Suit Gundam Final Shooting
 ***************************************************************************/
 
-static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
+READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	ssv_state *state = device->machine().driver_data<ssv_state>();
+	device_t *device = machine().device("eeprom");
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ device->machine().root_device().ioport(gunnames[state->m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
+	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ machine().root_device().ioport(gunnames[m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
 }
 
-static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
+WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 {
-	ssv_state *state = device->machine().driver_data<ssv_state>();
+	device_t *device = machine().device("eeprom");
 
 	if (data & ~0x7b00)
-		logerror("%s - Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -484,11 +484,11 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 		// clock line asserted: write latch or select next bit to read
 		eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
-		if (!(state->m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))	// rising clock
-			state->m_gdfs_lightgun_select = (data & 0x0300) >> 8;
+		if (!(m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))	// rising clock
+			m_gdfs_lightgun_select = (data & 0x0300) >> 8;
 	}
 
-	COMBINE_DATA(&state->m_gdfs_eeprom_old);
+	COMBINE_DATA(&m_gdfs_eeprom_old);
 }
 
 
@@ -582,8 +582,8 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_SHARE("gdfs_tmapram")
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_SHARE("gdfs_tmapscroll")
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("eeprom", gdfs_eeprom_w)
-	AM_RANGE(0x540000, 0x540001) AM_DEVREAD_LEGACY("eeprom", gdfs_eeprom_r)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
+	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_SHARE("gdfs_blitram")
@@ -1417,53 +1417,47 @@ static INPUT_PORTS_START( gdfs )
 	PORT_INCLUDE(ssv_joystick)
 
 	PORT_MODIFY("DSW1")	// IN0 - $210002
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Controls ) )	PORT_DIPLOCATION( "DSW1:1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Light_Gun ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Light Gun Calibration" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Light Gun Calibration" )	PORT_DIPLOCATION( "DSW1:2" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) ) /* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) )	PORT_DIPLOCATION( "DSW1:3" ) /* Manual lists this dip as "Unused" */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coinage ) )	PORT_DIPLOCATION( "DSW1:4,5" )
 //  PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) ) /* 2 Coins to Start, 1 Coin to Continue??? */
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Save Scores" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )	// Clear NVRAM on boot
+	PORT_DIPNAME( 0x0020, 0x0020, "Save Scores" )		PORT_DIPLOCATION( "DSW1:6" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )		// Clear NVRAM on boot
 	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION( "DSW1:7" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "DSW1:8" )	/* Manual lists this dip as "Unused" */
 
 	PORT_MODIFY("DSW2")	// IN1 - $210004
-	PORT_DIPNAME( 0x0001, 0x0001, "Invert X Axis" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Invert X Axis" )		PORT_DIPLOCATION( "DSW2:1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Language ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "DSW2:2" )	/* Manual lists this dip as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "DSW2:3" )	/* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Language ) )	PORT_DIPLOCATION( "DSW2:4" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION( "DSW2:5" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Damage From Machine Gun" )	// F76E34
+	PORT_DIPNAME( 0x0020, 0x0020, "Damage From Machine Gun" )	PORT_DIPLOCATION( "DSW2:6" )	// F76E34
 	PORT_DIPSETTING(      0x0020, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Damage From Beam Cannon" )	// F77487
+	PORT_DIPNAME( 0x0040, 0x0040, "Damage From Beam Cannon" )	PORT_DIPLOCATION( "DSW2:7" )	// F77487
 	PORT_DIPSETTING(      0x0040, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Damage From Missle" )	// F77255
+	PORT_DIPNAME( 0x0080, 0x0080, "Damage From Missle" )	PORT_DIPLOCATION( "DSW2:8" )	// F77255
 	PORT_DIPSETTING(      0x0080, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
 

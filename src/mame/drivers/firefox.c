@@ -92,6 +92,9 @@ public:
 	DECLARE_WRITE8_MEMBER(firefox_coin_counter_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	DECLARE_READ8_MEMBER(riot_porta_r);
+	DECLARE_WRITE8_MEMBER(riot_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(riot_irq);
 };
 
 
@@ -338,9 +341,9 @@ WRITE8_MEMBER(firefox_state::sound_to_main_w)
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( riot_porta_r )
+READ8_MEMBER(firefox_state::riot_porta_r)
 {
-	firefox_state *state = device->machine().driver_data<firefox_state>();
+	device_t *tms = machine().device("tms");
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
 	/* bit 5 = PA5 */
@@ -350,12 +353,12 @@ static READ8_DEVICE_HANDLER( riot_porta_r )
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
 
-	return (state->m_main_to_sound_flag << 7) | (state->m_sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(device) << 2);
+	return (m_main_to_sound_flag << 7) | (m_sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(tms) << 2);
 }
 
-static WRITE8_DEVICE_HANDLER( riot_porta_w )
+WRITE8_MEMBER(firefox_state::riot_porta_w)
 {
-	device_t *tms = device->machine().device("tms");
+	device_t *tms = machine().device("tms");
 
 	/* handle 5220 read */
 	tms5220_rsq_w(tms, (data>>1) & 1);
@@ -364,9 +367,9 @@ static WRITE8_DEVICE_HANDLER( riot_porta_w )
 	tms5220_wsq_w(tms, data & 1);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( riot_irq )
+WRITE_LINE_MEMBER(firefox_state::riot_irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -550,10 +553,10 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE_LEGACY("riot",riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey3", pokeyn_device, read, write)
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("pokey4", pokeyn_device, read, write)
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey3", pokey_device, read, write)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("pokey4", pokey_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -684,11 +687,11 @@ GFXDECODE_END
 
 static const riot6532_interface riot_intf =
 {
-	DEVCB_DEVICE_HANDLER("tms", riot_porta_r),
+	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_r),
 	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),
-	DEVCB_DEVICE_HANDLER("tms", riot_porta_w),
+	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_w),
 	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),
-	DEVCB_LINE(riot_irq)
+	DEVCB_DRIVER_LINE_MEMBER(firefox_state,riot_irq)
 };
 
 
@@ -727,19 +730,19 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_XTAL/8)
+	MCFG_POKEY_ADD("pokey1", MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_XTAL/8)
+	MCFG_POKEY_ADD("pokey2", MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey3", POKEYN, MASTER_XTAL/8)
+	MCFG_POKEY_ADD("pokey3", MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey4", POKEYN, MASTER_XTAL/8)
+	MCFG_POKEY_ADD("pokey4", MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 

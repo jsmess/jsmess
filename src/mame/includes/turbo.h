@@ -17,14 +17,23 @@ class turbo_state : public driver_device
 public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram(*this, "videoram"),
-		  m_spriteram(*this, "spriteram"),
-		  m_sprite_position(*this, "sprite_position") { }
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this,"subcpu"),
+		m_gfx1(*this, "gfx1"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_sprite_position(*this, "spritepos")
+	{ }
 
-	/* memory pointers */
+	/* device/memory pointers */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+	required_memory_region m_gfx1;
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sprite_position;
+
 	UINT8 *		m_buckrog_bitmap_ram;
 
 	/* machine states */
@@ -84,6 +93,22 @@ public:
 	DECLARE_READ8_MEMBER(buckrog_port_3_r);
 	DECLARE_WRITE8_MEMBER(turbo_videoram_w);
 	DECLARE_WRITE8_MEMBER(buckrog_bitmap_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1a_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1b_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1c_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi3c_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi1c_w);
+	DECLARE_READ8_MEMBER(turbo_analog_r);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi8255_0_w);
 };
 
 
