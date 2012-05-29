@@ -45,7 +45,8 @@ Notes:
 
     TODO:
 
-    - mcs51.c does not support 9-bit serial I/O
+    - rewrite the mcs51.c serial I/O to replace this horrible, horrible hack
+    - locate keys
 
 */
 
@@ -56,6 +57,8 @@ Notes:
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
+
+#define LOG 1
 
 #define I8051_TAG		"z5"
 #define SN76496_TAG		"z4"
@@ -99,7 +102,7 @@ static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(kb_p1_r) AM_WRITENOP
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
-	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
+	AM_RANGE(0x0000, 0xfeff) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -396,15 +399,9 @@ void wangpc_keyboard_device::device_reset()
 {
     transmit_register_reset();
     receive_register_reset();
-}
-
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
+    
+    set_out_data_bit(1);
+    serial_connection_out();
 }
 
 
@@ -414,26 +411,16 @@ void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 void wangpc_keyboard_device::input_callback(UINT8 state)
 {
-    //logerror("input %02x\n", state);
-
-    // receive
     int bit = (state & SERIAL_STATE_RX_DATA) ? 1 : 0;
 
-    //logerror("inbit %u \n", bit);
     receive_register_update_bit(bit);
 
     if (is_receive_register_full())
     {
         m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
         receive_register_extract();
-        logerror("Wang PC keyboard receive data %02x\n", get_received_char());
-    }
-
-    // transmit
-    if (!is_transmit_register_empty())
-    {
-        transmit_register_get_data_bit();
-        serial_connection_out();
+        
+        if (LOG) logerror("Wang PC keyboard receive data %02x\n", get_received_char());
     }
 }
 
@@ -458,9 +445,15 @@ void wangpc_keyboard_device::mcs51_tx_callback(device_t *device, int data)
 {
 	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
 
-    logerror("Wang PC keyboard transmit data %02x\n", data);
+    if (LOG) logerror("Wang PC keyboard transmit data %02x\n", data);
 
 	kb->transmit_register_setup(data);
+
+    // HACK bang the bits out immediately
+    while (!kb->is_transmit_register_empty())
+    {
+        kb->transmit_register_send_bit();
+    }
 }
 
 

@@ -12,10 +12,10 @@
 
 	TODO:
 
-	- boot
 	- keyboard
-	- floppy
-	- serial
+	- upd765.c drive polling (POST expects 4 consecutive Sense Interrupt Status commands to return xx,xx,xx,C3 = ready state changed on drive 3)
+	- floppy door disturbed interrupt
+	- floppy door open status
 	- hard disk
 
 */
@@ -43,7 +43,7 @@ enum
 
 void wangpc_state::select_drive(int drive, bool select)
 {
-	if (LOG) logerror("%sselect drive %u\n", select ? "" : "De", drive + 1);
+	if (LOG) logerror("%s: %sselect drive %u\n", machine().describe_context(), select ? "" : "De", drive + 1);
 
 	int state = select ? 0 : 1;
 
@@ -59,7 +59,7 @@ void wangpc_state::select_drive(int drive, bool select)
 
 void wangpc_state::set_motor(int drive, bool motor)
 {
-	if (LOG) logerror("Motor %u %s\n", drive + 1, motor ? "on" : "off");
+	if (LOG) logerror("%s: Motor %u %s\n", machine().describe_context(), drive + 1, motor ? "on" : "off");
 
 	int state = motor ? 0 : 1;
 
@@ -75,7 +75,7 @@ void wangpc_state::set_motor(int drive, bool motor)
 
 void wangpc_state::fdc_reset()
 {
-    if (LOG) logerror("FDC reset\n");
+    if (LOG) logerror("%s: FDC reset\n", machine().describe_context());
 
 	upd765_reset_w(m_fdc, 1);
 	upd765_reset_w(m_fdc, 0);
@@ -83,7 +83,7 @@ void wangpc_state::fdc_reset()
 
 void wangpc_state::fdc_tc()
 {
-    if (LOG) logerror("FDC TC\n");
+    if (LOG) logerror("%s: FDC TC\n", machine().describe_context());
 
 	upd765_tc_w(m_fdc, 1);
 	upd765_tc_w(m_fdc, 0);
@@ -109,8 +109,8 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 	m_fdc_tc_enable = BIT(data, 0);
 	m_fdc_dma_enable = BIT(data, 1);
 
-    if (LOG) logerror("Enable /EOP %u\n", m_fdc_tc_enable);
-    if (LOG) logerror("Disable /DREQ2 %u\n", m_fdc_dma_enable);
+    if (LOG) logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_fdc_tc_enable);
+    if (LOG) logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_fdc_dma_enable);
 
 	update_fdc_tc();
 	update_fdc_drq();
@@ -264,7 +264,7 @@ WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 
 WRITE8_MEMBER( wangpc_state::dma_page_w )
 {
-    if (LOG) logerror("DMA page %u: %01x\n", offset, data & 0x0f);
+    if (LOG) logerror("%s: DMA page %u: %01x\n", machine().describe_context(), offset, data & 0x0f);
 
 	m_dma_page[offset] = data & 0x0f;
 }
@@ -306,7 +306,7 @@ READ8_MEMBER( wangpc_state::status_r )
 
 WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 {
-    //if (LOG) logerror("Timer 0 IRQ clear\n");
+    //if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
 	pic8259_ir0_w(m_pic, CLEAR_LINE);
 }
@@ -318,7 +318,7 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 
 READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 {
-    //if (LOG) logerror("Timer 2 IRQ clear\n");
+    //if (LOG) logerror("%s: Timer 2 IRQ clear\n", machine().describe_context());
 
 	m_timer2_irq = 1;
 	check_level1_interrupts();
@@ -333,7 +333,7 @@ READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 
 WRITE8_MEMBER( wangpc_state::nmi_mask_w )
 {
-    if (LOG) logerror("NMI mask %02x\n", data);
+    if (LOG) logerror("%s: NMI mask %02x\n", machine().describe_context(), data);
 }
 
 
@@ -343,7 +343,7 @@ WRITE8_MEMBER( wangpc_state::nmi_mask_w )
 
 READ8_MEMBER( wangpc_state::led_on_r )
 {
-    if (LOG) logerror("LED on\n");
+    if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
 
 	output_set_led_value(LED_DIAGNOSTIC, 1);
 
@@ -357,7 +357,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 
 WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 {
-    if (LOG) logerror("FPU mask %02x\n", data);
+    if (LOG) logerror("%s: FPU mask %02x\n", machine().describe_context(), data);
 }
 
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 
 WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 {
-    if (LOG) logerror("TBRE clear\n");
+    if (LOG) logerror("%s: TBRE clear\n", machine().describe_context());
 
 	m_uart_tbre = 0;
 	check_level2_interrupts();
@@ -382,8 +382,12 @@ READ8_MEMBER( wangpc_state::uart_r )
 {
 	m_uart_dr = 0;
 	check_level2_interrupts();
+	
+	UINT8 data = m_uart->read(space, 0);
 
-	return m_uart->read(space, 0);
+    if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
+
+	return data;
 }
 
 
@@ -393,7 +397,7 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 WRITE8_MEMBER( wangpc_state::uart_w  )
 {
-    if (LOG) logerror("UART write %02x\n", data);
+    if (LOG) logerror("%s: UART write %02x\n", machine().describe_context(), data);
 
     switch (data)
     {
@@ -457,7 +461,7 @@ WRITE8_MEMBER( wangpc_state::centronics_w )
 
 READ8_MEMBER( wangpc_state::busy_clr_r )
 {
-    if (LOG) logerror("BUSY clear\n");
+    if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
 
 	m_busy = 1;
 	check_level1_interrupts();
@@ -472,7 +476,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 
 WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 {
-    if (LOG) logerror("ACKNLG clear\n");
+    if (LOG) logerror("%s: ACKNLG clear\n", machine().describe_context());
 
 	m_acknlg = 1;
 	check_level1_interrupts();
@@ -485,7 +489,7 @@ WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 
 READ8_MEMBER( wangpc_state::led_off_r )
 {
-    if (LOG) logerror("LED off\n");
+    if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
 
 	output_set_led_value(LED_DIAGNOSTIC, 0);
 
@@ -499,7 +503,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 
 WRITE8_MEMBER( wangpc_state::parity_nmi_clr_w )
 {
-    if (LOG) logerror("Parity NMI clear\n");
+    if (LOG) logerror("%s: Parity NMI clear\n", machine().describe_context());
 }
 
 
@@ -572,8 +576,8 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x1020, 0x1027) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x1040, 0x1047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, scn2661_device, read, 0x00ff)
-	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, scn2661_device, write, 0x00ff)
+	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, mc2661_device, read, 0x00ff)
+	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, mc2661_device, write, 0x00ff)
 	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8_LEGACY(AM9517A_TAG, i8237_r, i8237_w, 0x00ff)
 	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
@@ -969,7 +973,7 @@ WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 
 static IM6402_INTERFACE( uart_intf )
 {
-	62500,
+	0, // HACK should be 62500
 	62500,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -988,7 +992,7 @@ WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
 	check_level1_interrupts();
 }
 
-static SCN2661_INTERFACE( epci_intf )
+static MC2661_INTERFACE( epci_intf )
 {
 	0,
 	0,
@@ -1212,7 +1216,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
-	MCFG_SCN2661_ADD(SCN2661_TAG, 0, epci_intf)
+	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)

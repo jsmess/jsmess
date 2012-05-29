@@ -13,7 +13,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/scn2661.h"
+#include "machine/mc2661.h"
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
@@ -74,7 +74,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pit;
 	required_device<im6402_device> m_uart;
-	required_device<scn2661_device> m_epci;
+	required_device<mc2661_device> m_epci;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
