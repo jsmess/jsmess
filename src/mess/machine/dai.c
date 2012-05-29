@@ -151,6 +151,8 @@ MACHINE_START( dai )
 	state->membank("bank2")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x010000, 0x1000);
 	machine.scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
 	machine.scheduler().timer_pulse(attotime::from_hz(100), FUNC(dai_timer));	/* timer for tms5501 */
+
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
 }
 
 MACHINE_RESET( dai )
@@ -245,6 +247,25 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 		LOG_DAI_PORT_W (offset, data, "discrete devices - unmapped");
 		break;
 	}
+}
+
+/***************************************************************************
+
+    PIT8253
+
+    Offset need to be shifted by 1 to right, because the PIT is
+    connected to A1 and A2
+
+***************************************************************************/
+
+READ8_MEMBER(dai_state::dai_pit_r)
+{
+	return pit8253_r(m_pit, (offset>>1) & 3);
+}
+
+WRITE8_MEMBER(dai_state::dai_pit_w)
+{
+	pit8253_w(m_pit, (offset>>1) & 3, data);
 }
 
 /***************************************************************************

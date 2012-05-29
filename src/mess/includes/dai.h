@@ -17,7 +17,11 @@ class dai_state : public driver_device
 {
 public:
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_pit(*this, "pit8253")
+		{ }
+
+	required_device<device_t> m_pit;
 
 	UINT8 m_paddle_select;
 	UINT8 m_paddle_enable;
@@ -31,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dai_io_discrete_devices_w);
 	DECLARE_READ8_MEMBER(dai_amd9511_r);
 	DECLARE_WRITE8_MEMBER(dai_amd9511_w);
+	DECLARE_READ8_MEMBER(dai_pit_r);
+	DECLARE_WRITE8_MEMBER(dai_pit_w);
 };
 
 
