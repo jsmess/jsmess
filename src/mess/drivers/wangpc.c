@@ -838,7 +838,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	data |= m_timer2_irq;
 
 	// serial interrupt
-	data |= (m_epci->rxrdy_r() | m_epci->txemt_r()) << 1;
+	data |= !(m_epci->rxrdy_r() | m_epci->txemt_r()) << 1;
 
 	// parallel port interrupt
 	data |= m_acknlg << 2;

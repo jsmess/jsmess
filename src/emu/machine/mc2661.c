@@ -222,7 +222,7 @@ void mc2661_device::device_reset()
 	m_out_txrdy_func(CLEAR_LINE);
 	m_out_rts_func(1);
 	m_out_dtr_func(1);
-	m_out_txemt_dschg_func(ASSERT_LINE);
+	m_out_txemt_dschg_func(CLEAR_LINE);
 	m_out_bkdet_func(0);
 	m_out_xsync_func(0);
 }
@@ -434,7 +434,7 @@ WRITE_LINE_MEMBER( mc2661_device::cts_w )
 
 READ_LINE_MEMBER( mc2661_device::rxrdy_r )
 {
-	return STATUS_RXRDY;
+	return (m_sr & STATUS_RXRDY) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 
@@ -444,5 +444,5 @@ READ_LINE_MEMBER( mc2661_device::rxrdy_r )
 
 READ_LINE_MEMBER( mc2661_device::txemt_r )
 {
-	return STATUS_TXEMT;
+	return (m_sr & STATUS_TXEMT) ? ASSERT_LINE : CLEAR_LINE;
 }
