@@ -6,6 +6,49 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
+                            _____   _____
+                   GND   1 |*    \_/     | 40  
+                     G   2 |             | 39  
+                     I   3 |             | 38  RESET
+                     B   4 |             | 37  BRC
+                     R   5 |             | 36  
+                   BA0   6 |             | 35  B1 STROBE
+                   BA1   7 |             | 34  COLOR XTAL (3.636 MHz)
+                   BA2   8 |             | 33  
+                   BA3   9 |             | 32  
+                   BA4  10 |    UV201    | 31  
+                   BA5  11 |             | 30  EXTINT
+                   BA6  12 |             | 29  O/E
+                   BA7  13 |             | 28  BO7
+                   BA8  14 |             | 27  BO6
+                   BA9  15 |             | 26  BO5
+                  BA10  16 |             | 25  BO4
+                  BA11  17 |             | 24  BO3
+                  BA12  18 |             | 23  BO2
+                 HSYNC  19 |             | 22  BO1
+                 HSYNC  20 |_____________| 21  BO0
+
+                            _____   _____
+                         1 |*    \_/     | 40  B1 STROBE
+                         2 |             | 39  CPU RQ1
+               CPU RQ0   3 |             | 38  GND
+               XTAL IN   4 |             | 37  
+               XTAL IN   5 |             | 36  RESET
+                         6 |             | 35  
+               CPU phi   7 |             | 34  COLOR XTAL
+                         8 |             | 33  BRC
+                   BD0   9 |             | 32  BD7
+                   BO0  10 |    UV202    | 31  BO7
+                   BD1  11 |             | 30  BD6
+                   BO1  12 |             | 29  BO6
+                   BD2  13 |             | 28  BD5
+                   BO2  14 |             | 27  BO5
+                   BD3  15 |             | 26  BD4
+                   BO3  16 |             | 25  BO4
+                HBLANK  17 |             | 24  
+                        18 |             | 23  
+                        19 |             | 22  
+                        20 |_____________| 21  
 
 **********************************************************************/
 
