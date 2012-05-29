@@ -136,6 +136,8 @@ struct _upd765_t
 
 	int command;
 
+	UINT8			ready_changed;
+
 	emu_timer *seek_timer;
 	emu_timer *timer;
 	int timer_type;
@@ -2055,8 +2057,8 @@ static void upd765_setup_command(device_t *device)
 			/* interrupt pending? */
 			if (fdc->upd765_flags & UPD765_INT)
 			{
-				/* yes. Clear int */
-				upd765_set_int(device, CLEAR_LINE);
+				/* clear ready changed bit */
+				fdc->ready_changed &= ~(1 << fdc->drive);
 
 				/* clear drive seek bits */
 				fdc->FDC_main &= ~(1 | 2 | 4 | 8);
@@ -2068,6 +2070,17 @@ static void upd765_setup_command(device_t *device)
 
 				/* return result */
 				upd765_setup_result_phase(device,2);
+
+				if (fdc->ready_changed)
+				{
+					fdc->drive++;
+					fdc->upd765_status[0] = 0xc0 | fdc->drive;
+				}
+				else
+				{
+					/* Clear int */
+					upd765_set_int(device, CLEAR_LINE);
+				}
 			}
 			else
 			{
@@ -2291,6 +2304,9 @@ void upd765_reset(device_t *device, int offset)
 		int a_drive_is_ready;
 
 		fdc->upd765_status[0] = 0x080 | 0x040;
+
+		// HACK signal ready changed for all drives
+		fdc->ready_changed = 0x0f;
 
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
         do not set not-ready - need to check with pc_fdc.c whether all drives

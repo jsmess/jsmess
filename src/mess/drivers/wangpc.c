@@ -13,7 +13,6 @@
 	TODO:
 
 	- keyboard
-	- upd765.c drive polling (POST expects 4 consecutive Sense Interrupt Status commands to return xx,xx,xx,C3 = ready state changed on drive 3)
 	- floppy door disturbed interrupt
 	- floppy door open status
 	- hard disk
