@@ -21383,22 +21383,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="soulblad" supported="no">
-		<!-- single cartridge source: d4s -->
-		<description>Soul Blade (USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="not identified" />
-			<feature name="chip" value="not identified" /> <!-- 3 epoxy chips, no info printed -->
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="none" />
-			<dataarea name="rom" size="3145728">
-				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sf2tu" cloneof="sf2t">
 		<!-- single cartridge source: nitro322 -->
 		<description>Street Fighter II Turbo - Hyper Fighting (USA, Rev. A)</description>
@@ -21417,26 +21401,6 @@ Alternate board (XL-1)
 			<dataarea name="rom" size="2621440">
 				<rom name="sns-ti-1 p0.u1" size="2097152" crc="12f355ab" sha1="414f6ee184353b861fa5de8c7dfcc630786ae205" offset="0x000000" />
 				<rom name="sns-ti-1 p3.u2" size="524288"  crc="d244dcbc" sha1="37cfe528914f5b4afeb2d1d59b834ba4edfd4b70" offset="0x200000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sfiiisv">
-		<!-- single cartridge source: d4s -->
-		<description>Street Fighter III - Super Version (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="not identified" />
-			<feature name="u1" value="not identified" /> <!-- ROM -->
-			<feature name="u2" value="not identified" /> <!-- ROM -->
-			<feature name="u3" value="74LS139" />
-			<feature name="u4" value="not identified" /> <!-- CIC -->
-			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
-			<feature name="cart_back_label" value="none" />
-			<dataarea name="rom" size="2097152">
-				<rom name="zf3103a.u1" size="1048576" crc="0a667f6f" sha1="0b58cf0d1fddb7adda096c9b701f291965b478fa" offset="0x000000" />
-				<rom name="zf3103b.u2" size="1048576" crc="e94aa33b" sha1="0b25656e0bd0245d7f3816409fafb0122a0d325f" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23712,8 +23676,22 @@ Alternate board (XL-1)
 
 <!-- Pirates -->
 
-	<!-- Not supported, copy protection? -->
+<!-- the copy protection of the following titles are documented here:
+     - Bananas de Pijamas
+     - King of Fighters 2000
+     - Pocket Monster
+     - Pokemon Stadium
+     - Soul Blade
+     - Street Fighter EX Plus Alpha
+     - Tekken 2
+     - X-Men vs. Street Fighter
+-->
+
 	<software name="banpija" cloneof="chester" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>Bananas de Pijamas</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23771,8 +23749,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection -->
 	<software name="kof2000" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>The King of Fighters 2000 (Brazil)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23795,8 +23776,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection? -->
 	<software name="pokemon" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>Pocket Monster (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23843,8 +23827,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection? -->
 	<software name="pokestad" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>Pokemon Stadium (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23900,6 +23887,24 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="soulblad" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places). -->
+		<description>Soul Blade (USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="not identified" />
+			<feature name="chip" value="not identified" /> <!-- 3 epoxy chips, no info printed -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="3145728">
+				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="soulbladh" cloneof="soulblad">
 		<description>Soul Blade (USA, Cracked)</description>
@@ -23924,8 +23929,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection -->
 	<software name="sfex" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>Street Fighter EX Plus α (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23948,6 +23956,26 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="sfiiisv">
+		<!-- single cartridge source: d4s -->
+		<description>Street Fighter III - Super Version (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="not identified" />
+			<feature name="u1" value="not identified" /> <!-- ROM -->
+			<feature name="u2" value="not identified" /> <!-- ROM -->
+			<feature name="u3" value="74LS139" />
+			<feature name="u4" value="not identified" /> <!-- CIC -->
+			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
+			<feature name="cart_back_label" value="none" />
+			<dataarea name="rom" size="2097152">
+				<rom name="zf3103a.u1" size="1048576" crc="0a667f6f" sha1="0b58cf0d1fddb7adda096c9b701f291965b478fa" offset="0x000000" />
+				<rom name="zf3103b.u2" size="1048576" crc="e94aa33b" sha1="0b25656e0bd0245d7f3816409fafb0122a0d325f" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfiii12" cloneof="sfiiisv">
 		<description>Street Fighter III - Super Version 12 Fighters (Asia)</description>
 		<year>19??</year>
@@ -23959,8 +23987,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection? -->
 	<software name="tekken2" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		      it seems to contain some kind of microcontroller and expects write sequences
+          unknown algorithm at this time, all the values the game needs were bruteforced -->
 		<description>Tekken 2 (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23994,8 +24025,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- Not supported, copy protection? -->
 	<software name="xmensf" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>X-Men vs. Street Fighter (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
