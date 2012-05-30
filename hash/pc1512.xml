@@ -129,6 +129,13 @@
 				<rom name="46004.img" size="368640" crc="adf8c856" sha1="6de8d6f44e0e28546ed0432ed63c90e5fe6a658d" offset="0" />
 			</dataarea>
 		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 5 (Hard Disk Utilities)"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46005.img" size="368640" status="nodump" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="system_fr" cloneof="system">
@@ -161,6 +168,13 @@
 			<feature name="part_id" value="System Disc 4"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46004f.img" size="368640" crc="c9576eaa" sha1="7eb65b49838a4f284b38c83b7c0ea0e00bef41f9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 5 (Hard Disk Utilities)"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46005f.img" size="368640" status="nodump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
