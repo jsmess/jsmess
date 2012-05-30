@@ -12,9 +12,7 @@
 
 	TODO:
 
-	- keyboard
-	- floppy door disturbed interrupt
-	- floppy door open status
+	- boot
 	- hard disk
 
 */
@@ -107,9 +105,15 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
 	m_fdc_tc_enable = BIT(data, 0);
 	m_fdc_dma_enable = BIT(data, 1);
+	
+	if (BIT(data, 2)) m_fdc_dd0 = 0;
+	if (BIT(data, 3)) m_fdc_dd1 = 0;
 
-    if (LOG) logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_fdc_tc_enable);
-    if (LOG) logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_fdc_dma_enable);
+	if (LOG)
+	{
+    	logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_fdc_tc_enable);
+    	logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_fdc_dma_enable);
+	}
 
 	update_fdc_tc();
 	update_fdc_drq();
@@ -292,8 +296,12 @@ READ8_MEMBER( wangpc_state::status_r )
 
 	UINT8 data = 0x03;
 
-	// FDC interrupt
+	// floppy interrupts
 	data |= upd765_int_r(m_fdc) << 3;
+	data |= m_fdc_dd0 << 4;
+	data |= m_fdc_dd1 << 5;
+	data |= m_floppy0->exists() ? 0 : 0x40;
+	data |= m_floppy1->exists() ? 0 : 0x80;
 
 	return data;
 }
@@ -369,6 +377,7 @@ WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
     if (LOG) logerror("%s: TBRE clear\n", machine().describe_context());
 
 	m_uart_tbre = 0;
+
 	check_level2_interrupts();
 }
 
@@ -380,6 +389,7 @@ WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 READ8_MEMBER( wangpc_state::uart_r )
 {
 	m_uart_dr = 0;
+	
 	check_level2_interrupts();
 	
 	UINT8 data = m_uart->read(space, 0);
@@ -530,7 +540,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 	UINT8 data = 0;
 
 	// FDC interrupt
-	data |= upd765_int_r(m_fdc) << 7;
+	data |= (m_fdc_dd0 | m_fdc_dd1 | upd765_int_r(m_fdc)) << 7;
 
 	return data;
 }
@@ -654,7 +664,7 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 	m_dma_eop = !state;
 
 	update_fdc_tc();
-	check_level2_interrupts();
+	//check_level2_interrupts();
 }
 
 READ8_MEMBER( wangpc_state::memr_r )
@@ -763,7 +773,9 @@ void wangpc_state::check_level1_interrupts()
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | upd765_int_r(m_fdc) | m_fpu_irq | m_bus_irq2;
+	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | m_fdc_dd0 | m_fdc_dd1 | upd765_int_r(m_fdc) | m_fpu_irq | m_bus_irq2;
+
+	//logerror("level 2: %u %u %u %u %u %u %u %u\n",!m_dma_eop , m_uart_dr , m_uart_tbre , m_fdc_dd0 , m_fdc_dd1 , upd765_int_r(m_fdc) , m_fpu_irq , m_bus_irq2);
 
 	pic8259_ir2_w(m_pic, state);
 }
@@ -1076,6 +1088,7 @@ WRITE_LINE_MEMBER( wangpc_state::ack_w )
     if (LOG) logerror("ACKNLG %u\n", state);
 
 	m_acknlg = state;
+
 	check_level1_interrupts();
 }
 
@@ -1084,6 +1097,7 @@ WRITE_LINE_MEMBER( wangpc_state::busy_w )
     if (LOG) logerror("BUSY %u\n", state);
 
 	m_busy = state;
+
 	check_level1_interrupts();
 }
 
@@ -1091,16 +1105,6 @@ static const centronics_interface centronics_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, ack_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, busy_w),
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  WANGPC_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static WANGPC_KEYBOARD_INTERFACE( kb_intf )
-{
 	DEVCB_NULL
 };
 
@@ -1114,6 +1118,7 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
     if (LOG) logerror("Bus IRQ2 %u\n", state);
 
 	m_bus_irq2 = state;
+
 	check_level2_interrupts();
 }
 
@@ -1160,6 +1165,12 @@ void wangpc_state::machine_start()
 	// connect serial keyboard
 	m_uart->connect(m_kb);
 
+	// connect floppy callbacks
+	floppy_install_unload_proc(m_floppy0, wangpc_state::on_disk0_change);
+	floppy_install_load_proc(m_floppy0, wangpc_state::on_disk0_change);
+	floppy_install_unload_proc(m_floppy1, wangpc_state::on_disk1_change);
+	floppy_install_load_proc(m_floppy1, wangpc_state::on_disk1_change);
+
 	// state saving
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dma_channel));
@@ -1195,6 +1206,38 @@ void wangpc_state::machine_reset()
 }
 
 
+//-------------------------------------------------
+//  on_disk0_change -
+//-------------------------------------------------
+
+void wangpc_state::on_disk0_change(device_image_interface &image)
+{
+    wangpc_state *state = static_cast<wangpc_state *>(image.device().owner());
+
+    if (LOG) logerror("Door 1 disturbed\n");
+
+	state->m_fdc_dd0 = 1;
+
+	state->check_level2_interrupts();
+}
+
+
+//-------------------------------------------------
+//  on_disk1_change -
+//-------------------------------------------------
+
+void wangpc_state::on_disk1_change(device_image_interface &image)
+{
+    wangpc_state *state = static_cast<wangpc_state *>(image.device().owner());
+
+    if (LOG) logerror("Door 2 disturbed\n");
+	
+	state->m_fdc_dd1 = 1;
+
+	state->check_level2_interrupts();
+}
+
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -1219,7 +1262,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_WANGPC_KEYBOARD_ADD(kb_intf)
+	MCFG_WANGPC_KEYBOARD_ADD()
 
 	// bus
 	MCFG_WANGPC_BUS_ADD(bus_intf)
@@ -1256,4 +1299,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

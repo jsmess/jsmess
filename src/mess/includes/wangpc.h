@@ -3,7 +3,6 @@
 #ifndef __WANGPC__
 #define __WANGPC__
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/8237dma.h"
@@ -64,6 +63,8 @@ public:
 		  m_fdc_tc_enable(0),
 		  m_fdc_dma_enable(1),
 		  m_fdc_drq(1),
+		  m_fdc_dd0(0),
+		  m_fdc_dd1(0),
 		  m_ds1(1),
 		  m_ds2(1)
 	{ }
@@ -77,8 +78,8 @@ public:
 	required_device<mc2661_device> m_epci;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<wangpc_keyboard_device> m_kb;
 	required_device<wangpcbus_device> m_bus;
@@ -163,6 +164,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
+	static void on_disk0_change(device_image_interface &image);
+	static void on_disk1_change(device_image_interface &image);
+
 	UINT8 m_dma_page[3];
 	int m_dma_channel;
 
@@ -179,6 +183,8 @@ public:
 	int m_fdc_tc_enable;
 	int m_fdc_dma_enable;
 	int m_fdc_drq;
+	int m_fdc_dd0;
+	int m_fdc_dd1;
 	int m_ds1;
 	int m_ds2;
 

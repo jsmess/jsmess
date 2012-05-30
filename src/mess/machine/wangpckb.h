@@ -31,13 +31,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_WANGPC_KEYBOARD_ADD(_config) \
-    MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define WANGPC_KEYBOARD_INTERFACE(_name) \
-	const wangpc_keyboard_interface (_name) =
+#define MCFG_WANGPC_KEYBOARD_ADD() \
+    MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 
 
@@ -45,19 +40,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_keyboard_interface
-
-struct wangpc_keyboard_interface
-{
-	devcb_write_line	m_out_data_cb;
-};
-
-
 // ======================> wangpc_keyboard_device
 
 class wangpc_keyboard_device :  public device_t,
-								public device_serial_interface,
-								public wangpc_keyboard_interface
+								public device_serial_interface
 {
 public:
     // construction/destruction
@@ -70,6 +56,7 @@ public:
 
 	// not really public
 	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
 
