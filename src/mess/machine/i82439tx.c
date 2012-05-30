@@ -84,7 +84,7 @@ UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, in
 			break;
 
 		case 0x08:	/* revision identification register and class code register*/
-			result = 0x00000001;
+			result = 0x06000001;
 			break;
 
 		case 0x04:	/* PCI command register */
