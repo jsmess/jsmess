@@ -31,11 +31,12 @@
       standard monitor, and Basic, will also respond to this key.
     - The keyboard has a "English" key on the left, and a "Japan" key on the
       right. Pressing the appropriate key toggles the input language mode.
-      Internally, this turns the Kana bit off/on. On our keyboard, hold down
-      the ALT key to get Kana; release it to get English.
+      Internally, this turns the Kana bit off/on. On our keyboard, the ALT key
+      toggles between English and Kana.
 
     TODO/info:
-    - Sound not working. See the info down the page.
+    - Sound not working. The info makes its way to the audio chip but for
+      some unknown reason, nothing is heard.
     - FDC, type 1771, single sided, capacity 143KBytes, not connected up
     - Cassette doesn't load
     - Printer
@@ -308,7 +309,7 @@ static INPUT_PORTS_START( mycom )
 	PORT_START("XX")
 	PORT_BIT(0x001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_TOGGLE
 INPUT_PORTS_END
 
 
@@ -330,14 +331,6 @@ static GFXDECODE_START( mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const wd17xx_interface wd1771_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL, // no information available
-	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
@@ -357,10 +350,6 @@ WRITE8_MEMBER( mycom_state::mycom_04_w )
 	m_i_videoram = (m_i_videoram & 0x700) | data;
 
 	m_sn_we = data;
-	/* doesn't work? */
-	//printf(":%X ",data);
-	//if(m_sn_we)
-	  //sn76496_w(m_audio, 0, data);
 }
 
 WRITE8_MEMBER( mycom_state::mycom_06_w )
@@ -418,7 +407,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 		m_cass->change_state(
 		BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	if BIT(data, 3) // motor on
+	if (BIT(data, 3)) // motor on
 		m_cass->output( BIT(data, 2) ? -1.0 : +1.0);
 
 	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
@@ -426,15 +415,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 	m_0a = data;
 
-	/* Info about sound
-    - uses a SN76489N chip at an unknown clock
-    - each time a key is pressed, 4 lots of data are output to port 4
-    - after each data byte, there is a 4 byte control sequence to port 0a
-    - the control sequence is 9F,8F,AF,BF
-    - the data bytes are 8D,01,9F,9F
-    - the end result is silence  :(  */
-
-	// no sound comes out
+	// if WE & CE are low, pass sound command to audio chip
 	if ((data & 0x30)==0)
 		sn76496_w(m_audio, 0, m_sn_we);
 }
@@ -535,6 +516,38 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	}
 }
 
+// The floppy parameters are unknown, the below is copied from another driver
+static LEGACY_FLOPPY_OPTIONS_START(mycom)
+	LEGACY_FLOPPY_OPTION(mycom, "fdd", "mycom disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([82])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface mycom_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(mycom),
+	NULL,
+	NULL
+};
+
+static const wd17xx_interface wd1771_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL, // no information available
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+
 MACHINE_START_MEMBER(mycom_state)
 {
 	m_p_ram = memregion("maincpu")->base();
@@ -582,13 +595,14 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("sn1", SN76489, 1996800) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL_10MHz / 4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
 	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_FD1771_ADD("fdc", wd1771_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mycom_floppy_interface)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
@@ -615,6 +629,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1981, mycom,  	0,       0, 	mycom,	mycom,	 mycom,	   "Japan Electronics College",   "MYCOMZ-80A",	GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY                   FULLNAME       FLAGS */
+COMP( 1981, mycom,  0,      0,       mycom,     mycom,   mycom, "Japan Electronics College", "MYCOMZ-80A", GAME_NOT_WORKING | GAME_NO_SOUND )
