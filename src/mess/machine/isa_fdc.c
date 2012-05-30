@@ -9,6 +9,7 @@
 #include "machine/upd765.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
+#include "machine/idectrl.h"
 
 static READ8_DEVICE_HANDLER ( pc_fdc_r );
 static WRITE8_DEVICE_HANDLER ( pc_fdc_w );
@@ -325,7 +326,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 	UINT8 data = 0xff;
 
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
-
+	device_t *hdd = NULL;
 	switch(offset)
 	{
 		case 0: /* status register a */
@@ -343,6 +344,9 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 			data = upd765_data_r(fdc->m_upd765, offset);
 			break;
 		case 6: /* FDC reserved */
+			hdd = device->machine().device(":board3:ide:ide");
+			if (hdd)
+				data = ide_controller16_r(hdd, 0x3f6/2, 0x00ff);		
 			break;
 		case 7:
 			device_t *dev = get_floppy_subdevice(device, fdc->digital_output_register & 0x03);
@@ -365,6 +369,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 	if (LOG_FDC)
 		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
 	pc_fdc_check_data_rate(fdc,device->machine());  // check every time a command may start
+	device_t *hdd = NULL;
 
 	switch(offset)
 	{
@@ -385,6 +390,9 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 			break;
 		case 6:
 			/* FDC reserved */
+			hdd = device->machine().device(":board3:ide:ide");
+			if (hdd)
+				ide_controller16_w(hdd, 0x3f6/2, data, 0x00ff);
 			break;
 		case 7:
 			/* Configuration Control Register

@@ -19,6 +19,17 @@ static WRITE16_DEVICE_HANDLER( ide16_w )
 	ide_controller16_w(device, 0x1f0/2 + offset, data, mem_mask);
 }
 
+
+static READ16_DEVICE_HANDLER( ide16_alt_r )
+{
+	return ide_controller16_r(device, 0x3f6/2 + offset, 0x00ff);
+}
+
+static WRITE16_DEVICE_HANDLER( ide16_alt_w )
+{
+	ide_controller16_w(device, 0x3f6/2 + offset, data, 0x00ff);
+}
+
 static void ide_interrupt(device_t *device, int state)
 {
 	isa16_ide_device *ide  = downcast<isa16_ide_device *>(device->owner());
@@ -99,7 +110,9 @@ void isa16_ide_device::device_reset()
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
 		m_isa->install16_device(subdevice("ide"), 0x01f0, 0x01f7, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
+		//m_isa->install16_device(subdevice("ide"), 0x03f6, 0x03f7, 0, 0, FUNC(ide16_alt_r), FUNC(ide16_alt_w) );
 	} else {
 		m_isa->install16_device(subdevice("ide"), 0x0170, 0x0177, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
+		m_isa->install16_device(subdevice("ide"), 0x0376, 0x0377, 0, 0, FUNC(ide16_alt_r), FUNC(ide16_alt_w) );
 	}
 }
