@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "formats/pc_dsk.h"
 #include "machine/8237dma.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
