@@ -125,6 +125,7 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( led_on_r );
 	DECLARE_WRITE8_MEMBER( fpu_mask_w );
+	DECLARE_READ8_MEMBER( dma_eop_clr_r );
 	DECLARE_WRITE8_MEMBER( uart_tbre_clr_w );
 	DECLARE_READ8_MEMBER( uart_r );
 	DECLARE_WRITE8_MEMBER( uart_w );

@@ -267,9 +267,9 @@ WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 
 WRITE8_MEMBER( wangpc_state::dma_page_w )
 {
-    if (LOG) logerror("%s: DMA page %u: %01x\n", machine().describe_context(), offset, data & 0x0f);
+    if (LOG) logerror("%s: DMA page %u: %06x\n", machine().describe_context(), offset + 1, (data & 0x0f) << 16);
 
-	m_dma_page[offset] = data & 0x0f;
+	m_dma_page[offset + 1] = data & 0x0f;
 }
 
 
@@ -365,6 +365,22 @@ READ8_MEMBER( wangpc_state::led_on_r )
 WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 {
     if (LOG) logerror("%s: FPU mask %02x\n", machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
+//  dma_eop_clr_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::dma_eop_clr_r )
+{
+    if (LOG) logerror("%s: EOP clear\n", machine().describe_context());
+
+	m_dma_eop = 1;
+
+	check_level2_interrupts();
+
+	return 0xff;
 }
 
 
@@ -592,7 +608,7 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
 	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
 	AM_RANGE(0x10e4, 0x10e5) AM_READWRITE8(led_on_r, fpu_mask_w, 0x00ff)
-	AM_RANGE(0x10e6, 0x10e7) AM_WRITE8(uart_tbre_clr_w, 0x00ff)
+	AM_RANGE(0x10e6, 0x10e7) AM_READWRITE8(dma_eop_clr_r, uart_tbre_clr_w, 0x00ff)
 	AM_RANGE(0x10e8, 0x10e9) AM_READWRITE8(uart_r, uart_w, 0x00ff)
 	AM_RANGE(0x10ea, 0x10eb) AM_READWRITE8(centronics_r, centronics_w, 0x00ff)
 	AM_RANGE(0x10ec, 0x10ed) AM_READWRITE8(busy_clr_r, acknlg_clr_w, 0x00ff)
@@ -647,7 +663,7 @@ INPUT_PORTS_END
 void wangpc_state::update_fdc_tc()
 {
 	if (m_fdc_tc_enable)
-		upd765_tc_w(m_fdc, m_dma_eop);
+		upd765_tc_w(m_fdc, !m_dma_eop);
 	else
 		upd765_tc_w(m_fdc, 1);
 }
@@ -661,10 +677,15 @@ WRITE_LINE_MEMBER( wangpc_state::hrq_w )
 
 WRITE_LINE_MEMBER( wangpc_state::eop_w )
 {
-	m_dma_eop = !state;
+	if (!state)
+	{
+		//if (LOG) logerror("EOP set\n");
+
+		//m_dma_eop = 0;
+		//check_level2_interrupts();
+	}
 
 	update_fdc_tc();
-	//check_level2_interrupts();
 }
 
 READ8_MEMBER( wangpc_state::memr_r )
