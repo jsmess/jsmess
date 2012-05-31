@@ -141,12 +141,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );
 	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_READ8_MEMBER( ior1_r );
 	DECLARE_READ8_MEMBER( ior2_r );
-	DECLARE_READ8_MEMBER( ior3_r );
-	DECLARE_WRITE8_MEMBER( iow1_w );
 	DECLARE_WRITE8_MEMBER( iow2_w );
-	DECLARE_WRITE8_MEMBER( iow3_w );
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
@@ -169,8 +165,8 @@ public:
 	static void on_disk0_change(device_image_interface &image);
 	static void on_disk1_change(device_image_interface &image);
 
-	UINT8 m_dma_page[3];
-	int m_dma_channel;
+	UINT8 m_dma_page[4];
+	int m_dack;
 
 	int m_timer2_irq;
 	int m_acknlg;

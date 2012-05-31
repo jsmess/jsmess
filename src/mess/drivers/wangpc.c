@@ -691,22 +691,17 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 READ8_MEMBER( wangpc_state::memr_r )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
+	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
 
-	return program->read_byte(page_offset + offset);
+	return program->read_byte(addr);
 }
 
 WRITE8_MEMBER( wangpc_state::memw_w )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
+	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
 
-	program->write_byte(page_offset + offset, data);
-}
-
-READ8_MEMBER( wangpc_state::ior1_r )
-{
-	return m_bus->dack_r(1);
+	program->write_byte(addr, data);
 }
 
 READ8_MEMBER( wangpc_state::ior2_r )
@@ -717,16 +712,6 @@ READ8_MEMBER( wangpc_state::ior2_r )
 		return upd765_dack_r(m_fdc, 0);
 }
 
-READ8_MEMBER( wangpc_state::ior3_r )
-{
-	return m_bus->dack_r(3);
-}
-
-WRITE8_MEMBER( wangpc_state::iow1_w )
-{
-	m_bus->dack_w(1, data);
-}
-
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
 	if (m_fdc_dma_enable)
@@ -735,29 +720,24 @@ WRITE8_MEMBER( wangpc_state::iow2_w )
 		upd765_dack_w(m_fdc, 0, data);
 }
 
-WRITE8_MEMBER( wangpc_state::iow3_w )
-{
-	m_bus->dack_w(3, data);
-}
-
 WRITE_LINE_MEMBER( wangpc_state::dack0_w )
 {
-	if (!state) m_dma_channel = 0;
+	if (!state) m_dack = 0;
 }
 
 WRITE_LINE_MEMBER( wangpc_state::dack1_w )
 {
-	if (!state) m_dma_channel = 1;
+	if (!state) m_dack = 1;
 }
 
 WRITE_LINE_MEMBER( wangpc_state::dack2_w )
 {
-	if (!state) m_dma_channel = 2;
+	if (!state) m_dack = 2;
 }
 
 WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 {
-	if (!state) m_dma_channel = 3;
+	if (!state) m_dack = 3;
 }
 
 static I8237_INTERFACE( dmac_intf )
@@ -767,13 +747,13 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(wangpc_state, memr_r),
 	DEVCB_DRIVER_MEMBER(wangpc_state, memw_w),
 	{ DEVCB_NULL,
-	  DEVCB_DRIVER_MEMBER(wangpc_state, ior1_r),
+	  DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack1_r),
 	  DEVCB_DRIVER_MEMBER(wangpc_state, ior2_r),
-	  DEVCB_DRIVER_MEMBER(wangpc_state, ior3_r) },
+	  DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack3_r) },
 	{ DEVCB_NULL,
-	  DEVCB_DRIVER_MEMBER(wangpc_state, iow1_w),
+	  DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack1_w),
 	  DEVCB_DRIVER_MEMBER(wangpc_state, iow2_w),
-	  DEVCB_DRIVER_MEMBER(wangpc_state, iow3_w) },
+	  DEVCB_DEVICE_MEMBER(WANGPC_BUS_TAG, wangpcbus_device, dack3_w) },
 	{ DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack0_w),
 	  DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack1_w),
 	  DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack2_w),
@@ -1194,7 +1174,7 @@ void wangpc_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_dma_page));
-	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_dack));
 	save_item(NAME(m_timer2_irq));
 	save_item(NAME(m_acknlg));
 	save_item(NAME(m_dav));
