@@ -34,7 +34,7 @@ static const SCSIConfigTable sasi_dev_table =
 {
 	1,
 	{
-		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK }
+		{ SCSI_ID_0, "harddisk0" }
 	}
 };
 

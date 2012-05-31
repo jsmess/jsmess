@@ -11,7 +11,7 @@
 #define _SCSIBUS_H_
 
 #include "emu.h"
-#include "machine/scsidev.h"
+#include "machine/scsi.h"
 
 
 /***************************************************************************

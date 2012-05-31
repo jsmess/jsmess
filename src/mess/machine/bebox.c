@@ -994,8 +994,8 @@ static const SCSIConfigTable dev_table =
 {
 	2, /* 2 SCSI devices */
 	{
-		{ SCSI_ID_0, "harddisk1", SCSI_DEVICE_HARDDISK },	/* SCSI ID 0, using HD 0, HD */
-		{ SCSI_ID_3, "cdrom", SCSI_DEVICE_CDROM }	/* SCSI ID 3, using CHD 0, CD-ROM */
+		{ SCSI_ID_0, "harddisk1" },	/* SCSI ID 0, using HD 0, HD */
+		{ SCSI_ID_3, "cdrom" }	/* SCSI ID 3, using CHD 0, CD-ROM */
 	}
 };
 
@@ -1039,17 +1039,11 @@ MACHINE_RESET( bebox )
 	memcpy(machine.device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),state->memregion("user1")->base(),0x200000);
 }
 
-static void bebox_exit(running_machine &machine)
-{
-	lsi53c810_exit(&scsi53c810_intf);
-}
-
 MACHINE_START( bebox )
 {
 	pc_fdc_init(machine, &bebox_fdc_interface);
 	/* SCSI */
 	lsi53c810_init(machine, &scsi53c810_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(bebox_exit),&machine));
 }
 
 DRIVER_INIT( bebox )

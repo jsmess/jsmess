@@ -6,6 +6,7 @@
 #ifndef _NCR5380_H_
 #define _NCR5380_H_
 
+#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 struct NCR5380interface
@@ -56,8 +57,6 @@ public:
 	void ncr5380_write_data(int bytes, UINT8 *pData);
 
 	void *ncr5380_get_scsi_device(int id);
-
-	void ncr5380_scan_devices();
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -66,7 +65,7 @@ protected:
 	virtual void device_config_complete();
 
 private:
-	SCSIInstance *m_scsi_devices[8];
+	scsidev_device *m_scsi_devices[8];
 
 	UINT8 m_5380_Registers[8];
 	UINT8 m_last_id;
@@ -86,6 +85,5 @@ WRITE8_DEVICE_HANDLER(ncr5380_write_reg);
 
 void ncr5380_read_data(device_t *dev, int bytes, UINT8 *pData);
 void ncr5380_write_data(device_t *dev, int bytes, UINT8 *pData);
-void ncr5380_scan_devices(device_t *dev);
 
 #endif

@@ -115,6 +115,7 @@
  */
 
 #include "includes/fmtowns.h"
+#include "machine/scsihd.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
@@ -2485,11 +2486,6 @@ void towns_state::machine_reset()
 	m_cdda = machine().device("cdda");
 	m_speaker = machine().device(SPEAKER_TAG);
 	m_scsi = machine().device<fmscsi_device>("scsi");
-	m_hd0 = machine().device("harddisk0");
-	m_hd1 = machine().device("harddisk1");
-	m_hd2 = machine().device("harddisk2");
-	m_hd3 = machine().device("harddisk3");
-	m_hd4 = machine().device("harddisk4");
 	m_ram = machine().device<ram_device>(RAM_TAG);
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
@@ -2633,11 +2629,11 @@ static const SCSIConfigTable towns_scsi_devtable =
 {
 	5,                                      /* 5 SCSI devices */
 	{
-		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_1, "harddisk1", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_2, "harddisk2", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_3, "harddisk3", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_4, "harddisk4", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_0, "harddisk0" },
+		{ SCSI_ID_1, "harddisk1" },
+		{ SCSI_ID_2, "harddisk2" },
+		{ SCSI_ID_3, "harddisk3" },
+		{ SCSI_ID_4, "harddisk4" },
 	}
 };
 
@@ -2725,11 +2721,11 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
-	MCFG_HARDDISK_ADD("harddisk0")
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
+	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_DEVICE_ADD("harddisk3", SCSIHD, 0)
+	MCFG_DEVICE_ADD("harddisk4", SCSIHD, 0)
 	MCFG_FMSCSI_ADD("scsi",towns_scsi_config)
 
 	MCFG_UPD71071_ADD("dma_1",towns_dma_config)

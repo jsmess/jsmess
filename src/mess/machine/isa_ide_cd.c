@@ -55,7 +55,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 			// get the data from the device
 			if( m_atapi_xferlen > 0 )
 			{
-				SCSIReadData( m_inserted_cdrom, m_atapi_data, m_atapi_xferlen );
+				m_inserted_cdrom->ReadData( m_atapi_data, m_atapi_xferlen );
 				m_atapi_data_len = m_atapi_xferlen;
 			}
 
@@ -151,7 +151,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( m_inserted_cdrom, atapi_data, m_atapi_cdata_wait );
+				m_inserted_cdrom->WriteData( atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
 				atapi_irq(this, ASSERT_LINE);
@@ -167,7 +167,8 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 			// reset data pointer for reading SCSI results
 			m_atapi_data_ptr = 0;
 			m_atapi_data_len = 0;
-			cdrom_image_device *cdrom = subdevice<cdrom_image_device>("cdrom");
+			void *cdrom;
+			m_inserted_cdrom->GetDevice( &cdrom );
 			bool checkready = false;
 			switch(atapi_data[0]&0xff) {
 				case 0x00 :
@@ -182,7 +183,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 							break;
 			}
 
-			if (checkready && cdrom_get_toc(cdrom->get_cdrom_file())==NULL)
+			if (checkready && cdrom_get_toc((cdrom_file *)cdrom)==NULL)
 			{
 				logerror("ATAPI: SCSI command %02x returned not ready\n", atapi_data[0]&0xff);
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY | ATAPI_STAT_CHECK;
@@ -191,9 +192,9 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 				atapi_irq(this, ASSERT_LINE);
 			} else {
 				// send it to the SCSI device
-				SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
-				SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
-				SCSIGetPhase( m_inserted_cdrom, &phase );
+				m_inserted_cdrom->SetCommand( m_atapi_data, 12 );
+				m_inserted_cdrom->ExecCommand( &m_atapi_xferlen );
+				m_inserted_cdrom->GetPhase( &phase );
 
 				if (m_atapi_xferlen != -1)
 				{
@@ -385,14 +386,8 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 	}
 }
 
-static struct cdrom_interface ide_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_CDROM_ADD( "cdrom", ide_cdrom )
+	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )
@@ -450,15 +445,7 @@ isa16_ide_cd_device::isa16_ide_cd_device(const machine_config &mconfig, const ch
 void isa16_ide_cd_device::device_start()
 {
 	set_isa_device();
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific startup
-//-------------------------------------------------
-
-void isa16_ide_cd_device::device_stop()
-{
-	SCSIDeleteInstance(m_inserted_cdrom);
+	m_inserted_cdrom = subdevice<scsicd_device>("cdrom");
 }
 
 //-------------------------------------------------
@@ -467,9 +454,6 @@ void isa16_ide_cd_device::device_stop()
 
 void isa16_ide_cd_device::device_reset()
 {
-	astring tempstring;
-	if (m_inserted_cdrom) SCSIDeleteInstance(m_inserted_cdrom);
-	SCSIAllocInstance( machine(), &SCSIClassCr589, &m_inserted_cdrom, subtag(tempstring, "cdrom"));
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
 		m_isa->install16_device(0x01f0, 0x01f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));

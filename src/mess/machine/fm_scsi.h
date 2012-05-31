@@ -8,6 +8,7 @@
 #ifndef FM_SCSI_H_
 #define FM_SCSI_H_
 
+#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 // SCSI input lines (from target)
@@ -71,7 +72,6 @@ protected:
     // device-level overrides (none are required, but these are common)
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_stop();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
@@ -80,13 +80,12 @@ private:
     static const device_timer_id TIMER_TRANSFER = 0;
     static const device_timer_id TIMER_PHASE = 1;
 
-    void fmscsi_rescan(void);
     int get_scsi_cmd_len(UINT8 cbyte);
 
     devcb_resolved_write_line m_irq_func;
     devcb_resolved_write_line m_drq_func;
 
-    SCSIInstance* m_SCSIdevices[8];
+    scsidev_device* m_SCSIdevices[8];
     UINT8 m_command[32];
     UINT8 m_result[32];
     UINT8 m_command_index;

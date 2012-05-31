@@ -55,6 +55,7 @@
 */
 
 #include "includes/abc1600.h"
+#include "machine/scsihd.h"
 
 
 
@@ -1933,7 +1934,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_FD1797_ADD(SAB1797_02P_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_interface)
-	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 	MCFG_ABC99_ADD(abc99_intf)
 	MCFG_S1410_ADD()
 

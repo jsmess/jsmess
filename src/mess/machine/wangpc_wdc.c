@@ -8,6 +8,7 @@
 **********************************************************************/
 
 #include "wangpc_wdc.h"
+#include "machine/scsihd.h"
 
 
 
@@ -77,7 +78,7 @@ static const SCSIConfigTable sasi_dev_table =
 {
 	1,
 	{
-		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK }
+		{ SCSI_ID_0, "harddisk0" }
 	}
 };
 
@@ -106,7 +107,7 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 	MCFG_CPU_IO_MAP(wangpc_wdc_io)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 MACHINE_CONFIG_END
 
 

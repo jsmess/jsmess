@@ -7,6 +7,7 @@
 #ifndef MB89352_H_
 #define MB89352_H_
 
+#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 // SCSI lines readable via PSNS register (reg 5)
@@ -89,14 +90,13 @@ private:
     // internal device state goes here
     static const device_timer_id TIMER_TRANSFER = 0;
 
-    void mb89352_rescan(void);
     int get_scsi_cmd_len(UINT8 cbyte);
     //void set_ints(UINT8 flag);
 
     devcb_resolved_write_line m_irq_func;
     devcb_resolved_write_line m_drq_func;
 
-    SCSIInstance* m_SCSIdevices[8];
+    scsidev_device* m_SCSIdevices[8];
 
     UINT8 m_phase;  // current SCSI phase
     UINT8 m_target; // current SCSI target

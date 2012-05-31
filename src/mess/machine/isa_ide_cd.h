@@ -66,14 +66,13 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-		virtual void device_stop();
 		virtual void device_config_complete() { m_shortname = "isa_ide_cd"; }
 private:
         // internal state
 		bool m_is_primary;
 
 		// CDROM
-		SCSIInstance *m_inserted_cdrom;
+		scsicd_device *m_inserted_cdrom;
 
 		int m_atapi_data_ptr;
 		int m_atapi_data_len;

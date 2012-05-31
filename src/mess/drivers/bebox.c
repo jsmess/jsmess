@@ -29,6 +29,8 @@
 #include "machine/intelfsh.h"
 
 /* Devices */
+#include "machine/scsicd.h"
+#include "machine/scsihd.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/harddriv.h"
@@ -104,12 +106,6 @@ static const floppy_interface bebox_floppy_interface =
 	NULL
 };
 
-struct cdrom_interface bebox_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
@@ -147,7 +143,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_CDROM_ADD( "cdrom",bebox_cdrom )
+	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
+	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
 
 	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL, false )	/* FIXME */
 

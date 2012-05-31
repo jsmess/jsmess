@@ -17,6 +17,7 @@
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"
 #include "machine/scsi.h"
+#include "machine/scsihd.h"
 #include "machine/6522via.h"
 #include "machine/ctronics.h"
 #include "sound/ay8910.h"
@@ -81,10 +82,10 @@ static const SCSIConfigTable nimbus_scsi_dev_table =
 {
 	4,                                      /* 4 SCSI devices */
 	{
-		{ SCSI_ID_0, HARDDISK0_TAG, SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_1, HARDDISK1_TAG, SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_2, HARDDISK2_TAG, SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_3, HARDDISK3_TAG, SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_0, HARDDISK0_TAG },
+		{ SCSI_ID_1, HARDDISK1_TAG },
+		{ SCSI_ID_2, HARDDISK2_TAG },
+		{ SCSI_ID_3, HARDDISK3_TAG },
 	}
 };
 
@@ -333,10 +334,10 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
-    MCFG_HARDDISK_ADD(HARDDISK0_TAG)
-    MCFG_HARDDISK_ADD(HARDDISK1_TAG)
-    MCFG_HARDDISK_ADD(HARDDISK2_TAG)
-    MCFG_HARDDISK_ADD(HARDDISK3_TAG)
+	MCFG_DEVICE_ADD(HARDDISK0_TAG, SCSIHD, 0)
+	MCFG_DEVICE_ADD(HARDDISK1_TAG, SCSIHD, 0)
+	MCFG_DEVICE_ADD(HARDDISK2_TAG, SCSIHD, 0)
+	MCFG_DEVICE_ADD(HARDDISK3_TAG, SCSIHD, 0)
     MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
 
     MCFG_RAM_ADD(RAM_TAG)

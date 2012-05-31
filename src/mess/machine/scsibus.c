@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "machine/scsi.h"
+#include "machine/scsidev.h"
 #include "machine/scsibus.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
@@ -30,7 +31,7 @@
 typedef struct _scsibus_t scsibus_t;
 struct _scsibus_t
 {
-	SCSIInstance            *devices[8];
+	scsidev_device          *devices[8];
 	const SCSIBus_interface *interface;
 
 	devcb_resolved_write_line out_bsy_func;
@@ -63,8 +64,6 @@ struct _scsibus_t
 	emu_timer   *ack_timer;
 	emu_timer   *sel_timer;
 	emu_timer   *dataout_timer;
-
-	UINT8       initialised;
 };
 
 static void set_scsi_line_now(device_t *device, UINT8 line, UINT8 state);
@@ -134,7 +133,7 @@ static void scsibus_read_data(scsibus_t   *bus)
 
     if (bus->data_last > 0)
     {
-        SCSIReadData(bus->devices[bus->last_id], bus->data, bus->data_last);
+        bus->devices[bus->last_id]->ReadData(bus->data, bus->data_last);
         bus->bytes_left-=bus->data_last;
         bus->data_idx=0;
     }
@@ -144,7 +143,7 @@ static void scsibus_write_data(scsibus_t   *bus)
 {
     if(bus->bytes_left >= bus->sectorbytes)
     {
-        SCSIWriteData(bus->devices[bus->last_id], bus->data, bus->sectorbytes);
+        bus->devices[bus->last_id]->WriteData(bus->data, bus->sectorbytes);
 
         bus->bytes_left-=bus->sectorbytes;
         bus->data_idx=0;
@@ -361,7 +360,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 
 		// Recalibrate drive
@@ -371,7 +370,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 
 		// Request sense, return previous error codes
@@ -386,7 +385,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->data[2]=0x00;
 			bus->data[3]=0x00;
 			SET_STATUS_SENSE(SCSI_STATUS_OK,SCSI_SENSE_NO_SENSE);
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
 			break;
 
         // Format unit
@@ -394,9 +393,9 @@ static void scsibus_exec_command(device_t *device)
             LOG(1,"SCSIBUS: format unit bus->command[1]=%02X & 0x10\n",(bus->command[1] & 0x10));
             command_local=1;
             if((bus->command[1] & 0x10)==0x10)
-                SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+                bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             else
-                SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+                bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 
             bus->xfer_count=4;
             bus->data_last=bus->xfer_count;
@@ -411,7 +410,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 
 		// Setup drive parameters Xebec
@@ -421,7 +420,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=XEBEC_PARAMS_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
 		// Format bad track Xebec
@@ -431,7 +430,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=XEBEC_ALT_TRACK_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
 		// Write buffer Xebec S1410 specific
@@ -441,7 +440,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
 		// Read buffer Xebec S1410 specific
@@ -451,7 +450,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
+            bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAIN);
             break;
 
 		// Write buffer, Adaptec ACB40x0 specific
@@ -461,7 +460,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
 		// Read buffer, Adaptec ACB40x0 specific
@@ -471,7 +470,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
+            bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAIN);
             break;
 
 		// Send diagnostic info
@@ -481,7 +480,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=(bus->command[3]<<8)+bus->command[4];
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
 		case SCSI_CMD_SEARCH_DATA_EQUAL :
@@ -490,7 +489,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 
         case SCSI_CMD_READ_DEFECT :
@@ -505,7 +504,7 @@ static void scsibus_exec_command(device_t *device)
             bus->xfer_count=4;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-            SCSISetPhase(bus->devices[bus->last_id], SCSI_PHASE_DATAIN );
+            bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAIN);
             break;
 
         // write buffer
@@ -515,7 +514,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAOUT);
             break;
 
         // read buffer
@@ -525,7 +524,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
+            bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_DATAIN);
             break;
 
 		// Xebec S1410
@@ -537,7 +536,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 
 		// Commodore D9060/9090
@@ -547,7 +546,7 @@ static void scsibus_exec_command(device_t *device)
 			bus->xfer_count=0;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			bus->devices[bus->last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 	}
 
@@ -556,14 +555,14 @@ static void scsibus_exec_command(device_t *device)
     // to the disk driver
     if(!command_local)
     {
-        SCSISetCommand(bus->devices[bus->last_id], bus->command, bus->cmd_idx);
-        SCSIExecCommand(bus->devices[bus->last_id], &bus->xfer_count);
+        bus->devices[bus->last_id]->SetCommand(bus->command, bus->cmd_idx);
+        bus->devices[bus->last_id]->ExecCommand(&bus->xfer_count);
         bus->bytes_left=bus->xfer_count;
         bus->data_last=bus->xfer_count;
         bus->data_idx=0;
     }
 
-    SCSIGetPhase(bus->devices[bus->last_id], &newphase);
+    bus->devices[bus->last_id]->GetPhase(&newphase);
 
     scsi_change_phase(device,newphase);
 
@@ -655,7 +654,7 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
             {
 				// Check to see if device had image file mounted, if not, do not set busy,
 				// and stay busfree.
-				SCSIGetDevice(bus->devices[bus->last_id],&hdfile);
+				bus->devices[bus->last_id]->GetDevice(&hdfile);
 				if(hdfile!=(void *)NULL)
 				{
 					if(state==0)
@@ -945,16 +944,11 @@ void init_scsibus(device_t *device, int sectorbytes)
     const SCSIConfigTable   *scsidevs = bus->interface->scsidevs;
 	int                     devno;
 
-    if(!bus->initialised)
+    // try to open the devices
+    for (devno = 0; devno < scsidevs->devs_present; devno++)
     {
-        // try to open the devices
-        for (devno = 0; devno < scsidevs->devs_present; devno++)
-        {
-            LOG(1,"SCSIBUS:init devno=%d \n",devno);
-            SCSIAllocInstance( device->machine(), scsidevs->devices[devno].scsiClass, &bus->devices[scsidevs->devices[devno].scsiID], scsidevs->devices[devno].diskregion );
-        }
-
-        bus->initialised=1;
+        LOG(1,"SCSIBUS:init devno=%d \n",devno);
+        bus->devices[scsidevs->devices[devno].scsiID] = device->machine().device<scsidev_device>( scsidevs->devices[devno].tag );
     }
 
 	bus->sectorbytes = sectorbytes;
@@ -977,9 +971,6 @@ static DEVICE_START( scsibus )
 	bus->out_req_func.resolve(bus->interface->out_req_func, *device);
 	bus->out_rst_func.resolve(bus->interface->out_rst_func, *device);
 
-    // Flag not initialised
-    bus->initialised=0;
-
     // All lines start high - inactive
     bus->linestate=0xFF;
 
@@ -996,13 +987,6 @@ static DEVICE_START( scsibus )
 
 static DEVICE_STOP( scsibus )
 {
-    scsibus_t               *bus = get_token(device);
-    int                     devno;
-
-	for (devno = 0; devno < bus->interface->scsidevs->devs_present; devno++)
-	{
-        SCSIDeleteInstance( bus->devices[devno] );
-    }
 }
 
 static DEVICE_RESET( scsibus )

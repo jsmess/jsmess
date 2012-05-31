@@ -28,6 +28,7 @@
 #include "imagedev/chd_cd.h"
 #include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
+#include "machine/gdrom.h"
 
 #define CPU_CLOCK (200000000)
 
@@ -230,12 +231,6 @@ static const aica_interface dc_aica_interface =
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-struct cdrom_interface dc_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( dc, dc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
@@ -273,7 +268,7 @@ static MACHINE_CONFIG_START( dc, dc_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_CDROM_ADD( "cdrom",dc_cdrom )
+	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
 MACHINE_CONFIG_END
 
 ROM_START(dc)

@@ -23,6 +23,7 @@
 #include "machine/sgi.h"
 #include "machine/eeprom.h"
 #include "machine/wd33c93.h"
+#include "machine/scsicd.h"
 #include "imagedev/harddriv.h"
 #include "imagedev/chd_cd.h"
 
@@ -482,7 +483,7 @@ static void scsi_irq(running_machine &machine, int state)
 static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
-        { { SCSI_ID_6, "cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 6, using CHD 0, and it's a CD-ROM */
+        { { SCSI_ID_6, "cdrom" } } /* SCSI ID 6, CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =
@@ -491,14 +492,8 @@ static const struct WD33C93interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static void ip204415_exit(running_machine &machine)
-{
-	wd33c93_exit(&scsi_intf);
-}
-
 static DRIVER_INIT( ip204415 )
 {
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip204415_exit),&machine));
 }
 
 static TIMER_CALLBACK(ip20_timer)
@@ -591,12 +586,6 @@ static const mips3_config config =
 	32768	/* data cache size */
 };
 
-struct cdrom_interface ip20_cdrom =
-{
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_CPU_ADD( "maincpu", R4600BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -623,7 +612,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
-	MCFG_CDROM_ADD( "cdrom",ip20_cdrom )
+	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END

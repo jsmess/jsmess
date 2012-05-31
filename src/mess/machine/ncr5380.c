@@ -121,6 +121,14 @@ void ncr5380_device::device_start()
 	save_item(NAME(m_d_ptr));
 	save_item(NAME(m_d_limit));
 	save_item(NAME(m_next_req_flag));
+
+	int i;
+
+	// try to open the devices
+	for (i = 0; i < scsidevs->devs_present; i++)
+	{
+		m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+	}
 }
 
 //-------------------------------------------------
@@ -138,8 +146,6 @@ void ncr5380_device::device_reset()
 	m_d_ptr = 0;
 	m_d_limit = 0;
 	m_last_id = 0;
-
-	ncr5380_scan_devices();
 }
 
 //-------------------------------------------------
@@ -147,13 +153,6 @@ void ncr5380_device::device_reset()
 //-------------------------------------------------
 void ncr5380_device::device_stop()
 {
-	int i;
-
-	// clean up the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
-	{
-		SCSIDeleteInstance( m_scsi_devices[scsidevs->devices[i].scsiID] );
-	}
 }
 
 //-------------------------------------------------
@@ -337,8 +336,8 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ncr5380, ncr5380_write_reg)
 						if (VERBOSE)
 							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x (PC %x)\n", m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9], cpu_get_pc(machine().firstcpu));
 
-						SCSISetCommand(m_scsi_devices[m_last_id], &m_5380_Command[0], 16);
-						SCSIExecCommand(m_scsi_devices[m_last_id], &m_d_limit);
+						m_scsi_devices[m_last_id]->SetCommand(&m_5380_Command[0], 16);
+						m_scsi_devices[m_last_id]->ExecCommand(&m_d_limit);
 
 						if (VERBOSE)
 							logerror("NCR5380: Command returned %d bytes\n",  m_d_limit);
@@ -455,7 +454,7 @@ void ncr5380_device::ncr5380_read_data(int bytes, UINT8 *pData)
 	{
 		if (VERBOSE)
 			logerror("NCR5380: issuing read for %d bytes\n", bytes);
-		SCSIReadData(m_scsi_devices[m_last_id], pData, bytes);
+		m_scsi_devices[m_last_id]->ReadData(pData, bytes);
 	}
 	else
 	{
@@ -468,29 +467,11 @@ void ncr5380_device::ncr5380_write_data(int bytes, UINT8 *pData)
 {
 	if (m_scsi_devices[m_last_id])
 	{
-		SCSIWriteData(m_scsi_devices[m_last_id], pData, bytes);
+		m_scsi_devices[m_last_id]->WriteData(pData, bytes);
 	}
 	else
 	{
 		logerror("ncr5380: write to unknown device SCSI ID %d\n", m_last_id);
-	}
-}
-
-void ncr5380_device::ncr5380_scan_devices()
-{
-	int i;
-
-	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
-	{
-		// if a device wasn't already allocated
-		if (!m_scsi_devices[scsidevs->devices[i].scsiID])
-		{
-			SCSIAllocInstance( machine(),
-					scsidevs->devices[i].scsiClass,
-					&m_scsi_devices[scsidevs->devices[i].scsiID],
-					scsidevs->devices[i].diskregion );
-		}
 	}
 }
 
@@ -503,9 +484,3 @@ void ncr5380_write_data(device_t *dev, UINT8 bytes, UINT8 *pData)
 {
 	downcast<ncr5380_device*>(dev)->ncr5380_write_data(bytes, pData);
 }
-
-void ncr5380_scan_devices(device_t *dev)
-{
-	downcast<ncr5380_device*>(dev)->ncr5380_scan_devices();
-}
-

@@ -58,7 +58,7 @@
 
 static UINT8 *atapi_regs;
 static emu_timer *atapi_timer;
-static SCSIInstance *gdrom_device;
+static gdrom_device *gdrom;
 static UINT8 *atapi_data;
 static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
 static UINT32 gdrom_alt_status;
@@ -91,7 +91,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		struct sh4_ddt_dma ddtdata;
 
 		// get a sector from the SCSI device
-		SCSIReadData( gdrom_device, sector_buffer, 2048 );
+		gdrom->ReadData( sector_buffer, 2048 );
 
 		atapi_xferlen -= 2048;
 
@@ -160,7 +160,7 @@ static READ32_HANDLER( atapi_r )
 			// get the data from the device
 			if( atapi_xferlen > 0 )
 			{
-				SCSIReadData( gdrom_device, atapi_data, atapi_xferlen );
+				gdrom->ReadData( atapi_data, atapi_xferlen );
 				atapi_data_len = atapi_xferlen;
 			}
 
@@ -289,7 +289,7 @@ static WRITE32_HANDLER( atapi_w )
 			if (atapi_data_ptr == atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( gdrom_device, atapi_data, atapi_cdata_wait );
+				gdrom->WriteData( atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
 				gdrom_raise_irq(machine);
@@ -310,9 +310,9 @@ static WRITE32_HANDLER( atapi_w )
 			atapi_data_len = 0;
 
 			// send it to the SCSI device
-			SCSISetCommand( gdrom_device, atapi_data, 12 );
-			SCSIExecCommand( gdrom_device, &atapi_xferlen );
-			SCSIGetPhase( gdrom_device, &phase );
+			gdrom->SetCommand( atapi_data, 12 );
+			gdrom->ExecCommand( &atapi_xferlen );
+			gdrom->GetPhase( &phase );
 
 			if (atapi_xferlen != -1)
 			{
@@ -523,14 +523,6 @@ static WRITE32_HANDLER( atapi_w )
 	}
 }
 
-static void dreamcast_atapi_exit(running_machine& machine)
-{
-	if (gdrom_device != NULL)
-	{
-		SCSIDeleteInstance( gdrom_device );
-	}
-}
-
 void dreamcast_atapi_init(running_machine &machine)
 {
 	atapi_regs = auto_alloc_array_clear(machine, UINT8, ATAPI_REG_MAX);
@@ -547,9 +539,7 @@ void dreamcast_atapi_init(running_machine &machine)
 	atapi_timer = machine.scheduler().timer_alloc(FUNC(atapi_xfer_end));
 	atapi_timer->adjust(attotime::never);
 
-	gdrom_device = NULL;
-
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(dreamcast_atapi_exit),&machine));
+	gdrom = NULL;
 
 	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 
@@ -561,6 +551,8 @@ void dreamcast_atapi_init(running_machine &machine)
 	state_save_register_global(machine,  atapi_xferbase );
 	state_save_register_global(machine,  atapi_cdata_wait );
 	state_save_register_global(machine,  atapi_xfermod );
+
+	gdrom = machine.device<gdrom_device>( "cdrom" );
 }
 
 void dreamcast_atapi_reset(running_machine &machine)
@@ -576,15 +568,6 @@ void dreamcast_atapi_reset(running_machine &machine)
 
 	atapi_xferlen = 0;
 	atapi_xfermod = 0;
-
-	if ( machine.device<cdrom_image_device>("cdrom")->get_cdrom_file() != NULL )
-	{
-		SCSIAllocInstance( machine, &SCSIClassGDROM, &gdrom_device, "cdrom" );
-	}
-	else
-	{
-		gdrom_device = NULL;
-	}
 }
 
 /*

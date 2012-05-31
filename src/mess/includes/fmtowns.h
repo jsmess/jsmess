@@ -117,11 +117,6 @@ class towns_state : public driver_device
 	device_t* m_cdda;
 	device_t* m_speaker;
 	class fmscsi_device* m_scsi;
-	device_t* m_hd0;
-	device_t* m_hd1;
-	device_t* m_hd2;
-	device_t* m_hd3;
-	device_t* m_hd4;
 	ram_device* m_ram;
 
 	UINT16 m_ftimer;
