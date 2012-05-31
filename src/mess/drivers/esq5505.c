@@ -41,7 +41,7 @@
 #include "machine/esqvfd.h"
 
 #define GENERIC (0)
-#define EPS16   (1)
+#define EPS     (1)
 #define SQ1     (2)
 
 class esq5505_state : public driver_device
@@ -209,16 +209,17 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x340000, 0x3bffff) AM_RAM // sequencer memory?
     AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
-    AM_RANGE(0xff0000, 0xffffff) AM_RAM
+    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eps16_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("osram")
+static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x580000, 0x77ffff) AM_RAM         // sample RAM?
     AM_RANGE(0xc00000, 0xc0ffff) AM_ROM AM_REGION("osrom", 0)
+    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
 static UINT16 esq5505_read_adc(device_t *device)
@@ -281,7 +282,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
                 state->m_vfd->write_char(data);
                 break;
 
-            case EPS16:
+            case EPS:
                 state->m_epsvfd->write_char(data);
                 break;
 
@@ -307,7 +308,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
         {
             // EPS-16+ wants a throwaway reply byte for each byte sent to the KPC
             // VFX-SD and SD-1 definitely don't :)
-            if (state->m_system_type == EPS16)
+            if (state->m_system_type == EPS)
             {
                 // 0xe7 must respond with any byte that isn't 0xc8 or the ROM dies.
                 // 0x71 must respond with anything (return not checked)
@@ -356,9 +357,9 @@ static MACHINE_CONFIG_DERIVED(sq1, vfx)
     MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(eps16, vfx)
+static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(eps16_map)
+	MCFG_CPU_PROGRAM_MAP(eps_map)
 
     MCFG_ESQ2x40_REMOVE("vfd")
     MCFG_ESQ1x22_ADD("epsvfd")
@@ -428,7 +429,7 @@ ROM_START( sq1 )
     ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
 ROM_END
 
-ROM_START( eps16 )
+ROM_START( eps )
     ROM_REGION(0x10000, "osrom", 0)
     ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
     ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
@@ -452,12 +453,12 @@ static DRIVER_INIT(common)
     }
 }
 
-static DRIVER_INIT(eps16)
+static DRIVER_INIT(eps)
 {
     esq5505_state *state = machine.driver_data<esq5505_state>();
 
     DRIVER_INIT_CALL(common);
-    state->m_system_type = EPS16;
+    state->m_system_type = EPS;
 }
 
 static DRIVER_INIT(sq1)
@@ -468,10 +469,10 @@ static DRIVER_INIT(sq1)
     state->m_system_type = SQ1;
 }
 
+CONS( 1988, eps,   0, 0, eps,   vfx, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,   0, 0, vfx,   vfx, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
 CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
 CONS( 1990, sd1,   0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD 
 CONS( 1990, sd132, 0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
 CONS( 1990, sq1,   0, 0, sq1,   vfx, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
-CONS( 1990, eps16, 0, 0, eps16, vfx, eps16,  "Ensoniq", "EPS-16 Plus", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 
