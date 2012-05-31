@@ -1844,6 +1844,7 @@ $(MESSOBJ)/vtech.a:				\
 	$(MESS_DRIVERS)/socrates.o	\
 	$(MESS_DRIVERS)/pc2000.o	\
 	$(MESS_DRIVERS)/prestige.o	\
+	$(MESS_DRIVERS)/geniusiq.o	\
 
 $(MESSOBJ)/wang.a:				\
 	$(MESS_DRIVERS)/wangpc.o	\
