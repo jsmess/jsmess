@@ -135,7 +135,19 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	if (!m_sound_clk && sound_clk)
 	{
-		discrete_sound_w(m_discrete, NODE_01, m_keylatch & 0x03);
+		//discrete_sound_w(m_discrete, NODE_01, m_keylatch & 0x03);
+
+		UINT8 dac_data = 0;
+
+		switch (m_keylatch & 0x03)
+		{
+		case 0: dac_data = 0x00; break;
+		case 1: dac_data = 0x55; break;
+		case 2: dac_data = 0xaa; break;
+		case 3: dac_data = 0xff; break;
+		}
+
+		dac_data_w(m_dac, dac_data);
 	}
 
 	m_sound_clk = sound_clk;
@@ -544,6 +556,8 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(vidbrain)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)

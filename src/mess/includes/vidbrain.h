@@ -8,6 +8,7 @@
 #include "imagedev/cartslot.h"
 #include "machine/f3853.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
 #include "sound/discrete.h"
 #include "video/uv201.h"
 
@@ -16,6 +17,7 @@
 #define UV201_TAG			"uv201"
 #define SCREEN_TAG			"screen"
 #define DISCRETE_TAG		"discrete"
+#define DAC_TAG				"dac"
 
 class vidbrain_state : public driver_device
 {
@@ -26,6 +28,7 @@ public:
 		  m_smi(*this, F3853_TAG),
 		  m_uv(*this, UV201_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
+	      m_dac(*this, DAC_TAG),
 		  m_screen(*this, SCREEN_TAG)
 	{ }
 
@@ -33,6 +36,7 @@ public:
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
 	required_device<device_t> m_discrete;
+	required_device<device_t> m_dac;
 	required_device<screen_device> m_screen;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
