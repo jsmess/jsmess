@@ -38,6 +38,9 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	// not really public
+	DECLARE_WRITE8_MEMBER( status_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -49,10 +52,19 @@ protected:
 	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
+	virtual UINT8 wangpcbus_dack_r(int line);
+	virtual void wangpcbus_dack_w(int line, UINT8 data);
+	virtual bool wangpcbus_have_dack(int line);
 
 private:
+	inline void set_irq(int state);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_sasibus;
+
+	UINT8 m_status;
+	int m_irq;
+	int m_dreq;
 };
 
 

@@ -151,7 +151,7 @@ machine_config_constructor wangpc_lvc_device::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_irq2 -
+//  set_irq -
 //-------------------------------------------------
 
 inline void wangpc_lvc_device::set_irq(int state)

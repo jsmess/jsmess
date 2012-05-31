@@ -59,6 +59,8 @@ const rom_entry *wangpc_wdc_device::device_rom_region() const
 
 static ADDRESS_MAP_START( wangpc_wdc_mem, AS_PROGRAM, 8, wangpc_wdc_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -67,6 +69,13 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_wdc_io, AS_IO, 8, wangpc_wdc_device )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//AM_RANGE(0x01, 0x01) AM_READ() should return 0x72 during self-test
+	AM_RANGE(0x03, 0x03) AM_WRITE(status_w)
+	//AM_RANGE(0x10, 0x10) AM_WRITE()
+	//AM_RANGE(0x14, 0x14) AM_WRITE()
+	//AM_RANGE(0x18, 0x18) AM_WRITE()
+	//AM_RANGE(0x1c, 0x1c) AM_WRITE()
 ADDRESS_MAP_END
 
 
@@ -124,6 +133,28 @@ machine_config_constructor wangpc_wdc_device::device_mconfig_additions() const
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  set_irq -
+//-------------------------------------------------
+
+inline void wangpc_wdc_device::set_irq(int state)
+{
+	m_irq = state;
+
+	switch (m_dreq)
+	{
+	case 1: m_bus->irq5_w(m_irq); break;
+	case 2: m_bus->irq6_w(m_irq); break;
+	case 3: m_bus->irq7_w(m_irq); break;
+	}
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -155,6 +186,9 @@ void wangpc_wdc_device::device_start()
 
 void wangpc_wdc_device::device_reset()
 {
+	m_dreq = 0;
+
+	set_irq(CLEAR_LINE);
 }
 
 
@@ -191,8 +225,20 @@ UINT16 wangpc_wdc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 	{
 		switch (offset & 0x7f)
 		{
+		case 0x00/2:
+			data = m_status;
+			break;
+
+		case 0x02/2:
+			// TODO operation status register
+			break;
+
+		case 0x04/2:
+			set_irq(CLEAR_LINE);
+			break;
+
 		case 0xfe/2:
-			data = 0xff00 | OPTION_ID;
+			data = 0xff00 | (m_irq << 7) | OPTION_ID;
 			break;
 		}
 	}
@@ -211,9 +257,63 @@ void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 	{
 		switch (offset & 0x7f)
 		{
+		case 0x02/2:
+			// TODO command register
+			break;
+
 		case 0xfc/2:
 			device_reset();
 			break;
+
+		case 0xfe/2:
+			if (m_irq == ASSERT_LINE) set_irq(CLEAR_LINE);
+
+			if (BIT(data, 1)) m_dreq = 1;
+			if (BIT(data, 2)) m_dreq = 2;
+			if (BIT(data, 3)) m_dreq = 3;
+
+			if (m_irq == ASSERT_LINE) set_irq(ASSERT_LINE);
+			break;
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  wangpcbus_dack_r - DMA acknowledge read
+//-------------------------------------------------
+
+UINT8 wangpc_wdc_device::wangpcbus_dack_r(int line)
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  wangpcbus_dack_r - DMA acknowledge write
+//-------------------------------------------------
+
+void wangpc_wdc_device::wangpcbus_dack_w(int line, UINT8 data)
+{
+
+}
+
+
+//-------------------------------------------------
+//  wangpcbus_have_dack -
+//-------------------------------------------------
+
+bool wangpc_wdc_device::wangpcbus_have_dack(int line)
+{
+	return line == m_dreq;
+}
+
+
+//-------------------------------------------------
+//  status_w - status register write
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_wdc_device::status_w )
+{
+	m_status = data;
 }
