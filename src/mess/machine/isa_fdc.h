@@ -24,6 +24,7 @@ class isa8_fdc_device :
 public:
         // construction/destruction
         isa8_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -60,5 +61,23 @@ public:
 
 // device type definition
 extern const device_type ISA8_FDC;
+
+// ======================> isa8_fdc_smc_device
+
+class isa8_fdc_smc_device :
+		public isa8_fdc_device
+{
+public:
+    // construction/destruction
+    isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_config_complete() { m_shortname = "isa_fdc_smc"; }
+};
+
+
+// device type definition
+extern const device_type ISA8_FDC_SMC;
 
 #endif  /* ISA_FDC_H */

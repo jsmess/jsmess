@@ -84,6 +84,13 @@ isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, type, name, tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		m_upd765(*this, "upd765")
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -435,5 +442,36 @@ void isa8_fdc_device::dack_w(int line,UINT8 data)
 void isa8_fdc_device::eop_w(int state)
 {
 	pc_fdc_set_tc_state( this, state);
+}
+
+static MACHINE_CONFIG_FRAGMENT( fdc_smc_config )
+	MCFG_SMC37C78_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+MACHINE_CONFIG_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ISA8_FDC_SMC = &device_creator<isa8_fdc_smc_device>;
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa8_fdc_smc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( fdc_smc_config );
+}
+
+//-------------------------------------------------
+//  isa8_fdc_smc_device - constructor
+//-------------------------------------------------
+
+isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        isa8_fdc_device(mconfig, ISA8_FDC_SMC, "Diskette Drive Adapter (SMC37C78)", tag, owner, clock)
+{
 }
 

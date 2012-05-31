@@ -146,6 +146,8 @@ struct _upd765_t
 
 	char *data_buffer;
 	const upd765_interface *intf;
+	
+	bool pool;
 };
 
 //static void upd765_setup_data_request(unsigned char Data);
@@ -2059,6 +2061,10 @@ static void upd765_setup_command(device_t *device)
 			{
 				/* clear ready changed bit */
 				fdc->ready_changed &= ~(1 << fdc->drive);
+				
+				if (!fdc->pool) {
+					fdc->ready_changed = 0;
+				}
 
 				/* clear drive seek bits */
 				fdc->FDC_main &= ~(1 | 2 | 4 | 8);
@@ -2224,6 +2230,7 @@ static void upd765_setup_command(device_t *device)
 							break;
 
 						case 0x13:		/* configure */
+							fdc->pool = fdc->upd765_command_bytes[1] & 0x10;
 							upd765_idle(device);
 							break;
 
@@ -2417,6 +2424,8 @@ static void common_start(device_t *device, int device_type)
 	fdc->out_int_func.resolve(fdc->intf->out_int_func, *device);
 	fdc->out_drq_func.resolve(fdc->intf->out_drq_func, *device);
 
+	// plain upd765 is doing pooling
+	fdc->pool = true;	
 	// register for state saving
 	//state_save_register_item(device->machine(), "upd765", device->tag(), 0, upd765->number);
 }
@@ -2434,6 +2443,9 @@ static DEVICE_START( upd765b )
 static DEVICE_START( smc37c78 )
 {
 	common_start(device, TYPE_SMC37C78);
+	// specified in documentation that by default is off
+	upd765_t *fdc = get_safe_token(device);
+	fdc->pool = false;
 }
 
 static DEVICE_START( upd72065 )
