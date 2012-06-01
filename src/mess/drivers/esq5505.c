@@ -2,8 +2,8 @@
 
     esq5505.c - Ensoniq ES5505 + ES5510 based synthesizers and samplers
 
-    Ensoniq VFX, VFX-SD, EPS-16 Plus, SD-1, SD-1 32, and SQ-1 (SQ-1 Plus, SQ-2,
-    and KS-32 are known to also be this architecture).
+    Ensoniq VFX, VFX-SD, EPS, EPS-16 Plus, SD-1, SD-1 32, and SQ-1 (SQ-1 Plus,
+    SQ-2, and KS-32 are known to also be this architecture).
 
     The Taito sound system in taito_en.c is directly derived from the SQ-1.
 
@@ -13,12 +13,12 @@
  
     0x000000-0x00ffff   work RAM low
     0x200000-0x20001f   OTTO(5505) regs
-    0x240000-0x24003f   ??? regs
+    0x240000-0x2400ff   DMAC (68450) regs (EPS/EPS-16)
     0x260000-0x2601ff   ESP (5510) regs
     0x280000-0x28001f   DUART (68681) regs
-    0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS-16)
-    0x300000-0x300003   EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
-    0x340000-0x3bffff   EPS-16 sample RAM 
+    0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS/EPS-16)
+    0x300000-0x300003   EPS/EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
+    0x340000-0x3bffff   EPS/EPS-16 sample RAM 
     0xc00000-0xc3ffff   OS ROM
     0xff0000-0xffffff   work RAM hi (may or may not be mirrored with work RAM low)
  
@@ -33,6 +33,7 @@
 #include "sound/es5506.h"
 #include "machine/68681.h"
 #include "machine/wd1772.h"
+#include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "formats/esq16_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "formats/dfi_dsk.h"
@@ -54,7 +55,8 @@ public:
         m_fdc(*this, "wd1772"),
         m_epsvfd(*this, "epsvfd"),
         m_sq1vfd(*this, "sq1vfd"),
-        m_vfd(*this, "vfd")
+        m_vfd(*this, "vfd"),
+        m_dmac(*this, "mc68450")
     { }
 
     required_device<device_t> m_maincpu;
@@ -63,6 +65,7 @@ public:
     optional_device<esq1x22_t> m_epsvfd;
     optional_device<esq2x40_sq1_t> m_sq1vfd;
     optional_device<esq2x40_t> m_vfd;
+    optional_device<device_t> m_dmac;
 
     virtual void machine_reset();
 
@@ -215,6 +218,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+    AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x580000, 0x77ffff) AM_RAM         // sample RAM?
@@ -264,8 +268,16 @@ static UINT8 duart_input(device_t *device)
 static void duart_output(device_t *device, UINT8 data)
 {
     esq5505_state *state = device->machine().driver_data<esq5505_state>();
+	floppy_connector *con = device->machine().device<floppy_connector>("fd0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
 
     state->m_duart_io = data;
+
+    if (floppy)
+    {
+        floppy->ss_w((data & 2)>>1);
+    }
+
 //    printf("DUART output: %02x (PC=%x)\n", data, cpu_get_pc(state->m_maincpu));
 }
 
@@ -329,6 +341,49 @@ static const duart68681_config duart_config =
 	1000000, 1000000, // IP5, IP6
 };
 
+static void esq_dma_end(running_machine &machine, int channel, int irq)
+{
+	device_t *device = machine.device("mc68450");
+
+	if (irq != 0)
+	{
+        printf("DMAC IRQ, vector = %x\n", hd63450_get_vector(device, channel));
+	}
+}
+
+static void esq_dma_error(running_machine &machine, int channel, int irq)
+{
+	device_t *device = machine.device("mc68450");
+	if(irq != 0)
+	{
+        printf("DMAC error, vector = %x\n", hd63450_get_error_vector(device, channel));
+	}
+}
+
+static int esq_fdc_read_byte(running_machine &machine, int addr)
+{
+    esq5505_state *state = machine.driver_data<esq5505_state>();
+
+	return state->m_fdc->data_r();
+}
+
+static void esq_fdc_write_byte(running_machine &machine, int addr, int data)
+{
+    esq5505_state *state = machine.driver_data<esq5505_state>();
+    state->m_fdc->data_w(data & 0xff);
+}
+
+static const hd63450_intf dmac_interface =
+{
+	"maincpu",  // CPU - 68000
+	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
+	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
+	esq_dma_end,
+	esq_dma_error,
+    { esq_fdc_read_byte, 0, 0, 0 },     // ch 0 = fdc, ch 1 = 340001 (ADC?)
+    { esq_fdc_write_byte, 0, 0, 0 }
+};
+
 static const es5505_interface es5505_config =
 {
 	"waverom",	/* Bank 0 */
@@ -366,6 +421,8 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 
     MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+
+	MCFG_HD63450_ADD( "mc68450", dmac_interface )   // MC68450 compatible
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
