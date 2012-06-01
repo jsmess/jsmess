@@ -61,9 +61,9 @@ public:
 		  m_uart_tbre(0),
 		  m_fpu_irq(0),
 		  m_bus_irq2(0),
-		  m_fdc_tc_enable(0),
-		  m_fdc_dma_enable(1),
-		  m_fdc_drq(1),
+		  m_enable_eop(0),
+		  m_disable_dreq2(0),
+		  m_fdc_drq(0),
 		  m_fdc_dd0(0),
 		  m_fdc_dd1(0),
 		  m_ds1(1),
@@ -178,8 +178,8 @@ public:
 	int m_fpu_irq;
 	int m_bus_irq2;
 
-	int m_fdc_tc_enable;
-	int m_fdc_dma_enable;
+	int m_enable_eop;
+	int m_disable_dreq2;
 	int m_fdc_drq;
 	int m_fdc_dd0;
 	int m_fdc_dd1;

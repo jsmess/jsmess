@@ -103,16 +103,16 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
     */
 
-	m_fdc_tc_enable = BIT(data, 0);
-	m_fdc_dma_enable = BIT(data, 1);
+	m_enable_eop = BIT(data, 0);
+	m_disable_dreq2 = BIT(data, 1);
 	
 	if (BIT(data, 2)) m_fdc_dd0 = 0;
 	if (BIT(data, 3)) m_fdc_dd1 = 0;
 
 	if (LOG)
 	{
-    	logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_fdc_tc_enable);
-    	logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_fdc_dma_enable);
+    	logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_enable_eop);
+    	logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_disable_dreq2);
 	}
 
 	update_fdc_tc();
@@ -662,10 +662,10 @@ INPUT_PORTS_END
 
 void wangpc_state::update_fdc_tc()
 {
-	if (m_fdc_tc_enable)
+	if (m_enable_eop)
 		upd765_tc_w(m_fdc, !m_dma_eop);
 	else
-		upd765_tc_w(m_fdc, 1);
+		upd765_tc_w(m_fdc, 0);
 }
 
 WRITE_LINE_MEMBER( wangpc_state::hrq_w )
@@ -706,7 +706,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 
 READ8_MEMBER( wangpc_state::ior2_r )
 {
-	if (m_fdc_dma_enable)
+	if (m_disable_dreq2)
 		return m_bus->dack_r(2);
 	else
 		return upd765_dack_r(m_fdc, 0);
@@ -714,7 +714,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
-	if (m_fdc_dma_enable)
+	if (m_disable_dreq2)
 		m_bus->dack_w(2, data);
 	else
 		upd765_dack_w(m_fdc, 0, data);
@@ -1054,10 +1054,10 @@ WRITE_LINE_MEMBER( wangpc_state::fdc_drq_w )
 
 void wangpc_state::update_fdc_drq()
 {
-	if (m_fdc_dma_enable)
-		i8237_dreq2_w(m_dmac, m_fdc_drq);
+	if (m_disable_dreq2)
+		i8237_dreq2_w(m_dmac, 1);
 	else
-		i8237_dreq2_w(m_dmac, CLEAR_LINE);
+		i8237_dreq2_w(m_dmac, !m_fdc_drq);
 }
 
 static UPD765_GET_IMAGE( wangpc_fdc_get_image )
@@ -1184,8 +1184,8 @@ void wangpc_state::machine_start()
 	save_item(NAME(m_uart_tbre));
 	save_item(NAME(m_fpu_irq));
 	save_item(NAME(m_bus_irq2));
-	save_item(NAME(m_fdc_tc_enable));
-	save_item(NAME(m_fdc_dma_enable));
+	save_item(NAME(m_enable_eop));
+	save_item(NAME(m_disable_dreq2));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_ds1));
 	save_item(NAME(m_ds2));
