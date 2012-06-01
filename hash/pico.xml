@@ -171,7 +171,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * うんてんトーマス　デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
 * アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
-* 仮面ライダーアギト&クウガワイルドバトル - Kamen Rider Agito & Kuuga Wild Battle (Bandai - 200104xx - T-133360)
 * も～っと！おジャ魔女どれみ - Mo~tto! Ojamajo Doremi (Bandai - 200106xx - T-133370)
 * 新ウルトラマンピコ ウルトラファイティングベース - Shin Ultraman Pico Ultraman Fighting Best (Bandai - 200110xx - T-133380)
 * どうぶつピコ ハムスターランド <初回限定･ハムスター人形付属> - Doubutsu Pico Hamster Land ~Shokai Gentei-Hamster Ningyou Fuzoku~ (Bandai - 20020315 - T-133390)
@@ -507,6 +506,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hello kitty no machiheodekake (japan).bin" size="1048576" crc="3f336747" sha1="28e866688fed6e7c0a82c3f1e91f205600afcf68" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamenrid">
+		<description>Kamen Rider Agito &amp; Kuuga - Wild Battle (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133360"/>
+		<info name="release" value="200104xx"/>
+		<info name="alt_title" value="仮面ライダーアギト&amp;クウガワイルドバトル"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="kamen rider agito &amp; kuuga wild battle (japan).bin" size="1048576" crc="316596dc" sha1="18dc0756e0c61a397fe88d06c5915d543440d16e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2314,28 +2327,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Kabutcho Challenge Fishing - Kabutcho Tsuri Gakkou (J).bin" size="????" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kamenrid">
-		<description>Kamen Rider Agito &amp; Kuuga - Wild Battle (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Kamen Rider Agito &amp; Kuuga - Wild Battle (J).bin" size="????" crc="316596dc" sha1="18dc0756e0c61a397fe88d06c5915d543440d16e" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kantwakk">
-		<description>Kantan Wakuwaku Keyboard (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Kantan Wakuwaku Keyboard (J).bin" size="????" crc="57e973f7" sha1="ffd6289f41a95ed04cb04ef40041fa9fcc4f1661" offset="000000" >
 			</dataarea>
 		</part>
 	</software>

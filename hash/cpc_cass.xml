@@ -43,23 +43,12 @@
 
 <softwarelist name="cpc_cass" description="Amstrad CPC Cassette Images">
 
-	<!-- Identifying 007 The Living Daylights (UK) (1987) (Spain retail version) [Original] [TAPE].zip... -->
-	<software name="007theli" supported="no">
-		<description>007 The Living Daylights (UK) (Spain retail version) [Original] [TAPE]</description>
-		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="60121">
-				<rom name="007 the living daylights (uk) (1987) (spain retail version) [original] [tape].cdt" size="60121" crc="0c26dde1" sha1="88f5e991ca54190ad95fe18ad89b604fa5a61e00" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
+<!-- GAMES -->
 	<!-- Identifying 007 The Living Daylights (UK) (1987) (UK retail version) [Original] [TAPE].zip... -->
-	<software name="007theli01" cloneof="007theli" supported="no">
-		<description>007 The Living Daylights (UK) (UK retail version) [Original] [TAPE]</description>
+	<software name="007tld" supported="no">
+		<description>007 The Living Daylights (UK)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Domark</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="59944">
 				<rom name="007 the living daylights (uk) (1987) (uk retail version) [original] [tape].cdt" size="59944" crc="4889b7d3" sha1="022f783a9f20a2a67d71348d3c1860bc624cb440" offset="0" />
@@ -67,130 +56,23 @@
 		</part>
 	</software>
 
-	<!-- Identifying 10 Great Games (UK) (2 K7 4 faces) (1987) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="10greatg" supported="no">
-		<description>10 Great Games (UK) (2 K7 4 faces) [Original] [TAPE] [COMPILATION]</description>
+	<!-- Identifying 007 The Living Daylights (UK) (1987) (Spain retail version) [Original] [TAPE].zip... -->
+	<software name="007tlds" cloneof="007tld" supported="no">
+		<description>007 The Living Daylights (Spa)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Domark</publisher>
 		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="65431">
-				<rom name="10 great games (uk) (k7 1 face a) (1987) (1. avenger) [original] [tape] [compilation].cdt" size="65431" crc="60fe9573" sha1="0f51b0519c45f47cae49e66495ddc61922d2520a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="62064">
-				<rom name="10 great games (uk) (k7 1 face a) (1987) (2. future knight) [original] [tape] [compilation].cdt" size="62064" crc="90b41b00" sha1="e70a1b3f9da3aa5ff4c4397525ea06a760e1d3d7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="10 great games (uk) (k7 1 face a) (1987) (3. krakout) [original] [tape] [compilation].cdt" size="65492" crc="ce727237" sha1="75d7b82fb9570f950413a9deabde7243c4fede7e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="66214">
-				<rom name="10 great games (uk) (k7 1 face b) (1987) (4. bounder) [original] [tape] [compilation].cdt" size="66214" crc="df3d7e60" sha1="871e2f2c5a3871b90685f98cd11c13b49e21e914" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="58736">
-				<rom name="10 great games (uk) (k7 1 face b) (1987) (5. footballer of the year) [original] [tape] [compilation].cdt" size="58736" crc="f718deb5" sha1="4c011e73846787bc8939c16875a50788c845982c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="65410">
-				<rom name="10 great games (uk) (k7 2 face a) (1987) (6. trailblazer) [original] [tape] [compilation].cdt" size="65410" crc="cd5d69f3" sha1="048caa82ea7737fb343dd8cdeb178f7d80c3c93a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="52478">
-				<rom name="10 great games (uk) (k7 2 face a) (1987) (7. highway encounter) [original] [tape] [compilation].cdt" size="52478" crc="4e9da7e8" sha1="44407ac1d5ef3902ba27e95c2b911464b7390576" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="67408">
-				<rom name="10 great games (uk) (k7 2 face a) (1987) (8. monty on the run) [original] [tape] [compilation].cdt" size="67408" crc="2a2a35a4" sha1="f58e3ec33a2ffb0c194ea3b46a4bc1a228f32565" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="61673">
-				<rom name="10 great games (uk) (k7 2 face b) (1987) (9. west bank) [original] [tape] [compilation].cdt" size="61673" crc="03099b6e" sha1="cbd8779a753e5b6bf1151f0a4d5d81fcadbedf3a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="58200">
-				<rom name="10 great games (uk) (k7 2 face b) (1987) (10. jack the nipper) [original] [tape] [compilation].cdt" size="58200" crc="c0426069" sha1="4e536bb53f65992f323ab21dffde3508eabb63ae" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 10 Great Games II (UK) (4 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="10greatg01" cloneof="10greatg" supported="no">
-		<description>10 Great Games II (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="43939">
-				<rom name="10 great games ii (uk) (face 1b) (1988) (04. samurai trilogy - game) [original] [tape] [compilation].cdt" size="43939" crc="8e20fb06" sha1="010438ae46af7d147b31c0b976a85b2a83711da3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="121693">
-				<rom name="10 great games ii (uk) (face 1b) (1988) (06. basil the great mouse detective) [original] [tape] [compilation].cdt" size="121693" crc="e21a1d6a" sha1="e78c29715e4040d83450072b568ed97be321bd27" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="284618">
-				<rom name="10 great games ii (uk) (face 2a) (1988) (04. samurai trilogy - sections) (1987) [original] [tape] [compilation].cdt" size="284618" crc="9afaf2d5" sha1="42e333af36e9b043248a489426e562a66f4fb8fd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="10 great games ii (uk) (face 2a) (1988) (05. jack the nipper ii in coconut capers) [original] [tape] [compilation].cdt" size="65492" crc="b20722cd" sha1="4c1aac1b12c623e68d93e2915af5bc59883d158f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="60163">
-				<rom name="10 great games ii (uk) (face 2b) (1988) (08. the duct) [original] [tape] [compilation].cdt" size="60163" crc="3065e227" sha1="06177b141025b51e978255aa03c846428bc7029a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="10 great games ii (uk) (face 2b) (1988) (09. thing bounces back) [original] [tape] [compilation].cdt" size="65492" crc="287b8d2f" sha1="a6cbdeab5371cee82f78ddc8645b555ed368fb79" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="10 great games ii (uk) (face 2b) (1988) (10. auf wiedersehen monty) [original] [tape] [compilation].cdt" size="65492" crc="190e17fc" sha1="b460d6e59ee7a0b9743ddc508cb17ba18fa8d550" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="269660">
-				<rom name="10 great games ii (uk) (face 2b) (1988) (07. mask) [original] [tape] [compilation].cdt" size="269660" crc="d76bdb11" sha1="678215a95d41fab1bd3a0fad159106555ec4ca9f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="65494">
-				<rom name="10 great games ii (uk) (face 1a) (1988) (01. death wish 3) [original] [tape] [compilation].cdt" size="65494" crc="8a3e0c39" sha1="27a2ae292d8d22d1a662feeb05000b15d15f3eb5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="68465">
-				<rom name="10 great games ii (uk) (face 1a) (1988) (02. the final matrix) [original] [tape] [compilation].cdt" size="68465" crc="23bd22eb" sha1="78ba0d3e9d77e9c592d5689dda4a8be41cf869e4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass11" interface="cpc_cass">
-			<dataarea name="cass" size="61673">
-				<rom name="10 great games ii (uk) (face 1a) (1988) (03. convoy raider) [original] [tape] [compilation].cdt" size="61673" crc="dd04c015" sha1="25ec42380895931db58cc9510801c0a9d32b96f3" offset="0" />
+			<dataarea name="cass" size="60121">
+				<rom name="007 the living daylights (uk) (1987) (spain retail version) [original] [tape].cdt" size="60121" crc="0c26dde1" sha1="88f5e991ca54190ad95fe18ad89b604fa5a61e00" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Identifying 10th Frame (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="10thfram" supported="no">
-		<description>10th Frame (UK) [Original] [TAPE]</description>
+	<software name="10frame" supported="no">
+		<description>10th Frame (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="58837">
 				<rom name="10th frame (uk) (1986) [original] [tape].cdt" size="58837" crc="19a69206" sha1="19a9cad4dce1a14fac4b2b1f28c45d9d5ab0c33b" offset="0" />
@@ -199,10 +81,10 @@
 	</software>
 
 	<!-- Identifying 11 A Side Soccer (UK) (1989) [Original] [TAPE].zip... -->
-	<software name="11asides" supported="no">
+	<software name="11assoc" supported="no">
 		<description>11 A Side Soccer (UK) [Original] [TAPE]</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="56523">
 				<rom name="11 a side soccer (uk) (1989) [original] [tape].cdt" size="56523" crc="794766d0" sha1="87320695abd7c843679a32beb13d0710621b9c3a" offset="0" />
@@ -210,275 +92,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying 12 Jeux Exceptionnels (UK) (4 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="12jeuxex" supported="no">
-		<description>12 Jeux Exceptionnels (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="98806">
-				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (5. exolon) [original] [tape] [compilation].cdt" size="98806" crc="818dd5f7" sha1="a475608f686865455ff3469ef667bf300385bef9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="71971">
-				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (6. nebulus) [original] [tape] [compilation].cdt" size="71971" crc="19e70dfc" sha1="cbf08f3545219559339a12ee3a9637b320f08045" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="81845">
-				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (7. blood brothers) [original] [tape] [compilation].cdt" size="81845" crc="56856df6" sha1="0443606e6eb6a9d299fe01bf0db0cdce42af6edc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (8. masters of the universe) [original] [tape] [compilation].cdt" size="65492" crc="2e68104e" sha1="8c27bb2a7de8f6ab65d2dfdad039635c7cfbb1ee" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="52785">
-				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (9. ranarama) [original] [tape] [compilation].cdt" size="52785" crc="acf942d6" sha1="5331cf311837372138fb21a015a886aff0126abe" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="54877">
-				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (10. cybernoid) [original] [tape] [compilation].cdt" size="54877" crc="d6ab9668" sha1="702f9fad5e43e89ff70215a1f615bc0f624b7697" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="72594">
-				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (11. deflektor) [original] [tape] [compilation].cdt" size="72594" crc="a2b16bd8" sha1="855d64d2afb3ffaa1ec7e031471d08d75f300ccb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="269660">
-				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (12. mask) [original] [tape] [compilation].cdt" size="269660" crc="d76bdb11" sha1="678215a95d41fab1bd3a0fad159106555ec4ca9f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="65493">
-				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (1. north star) [original] [tape] [compilation].cdt" size="65493" crc="a02ca947" sha1="2125404e08b3635fea9200ceac83c84d4515de3e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="65492">
-				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (2. venom strikes back) [original] [tape] [compilation].cdt" size="65492" crc="f77b3bd1" sha1="456b4d23f401c0cd8f75833fcd639d1286332dc1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass11" interface="cpc_cass">
-			<dataarea name="cass" size="142381">
-				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (3. hercules slayer of the damned) [original] [tape] [compilation].cdt" size="142381" crc="03616468" sha1="1d297c38d015b18a8f6bb01a0df3680cdcce726b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass12" interface="cpc_cass">
-			<dataarea name="cass" size="76426">
-				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (4. marauder) [original] [tape] [compilation].cdt" size="76426" crc="0dde8479" sha1="2c8f9215a381cc1d7d47e94d61749541b24f84fd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 12 Jeux Fantastiques (UK) (6 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="12jeuxfa" supported="no">
-		<description>12 Jeux Fantastiques (UK) (6 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="85304">
-				<rom name="12 jeux fantastiques (uk) (face 1a) (1989) (01. skate crazy - car park challenge) [original] [tape] [compilation].cdt" size="85304" crc="eb7b7620" sha1="66b40aee5f4c19090a5700ea85bad7c2ee8b3165" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="105034">
-				<rom name="12 jeux fantastiques (uk) (face 1a) (1989) (01. skate crazy - championship course) [original] [tape] [compilation].cdt" size="105034" crc="8465ef9e" sha1="45388cf90ff185fced6fc4fffdc0075282a8309d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="100548">
-				<rom name="12 jeux fantastiques (uk) (face 1b) (1989) (02. techno cop) [original] [tape] [compilation].cdt" size="100548" crc="7a5dc01a" sha1="b1f1aa2ccdeb33a0a7782d9dbb12c314e2aa278c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="90364">
-				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (03. dark fusion) [original] [tape] [compilation].cdt" size="90364" crc="84145cd6" sha1="8cd4b15551e24987176d0ba818ddd9f3aaa2a800" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="65493">
-				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (04. night raider) [original] [tape] [compilation].cdt" size="65493" crc="d5feebdc" sha1="396645e3158138f0649779ec3551f2569affbf3b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="64588">
-				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (05. artura) [original] [tape] [compilation].cdt" size="64588" crc="5606e323" sha1="07956dc0a9dcf879a265a3979a2962dbf64c236c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="119900">
-				<rom name="12 jeux fantastiques (uk) (face 2b) (1989) (06. motor massacre) [original] [tape] [compilation].cdt" size="119900" crc="248593ad" sha1="475d20d67a8c6021f26bbd7955edf15d69d05f3e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="67082">
-				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (07. gary lineker's superstar soccer) [original] [tape] [compilation].cdt" size="67082" crc="5cfc6002" sha1="51a278bdeb573ab720c2442e79e2fd44253a139f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="60969">
-				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (08. hate - hostile all terrain encounter) [original] [tape] [compilation].cdt" size="60969" crc="85aee1b5" sha1="668174c1ac7e989097514eb5bcc2f5827d3514b2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="70429">
-				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (09. super scramble simulator) [original] [tape] [compilation].cdt" size="70429" crc="5430af71" sha1="fab29be81084fcd49b125526b841ae67c8149a6d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass11" interface="cpc_cass">
-			<dataarea name="cass" size="76423">
-				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (10. marauder) [original] [tape] [compilation].cdt" size="76423" crc="d43d8883" sha1="52c426cc402a9cdbadc16fab9fe91855c79dde5f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass12" interface="cpc_cass">
-			<dataarea name="cass" size="59953">
-				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (11. gary lineker's hot-shot !) [original] [tape] [compilation].cdt" size="59953" crc="8af64f79" sha1="867de31e65e7975f3f99a9b4562048a5f9b2f274" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass13" interface="cpc_cass">
-			<dataarea name="cass" size="59275">
-				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (12. stormlord) [original] [tape] [compilation].cdt" size="59275" crc="9f5e8411" sha1="7034d6016f3c90c21d402a5c6d6f4a30b6f6ecc0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 12 Top Amstrad Hits (F,UK) (7 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="12topams" supported="no">
-		<description>12 Top Amstrad Hits (F,UK) (7 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="39354">
-				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (airwolf) [original] [tape] [compilation].cdt" size="39354" crc="3004975d" sha1="9caf84210fb83722b4fb343785ad4e55ff18fabe" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="54055">
-				<rom name="12 top amstrad hits (uk) (face 1b) (1989) (enduro racer) [original] [tape] [compilation].cdt" size="54055" crc="bfe8467c" sha1="3d9017050f6095ca162f15331f17c39507dfec67" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="59941">
-				<rom name="12 top amstrad hits (uk) (face 1b) (1989) (living day lights) [original] [tape] [compilation].cdt" size="59941" crc="c776cfde" sha1="26b96e484c2fc17839bf3efb97b324c1691eecc4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="82285">
-				<rom name="12 top amstrad hits (uk) (face 2a) (1989) (paperboy) [original] [tape] [compilation].cdt" size="82285" crc="07482b0f" sha1="b3c31a53559ba4c3bc93623738b14cdce1072f12" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="68533">
-				<rom name="12 top amstrad hits (uk) (face 3a) (1989) (1942) [original] [tape] [compilation].cdt" size="68533" crc="0a996faa" sha1="59a72b52b65c27c06431e1d3fe0657c4e8501c92" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="62251">
-				<rom name="12 top amstrad hits (uk) (face 3a) (1989) (ikari warriors) [original] [tape] [compilation].cdt" size="62251" crc="975dddcf" sha1="6ad0bb2cceda4dd59031f6fd46290e681aaace80" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="51991">
-				<rom name="12 top amstrad hits (uk) (face 3b) (1989) (saboteur ii) [original] [tape] [compilation].cdt" size="51991" crc="a200c6df" sha1="794caef750da05c5fcae9bd59815a0cd902d12c8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="75385">
-				<rom name="12 top amstrad hits (uk) (face 3b) (1989) (battle ships) [original] [tape] [compilation].cdt" size="75385" crc="ea3ebb7a" sha1="bf48440c4795eb80945483362cc1e3d987451314" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="132265">
-				<rom name="12 top amstrad hits (f) (face 1a) (1989) (gabrielle) [original] [tape] [compilation].cdt" size="132265" crc="15141fa5" sha1="f8cd1552845ae1dc89eff12393ab4d849e6d601f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="41689">
-				<rom name="12 top amstrad hits (f) (face 1b) (1989) (mange cailloux) [original] [tape] [compilation].cdt" size="41689" crc="37219f47" sha1="adec81b9004e6367c59f2995bd81d9a50384e3b6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass11" interface="cpc_cass">
-			<dataarea name="cass" size="81658">
-				<rom name="12 top amstrad hits (f) (face 2a) (1989) (asphalt) [original] [tape] [compilation].cdt" size="81658" crc="e4e112cc" sha1="2ecd8364d77934c80954466b5b1d9d7c8929beff" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass12" interface="cpc_cass">
-			<dataarea name="cass" size="61219">
-				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (bombjack) [original] [tape] [compilation].cdt" size="61219" crc="adfeea9d" sha1="32cc49f1d497eded372a0aec438518af46974eb9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass13" interface="cpc_cass">
-			<dataarea name="cass" size="61735">
-				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (ghosts'n goblins) [original] [tape] [compilation].cdt" size="61735" crc="3523ce78" sha1="b25436d3cf288d87261eb6ff6334755ae3a7e71a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 123 (UK) (2 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="123uk2fa" supported="no">
-		<description>123 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="77199">
-				<rom name="123 (uk) (face a) (1988) [original] [tape] [compilation].cdt" size="77199" crc="9a2c1977" sha1="c9eea85c6d585e0ac5e95ef9643919ba4017d393" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="97137">
-				<rom name="123 (uk) (face b) (1988) [original] [tape] [compilation].cdt" size="97137" crc="518cb651" sha1="4d66eb2ee3e7dc198119b58e2fec513a43d039ee" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 180 (UK) (1986) (v2) [Original] [TAPE].zip... -->
-	<software name="180uk198" supported="no">
-		<description>180 (UK) (v2) [Original] [TAPE]</description>
-		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="52796">
-				<rom name="180 (uk) (1986) (v2) [original] [tape].cdt" size="52796" crc="e24b0ac4" sha1="880a85be959f382d61b4d74dac7d10993fe8acf2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 180 (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="180uk19801" cloneof="180uk198" supported="no">
-		<description>180 (UK) [Original] [TAPE]</description>
-		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="57780">
-				<rom name="180 (uk) (1986) [original] [tape].cdt" size="57780" crc="d123de3a" sha1="893fd084128070bd46359ce126f5426b4c22804c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 1942 (UK) (1986) (Spain retail version) [Original] [TAPE].zip... -->
-	<software name="1942uk19" supported="no">
-		<description>1942 (UK) (Spain retail version) [Original] [TAPE]</description>
-		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="59263">
-				<rom name="1942 (uk) (1986) (spain retail version) [original] [tape].cdt" size="59263" crc="50c528d7" sha1="51d78f79c3724c4a8eb1748c0f8e7a7ad860bc0b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 1942 (UK) (1986) (UK retail version) [Original] [TAPE].zip... -->
-	<software name="1942uk1901" cloneof="1942uk19" supported="no">
-		<description>1942 (UK) (UK retail version) [Original] [TAPE]</description>
+	<software name="1942" supported="no">
+		<description>1942 (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Elite Systems</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="68533">
 				<rom name="1942 (uk) (1986) (uk retail version) [original] [tape].cdt" size="68533" crc="d8a14e53" sha1="799756631312b8be72affb9fe47385798e274ef0" offset="0" />
@@ -486,23 +104,23 @@
 		</part>
 	</software>
 
-	<!-- Identifying 1942 + Batty (UK) (1989) (Spain retail version) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="1942batt" supported="no">
-		<description>1942 + Batty (UK) (Spain retail version) [Original] [TAPE] [COMPILATION]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Identifying 1942 (UK) (1986) (Spain retail version) [Original] [TAPE].zip... -->
+	<software name="1942s" cloneof="1942" supported="no">
+		<description>1942 (Spa)</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
 		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="107477">
-				<rom name="1942 + batty (uk) (1989) (spain retail version) [original] [tape] [compilation].cdt" size="107477" crc="63f78c55" sha1="556f73bbfb731dd426af80ae3b34b43f685aff6b" offset="0" />
+			<dataarea name="cass" size="59263">
+				<rom name="1942 (uk) (1986) (spain retail version) [original] [tape].cdt" size="59263" crc="50c528d7" sha1="51d78f79c3724c4a8eb1748c0f8e7a7ad860bc0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Identifying 1943 (UK) (1988) [Original] [TAPE].zip... -->
-	<software name="1943uk19" supported="no">
-		<description>1943 (UK) [Original] [TAPE]</description>
+	<software name="1943" supported="no">
+		<description>1943 (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Go! ~ Capcom</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="60797">
 				<rom name="1943 (uk) (1988) [original] [tape].cdt" size="60797" crc="940c33aa" sha1="a083de348f6e1a55fefd27dbdd3b04dda5c103db" offset="0" />
@@ -511,10 +129,10 @@
 	</software>
 
 	<!-- Identifying 1st Division Manager (UK) (1992) [Original] [TAPE].zip... -->
-	<software name="1stdivis" supported="no">
-		<description>1st Division Manager (UK) [Original] [TAPE]</description>
+	<software name="1stdivma" supported="no">
+		<description>1st Division Manager (UK)</description>
 		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="60327">
 				<rom name="1st division manager (uk) (1992) [original] [tape].cdt" size="60327" crc="3c0b820e" sha1="3ad74b694608b0d44a7cffa2e8e3ddd4daa2ee52" offset="0" />
@@ -523,10 +141,10 @@
 	</software>
 
 	<!-- Identifying 2 Player Soccer Squad (UK) (1990) [Original] [TAPE].zip... -->
-	<software name="2players" supported="no">
-		<description>2 Player Soccer Squad (UK) [Original] [TAPE]</description>
+	<software name="2psocsqd" supported="no">
+		<description>2 Player Soccer Squad (UK)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cult</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="62503">
 				<rom name="2 player soccer squad (uk) (1990) [original] [tape].cdt" size="62503" crc="0dc56966" sha1="7e5b46219b901440dd459ee9998dcc809294ae46" offset="0" />
@@ -535,10 +153,10 @@
 	</software>
 
 	<!-- Identifying 2 Player Super League (UK) (1989) [Original] [TAPE].zip... -->
-	<software name="2players01" cloneof="2players" supported="no">
-		<description>2 Player Super League (UK) [Original] [TAPE]</description>
+	<software name="2psuplea" supported="no">
+		<description>2 Player Super League (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cult</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="45479">
 				<rom name="2 player super league (uk) (1989) [original] [tape].cdt" size="45479" crc="a37f076c" sha1="adf30d362954591df36dcf50db48c4199a9dfcdc" offset="0" />
@@ -547,10 +165,10 @@
 	</software>
 
 	<!-- Identifying 2088 (UK) (1988) [Original] [TAPE].zip... -->
-	<software name="2088uk19" supported="no">
-		<description>2088 (UK) [Original] [TAPE]</description>
+	<software name="2088" supported="no">
+		<description>2088 (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Zeppelin Games</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="32725">
 				<rom name="2088 (uk) (1988) [original] [tape].cdt" size="32725" crc="8f89d95d" sha1="be13f9d8450b9cecaa90211352fa4465f04efecb" offset="0" />
@@ -559,10 +177,10 @@
 	</software>
 
 	<!-- Identifying 2112 AD (UK,F,G,S) (64K) (1986) [Original] [TAPE].zip... -->
-	<software name="2112aduk" supported="no">
-		<description>2112 AD (UK,F,G,S) (64K) [Original] [TAPE]</description>
+	<software name="2112ad" supported="no">
+		<description>2112 AD (Euro?)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Design Design</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="59195">
 				<rom name="2112 ad (uk,f,g,s) (64k) (1986) [original] [tape].cdt" size="59195" crc="b114a149" sha1="7a4e5fb1b5cd0533d8e8ff99fa57ec35c19d5bd3" offset="0" />
@@ -570,38 +188,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying 3 As (F,S) (4 faces) (1986) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="3asfs4fa" supported="no">
-		<description>3 As (F,S) (4 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="67801">
-				<rom name="3 as (f) (face 2a) (1986) (la malediction de thaar) [original] [tape] [compilation].cdt" size="67801" crc="d8571136" sha1="bbf3c87fee00f33498b1b8c496a32906cc6d6e6a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="10105">
-				<rom name="3 as (f) (face 3a) (1986) (graph pack) [original] [tape] [compilation].cdt" size="10105" crc="e9d11255" sha1="15a041740cdea906384267e95d322b7268e355d8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="15571">
-				<rom name="3 as (f) (face 3b) (1986) (graph pack) [original] [tape] [compilation].cdt" size="15571" crc="12420bb1" sha1="180705c350a7a278bb79f909d7ab2e902cf27662" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="65947">
-				<rom name="3 as (s) (face 1a) (1986) (gorbaf el vikingo) [original] [tape] [compilation].cdt" size="65947" crc="aa1fa72d" sha1="9471c39f1e580e9b271b63658617410c4ec2644e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 3-D Voicechess (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dvoicec" supported="no">
-		<description>3-D Voicechess (UK) [Original] [TAPE]</description>
+	<software name="3dvchess" supported="no">
+		<description>3-D Voicechess (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CP Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="48585">
 				<rom name="3-d voicechess (uk) (1985) [original] [tape].cdt" size="48585" crc="30fad1dd" sha1="dc12536ac99d2c3160c79cdcfad5e1fddc64e535" offset="0" />
@@ -611,9 +202,9 @@
 
 	<!-- Identifying 3D Boxing (UK) (1985) [Original] [TAPE].zip... -->
 	<software name="3dboxing" supported="no">
-		<description>3D Boxing (UK) [Original] [TAPE]</description>
+		<description>3D Boxing (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Amsoft</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="58470">
 				<rom name="3d boxing (uk) (1985) [original] [tape].cdt" size="58470" crc="19182316" sha1="adc783a37568ae81fcaa3c7a0af80b08258c038c" offset="0" />
@@ -649,10 +240,10 @@
 	</software>
 
 	<!-- Identifying 3D Grand Prix (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dgrandp" supported="no">
-		<description>3D Grand Prix (UK) [Original] [TAPE]</description>
+	<software name="3dgp" supported="no">
+		<description>3D Grand Prix (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Amsoft</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="59311">
 				<rom name="3d grand prix (uk) (1985) [original] [tape].cdt" size="59311" crc="f43f14a9" sha1="ffd5b597385ffddf4136cae8ff5cb512819e7194" offset="0" />
@@ -660,23 +251,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying 3D Invaders (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dinvade" supported="no">
-		<description>3D Invaders (UK) [Original] [TAPE]</description>
-		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="16135">
-				<rom name="3d invaders (uk) (1985) [original] [tape].cdt" size="16135" crc="975a5e27" sha1="ba2bed140fd8d82ebb54e047ee5524616da09cd7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 3D Monster Chase (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dmonste" supported="no">
-		<description>3D Monster Chase (UK) [Original] [TAPE]</description>
+	<software name="3dmoncha" supported="no">
+		<description>3D Monster Chase (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Romik Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="27163">
 				<rom name="3d monster chase (uk) (1985) [original] [tape].cdt" size="27163" crc="3160066b" sha1="532dcb443b01a1cf8bda2b52bc2a91f5182c3915" offset="0" />
@@ -685,8 +264,8 @@
 	</software>
 
 	<!-- Identifying 3D Pinball (UK) (1989) [Original] [TAPE].zip... -->
-	<software name="3dpinbal" supported="no">
-		<description>3D Pinball (UK) [Original] [TAPE]</description>
+	<software name="3dpinb" supported="no">
+		<description>3D Pinball (UK)</description>
 		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="cpc_cass">
@@ -698,9 +277,9 @@
 
 	<!-- Identifying 3D Quasars (UK) (1985) [Original] [TAPE].zip... -->
 	<software name="3dquasar" supported="no">
-		<description>3D Quasars (UK) [Original] [TAPE]</description>
+		<description>3D Quasars (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Solar Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="22789">
 				<rom name="3d quasars (uk) (1985) [original] [tape].cdt" size="22789" crc="fac00af9" sha1="5359a42081b4956ccbfde20f9b6a015544601a8b" offset="0" />
@@ -709,10 +288,10 @@
 	</software>
 
 	<!-- Identifying 3D Snooker (UK) (1990) [Original] [TAPE].zip... -->
-	<software name="3dsnooke" supported="no">
-		<description>3D Snooker (UK) [Original] [TAPE]</description>
+	<software name="3dsnook" supported="no">
+		<description>3D Snooker (UK)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Players Premier</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="65131">
 				<rom name="3d snooker (uk) (1990) [original] [tape].cdt" size="65131" crc="78ab9de5" sha1="76fd7562fb157a437a880eddf32b2f6b69ce312c" offset="0" />
@@ -721,10 +300,10 @@
 	</software>
 
 	<!-- Identifying 3D Starfighter (UK) (1987) [Original] [TAPE].zip... -->
-	<software name="3dstarfi" supported="no">
-		<description>3D Starfighter (UK) [Original] [TAPE]</description>
+	<software name="3dsfight" supported="no">
+		<description>3D Starfighter (UK)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="60796">
 				<rom name="3d starfighter (uk) (1987) [original] [tape].cdt" size="60796" crc="2acc0604" sha1="02ba5c9ed9a2ea36646c1912f501643b5a13a2f7" offset="0" />
@@ -733,10 +312,10 @@
 	</software>
 
 	<!-- Identifying 3D Starstrike (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dstarst" supported="no">
-		<description>3D Starstrike (UK) [Original] [TAPE]</description>
+	<software name="3dsstrik" supported="no">
+		<description>3D Starstrike (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Realtime Games Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="43237">
 				<rom name="3d starstrike (uk) (1985) [original] [tape].cdt" size="43237" crc="f8e09537" sha1="7dcca7ddd5a1412aa728a77a525711aeebd9cd00" offset="0" />
@@ -745,10 +324,10 @@
 	</software>
 
 	<!-- Identifying 3D Starstrike.zip... -->
-	<software name="3dstarst01" cloneof="3dstarst" supported="no">
-		<description>3D Starstrike</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="3dsstrika" cloneof="3dsstrik" supported="no">
+		<description>3D Starstrike (UK?, Alt?)</description>
+		<year>1985</year>
+		<publisher>Realtime Games Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="43254">
 				<rom name="3d starstrike.cdt" size="43254" crc="a5ffedf4" sha1="ae3fd65bc055f364d90744803d7f602368e40854" offset="0" />
@@ -757,10 +336,10 @@
 	</software>
 
 	<!-- Identifying 3D Stunt Rider (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="3dstuntr" supported="no">
-		<description>3D Stunt Rider (UK) [Original] [TAPE]</description>
+	<software name="3dstunt" supported="no">
+		<description>3D Stunt Rider (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Amsoft</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="67377">
 				<rom name="3d stunt rider (uk) (1985) [original] [tape].cdt" size="67377" crc="b659259e" sha1="47edede81dfbb7577cfeedaed71754606d3bc424" offset="0" />
@@ -768,8 +347,20 @@
 		</part>
 	</software>
 
+	<!-- Identifying 3D Invaders (UK) (1985) [Original] [TAPE].zip... -->
+	<software name="3dinvad" supported="no">
+		<description>3D-Invaders (UK)</description>
+		<year>1985</year>
+		<publisher>Amsoft</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="16135">
+				<rom name="3d invaders (uk) (1985) [original] [tape].cdt" size="16135" crc="975a5e27" sha1="ba2bed140fd8d82ebb54e047ee5524616da09cd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Identifying 3D-Plot 4 (G) (1985) [Original] [TAPE] [UTILITAIRE].zip... -->
-	<software name="3dplot4g" supported="no">
+	<software name="3dplot4" supported="no">
 		<description>3D-Plot 4 (Ger) [Original] [TAPE] [UTILITAIRE]</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -781,10 +372,10 @@
 	</software>
 
 	<!-- Identifying 3D-Sub (F) (1985) [Original] [TAPE].zip... -->
-	<software name="3dsubf19" supported="no">
-		<description>3D-Sub (Fra) [Original] [TAPE]</description>
+	<software name="3dsub" supported="no">
+		<description>3D-Sub (Fra)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Loriciels</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="41785">
 				<rom name="3d-sub (f) (1985) [original] [tape].cdt" size="41785" crc="e78e03d2" sha1="f84b99c581da8d2e01dcb2b20e97dd1db6cf9bd0" offset="0" />
@@ -793,10 +384,10 @@
 	</software>
 
 	<!-- Identifying 3DC (UK) (1987) [Original] [TAPE].zip... -->
-	<software name="3dcuk198" supported="no">
-		<description>3DC (UK) [Original] [TAPE]</description>
+	<software name="3dc" supported="no">
+		<description>3DC (UK)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Elite Systems</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="66705">
 				<rom name="3dc (uk) (1987) [original] [tape].cdt" size="66705" crc="50456454" sha1="27b11b2361c46dc4d6149aa94254fda7b945e226" offset="0" />
@@ -804,179 +395,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying 4 Game Pack N 1 (UK) (2 faces) (1991) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamepac" supported="no">
-		<description>4 Game Pack N 1 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1991</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="96487">
-				<rom name="4 game pack n 1 (uk) (face a) (1991) [original] [tape] [compilation].cdt" size="96487" crc="caaeff33" sha1="229408662f460bccd11b3af26eb1e66894e9e067" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="93087">
-				<rom name="4 game pack n 1 (uk) (face b) (1991) [original] [tape] [compilation].cdt" size="93087" crc="beb935f8" sha1="397fbed92f313790da14bab7ba4513734c4599ee" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Game Pack N 2 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamepac01" cloneof="4gamepac" supported="no">
-		<description>4 Game Pack N 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="86842">
-				<rom name="4 game pack n 2 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="86842" crc="dfb15436" sha1="aae116379d5e6453d4727cb32313890b82fd22ca" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="93886">
-				<rom name="4 game pack n 2 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="93886" crc="ecd04ad1" sha1="c6849768bef39b2901b40d0f0bc06b3a6f4c0640" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Game Pack N 3 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamepac02" cloneof="4gamepac" supported="no">
-		<description>4 Game Pack N 3 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="91204">
-				<rom name="4 game pack n 3 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="91204" crc="6b7d0cc7" sha1="e7cb56b0cac0dc59838bded267e6cd4000584cec" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="90244">
-				<rom name="4 game pack n 3 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="90244" crc="0dfd0343" sha1="0fda66418f66fa497398a48348836df4aa3004c5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Games In 1 Pack - Hit Pack 1 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamesin" supported="no">
-		<description>4 Games In 1 Pack - Hit Pack 1 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="125745">
-				<rom name="4 games in 1 pack - hit pack 1 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="125745" crc="10f73133" sha1="171581ae1115f7fe63f359ae9c88180bc622c768" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="113191">
-				<rom name="4 games in 1 pack - hit pack 1 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="113191" crc="cd24c467" sha1="c9b8f28e9ec0f1b2762153d16c2e695b337d79df" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Games In 1 Pack - Hit Pack 2 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamesin01" cloneof="4gamesin" supported="no">
-		<description>4 Games In 1 Pack - Hit Pack 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="116641">
-				<rom name="4 games in 1 pack - hit pack 2 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="116641" crc="d18b0f6e" sha1="1268f3b50fd61f9aa1b65d552ad5641d7565ef56" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="116358">
-				<rom name="4 games in 1 pack - hit pack 2 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="116358" crc="997d0e53" sha1="76ee25f6e20d9a826ae08f02e0011b4baa7d5283" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Games In 1 Pack - Hit Pack 5 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4gamesin02" cloneof="4gamesin" supported="no">
-		<description>4 Games In 1 Pack - Hit Pack 5 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="95263">
-				<rom name="4 games in 1 pack - hit pack 5 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="95263" crc="026106ef" sha1="43d1fac86452df76e1edaf9adb9f789a39903ecb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="123539">
-				<rom name="4 games in 1 pack - hit pack 5 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="123539" crc="d03ec403" sha1="07734274f1f90cd39019290acac0042f4fdc4cf1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4 Soccer Simulators (UK) (2 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4soccers" supported="no">
-		<description>4 Soccer Simulators (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="111773">
-				<rom name="4 soccer simulators (uk) (face a) (1989) [original] [tape] [compilation].cdt" size="111773" crc="cfeb1b00" sha1="f2d2ad555f4264e8c8614cef7ba72420865b4451" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="113772">
-				<rom name="4 soccer simulators (uk) (face b) (1989) [original] [tape] [compilation].cdt" size="113772" crc="6b750ee1" sha1="b47c6313c3c891b6051ef40110a2f346e75aad79" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4th Dimension (UK) (2 faces) (1990) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="4thdimen" supported="no">
-		<description>4th Dimension (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="48580">
-				<rom name="4th dimension (uk) (face a) (1990) (1. battle valley) [original] [tape] [compilation].cdt" size="48580" crc="da557a52" sha1="46ad42adb883d0ac18900f43d29dc130c850b23f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="40535">
-				<rom name="4th dimension (uk) (face a) (1990) (2. anarchy) [original] [tape] [compilation].cdt" size="40535" crc="1c58eea2" sha1="32de3c89b2605771da6549c7b905726c03e152a3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="20051">
-				<rom name="4th dimension (uk) (face b) (1990) (3. supercup) [original] [tape] [compilation].cdt" size="20051" crc="88d4708e" sha1="bb58d572e08e16f4f81504c9fc04befd265459c8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="58061">
-				<rom name="4th dimension (uk) (face b) (1990) (4. herobotix) [original] [tape] [compilation].cdt" size="58061" crc="60ab68fb" sha1="e4f453130b54b8e8d5a7cb63e85490c81a247580" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 4x4 Off-Road Racing (UK) (1989) (Version split) [Original] [TAPE].zip... -->
-	<software name="4x4offro" supported="no">
-		<description>4x4 Off-Road Racing (UK) (Version split) [Original] [TAPE]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="47263">
-				<rom name="4x4 off-road racing (uk) (1989) (00. boot code) (version split) [original] [tape].cdt" size="47263" crc="3b7c362a" sha1="db22d0798d826eb00c63b328db651e14a8646980" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="23253">
-				<rom name="4x4 off-road racing (uk) (1989) (01. block 01) (version split) [original] [tape].cdt" size="23253" crc="badfb930" sha1="9c2e07cc18b7fee23e61c4df91c3702f2c672366" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="21194">
-				<rom name="4x4 off-road racing (uk) (1989) (02. block 02) (version split) [original] [tape].cdt" size="21194" crc="bfd9d888" sha1="ccd2ebf91553711503f4dd9728169ac29c8784ef" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 4x4 Off-Road Racing (UK) (2 faces) (1989) [Original] [TAPE].zip... -->
-	<software name="4x4offro01" cloneof="4x4offro" supported="no">
-		<description>4x4 Off-Road Racing (UK) (2 faces) [Original] [TAPE]</description>
+	<software name="4x4offrd" supported="no">
+		<description>4x4 Off-Road Racing (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Epyx</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="47263">
 				<rom name="4x4 off-road racing (uk) (face a) (1989) [original] [tape].cdt" size="47263" crc="3b7c362a" sha1="db22d0798d826eb00c63b328db651e14a8646980" offset="0" />
@@ -989,70 +412,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying 6-Pak (UK) (2 faces) (1987) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="6pakuk2f" supported="no">
-		<description>6-Pak (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="341461">
-				<rom name="6-pak (uk) (face 2) (1987) (7. split personalities) [original] [tape] [compilation].cdt" size="341461" crc="00c6d79e" sha1="a76a29fbe8952735cc5716ee991075a7e119eec6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="49573">
-				<rom name="6-pak (uk) (face 1) (1987) (1. scooby doo in the castle mystery) [original] [tape] [compilation].cdt" size="49573" crc="61f98935" sha1="259ed353a4ed2685bfe74e66ebc3c19eb1f34509" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="67567">
-				<rom name="6-pak (uk) (face 1) (1987) (2. 1942) [original] [tape] [compilation].cdt" size="67567" crc="77f508c6" sha1="f691022be425793dc0737a20a590834b3768f87d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="63277">
-				<rom name="6-pak (uk) (face 1) (1987) (3. duet) [original] [tape] [compilation].cdt" size="63277" crc="dc0ac784" sha1="327df17063d2a6862a5f890b758c221222767efa" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="50141">
-				<rom name="6-pak (uk) (face 2) (1987) (4. jet set willy ii) [original] [tape] [compilation].cdt" size="50141" crc="dc0c4f69" sha1="18d8eeabdadbfe4ecad8a348fa29cfb44a9c2680" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="76903">
-				<rom name="6-pak (uk) (face 2) (1987) (5. the sacred armour of antiriad) [original] [tape] [compilation].cdt" size="76903" crc="c10335e6" sha1="f548fcee44b8810a6b6084f3dfe9456bd9edc3d3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="62513">
-				<rom name="6-pak (uk) (face 2) (1987) (6. fighting warrior) [original] [tape] [compilation].cdt" size="62513" crc="7fd915c4" sha1="06f7d2c629fc463ad234254777c93fd93a2066eb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying 6-Pak Volume 2 (UK) (2 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="6pakvolu" supported="no">
-		<description>6-Pak Volume 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="198208">
-				<rom name="6-pak volume 2 (uk) (face 1) (1988) [original] [tape] [compilation].cdt" size="198208" crc="106b7ee8" sha1="c4208d8c4b689e53acff6e517f4e6ae233dd030d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="192777">
-				<rom name="6-pak volume 2 (uk) (face 2) (1988) [original] [tape] [compilation].cdt" size="192777" crc="00ebe308" sha1="76d0e867c150582217be587c644949f0bc78cddd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 7 Card Stud (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="7cardstu" supported="no">
-		<description>7 Card Stud (UK) [Original] [TAPE]</description>
+	<software name="7cardstd" supported="no">
+		<description>7 Card Stud (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Martech</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="44107">
 				<rom name="7 card stud (uk) (1986) [original] [tape].cdt" size="44107" crc="f756ed26" sha1="e69f23389f90d552ae97f03729d8e0c340cb25c1" offset="0" />
@@ -1060,35 +424,29 @@
 		</part>
 	</software>
 
-	<!-- Identifying 720 (UK) (1986) (Audio Tape) [Original] [TAPE].zip... -->
-	<software name="720uk198" supported="no">
-		<description>720 (UK) (Audio Tape) [Original] [TAPE]</description>
-		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Identifying 720 (UK) (1988) [Original] [TAPE].zip... -->
+	<software name="720" supported="no">
+		<description>720° (UK)</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="81886">
+				<rom name="720 (uk) (1988) [original] [tape].cdt" size="81886" crc="e0f52757" sha1="1b7792c5c17c9281d4c89ec9e56d4f20180b5e8e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<feature name="part_id" value="Face B (containing arcade soundtrack)" />
 			<dataarea name="cass" size="11930644">
 				<rom name="720 (uk) (1986) (audio tape) [original] [tape].mp3" size="11930644" crc="c74a8671" sha1="76489c32d29a82fc9bf328e3ff3ac161389b300e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Identifying 720 (UK) (1988) [Original] [TAPE].zip... -->
-	<software name="720uk19801" cloneof="720uk198" supported="no">
-		<description>720 (UK) [Original] [TAPE]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="81886">
-				<rom name="720 (uk) (1988) [original] [tape].cdt" size="81886" crc="e0f52757" sha1="1b7792c5c17c9281d4c89ec9e56d4f20180b5e8e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying 750cc Grand Prix (UK) (1989) [Original] [TAPE].zip... -->
-	<software name="750ccgra" supported="no">
-		<description>750cc Grand Prix (UK) [Original] [TAPE]</description>
+	<software name="750gp" supported="no">
+		<description>750cc Grand Prix (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="56022">
 				<rom name="750cc grand prix (uk) (1989) [original] [tape].cdt" size="56022" crc="bad7db8a" sha1="93b3b1cb01e6d50bea3d14d282dec583dacd38f3" offset="0" />
@@ -1097,10 +455,10 @@
 	</software>
 
 	<!-- Identifying A Question Of Scruples (UK) (2 faces) (1987) [Original] [TAPE].zip... -->
-	<software name="aquestio" supported="no">
-		<description>A Question Of Scruples (UK) (2 faces) [Original] [TAPE]</description>
+	<software name="scruples" supported="no">
+		<description>A Question Of Scruples (UK)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Leisure Genius</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="78065">
 				<rom name="a question of scruples (uk) (face a) (1987) [original] [tape].cdt" size="78065" crc="5c877623" sha1="18a81e9d7a20979050f12674d9464ed0b802928a" offset="0" />
@@ -1114,10 +472,10 @@
 	</software>
 
 	<!-- Identifying A Question Of Sport (UK) (1988) (Version Split) [Original] [TAPE].zip... -->
-	<software name="aquestio01" cloneof="aquestio" supported="no">
-		<description>A Question Of Sport (UK) (Version Split) [Original] [TAPE]</description>
+	<software name="qos" supported="no">
+		<description>A Question Of Sport (UK, Version Split)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Elite Systems</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="67503">
 				<rom name="a question of sport (uk) (1988) (00. code program) (version split) [original] [tape].cdt" size="67503" crc="464ec498" sha1="23aac1008ef649a6fe23b584e80bff23840b2d8f" offset="0" />
@@ -1151,10 +509,10 @@
 	</software>
 
 	<!-- Identifying A View To A Kill (UK) (1985) [Original] [TAPE].zip... -->
-	<software name="aviewtoa" supported="no">
-		<description>A View To A Kill (UK) [Original] [TAPE]</description>
+	<software name="avtak" supported="no">
+		<description>A View To A Kill (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Domark</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="23455">
 				<rom name="a view to a kill (uk) (1985) [original] [tape].cdt" size="23455" crc="4847864f" sha1="3b09dca604ce4ca18350906af37bcb15c4ef9020" offset="0" />
@@ -1178,10 +536,10 @@
 	</software>
 
 	<!-- Identifying AAARGH! (S) (1988) [Original] [TAPE].zip... -->
-	<software name="aaarghs1" supported="no">
-		<description>AAARGH! (Spa) [Original] [TAPE]</description>
+	<software name="aaargh" supported="no">
+		<description> Aaargh! (Spa)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Melbourne House</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="167611">
 				<rom name="aaargh! (s) (1988) [original] [tape].cdt" size="167611" crc="2a3006f9" sha1="354ec471d814109a2cbd6828148f76837bad52ba" offset="0" />
@@ -1191,9 +549,9 @@
 
 	<!-- Identifying Abracadabra (S) (2 faces) (1988) [Original] [TAPE].zip... -->
 	<software name="abracada" supported="no">
-		<description>Abracadabra (Spa) (2 faces) [Original] [TAPE]</description>
+		<description>Abracadabra (Spa)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Proein Soft Line</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="72643">
 				<rom name="abracadabra (s) (face a) (1988) [original] [tape].cdt" size="72643" crc="f3a0eeb5" sha1="2dcb4b674431e0db337b9639e05f3e8e9e05481e" offset="0" />
@@ -1207,10 +565,10 @@
 	</software>
 
 	<!-- Identifying Abu Simbel Profanation (S) (1986) [Original] [TAPE].zip... -->
-	<software name="abusimbe" supported="no">
-		<description>Abu Simbel Profanation (Spa) [Original] [TAPE]</description>
+	<software name="abusimbl" supported="no">
+		<description>Abu Simbel Profanation (Spa)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="54529">
 				<rom name="abu simbel profanation (s) (1986) [original] [tape].cdt" size="54529" crc="2a9a0a9c" sha1="1163f4e67cb7b17b0a3a772c1b55dfe2ad6c87e9" offset="0" />
@@ -1219,10 +577,10 @@
 	</software>
 
 	<!-- Identifying Academy - Tau Ceti II (UK) (2 Faces) (1989) [Original] [TAPE].zip... -->
-	<software name="academyt" supported="no">
-		<description>Academy - Tau Ceti II (UK) (2 Faces) [Original] [TAPE]</description>
+	<software name="academy" supported="no">
+		<description>Academy (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CRL Group</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="60249">
 				<rom name="academy - tau ceti ii (uk) (face a) (1989) [original] [tape].cdt" size="60249" crc="2917a4c4" sha1="ee9f1c06088d53b7d7ed4d7095d2b33cc290a445" offset="0" />
@@ -1236,10 +594,10 @@
 	</software>
 
 	<!-- Identifying Ace (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="aceuk198" supported="no">
-		<description>Ace (UK) [Original] [TAPE]</description>
+	<software name="ace" supported="no">
+		<description>ACE (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cascade Games</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="39319">
 				<rom name="ace (uk) (1986) [original] [tape].cdt" size="39319" crc="e523b1fd" sha1="d8c321a87f4a13062fe6f83747cd1bc5752eadb3" offset="0" />
@@ -1248,10 +606,10 @@
 	</software>
 
 	<!-- Identifying Ace 2 (UK) (1987) (Spain retail version) [Original] [TAPE].zip... -->
-	<software name="ace2uk19" supported="no">
-		<description>Ace 2 (UK) (Spain retail version) [Original] [TAPE]</description>
+	<software name="ace2">
+		<description>ACE 2 (Spa)</description> <!-- Game in English, was the same disk sold in UK too? -->
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cascade Games</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="57495">
 				<rom name="ace 2 (uk) (1987) (spain retail version) [original] [tape].cdt" size="57495" crc="86bc2be9" sha1="cce8eb4498f43b2581d2253fc6ab0eec45e8f985" offset="0" />
@@ -1261,9 +619,9 @@
 
 	<!-- Identifying Ace Of Aces (UK) (1985) [Original] [TAPE].zip... -->
 	<software name="aceoface" supported="no">
-		<description>Ace Of Aces (UK) [Original] [TAPE]</description>
+		<description>Ace Of Aces (UK)</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="96405">
 				<rom name="ace of aces (uk) (1985) [original] [tape].cdt" size="96405" crc="282d89f8" sha1="096337ee1a66a71edb5ded068ec2c4149dfb75a1" offset="0" />
@@ -1272,10 +630,10 @@
 	</software>
 
 	<!-- Identifying Acro Jet The Advanced Flight Simulator (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="acrojett" supported="no">
-		<description>Acro Jet The Advanced Flight Simulator (UK) [Original] [TAPE]</description>
+	<software name="acrojet" supported="no">
+		<description>AcroJet - The Advanced Flight Simulator (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Microprose</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="49901">
 				<rom name="acro jet the advanced flight simulator (uk) (1986) [original] [tape].cdt" size="49901" crc="2c5ad0d8" sha1="f963eb52fb5ee6f5aa819e5de210e3ab5a4bf240" offset="0" />
@@ -1283,115 +641,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying Action 5 (UK) (8 faces) (1990) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="action5u" supported="no">
-		<description>Action 5 (UK) (8 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="42363">
-				<rom name="action 5 (uk) (face 1a) (1990) (2. rick dangerous ii - code) [original] [tape] [compilation].cdt" size="42363" crc="f2593f5f" sha1="1b7a1481ccdf2751cd599459c4e93cd76064524a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="111473">
-				<rom name="action 5 (uk) (face 1b) (1990) (2. rick dangerous ii - levels) [original] [tape] [compilation].cdt" size="111473" crc="26b3f460" sha1="1cbd4cfc974110b635936096a603a3ba8f2f4535" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="82673">
-				<rom name="action 5 (f) (face 3a) (1990) (5. gunship - cote 1) [original] [tape] [compilation].cdt" size="82673" crc="aefebeaa" sha1="6ef0915fe31212cbc3e4f52571a86647de273288" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="10315">
-				<rom name="action 5 (f) (face 3b) (1990) (5. gunship - cote 2) [original] [tape] [compilation].cdt" size="10315" crc="2b6ad60d" sha1="f125393576b5fb9edde1802b1d224128467ca8e5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="50733">
-				<rom name="action 5 (f) (face 4a) (1990) (5. gunship - cote 3) [original] [tape] [compilation].cdt" size="50733" crc="78d6e90d" sha1="3555499d32e283fb8af61c5a42095405ffae1554" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="50665">
-				<rom name="action 5 (f) (face 4b) (1990) (5. gunship - cote 4) [original] [tape] [compilation].cdt" size="50665" crc="e7bccbee" sha1="c4b1630e9a046024676579772e1290b04c5879bf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="140231">
-				<rom name="action 5 (f) (face 2a) (1990) (3. superski) [original] [tape] [compilation].cdt" size="140231" crc="9ab502e6" sha1="becc8cf8bafbcde24855a9d876dc909bcb001d22" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="201549">
-				<rom name="action 5 (uk) (face 2b) (1990) (4. ghostbusters ii) [original] [tape] [compilation].cdt" size="201549" crc="0b35e41c" sha1="bc4649dbfb29e17762197ebe44554a606a9469e4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="51505">
-				<rom name="action 5 (uk) (face 1a) (1990) (1. hard drivin 64k) [original] [tape] [compilation].cdt" size="51505" crc="4890a166" sha1="9d71ee2139da44842940b3204ce1bfa63957b387" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Identifying Action Countdown (UK) (4 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
-	<software name="actionco" supported="no">
-		<description>Action Countdown (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
-		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="58721">
-				<rom name="action countdown (uk) (face 1a) (1989) (1. metropolis) [original] [tape] [compilation].cdt" size="58721" crc="fb9a7f63" sha1="05ada5f22ed2d04d9823b0e301da952627cbc384" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="115125">
-				<rom name="action countdown (uk) (face 1a) (1989) (2. titanic) [original] [tape] [compilation].cdt" size="115125" crc="1c64f09d" sha1="fdddc85713d27c9d780191b51d3d84ab0701c975" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="56717">
-				<rom name="action countdown (uk) (face 1b) (1989) (3. wells &amp; fargo) [original] [tape] [compilation].cdt" size="56717" crc="df4cc0ca" sha1="3aeeb0c09ba1f9e4d574b9f1d35854b15dfef5e1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="80666">
-				<rom name="action countdown (uk) (face 2a) (1989) (5. black beard) [original] [tape] [compilation].cdt" size="80666" crc="1ed911e2" sha1="f3b3b26fa55f0ef9126384b90427f25a16bc58cb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="78509">
-				<rom name="action countdown (uk) (face 2a) (1989) (6. tuareg) [original] [tape] [compilation].cdt" size="78509" crc="4b648a64" sha1="aaf63c5a61f64b2cd7736b36aa9f97ab5138c936" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="61967">
-				<rom name="action countdown (uk) (face 2b) (1989) (7. colosseum) [original] [tape] [compilation].cdt" size="61967" crc="4c8ec300" sha1="c1082cb5828d8c924eacfadbae09cf9ac0a96b1a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="49292">
-				<rom name="action countdown (uk) (face 2b) (1989) (8. score 3020) [original] [tape] [compilation].cdt" size="49292" crc="8b174a9b" sha1="c095c06efd15e15e7469a3272344be615334884f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="61208">
-				<rom name="action countdown (uk) (face 2b) (1989) (9. rock 'n roller) [original] [tape] [compilation].cdt" size="61208" crc="1da7a421" sha1="f52dc71d7c00652ea915bda65618e52f7a142007" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="101090">
-				<rom name="action countdown (uk) (face 1b) (1989) (4. stardust) [original] [tape] [compilation].cdt" size="101090" crc="c7c64d02" sha1="9017368a5200f553d19d7e70b3b07dc856d111b6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying Action Fighter (UK) (1989) [Original] [TAPE].zip... -->
-	<software name="actionfi" supported="no">
-		<description>Action Fighter (UK) [Original] [TAPE]</description>
+	<software name="actionfg" supported="no">
+		<description>Action Fighter (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Firebird</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="49653">
 				<rom name="action fighter (uk) (1989) [original] [tape].cdt" size="49653" crc="da04ed08" sha1="09aa461ec46b8af71ac7bbb32f0f4c5d7caad29f" offset="0" />
@@ -1400,10 +654,10 @@
 	</software>
 
 	<!-- Identifying Action Force (UK) (1988) [Original] [TAPE].zip... -->
-	<software name="actionfo" supported="no">
-		<description>Action Force (UK) [Original] [TAPE]</description>
+	<software name="actforce" supported="no">
+		<description>Action Force (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="94462">
 				<rom name="action force (uk) (1988) [original] [tape].cdt" size="94462" crc="a987088e" sha1="54ef259fcb094a0cd3a195d564dd7eb312e12d3d" offset="0" />
@@ -1412,10 +666,10 @@
 	</software>
 
 	<!-- Identifying Action Service (UK) (1990) [Original] [TAPE].zip... -->
-	<software name="actionse" supported="no">
-		<description>Action Service (UK) [Original] [TAPE]</description>
+	<software name="actnserv" supported="no">
+		<description>Action Service (UK)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cobra Soft</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="81691">
 				<rom name="action service (uk) (1990) [original] [tape].cdt" size="81691" crc="fd2f6d1e" sha1="9ec7607781d3de42da15d33865a7b9212f1ef101" offset="0" />
@@ -1424,10 +678,10 @@
 	</software>
 
 	<!-- Identifying Activator (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="activato" supported="no">
-		<description>Activator (UK) [Original] [TAPE]</description>
+	<software name="activatr" supported="no">
+		<description>Activator (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cascade Games</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="60787">
 				<rom name="activator (uk) (1986) [original] [tape].cdt" size="60787" crc="ad869a83" sha1="0981dc11afb1122d4850806334ad664537a11755" offset="0" />
@@ -1435,28 +689,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying Adidas Championship Football (UK) (2 faces) (1990) (Spain retail version) [Original] [TAPE].zip... -->
-	<software name="adidasch" supported="no">
-		<description>Adidas Championship Football (UK) (2 faces) (Spain retail version) [Original] [TAPE]</description>
-		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="98240">
-				<rom name="adidas championship football (uk) (face a) (1990) (spain retail version) [original] [tape].cdt" size="98240" crc="1652d132" sha1="8595db123b92c799cf77cbb4ff1a6323f80ba986" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="87187">
-				<rom name="adidas championship football (uk) (face b) (1990) (spain retail version) [original] [tape].cdt" size="87187" crc="79297ff8" sha1="e9e8b59695471fb19fb55aab27f2990df571006a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying Adidas Championship Football (UK) (2 faces) (1990) [Original] [TAPE].zip... -->
-	<software name="adidasch01" cloneof="adidasch" supported="no">
-		<description>Adidas Championship Football (UK) (2 faces) [Original] [TAPE]</description>
+	<software name="adidasfb" supported="no">
+		<description>Adidas Championship Football (UK)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Ocean</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="92489">
 				<rom name="adidas championship football (uk) (face a) (1990) [original] [tape].cdt" size="92489" crc="b36f1e46" sha1="4929f33e583e7fc48f99d6c9ff06f4b9da32a132" offset="0" />
@@ -1469,11 +706,28 @@
 		</part>
 	</software>
 
-	<!-- Identifying Adidas Championship Tie Break (UK) (1990) [Original] [TAPE].zip... -->
-	<software name="adidasch02" cloneof="adidasch" supported="no">
-		<description>Adidas Championship Tie Break (UK) [Original] [TAPE]</description>
+	<!-- Identifying Adidas Championship Football (UK) (2 faces) (1990) (Spain retail version) [Original] [TAPE].zip... -->
+	<software name="adidasfbs" cloneof="adidasfb" supported="no">
+		<description>Adidas Championship Football (Spa)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Ocean</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="98240">
+				<rom name="adidas championship football (uk) (face a) (1990) (spain retail version) [original] [tape].cdt" size="98240" crc="1652d132" sha1="8595db123b92c799cf77cbb4ff1a6323f80ba986" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="87187">
+				<rom name="adidas championship football (uk) (face b) (1990) (spain retail version) [original] [tape].cdt" size="87187" crc="79297ff8" sha1="e9e8b59695471fb19fb55aab27f2990df571006a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying Adidas Championship Tie Break (UK) (1990) [Original] [TAPE].zip... -->
+	<software name="adidastb" supported="no">
+		<description>Adidas Championship Tie Break (UK)</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="87992">
 				<rom name="adidas championship tie break (uk) (1990) [original] [tape].cdt" size="87992" crc="cffc3bc3" sha1="5f2ac53a70ceb0d17bb5ec37e81057644fe665a5" offset="0" />
@@ -1481,23 +735,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying Admiral Graf Spee (S) (1984) [Original] [TAPE].zip... -->
-	<software name="admiralg" supported="no">
-		<description>Admiral Graf Spee (Spa) [Original] [TAPE]</description>
-		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="28647">
-				<rom name="admiral graf spee (s) (1984) [original] [tape].cdt" size="28647" crc="f37f8da0" sha1="c9d66740fd6a324340a1e57d48723b647db5f787" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying Admiral Graf Spee (UK) (1984) [Original] [TAPE].zip... -->
-	<software name="admiralg01" cloneof="admiralg" supported="no">
-		<description>Admiral Graf Spee (UK) [Original] [TAPE]</description>
+	<software name="grafspee" supported="no">
+		<description>Admiral Graf Spee (UK)</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Amsoft</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="28759">
 				<rom name="admiral graf spee (uk) (1984) [original] [tape].cdt" size="28759" crc="62d7c045" sha1="c308d67621c283135f42351d7778e7073a301861" offset="0" />
@@ -1505,11 +747,23 @@
 		</part>
 	</software>
 
+	<!-- Identifying Admiral Graf Spee (S) (1984) [Original] [TAPE].zip... -->
+	<software name="grafspees" cloneof="grafspee" supported="no">
+		<description>Admiral Graf Spee (Spa)</description>
+		<year>1984</year>
+		<publisher>Amsoft</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="28647">
+				<rom name="admiral graf spee (s) (1984) [original] [tape].cdt" size="28647" crc="f37f8da0" sha1="c9d66740fd6a324340a1e57d48723b647db5f787" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Identifying Advanced Destroyer Simulator (S) (2 faces) (1990) [Original] [TAPE].zip... -->
-	<software name="advanced" supported="no">
-		<description>Advanced Destroyer Simulator (Spa) (2 faces) [Original] [TAPE]</description>
+	<software name="ads" supported="no">
+		<description>Advanced Destroyer Simulator (Spa)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Loriciels</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="53253">
 				<rom name="advanced destroyer simulator (s) (face a) (1990) [original] [tape].cdt" size="53253" crc="9e1b93f4" sha1="2a0168b96b366084cccbd6243716f0f10900e89f" offset="0" />
@@ -1523,10 +777,10 @@
 	</software>
 
 	<!-- Identifying Advanced Lawnmowing Simulator (UK) (2010) (PD) [Original] [TAPE].zip... -->
-	<software name="advanced01" cloneof="advanced" supported="no">
-		<description>Advanced Lawnmowing Simulator (UK) (2010) (PD) [Original] [TAPE]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="advlawn" supported="no">
+		<description>Advanced Lawnmowing Simulator (UK)</description>
+		<year>2010</year>
+		<publisher>Markus Hohmann</publisher> <!-- PD -->
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="27727">
 				<rom name="advanced lawnmowing simulator (uk) (2010) (pd) [original] [tape].cdt" size="27727" crc="a687ef4a" sha1="9f84e842053fa28cc0e1e9f397d1f2193f237164" offset="0" />
@@ -1535,10 +789,10 @@
 	</software>
 
 	<!-- Identifying Advanced Pinball Simulator (UK) (1988) [Original] [TAPE].zip... -->
-	<software name="advanced02" cloneof="advanced" supported="no">
-		<description>Advanced Pinball Simulator (UK) [Original] [TAPE]</description>
+	<software name="advanpin" supported="no">
+		<description>Advanced Pinball Simulator (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="64080">
 				<rom name="advanced pinball simulator (uk) (1988) [original] [tape].cdt" size="64080" crc="0f54fa40" sha1="6097171aceaa4115369bf67ef09c6762d0571865" offset="0" />
@@ -1547,8 +801,8 @@
 	</software>
 
 	<!-- Identifying Adventure Quest (UK) (64K) (1984) [Original] [TAPE].zip... -->
-	<software name="adventur" supported="no">
-		<description>Adventure Quest (UK) (64K) [Original] [TAPE]</description>
+	<software name="advquest" supported="no">
+		<description>Adventure Quest (UK, 64K)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="cpc_cass">
@@ -1560,9 +814,9 @@
 
 	<!-- Identifying African Trail Simulator (S) (1990) [Original] [TAPE].zip... -->
 	<software name="africant" supported="no">
-		<description>African Trail Simulator (Spa) [Original] [TAPE]</description>
+		<description>African Trail Simulator (Spa)</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Positive</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="63525">
 				<rom name="african trail simulator (s) (1990) [original] [tape].cdt" size="63525" crc="80c6beca" sha1="a85ad02950f2f29341306bb6a8f2f3babd952e57" offset="0" />
@@ -1570,68 +824,11 @@
 		</part>
 	</software>
 
-	<!-- Identifying After Burner (UK) (1988) (Version Split) [Original] [TAPE].zip... -->
-	<software name="afterbur" supported="no">
-		<description>After Burner (UK) (Version Split) [Original] [TAPE]</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="cpc_cass">
-			<dataarea name="cass" size="3671">
-				<rom name="after burner (uk) (1988) (02. stage 3 - 7) (version split) [original] [tape].cdt" size="3671" crc="17963e68" sha1="ac9a370d4b3e47f08765f2f03aa9be1751518bfc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="6804">
-				<rom name="after burner (uk) (1988) (03. stage 8) (version split) [original] [tape].cdt" size="6804" crc="4c834013" sha1="e2aa3783571a88aee98641711a3cf8bbb23a3e3b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="cpc_cass">
-			<dataarea name="cass" size="3778">
-				<rom name="after burner (uk) (1988) (04. stage 9 - 11) (version split) [original] [tape].cdt" size="3778" crc="431f5455" sha1="dd69bda856186537353e8056810975b061dd00ec" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="cpc_cass">
-			<dataarea name="cass" size="4072">
-				<rom name="after burner (uk) (1988) (05. stage 12 - 16) (version split) [original] [tape].cdt" size="4072" crc="de31e6ba" sha1="05f8caef687593e864e9f60f0f7c40fc602474dc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="cpc_cass">
-			<dataarea name="cass" size="7141">
-				<rom name="after burner (uk) (1988) (06. stage 17) (version split) [original] [tape].cdt" size="7141" crc="9b76cd0e" sha1="ebacd1940eead92b44052de4cda94919ad8c01d7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="cpc_cass">
-			<dataarea name="cass" size="3970">
-				<rom name="after burner (uk) (1988) (07. stage 18 - 20) (version split) [original] [tape].cdt" size="3970" crc="4bff3f1f" sha1="04163cb9ef650a37ddc87c87d60ef97550ce3d19" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="cpc_cass">
-			<dataarea name="cass" size="7163">
-				<rom name="after burner (uk) (1988) (08. stage 21 - 23) (version split) [original] [tape].cdt" size="7163" crc="23645c1c" sha1="9d638ea00067a88c71d95b301f5a5a87e1f5b6df" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="cpc_cass">
-			<dataarea name="cass" size="11891">
-				<rom name="after burner (uk) (1988) (09. stage 24) (version split) [original] [tape].cdt" size="11891" crc="a566acd5" sha1="686a54a2be3f9509eba2625c2abea4927b501221" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="cpc_cass">
-			<dataarea name="cass" size="93529">
-				<rom name="after burner (uk) (1988) (-code programme) (version split) [original] [tape].cdt" size="93529" crc="a1e37556" sha1="b1bc43003c75c8845594e1eb2ceea8c0d63c9d01" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="cpc_cass">
-			<dataarea name="cass" size="8611">
-				<rom name="after burner (uk) (1988) (01. stage 1 - 2) (version split) [original] [tape].cdt" size="8611" crc="bef343f4" sha1="200dc0144f8ccffc6742795780114927fb48c619" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Identifying After Burner (UK) (2 faces) (1988) [Original] [TAPE].zip... -->
-	<software name="afterbur01" cloneof="afterbur" supported="no">
-		<description>After Burner (UK) (2 faces) [Original] [TAPE]</description>
+	<software name="aburner" supported="no">
+		<description>After Burner (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Activision</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="93529">
 				<rom name="after burner (uk) (face a) (1988) [original] [tape].cdt" size="93529" crc="a1e37556" sha1="b1bc43003c75c8845594e1eb2ceea8c0d63c9d01" offset="0" />
@@ -1645,10 +842,10 @@
 	</software>
 
 	<!-- Identifying After Shock (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="aftersho" supported="no">
-		<description>After Shock (UK) [Original] [TAPE]</description>
+	<software name="aftshock" supported="no">
+		<description>After Shock (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Interceptor Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="58588">
 				<rom name="after shock (uk) (1986) [original] [tape].cdt" size="58588" crc="eb6b7cc1" sha1="3e4f05e8bf97fb2f892931c2e608fae3a4b209c2" offset="0" />
@@ -1657,10 +854,10 @@
 	</software>
 
 	<!-- Identifying After The War (UK) (2 faces) (1989) [Original] [TAPE].zip... -->
-	<software name="afterthe" supported="no">
-		<description>After The War (UK) (2 faces) [Original] [TAPE]</description>
+	<software name="afterwar" supported="no">
+		<description>After the War (UK)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="77866">
 				<rom name="after the war (uk) (face 1) (1989) [original] [tape].cdt" size="77866" crc="5bf92ffc" sha1="20eeae7a5262d9648f5034796a6433520a1855a6" offset="0" />
@@ -1674,10 +871,10 @@
 	</software>
 
 	<!-- Identifying After The War (S) (2 faces) (1989) [Original] [TAPE].zip... -->
-	<software name="afterthe01" cloneof="afterthe" supported="no">
-		<description>After The War (Spa) (2 faces) [Original] [TAPE]</description>
+	<software name="afterwars" cloneof="afterwar" supported="no">
+		<description>After the War (Spa)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dinamic Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="64332">
 				<rom name="after the war (s) (face a) (1989) [original] [tape].cdt" size="64332" crc="971ca63a" sha1="ef066f0ed77fb027d744f45dab902ab54c2a79c5" offset="0" />
@@ -1692,9 +889,9 @@
 
 	<!-- Identifying Aftermath (UK) (1988) [Original] [TAPE].zip... -->
 	<software name="aftermat" supported="no">
-		<description>Aftermath (UK) [Original] [TAPE]</description>
+		<description>Aftermath (UK)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="38545">
 				<rom name="aftermath (uk) (1988) [original] [tape].cdt" size="38545" crc="35293d9d" sha1="08f96321fb6d4d4d105343c418606ca833408e3e" offset="0" />
@@ -1704,9 +901,9 @@
 
 	<!-- Identifying Afteroids (S) (1988) [Original] [TAPE].zip... -->
 	<software name="afteroid" supported="no">
-		<description>Afteroids (Spa) [Original] [TAPE]</description>
+		<description>Afteroids (Spa)</description>
 		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Zigurat</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="63945">
 				<rom name="afteroids (s) (1988) [original] [tape].cdt" size="63945" crc="8c6525fa" sha1="b40bf4088380cdaeb41b050097a512a741c1a2de" offset="0" />
@@ -1727,10 +924,10 @@
 	</software>
 
 	<!-- Identifying Agent Orange (UK) (1986) [Original] [TAPE].zip... -->
-	<software name="agentora" supported="no">
-		<description>Agent Orange (UK) [Original] [TAPE]</description>
+	<software name="agorange" supported="no">
+		<description>Agent Orange (UK)</description>
 		<year>1986</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="59994">
 				<rom name="agent orange (uk) (1986) [original] [tape].cdt" size="59994" crc="e8200371" sha1="6a1413586f91e17116b02c46cd04c25297d56f4e" offset="0" />
@@ -1739,10 +936,10 @@
 	</software>
 
 	<!-- Identifying Agent X II (UK) (1987) [Original] [TAPE].zip... -->
-	<software name="agentxii" supported="no">
-		<description>Agent X II (UK) [Original] [TAPE]</description>
+	<software name="agentx2" supported="no">
+		<description>Agent X II (UK)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Mastertronic</publisher>
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="119060">
 				<rom name="agent x ii (uk) (1987) [original] [tape].cdt" size="119060" crc="ec4b7837" sha1="944d3e312a2c55be6a85d794518b819cc488906b" offset="0" />
@@ -9853,6 +9050,30 @@
 		<part name="cass" interface="cpc_cass">
 			<dataarea name="cass" size="31177">
 				<rom name="darkwurlde (uk) (1986) [original] [tape].cdt" size="31177" crc="7efe4322" sha1="df3dd8c197113ffd2c1c11054f61df3004c29110" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 180 (UK) (1986) (v2) [Original] [TAPE].zip... -->
+	<software name="darts180" supported="no">
+		<description>Darts 180 (UK, v2)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="52796">
+				<rom name="180 (uk) (1986) (v2) [original] [tape].cdt" size="52796" crc="e24b0ac4" sha1="880a85be959f382d61b4d74dac7d10993fe8acf2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 180 (UK) (1986) [Original] [TAPE].zip... -->
+	<software name="darts180o" cloneof="darts180" supported="no">
+		<description>Darts 180 (UK)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="57780">
+				<rom name="180 (uk) (1986) [original] [tape].cdt" size="57780" crc="d123de3a" sha1="893fd084128070bd46359ce126f5426b4c22804c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -51804,4 +51025,787 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!--  Compilations -->
+
+	<!-- Identifying 10 Great Games (UK) (2 K7 4 faces) (1987) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="10greatg" supported="no">
+		<description>10 Great Games (UK) (2 K7 4 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="65431">
+				<rom name="10 great games (uk) (k7 1 face a) (1987) (1. avenger) [original] [tape] [compilation].cdt" size="65431" crc="60fe9573" sha1="0f51b0519c45f47cae49e66495ddc61922d2520a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="62064">
+				<rom name="10 great games (uk) (k7 1 face a) (1987) (2. future knight) [original] [tape] [compilation].cdt" size="62064" crc="90b41b00" sha1="e70a1b3f9da3aa5ff4c4397525ea06a760e1d3d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="10 great games (uk) (k7 1 face a) (1987) (3. krakout) [original] [tape] [compilation].cdt" size="65492" crc="ce727237" sha1="75d7b82fb9570f950413a9deabde7243c4fede7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="66214">
+				<rom name="10 great games (uk) (k7 1 face b) (1987) (4. bounder) [original] [tape] [compilation].cdt" size="66214" crc="df3d7e60" sha1="871e2f2c5a3871b90685f98cd11c13b49e21e914" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="58736">
+				<rom name="10 great games (uk) (k7 1 face b) (1987) (5. footballer of the year) [original] [tape] [compilation].cdt" size="58736" crc="f718deb5" sha1="4c011e73846787bc8939c16875a50788c845982c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="65410">
+				<rom name="10 great games (uk) (k7 2 face a) (1987) (6. trailblazer) [original] [tape] [compilation].cdt" size="65410" crc="cd5d69f3" sha1="048caa82ea7737fb343dd8cdeb178f7d80c3c93a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="52478">
+				<rom name="10 great games (uk) (k7 2 face a) (1987) (7. highway encounter) [original] [tape] [compilation].cdt" size="52478" crc="4e9da7e8" sha1="44407ac1d5ef3902ba27e95c2b911464b7390576" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="67408">
+				<rom name="10 great games (uk) (k7 2 face a) (1987) (8. monty on the run) [original] [tape] [compilation].cdt" size="67408" crc="2a2a35a4" sha1="f58e3ec33a2ffb0c194ea3b46a4bc1a228f32565" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="61673">
+				<rom name="10 great games (uk) (k7 2 face b) (1987) (9. west bank) [original] [tape] [compilation].cdt" size="61673" crc="03099b6e" sha1="cbd8779a753e5b6bf1151f0a4d5d81fcadbedf3a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="58200">
+				<rom name="10 great games (uk) (k7 2 face b) (1987) (10. jack the nipper) [original] [tape] [compilation].cdt" size="58200" crc="c0426069" sha1="4e536bb53f65992f323ab21dffde3508eabb63ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 10 Great Games II (UK) (4 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="10greatg01" cloneof="10greatg" supported="no">
+		<description>10 Great Games II (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="43939">
+				<rom name="10 great games ii (uk) (face 1b) (1988) (04. samurai trilogy - game) [original] [tape] [compilation].cdt" size="43939" crc="8e20fb06" sha1="010438ae46af7d147b31c0b976a85b2a83711da3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="121693">
+				<rom name="10 great games ii (uk) (face 1b) (1988) (06. basil the great mouse detective) [original] [tape] [compilation].cdt" size="121693" crc="e21a1d6a" sha1="e78c29715e4040d83450072b568ed97be321bd27" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="284618">
+				<rom name="10 great games ii (uk) (face 2a) (1988) (04. samurai trilogy - sections) (1987) [original] [tape] [compilation].cdt" size="284618" crc="9afaf2d5" sha1="42e333af36e9b043248a489426e562a66f4fb8fd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="10 great games ii (uk) (face 2a) (1988) (05. jack the nipper ii in coconut capers) [original] [tape] [compilation].cdt" size="65492" crc="b20722cd" sha1="4c1aac1b12c623e68d93e2915af5bc59883d158f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="60163">
+				<rom name="10 great games ii (uk) (face 2b) (1988) (08. the duct) [original] [tape] [compilation].cdt" size="60163" crc="3065e227" sha1="06177b141025b51e978255aa03c846428bc7029a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="10 great games ii (uk) (face 2b) (1988) (09. thing bounces back) [original] [tape] [compilation].cdt" size="65492" crc="287b8d2f" sha1="a6cbdeab5371cee82f78ddc8645b555ed368fb79" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="10 great games ii (uk) (face 2b) (1988) (10. auf wiedersehen monty) [original] [tape] [compilation].cdt" size="65492" crc="190e17fc" sha1="b460d6e59ee7a0b9743ddc508cb17ba18fa8d550" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="269660">
+				<rom name="10 great games ii (uk) (face 2b) (1988) (07. mask) [original] [tape] [compilation].cdt" size="269660" crc="d76bdb11" sha1="678215a95d41fab1bd3a0fad159106555ec4ca9f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="65494">
+				<rom name="10 great games ii (uk) (face 1a) (1988) (01. death wish 3) [original] [tape] [compilation].cdt" size="65494" crc="8a3e0c39" sha1="27a2ae292d8d22d1a662feeb05000b15d15f3eb5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="68465">
+				<rom name="10 great games ii (uk) (face 1a) (1988) (02. the final matrix) [original] [tape] [compilation].cdt" size="68465" crc="23bd22eb" sha1="78ba0d3e9d77e9c592d5689dda4a8be41cf869e4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass11" interface="cpc_cass">
+			<dataarea name="cass" size="61673">
+				<rom name="10 great games ii (uk) (face 1a) (1988) (03. convoy raider) [original] [tape] [compilation].cdt" size="61673" crc="dd04c015" sha1="25ec42380895931db58cc9510801c0a9d32b96f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 12 Jeux Exceptionnels (UK) (4 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="12jeuxex" supported="no">
+		<description>12 Jeux Exceptionnels (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="98806">
+				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (5. exolon) [original] [tape] [compilation].cdt" size="98806" crc="818dd5f7" sha1="a475608f686865455ff3469ef667bf300385bef9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="71971">
+				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (6. nebulus) [original] [tape] [compilation].cdt" size="71971" crc="19e70dfc" sha1="cbf08f3545219559339a12ee3a9637b320f08045" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="81845">
+				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (7. blood brothers) [original] [tape] [compilation].cdt" size="81845" crc="56856df6" sha1="0443606e6eb6a9d299fe01bf0db0cdce42af6edc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (8. masters of the universe) [original] [tape] [compilation].cdt" size="65492" crc="2e68104e" sha1="8c27bb2a7de8f6ab65d2dfdad039635c7cfbb1ee" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="52785">
+				<rom name="12 jeux exceptionnels (uk) (face 2a) (1988) (9. ranarama) [original] [tape] [compilation].cdt" size="52785" crc="acf942d6" sha1="5331cf311837372138fb21a015a886aff0126abe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="54877">
+				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (10. cybernoid) [original] [tape] [compilation].cdt" size="54877" crc="d6ab9668" sha1="702f9fad5e43e89ff70215a1f615bc0f624b7697" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="72594">
+				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (11. deflektor) [original] [tape] [compilation].cdt" size="72594" crc="a2b16bd8" sha1="855d64d2afb3ffaa1ec7e031471d08d75f300ccb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="269660">
+				<rom name="12 jeux exceptionnels (uk) (face 2b) (1988) (12. mask) [original] [tape] [compilation].cdt" size="269660" crc="d76bdb11" sha1="678215a95d41fab1bd3a0fad159106555ec4ca9f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="65493">
+				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (1. north star) [original] [tape] [compilation].cdt" size="65493" crc="a02ca947" sha1="2125404e08b3635fea9200ceac83c84d4515de3e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="65492">
+				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (2. venom strikes back) [original] [tape] [compilation].cdt" size="65492" crc="f77b3bd1" sha1="456b4d23f401c0cd8f75833fcd639d1286332dc1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass11" interface="cpc_cass">
+			<dataarea name="cass" size="142381">
+				<rom name="12 jeux exceptionnels (uk) (face 1a) (1988) (3. hercules slayer of the damned) [original] [tape] [compilation].cdt" size="142381" crc="03616468" sha1="1d297c38d015b18a8f6bb01a0df3680cdcce726b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass12" interface="cpc_cass">
+			<dataarea name="cass" size="76426">
+				<rom name="12 jeux exceptionnels (uk) (face 1b) (1988) (4. marauder) [original] [tape] [compilation].cdt" size="76426" crc="0dde8479" sha1="2c8f9215a381cc1d7d47e94d61749541b24f84fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 12 Jeux Fantastiques (UK) (6 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="12jeuxfa" supported="no">
+		<description>12 Jeux Fantastiques (UK) (6 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="85304">
+				<rom name="12 jeux fantastiques (uk) (face 1a) (1989) (01. skate crazy - car park challenge) [original] [tape] [compilation].cdt" size="85304" crc="eb7b7620" sha1="66b40aee5f4c19090a5700ea85bad7c2ee8b3165" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="105034">
+				<rom name="12 jeux fantastiques (uk) (face 1a) (1989) (01. skate crazy - championship course) [original] [tape] [compilation].cdt" size="105034" crc="8465ef9e" sha1="45388cf90ff185fced6fc4fffdc0075282a8309d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="100548">
+				<rom name="12 jeux fantastiques (uk) (face 1b) (1989) (02. techno cop) [original] [tape] [compilation].cdt" size="100548" crc="7a5dc01a" sha1="b1f1aa2ccdeb33a0a7782d9dbb12c314e2aa278c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="90364">
+				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (03. dark fusion) [original] [tape] [compilation].cdt" size="90364" crc="84145cd6" sha1="8cd4b15551e24987176d0ba818ddd9f3aaa2a800" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="65493">
+				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (04. night raider) [original] [tape] [compilation].cdt" size="65493" crc="d5feebdc" sha1="396645e3158138f0649779ec3551f2569affbf3b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="64588">
+				<rom name="12 jeux fantastiques (uk) (face 2a) (1989) (05. artura) [original] [tape] [compilation].cdt" size="64588" crc="5606e323" sha1="07956dc0a9dcf879a265a3979a2962dbf64c236c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="119900">
+				<rom name="12 jeux fantastiques (uk) (face 2b) (1989) (06. motor massacre) [original] [tape] [compilation].cdt" size="119900" crc="248593ad" sha1="475d20d67a8c6021f26bbd7955edf15d69d05f3e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="67082">
+				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (07. gary lineker's superstar soccer) [original] [tape] [compilation].cdt" size="67082" crc="5cfc6002" sha1="51a278bdeb573ab720c2442e79e2fd44253a139f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="60969">
+				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (08. hate - hostile all terrain encounter) [original] [tape] [compilation].cdt" size="60969" crc="85aee1b5" sha1="668174c1ac7e989097514eb5bcc2f5827d3514b2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="70429">
+				<rom name="12 jeux fantastiques (uk) (face 3a) (1989) (09. super scramble simulator) [original] [tape] [compilation].cdt" size="70429" crc="5430af71" sha1="fab29be81084fcd49b125526b841ae67c8149a6d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass11" interface="cpc_cass">
+			<dataarea name="cass" size="76423">
+				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (10. marauder) [original] [tape] [compilation].cdt" size="76423" crc="d43d8883" sha1="52c426cc402a9cdbadc16fab9fe91855c79dde5f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass12" interface="cpc_cass">
+			<dataarea name="cass" size="59953">
+				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (11. gary lineker's hot-shot !) [original] [tape] [compilation].cdt" size="59953" crc="8af64f79" sha1="867de31e65e7975f3f99a9b4562048a5f9b2f274" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass13" interface="cpc_cass">
+			<dataarea name="cass" size="59275">
+				<rom name="12 jeux fantastiques (uk) (face 3b) (1989) (12. stormlord) [original] [tape] [compilation].cdt" size="59275" crc="9f5e8411" sha1="7034d6016f3c90c21d402a5c6d6f4a30b6f6ecc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 12 Top Amstrad Hits (F,UK) (7 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="12topams" supported="no">
+		<description>12 Top Amstrad Hits (F,UK) (7 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="39354">
+				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (airwolf) [original] [tape] [compilation].cdt" size="39354" crc="3004975d" sha1="9caf84210fb83722b4fb343785ad4e55ff18fabe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="54055">
+				<rom name="12 top amstrad hits (uk) (face 1b) (1989) (enduro racer) [original] [tape] [compilation].cdt" size="54055" crc="bfe8467c" sha1="3d9017050f6095ca162f15331f17c39507dfec67" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="59941">
+				<rom name="12 top amstrad hits (uk) (face 1b) (1989) (living day lights) [original] [tape] [compilation].cdt" size="59941" crc="c776cfde" sha1="26b96e484c2fc17839bf3efb97b324c1691eecc4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="82285">
+				<rom name="12 top amstrad hits (uk) (face 2a) (1989) (paperboy) [original] [tape] [compilation].cdt" size="82285" crc="07482b0f" sha1="b3c31a53559ba4c3bc93623738b14cdce1072f12" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="68533">
+				<rom name="12 top amstrad hits (uk) (face 3a) (1989) (1942) [original] [tape] [compilation].cdt" size="68533" crc="0a996faa" sha1="59a72b52b65c27c06431e1d3fe0657c4e8501c92" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="62251">
+				<rom name="12 top amstrad hits (uk) (face 3a) (1989) (ikari warriors) [original] [tape] [compilation].cdt" size="62251" crc="975dddcf" sha1="6ad0bb2cceda4dd59031f6fd46290e681aaace80" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="51991">
+				<rom name="12 top amstrad hits (uk) (face 3b) (1989) (saboteur ii) [original] [tape] [compilation].cdt" size="51991" crc="a200c6df" sha1="794caef750da05c5fcae9bd59815a0cd902d12c8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="75385">
+				<rom name="12 top amstrad hits (uk) (face 3b) (1989) (battle ships) [original] [tape] [compilation].cdt" size="75385" crc="ea3ebb7a" sha1="bf48440c4795eb80945483362cc1e3d987451314" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="132265">
+				<rom name="12 top amstrad hits (f) (face 1a) (1989) (gabrielle) [original] [tape] [compilation].cdt" size="132265" crc="15141fa5" sha1="f8cd1552845ae1dc89eff12393ab4d849e6d601f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="41689">
+				<rom name="12 top amstrad hits (f) (face 1b) (1989) (mange cailloux) [original] [tape] [compilation].cdt" size="41689" crc="37219f47" sha1="adec81b9004e6367c59f2995bd81d9a50384e3b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass11" interface="cpc_cass">
+			<dataarea name="cass" size="81658">
+				<rom name="12 top amstrad hits (f) (face 2a) (1989) (asphalt) [original] [tape] [compilation].cdt" size="81658" crc="e4e112cc" sha1="2ecd8364d77934c80954466b5b1d9d7c8929beff" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass12" interface="cpc_cass">
+			<dataarea name="cass" size="61219">
+				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (bombjack) [original] [tape] [compilation].cdt" size="61219" crc="adfeea9d" sha1="32cc49f1d497eded372a0aec438518af46974eb9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass13" interface="cpc_cass">
+			<dataarea name="cass" size="61735">
+				<rom name="12 top amstrad hits (uk) (face 1a) (1989) (ghosts'n goblins) [original] [tape] [compilation].cdt" size="61735" crc="3523ce78" sha1="b25436d3cf288d87261eb6ff6334755ae3a7e71a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 123 (UK) (2 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="123uk2fa" supported="no">
+		<description>123 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="77199">
+				<rom name="123 (uk) (face a) (1988) [original] [tape] [compilation].cdt" size="77199" crc="9a2c1977" sha1="c9eea85c6d585e0ac5e95ef9643919ba4017d393" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="97137">
+				<rom name="123 (uk) (face b) (1988) [original] [tape] [compilation].cdt" size="97137" crc="518cb651" sha1="4d66eb2ee3e7dc198119b58e2fec513a43d039ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 1942 + Batty (UK) (1989) (Spain retail version) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="1942batt" supported="no">
+		<description>1942 + Batty (UK) (Spain retail version) [Original] [TAPE] [COMPILATION]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="107477">
+				<rom name="1942 + batty (uk) (1989) (spain retail version) [original] [tape] [compilation].cdt" size="107477" crc="63f78c55" sha1="556f73bbfb731dd426af80ae3b34b43f685aff6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 3 As (F,S) (4 faces) (1986) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="3asfs4fa" supported="no">
+		<description>3 As (F,S) (4 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="67801">
+				<rom name="3 as (f) (face 2a) (1986) (la malediction de thaar) [original] [tape] [compilation].cdt" size="67801" crc="d8571136" sha1="bbf3c87fee00f33498b1b8c496a32906cc6d6e6a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="10105">
+				<rom name="3 as (f) (face 3a) (1986) (graph pack) [original] [tape] [compilation].cdt" size="10105" crc="e9d11255" sha1="15a041740cdea906384267e95d322b7268e355d8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="15571">
+				<rom name="3 as (f) (face 3b) (1986) (graph pack) [original] [tape] [compilation].cdt" size="15571" crc="12420bb1" sha1="180705c350a7a278bb79f909d7ab2e902cf27662" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="65947">
+				<rom name="3 as (s) (face 1a) (1986) (gorbaf el vikingo) [original] [tape] [compilation].cdt" size="65947" crc="aa1fa72d" sha1="9471c39f1e580e9b271b63658617410c4ec2644e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Game Pack N 1 (UK) (2 faces) (1991) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamepac" supported="no">
+		<description>4 Game Pack N 1 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="96487">
+				<rom name="4 game pack n 1 (uk) (face a) (1991) [original] [tape] [compilation].cdt" size="96487" crc="caaeff33" sha1="229408662f460bccd11b3af26eb1e66894e9e067" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="93087">
+				<rom name="4 game pack n 1 (uk) (face b) (1991) [original] [tape] [compilation].cdt" size="93087" crc="beb935f8" sha1="397fbed92f313790da14bab7ba4513734c4599ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Game Pack N 2 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamepac01" cloneof="4gamepac" supported="no">
+		<description>4 Game Pack N 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="86842">
+				<rom name="4 game pack n 2 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="86842" crc="dfb15436" sha1="aae116379d5e6453d4727cb32313890b82fd22ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="93886">
+				<rom name="4 game pack n 2 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="93886" crc="ecd04ad1" sha1="c6849768bef39b2901b40d0f0bc06b3a6f4c0640" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Game Pack N 3 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamepac02" cloneof="4gamepac" supported="no">
+		<description>4 Game Pack N 3 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="91204">
+				<rom name="4 game pack n 3 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="91204" crc="6b7d0cc7" sha1="e7cb56b0cac0dc59838bded267e6cd4000584cec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="90244">
+				<rom name="4 game pack n 3 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="90244" crc="0dfd0343" sha1="0fda66418f66fa497398a48348836df4aa3004c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Games In 1 Pack - Hit Pack 1 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamesin" supported="no">
+		<description>4 Games In 1 Pack - Hit Pack 1 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="125745">
+				<rom name="4 games in 1 pack - hit pack 1 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="125745" crc="10f73133" sha1="171581ae1115f7fe63f359ae9c88180bc622c768" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="113191">
+				<rom name="4 games in 1 pack - hit pack 1 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="113191" crc="cd24c467" sha1="c9b8f28e9ec0f1b2762153d16c2e695b337d79df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Games In 1 Pack - Hit Pack 2 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamesin01" cloneof="4gamesin" supported="no">
+		<description>4 Games In 1 Pack - Hit Pack 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="116641">
+				<rom name="4 games in 1 pack - hit pack 2 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="116641" crc="d18b0f6e" sha1="1268f3b50fd61f9aa1b65d552ad5641d7565ef56" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="116358">
+				<rom name="4 games in 1 pack - hit pack 2 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="116358" crc="997d0e53" sha1="76ee25f6e20d9a826ae08f02e0011b4baa7d5283" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Games In 1 Pack - Hit Pack 5 (UK) (2 faces) (1992) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4gamesin02" cloneof="4gamesin" supported="no">
+		<description>4 Games In 1 Pack - Hit Pack 5 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="95263">
+				<rom name="4 games in 1 pack - hit pack 5 (uk) (face a) (1992) [original] [tape] [compilation].cdt" size="95263" crc="026106ef" sha1="43d1fac86452df76e1edaf9adb9f789a39903ecb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="123539">
+				<rom name="4 games in 1 pack - hit pack 5 (uk) (face b) (1992) [original] [tape] [compilation].cdt" size="123539" crc="d03ec403" sha1="07734274f1f90cd39019290acac0042f4fdc4cf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4 Soccer Simulators (UK) (2 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4soccers" supported="no">
+		<description>4 Soccer Simulators (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="111773">
+				<rom name="4 soccer simulators (uk) (face a) (1989) [original] [tape] [compilation].cdt" size="111773" crc="cfeb1b00" sha1="f2d2ad555f4264e8c8614cef7ba72420865b4451" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="113772">
+				<rom name="4 soccer simulators (uk) (face b) (1989) [original] [tape] [compilation].cdt" size="113772" crc="6b750ee1" sha1="b47c6313c3c891b6051ef40110a2f346e75aad79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 4th Dimension (UK) (2 faces) (1990) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="4thdimen" supported="no">
+		<description>4th Dimension (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="48580">
+				<rom name="4th dimension (uk) (face a) (1990) (1. battle valley) [original] [tape] [compilation].cdt" size="48580" crc="da557a52" sha1="46ad42adb883d0ac18900f43d29dc130c850b23f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="40535">
+				<rom name="4th dimension (uk) (face a) (1990) (2. anarchy) [original] [tape] [compilation].cdt" size="40535" crc="1c58eea2" sha1="32de3c89b2605771da6549c7b905726c03e152a3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="20051">
+				<rom name="4th dimension (uk) (face b) (1990) (3. supercup) [original] [tape] [compilation].cdt" size="20051" crc="88d4708e" sha1="bb58d572e08e16f4f81504c9fc04befd265459c8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="58061">
+				<rom name="4th dimension (uk) (face b) (1990) (4. herobotix) [original] [tape] [compilation].cdt" size="58061" crc="60ab68fb" sha1="e4f453130b54b8e8d5a7cb63e85490c81a247580" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 6-Pak (UK) (2 faces) (1987) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="6pakuk2f" supported="no">
+		<description>6-Pak (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="341461">
+				<rom name="6-pak (uk) (face 2) (1987) (7. split personalities) [original] [tape] [compilation].cdt" size="341461" crc="00c6d79e" sha1="a76a29fbe8952735cc5716ee991075a7e119eec6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="49573">
+				<rom name="6-pak (uk) (face 1) (1987) (1. scooby doo in the castle mystery) [original] [tape] [compilation].cdt" size="49573" crc="61f98935" sha1="259ed353a4ed2685bfe74e66ebc3c19eb1f34509" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="67567">
+				<rom name="6-pak (uk) (face 1) (1987) (2. 1942) [original] [tape] [compilation].cdt" size="67567" crc="77f508c6" sha1="f691022be425793dc0737a20a590834b3768f87d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="63277">
+				<rom name="6-pak (uk) (face 1) (1987) (3. duet) [original] [tape] [compilation].cdt" size="63277" crc="dc0ac784" sha1="327df17063d2a6862a5f890b758c221222767efa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="50141">
+				<rom name="6-pak (uk) (face 2) (1987) (4. jet set willy ii) [original] [tape] [compilation].cdt" size="50141" crc="dc0c4f69" sha1="18d8eeabdadbfe4ecad8a348fa29cfb44a9c2680" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="76903">
+				<rom name="6-pak (uk) (face 2) (1987) (5. the sacred armour of antiriad) [original] [tape] [compilation].cdt" size="76903" crc="c10335e6" sha1="f548fcee44b8810a6b6084f3dfe9456bd9edc3d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="62513">
+				<rom name="6-pak (uk) (face 2) (1987) (6. fighting warrior) [original] [tape] [compilation].cdt" size="62513" crc="7fd915c4" sha1="06f7d2c629fc463ad234254777c93fd93a2066eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying 6-Pak Volume 2 (UK) (2 faces) (1988) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="6pakvolu" supported="no">
+		<description>6-Pak Volume 2 (UK) (2 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="198208">
+				<rom name="6-pak volume 2 (uk) (face 1) (1988) [original] [tape] [compilation].cdt" size="198208" crc="106b7ee8" sha1="c4208d8c4b689e53acff6e517f4e6ae233dd030d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="192777">
+				<rom name="6-pak volume 2 (uk) (face 2) (1988) [original] [tape] [compilation].cdt" size="192777" crc="00ebe308" sha1="76d0e867c150582217be587c644949f0bc78cddd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying Action 5 (UK) (8 faces) (1990) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="action5u" supported="no">
+		<description>Action 5 (UK) (8 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="42363">
+				<rom name="action 5 (uk) (face 1a) (1990) (2. rick dangerous ii - code) [original] [tape] [compilation].cdt" size="42363" crc="f2593f5f" sha1="1b7a1481ccdf2751cd599459c4e93cd76064524a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="111473">
+				<rom name="action 5 (uk) (face 1b) (1990) (2. rick dangerous ii - levels) [original] [tape] [compilation].cdt" size="111473" crc="26b3f460" sha1="1cbd4cfc974110b635936096a603a3ba8f2f4535" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="82673">
+				<rom name="action 5 (f) (face 3a) (1990) (5. gunship - cote 1) [original] [tape] [compilation].cdt" size="82673" crc="aefebeaa" sha1="6ef0915fe31212cbc3e4f52571a86647de273288" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="10315">
+				<rom name="action 5 (f) (face 3b) (1990) (5. gunship - cote 2) [original] [tape] [compilation].cdt" size="10315" crc="2b6ad60d" sha1="f125393576b5fb9edde1802b1d224128467ca8e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="50733">
+				<rom name="action 5 (f) (face 4a) (1990) (5. gunship - cote 3) [original] [tape] [compilation].cdt" size="50733" crc="78d6e90d" sha1="3555499d32e283fb8af61c5a42095405ffae1554" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="50665">
+				<rom name="action 5 (f) (face 4b) (1990) (5. gunship - cote 4) [original] [tape] [compilation].cdt" size="50665" crc="e7bccbee" sha1="c4b1630e9a046024676579772e1290b04c5879bf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="140231">
+				<rom name="action 5 (f) (face 2a) (1990) (3. superski) [original] [tape] [compilation].cdt" size="140231" crc="9ab502e6" sha1="becc8cf8bafbcde24855a9d876dc909bcb001d22" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="201549">
+				<rom name="action 5 (uk) (face 2b) (1990) (4. ghostbusters ii) [original] [tape] [compilation].cdt" size="201549" crc="0b35e41c" sha1="bc4649dbfb29e17762197ebe44554a606a9469e4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="51505">
+				<rom name="action 5 (uk) (face 1a) (1990) (1. hard drivin 64k) [original] [tape] [compilation].cdt" size="51505" crc="4890a166" sha1="9d71ee2139da44842940b3204ce1bfa63957b387" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying Action Countdown (UK) (4 faces) (1989) [Original] [TAPE] [COMPILATION].zip... -->
+	<software name="actionco" supported="no">
+		<description>Action Countdown (UK) (4 faces) [Original] [TAPE] [COMPILATION]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="58721">
+				<rom name="action countdown (uk) (face 1a) (1989) (1. metropolis) [original] [tape] [compilation].cdt" size="58721" crc="fb9a7f63" sha1="05ada5f22ed2d04d9823b0e301da952627cbc384" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="115125">
+				<rom name="action countdown (uk) (face 1a) (1989) (2. titanic) [original] [tape] [compilation].cdt" size="115125" crc="1c64f09d" sha1="fdddc85713d27c9d780191b51d3d84ab0701c975" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="56717">
+				<rom name="action countdown (uk) (face 1b) (1989) (3. wells &amp; fargo) [original] [tape] [compilation].cdt" size="56717" crc="df4cc0ca" sha1="3aeeb0c09ba1f9e4d574b9f1d35854b15dfef5e1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="80666">
+				<rom name="action countdown (uk) (face 2a) (1989) (5. black beard) [original] [tape] [compilation].cdt" size="80666" crc="1ed911e2" sha1="f3b3b26fa55f0ef9126384b90427f25a16bc58cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="78509">
+				<rom name="action countdown (uk) (face 2a) (1989) (6. tuareg) [original] [tape] [compilation].cdt" size="78509" crc="4b648a64" sha1="aaf63c5a61f64b2cd7736b36aa9f97ab5138c936" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="61967">
+				<rom name="action countdown (uk) (face 2b) (1989) (7. colosseum) [original] [tape] [compilation].cdt" size="61967" crc="4c8ec300" sha1="c1082cb5828d8c924eacfadbae09cf9ac0a96b1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="49292">
+				<rom name="action countdown (uk) (face 2b) (1989) (8. score 3020) [original] [tape] [compilation].cdt" size="49292" crc="8b174a9b" sha1="c095c06efd15e15e7469a3272344be615334884f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="61208">
+				<rom name="action countdown (uk) (face 2b) (1989) (9. rock 'n roller) [original] [tape] [compilation].cdt" size="61208" crc="1da7a421" sha1="f52dc71d7c00652ea915bda65618e52f7a142007" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="101090">
+				<rom name="action countdown (uk) (face 1b) (1989) (4. stardust) [original] [tape] [compilation].cdt" size="101090" crc="c7c64d02" sha1="9017368a5200f553d19d7e70b3b07dc856d111b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- Split tapes -->
+
+
+	<!-- Identifying 4x4 Off-Road Racing (UK) (1989) (Version split) [Original] [TAPE].zip... -->
+	<software name="4x4offro" supported="no">
+		<description>4x4 Off-Road Racing (UK) (Version split) [Original] [TAPE]</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="47263">
+				<rom name="4x4 off-road racing (uk) (1989) (00. boot code) (version split) [original] [tape].cdt" size="47263" crc="3b7c362a" sha1="db22d0798d826eb00c63b328db651e14a8646980" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="23253">
+				<rom name="4x4 off-road racing (uk) (1989) (01. block 01) (version split) [original] [tape].cdt" size="23253" crc="badfb930" sha1="9c2e07cc18b7fee23e61c4df91c3702f2c672366" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="21194">
+				<rom name="4x4 off-road racing (uk) (1989) (02. block 02) (version split) [original] [tape].cdt" size="21194" crc="bfd9d888" sha1="ccd2ebf91553711503f4dd9728169ac29c8784ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Identifying After Burner (UK) (1988) (Version Split) [Original] [TAPE].zip... -->
+	<software name="afterbur" supported="no">
+		<description>After Burner (UK) (Version Split) [Original] [TAPE]</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="cpc_cass">
+			<dataarea name="cass" size="3671">
+				<rom name="after burner (uk) (1988) (02. stage 3 - 7) (version split) [original] [tape].cdt" size="3671" crc="17963e68" sha1="ac9a370d4b3e47f08765f2f03aa9be1751518bfc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cpc_cass">
+			<dataarea name="cass" size="6804">
+				<rom name="after burner (uk) (1988) (03. stage 8) (version split) [original] [tape].cdt" size="6804" crc="4c834013" sha1="e2aa3783571a88aee98641711a3cf8bbb23a3e3b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="cpc_cass">
+			<dataarea name="cass" size="3778">
+				<rom name="after burner (uk) (1988) (04. stage 9 - 11) (version split) [original] [tape].cdt" size="3778" crc="431f5455" sha1="dd69bda856186537353e8056810975b061dd00ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="cpc_cass">
+			<dataarea name="cass" size="4072">
+				<rom name="after burner (uk) (1988) (05. stage 12 - 16) (version split) [original] [tape].cdt" size="4072" crc="de31e6ba" sha1="05f8caef687593e864e9f60f0f7c40fc602474dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cpc_cass">
+			<dataarea name="cass" size="7141">
+				<rom name="after burner (uk) (1988) (06. stage 17) (version split) [original] [tape].cdt" size="7141" crc="9b76cd0e" sha1="ebacd1940eead92b44052de4cda94919ad8c01d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="cpc_cass">
+			<dataarea name="cass" size="3970">
+				<rom name="after burner (uk) (1988) (07. stage 18 - 20) (version split) [original] [tape].cdt" size="3970" crc="4bff3f1f" sha1="04163cb9ef650a37ddc87c87d60ef97550ce3d19" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="cpc_cass">
+			<dataarea name="cass" size="7163">
+				<rom name="after burner (uk) (1988) (08. stage 21 - 23) (version split) [original] [tape].cdt" size="7163" crc="23645c1c" sha1="9d638ea00067a88c71d95b301f5a5a87e1f5b6df" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="cpc_cass">
+			<dataarea name="cass" size="11891">
+				<rom name="after burner (uk) (1988) (09. stage 24) (version split) [original] [tape].cdt" size="11891" crc="a566acd5" sha1="686a54a2be3f9509eba2625c2abea4927b501221" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cpc_cass">
+			<dataarea name="cass" size="93529">
+				<rom name="after burner (uk) (1988) (-code programme) (version split) [original] [tape].cdt" size="93529" crc="a1e37556" sha1="b1bc43003c75c8845594e1eb2ceea8c0d63c9d01" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="cpc_cass">
+			<dataarea name="cass" size="8611">
+				<rom name="after burner (uk) (1988) (01. stage 1 - 2) (version split) [original] [tape].cdt" size="8611" crc="bef343f4" sha1="200dc0144f8ccffc6742795780114927fb48c619" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>
