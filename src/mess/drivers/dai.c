@@ -59,14 +59,7 @@ Timings:
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
 #include "includes/dai.h"
-#include "machine/pit8253.h"
-#include "machine/tms5501.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
 
 /* I/O ports */
 static ADDRESS_MAP_START( dai_io , AS_IO, 8, dai_state )
@@ -235,7 +228,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", DAI, 0)
+	MCFG_SOUND_ADD("custom", DAI_SOUND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

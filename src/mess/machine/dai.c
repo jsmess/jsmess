@@ -9,15 +9,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "emu.h"
-#include "imagedev/cassette.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
 #include "includes/dai.h"
-#include "machine/pit8253.h"
-#include "machine/tms5501.h"
-#include "machine/ram.h"
 
 #define DEBUG_DAI_PORTS	0
 
@@ -94,44 +87,23 @@ I8255A_INTERFACE( dai_ppi82555_intf )
 	DEVCB_NULL	/* Port C write */
 };
 
-static WRITE_LINE_DEVICE_HANDLER( dai_pit_out0 )
-{
-	dai_state *drvstate = device->machine().driver_data<dai_state>();
-	dai_set_input(drvstate->m_sound, 0, state);
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( dai_pit_out1 )
-{
-	dai_state *drvstate = device->machine().driver_data<dai_state>();
-	dai_set_input(drvstate->m_sound, 1, state);
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( dai_pit_out2 )
-{
-	dai_state *drvstate = device->machine().driver_data<dai_state>();
-	dai_set_input(drvstate->m_sound, 2, state);
-}
-
-
 const struct pit8253_config dai_pit8253_intf =
 {
 	{
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(dai_pit_out0)
+			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch0),
 		},
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(dai_pit_out1)
+			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch1),
 		},
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(dai_pit_out2)
+			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch2),
 		}
 	}
 };
@@ -145,8 +117,6 @@ static TIMER_CALLBACK( dai_timer )
 MACHINE_START( dai )
 {
 	dai_state *state = machine.driver_data<dai_state>();
-	state->m_sound = machine.device("custom");
-	state->m_tms5501 = machine.device("tms5501");
 
 	state->membank("bank2")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x010000, 0x1000);
 	machine.scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
@@ -217,13 +187,13 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 {
 	switch(offset & 0x000f) {
 	case 0x04:
-		dai_set_volume(m_sound, offset, data);
+		m_sound->set_volume(space, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
-		dai_set_volume(m_sound, offset, data);
+		m_sound->set_volume(space, offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
 		break;
