@@ -225,6 +225,10 @@ WRITE8_MEMBER( sb8_device::dsp_reset_w )
 	}
 
 	m_dsp.reset_latch = data;
+	m_isa->drq1_w(0);
+	m_dsp.dma_autoinit = 0;
+	m_isa->irq5_w(0);
+	m_timer->adjust(attotime::never, 0);
 
 	//printf("%02x\n",data);
 }
@@ -500,6 +504,7 @@ void isa8_sblaster1_5_device::device_start()
 {
     set_isa_device();
 	/* 1.5 makes CM/S support optional (empty sockets, but they work if the user populates them!) */
+	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0200;
     sb8_device::device_start();
 }
@@ -515,6 +520,8 @@ void sb8_device::device_reset()
     m_dack_out = 0;
     m_dsp.fifo_ptr = 0;
     m_dsp.fifo_r_ptr = 0;
+    m_dsp.wbuf_status = 0;
+    m_dsp.rbuf_status = 0;
 }
 
 UINT8 sb8_device::dack_r(int line)
