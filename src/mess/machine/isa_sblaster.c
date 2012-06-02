@@ -14,6 +14,7 @@
 #include "sound/speaker.h"
 #include "sound/3812intf.h"
 #include "sound/saa1099.h"
+#include "sound/dac.h"
 #include "machine/pic8259.h"
 
 /*
@@ -98,6 +99,9 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+    MCFG_SOUND_ADD("sbdac", DAC, 0)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
@@ -107,6 +111,8 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	/* no CM/S support (empty sockets) */
 
+    MCFG_SOUND_ADD("sbdac", DAC, 0)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -229,6 +235,10 @@ WRITE8_MEMBER( sb8_device::dsp_reset_w )
 	m_dsp.dma_autoinit = 0;
 	m_isa->irq5_w(0);
 	m_timer->adjust(attotime::never, 0);
+    m_dsp.d_rptr = 0;
+    m_dsp.d_wptr = 0;
+    m_dsp.dma_throttled = false;
+    m_dsp.dma_timer_started = false;
 
 	//printf("%02x\n",data);
 }
@@ -253,10 +263,12 @@ WRITE8_MEMBER( sb8_device::dsp_data_w )
 READ8_MEMBER(sb8_device::dsp_rbuf_status_r)
 {
 //    printf("read Rbufstat @ %x\n", offset);
-    m_isa->irq5_w(0);   // reading this port ACKs the card's IRQ
 
     if(offset)
 		return 0xff;
+
+//    printf("Clear IRQ5\n");
+    m_isa->irq5_w(0);   // reading this port ACKs the card's IRQ
 
 	return m_dsp.rbuf_status;
 }
@@ -288,7 +300,7 @@ void sb8_device::process_fifo(UINT8 cmd)
 	else if(m_dsp.fifo_ptr == m_cmd_fifo_length[cmd])
 	{
 		/* get FIFO params */
-        printf("SB FIFO command: %02x\n", cmd);
+//        printf("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
             case 0x10:  // Direct DAC
@@ -296,16 +308,20 @@ void sb8_device::process_fifo(UINT8 cmd)
 
             case 0x14:  // 8-bit DMA, no autoinit
                 m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
-                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
+//                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
                 m_dsp.dma_autoinit = 0;
+                m_dsp.dma_timer_started = false;
+                m_dsp.dma_throttled = false;
                 m_isa->drq1_w(1);
                 break;
 
             case 0x1c:  // 8-bit DMA with autoinit
-            	printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
+//            	printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
                 m_dsp.dma_autoinit = 1;
+                m_dsp.dma_timer_started = false;
+                m_dsp.dma_throttled = false;
                 m_isa->drq1_w(1);
             	break;
 
@@ -321,6 +337,8 @@ void sb8_device::process_fifo(UINT8 cmd)
             case 0xd0:  // halt 8-bit DMA
                 m_timer->adjust(attotime::never, 0);
                 m_isa->drq1_w(0);   // drop DRQ
+                m_dsp.dma_throttled = false;
+                m_dsp.dma_timer_started = false;
                 break;
 
             case 0xd1: // speaker on
@@ -453,7 +471,8 @@ machine_config_constructor isa8_sblaster1_5_device::device_mconfig_additions() c
 
 sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
     device_t(mconfig, type, name, tag, owner, clock),
-    device_isa8_card_interface(mconfig, *this)
+    device_isa8_card_interface(mconfig, *this),
+    m_dac(*this, "sbdac")
 {
 }
 
@@ -538,35 +557,60 @@ void sb8_device::dack_w(int line, UINT8 data)
 //  if(data != 0x80)
 //      printf("%02x\n",data);
 
-    // set the transfer over timer on the 1st byte
-    if (m_dsp.dma_transferred == 0)
+    // set the transfer timer on the 1st byte
+    if (!m_dsp.dma_timer_started)
     {
-        double time_constant = (double)m_dsp.frequency;
+        m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+        m_dsp.d_rptr = m_dsp.d_wptr = 0;
+        m_dsp.dma_timer_started = true;
+    }
 
-        time_constant /= (double)m_dsp.dma_length;
-//        printf("DMA timer set for %f Hz\n", time_constant);
+    m_dsp.data[m_dsp.d_wptr++] = data;
+    m_dsp.d_wptr %= 128;
 
-        m_timer->adjust(attotime::from_hz(time_constant), 0);
+    if (m_dsp.d_wptr == m_dsp.d_rptr)
+    {
+//        printf("throttling DRQ\n");
+        m_isa->drq1_w(0);	// drop DRQ here
+        m_dsp.dma_throttled = true;
     }
 
     m_dsp.dma_transferred++;
     if (m_dsp.dma_transferred >= m_dsp.dma_length)
     {
 //        printf("DMA fill completed (%d out of %d)\n", m_dsp.dma_transferred, m_dsp.dma_length);
+
         m_isa->drq1_w(0);	// drop DRQ here
+
+        if (m_dsp.dma_autoinit)
+        {
+//            printf("autoinit reset\n");
+            m_dsp.dma_transferred = 0;
+            if (!m_dsp.dma_throttled)   // if we're not throttled, re-raise DRQ right now
+            {
+                m_isa->drq1_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
+            }
+        }
+
+        m_isa->irq5_w(1);	// raise IRQ as per the Creative manual
     }
 }
 
 void sb8_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-    printf("DMA timer expire\n");
-    if(m_dsp.dma_autoinit)
+//    printf("DMA timer expire\n");
+
+    dac_data_w(m_dac, m_dsp.data[m_dsp.d_rptr]);
+    m_dsp.data[m_dsp.d_rptr++] = 0x80;
+    m_dsp.d_rptr %= 128;
+
+    if (m_dsp.dma_throttled)
     {
-        m_dsp.dma_transferred = 0;
-        m_isa->drq1_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
+        if (m_dsp.d_rptr == m_dsp.d_wptr)
+        {
+//            printf("unthrottling DRQ\n");
+            m_isa->drq1_w(1);   // raise DRQ
+            m_dsp.dma_throttled = false;
+        }
     }
-
-    m_isa->irq5_w(1);	// raise IRQ as per the Creative manual
-
-    m_timer->adjust(attotime::never, 0);
 }

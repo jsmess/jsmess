@@ -25,6 +25,9 @@ struct sb8_dsp_state
     UINT32 frequency;
     UINT32 dma_length, dma_transferred;
     UINT8 dma_autoinit;
+    UINT8 data[128], d_wptr, d_rptr;
+    bool dma_timer_started;
+    bool dma_throttled;
 };
 
 // ======================> sb8_device (parent)
@@ -36,6 +39,8 @@ class sb8_device :
 public:
         // construction/destruction
         sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
+
+        required_device<device_t> m_dac;
 
         void process_fifo(UINT8 cmd);
         void queue(UINT8 data);
