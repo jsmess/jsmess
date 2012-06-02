@@ -21730,7 +21730,9 @@ Alternate board (XL-1)
 
 
 <!-- Pending dumps -->
+
 <!--
+
 	<software name="srobot3rc" cloneof="srobot3">
 		<description>Dai-3-ji Super Robot Taisen (Jpn, Rev. C)</description>
 		<year>1993</year>
@@ -21739,8 +21741,20 @@ Alternate board (XL-1)
 		<info name="release" value="19930723" />
 		<info name="alt_title" value="第3次 スーパーロボット大戦" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="C" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
 				<rom name="dai-3-ji super robot taisen (japan) (rev 3).sfc" size="1572864" crc="C2941881" offset="0x000000" />
+				<rom name="shvc-rt-3 p0.u1" size="1048576" crc="" sha1="" offset="0x000000" />
+				<rom name="shvc-rt-3 p1.u2" size="524288"  crc="" sha1="" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -21755,8 +21769,14 @@ Alternate board (XL-1)
 		<info name="release" value="19930219" />
 		<info name="alt_title" value="ドラえもん のび太と妖精の国" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="524288">
-				<rom name="doraemon - nobita to yousei no kuni (japan) (rev 1).sfc" size="524288" crc="55E44983" offset="0x000000" />
+				<rom name="shvc-dr-1.u1" size="524288" crc="55e44983" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21769,8 +21789,17 @@ Alternate board (XL-1)
 		<info name="release" value="19941216" />
 		<info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="ganbare goemon 3 - shishi juurokubee no karakuri manjigatame (japan) (rev 1).sfc" size="2097152" crc="458C473B" offset="0x000000" />
+				<rom name="shvc-2u-1.u1" size="2097152" crc="458c473b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -21785,8 +21814,17 @@ Alternate board (XL-1)
 		<info name="release" value="19941216" />
 		<info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="ganbare goemon 3 - shishi juurokubee no karakuri manjigatame (japan) (rev 2).sfc" size="2097152" crc="AF984BC1" offset="0x000000" />
+				<rom name="shvc-2u-2.u1" size="2097152" crc="af984bc1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -21801,24 +21839,42 @@ Alternate board (XL-1)
 		<info name="release" value="19930129" />
 		<info name="alt_title" value="信長公記" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A5B-04" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shinchou kouki (japan) (rev 1).sfc" size="1048576" crc="1A77CF3B" offset="0x000000" />
+				<rom name="shvc-nt-1.u1" size="1048576" crc="1a77cf3b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="shinmt2a" cloneof="shinmt2">
+	<software name="shinmt2b" cloneof="shinmt2">
 		<description>Shin Megami Tensei II (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
-		<info name="serial" value="SHVC-ZE" />
+		<info name="serial" value="SHVC-ZE-1" />
 		<info name="release" value="19940318" />
 		<info name="alt_title" value="真・女神転生II" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shin megami tensei ii (japan) (rev 1).sfc" size="1048576" crc="84268A75" offset="0x000000" />
+				<rom name="shvc-ze-1.u1" size="2097152" crc="84268a75" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -21833,8 +21889,17 @@ Alternate board (XL-1)
 		<info name="release" value="19920807" />
 		<info name="alt_title" value="初代 熱血硬派くにおくん" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1B-06" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shodai nekketsu kouha kunio-kun (japan) (rev 1).sfc" size="1048576" crc="5DF55465" offset="0x000000" />
+				<rom name="shvc-kn-1.u1" size="1048576" crc="5df55465" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -21850,13 +21915,15 @@ Alternate board (XL-1)
 		<info name="alt_title" value="晦-つきこもり" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="tsukikomori (japan) (rev 1) (np).sfc" size="4194304" crc="F37C6726" offset="0x000000" />
+				<rom name="tsukikomori (japan) (rev 1) (np).sfc" size="4194304" crc="f37c6726" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
+
 -->
+
 <!-- End of pending dumps -->
 
 
@@ -23676,23 +23743,62 @@ Alternate board (XL-1)
 
 <!-- Pirates -->
 
-<!-- the copy protection of the following titles are documented here:
+<!-- most common copy protection devices used in pirate cartridges
+
+     - Aladdin 2000
      - Bananas de Pijamas
+     - A Bug's Life
+     - Digimon Adventure
      - King of Fighters 2000
      - Pocket Monster
+     - Pokemon Gold Silver
      - Pokemon Stadium
-     - Soul Blade
+     - Soul Edge Vs Samurai
      - Street Fighter EX Plus Alpha
-     - Tekken 2
      - X-Men vs. Street Fighter
+     the game checks for the expected values after writing to the device and refuse to work if they don`t match up,
+     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+     the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345
+
+     - Soul Blade
+		 the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		 a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+
+     - Tekken 2
+		 the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
+		 it seems to contain some kind of microcontroller and expects write sequences
+     unknown algorithm at this time, all the values the game needs were bruteforced
 -->
+
+	<software name="aladdi2k" supported="no">
+		<!-- single cartridge source: d4s -->
+		<description>Aladdin 2000 (Brazil, Mega Drive Bootleg)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="" /> <!-- epoxy board with surface mounted cic -->
+			<feature name="cart_model" value="SNS-006" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1" size="1048576" crc="752a25d3" sha1="a8585b3e61c610af18a077dd1a2ea3d0aa25dda8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="aladdi2kh" cloneof="aladdi2k">
+		<description>Aladdin 2000 (Brazil, Mega Drive Bootleg, Cracked)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="aladdin 2000 (mega drive bootleg) (cracked).sfc" size="1048576" crc="a818cfd5" sha1="1de9a68980cac63346e3cda14a5aa0d6cea8b739" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="banpija" cloneof="chester" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
-		<description>Bananas de Pijamas</description>
+		<description>Bananas de Pijamas (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23704,7 +23810,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="banpijah" cloneof="chester" supported="no">
-		<description>Bananas de Pijamas (Cracked)</description>
+		<description>Bananas de Pijamas (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23714,8 +23820,46 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- This is cracked but we don't have the original dump! -->
-	<software name="digimonh">
+	<software name="abugslif" supported="no">
+		<!-- single cartridge source: d4s -->
+		<!-- highly similar to the game boy color version, this could be based on a prototype -->
+		<description>A Bug's Life (Brazil)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="890409C" /> <!-- epoxy board -->
+			<feature name="cart_model" value="SNS-006" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u2" size="2097152" crc="014f0fcf" sha1="930ab53fded53a65824690b394d6e8c6565c083b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="abugslifh" cloneof="abugslif">
+		<description>A Bug's Life (Brazil, Cracked)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="a bug's life (cracked).sfc" size="2097152" crc="1683518d" sha1="b90bffd1f9ee459f3df57545916fb66e23de8a4d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimon">
+		<description>Digimon Adventure</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="digimon adventure.sfc" size="2097152" crc="4f660972" sha1="82a8406ba79971ac62d4e79971a4169c4461725e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="digimonh" cloneof="digimon">
 		<description>Digimon Adventure (Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23751,9 +23895,6 @@ Alternate board (XL-1)
 
 	<software name="kof2000" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
 		<description>The King of Fighters 2000 (Brazil)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23778,10 +23919,7 @@ Alternate board (XL-1)
 
 	<software name="pokemon" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
-		<description>Pocket Monster (World)</description>
+		<description>Pocket Monster (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23793,19 +23931,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="pokemonh" cloneof="pokemon">
-		<description>Pocket Monster (World, Cracked)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monster (world) (cracked).sfc" size="2097152" crc="1e21df4a" sha1="6f56ae4f76229ad749d1e28634540328d6fb9205" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="pokemonha" cloneof="pokemon">
-		<description>Pocket Monster (World, Cracked, Alt)</description>
+		<description>Pocket Monster (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23815,8 +23941,19 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- This is cracked but we don't have the original dump! -->
-	<software name="pokegsh">
+	<software name="pokegs">
+		<description>Pokemon Gold Silver</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon gold silver.sfc" size="2097152" crc="7c0b798d" sha1="40aef565230d70b833a73197adac73549b152f67" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="pokegsh" cloneof="pokegs">
 		<description>Pokemon Gold Silver (Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23829,10 +23966,7 @@ Alternate board (XL-1)
 
 	<software name="pokestad" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
-		<description>Pokemon Stadium (World)</description>
+		<description>Pokemon Stadium (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23844,7 +23978,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="pokestadh" cloneof="pokestad">
-		<description>Pokemon Stadium (World, Cracked)</description>
+		<description>Pokemon Stadium (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23876,6 +24010,17 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="sonic4" cloneof="speedy">
+		<description>Sonic the Hedgehog 4 (World)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sonic the hedgehog 4 (world) (unl) [b].sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonic4a" cloneof="speedy">
 		<description>Sonic the Hedgehog (Alt)</description>
 		<year>19??</year>
@@ -23889,9 +24034,7 @@ Alternate board (XL-1)
 
 	<software name="soulblad" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places). -->
-		<description>Soul Blade (USA)</description>
+		<description>Soul Blade (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23907,7 +24050,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="soulbladh" cloneof="soulblad">
-		<description>Soul Blade (USA, Cracked)</description>
+		<description>Soul Blade (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23917,8 +24060,19 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<!-- This is cracked but we don't have the original dump! -->
 	<software name="souledge">
+		<description>Soul Edge Vs Samurai</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="soul edge vs samurai.sfc" size="2097152" crc="5e4ada04" sha1="fa48972ae8406b7ef17b3b0096bed6b858d36939" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="souledgeh" cloneof="souledge">
 		<description>Soul Edge Vs Samurai (Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -23931,10 +24085,7 @@ Alternate board (XL-1)
 
 	<software name="sfex" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
-		<description>Street Fighter EX Plus α (World)</description>
+		<description>Street Fighter EX Plus α (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23946,7 +24097,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="sfexh" cloneof="sfex">
-		<description>Street Fighter EX Plus α (World, Cracked)</description>
+		<description>Street Fighter EX Plus α (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23962,11 +24113,11 @@ Alternate board (XL-1)
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="not identified" />
-			<feature name="u1" value="not identified" /> <!-- ROM -->
-			<feature name="u2" value="not identified" /> <!-- ROM -->
-			<feature name="u3" value="74LS139" />
-			<feature name="u4" value="not identified" /> <!-- CIC -->
+			<feature name="pcb" value="" />
+			<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="u2" value="" /> <!-- ROM -->
+			<feature name="u3" value="" /> <!-- 74LS139 -->
+			<feature name="u4" value="" /> <!-- CIC -->
 			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="2097152">
@@ -23989,10 +24140,7 @@ Alternate board (XL-1)
 
 	<software name="tekken2" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		      it seems to contain some kind of microcontroller and expects write sequences
-          unknown algorithm at this time, all the values the game needs were bruteforced -->
-		<description>Tekken 2 (World)</description>
+		<description>Tekken 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -24004,7 +24152,7 @@ Alternate board (XL-1)
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="tekken2h" cloneof="tekken2">
-		<description>Tekken 2 (World, Cracked)</description>
+		<description>Tekken 2 (Asia, Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -24027,23 +24175,24 @@ Alternate board (XL-1)
 
 	<software name="xmensf" supported="no">
 		<!-- single cartridge source: d4s -->
-		<!-- copy protection device: the game checks for the expected values after writing to this device and refuse to work if they don`t match up,
-		     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-         the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345 -->
-		<description>X-Men vs. Street Fighter (World)</description>
-		<year>19??</year>
+		<description>X-Men vs. Street Fighter (Asia)</description>
+		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="" />
+			<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="u2" value="" /> <!-- CIC -->
+			<feature name="cart_model" value="" /> <!-- similar to a standard JPN cart -->
 			<dataarea name="rom" size="2097152">
-				<rom name="x-men vs. street fighter (world) (unl).sfc" size="2097152" crc="40242231" sha1="7ea216437c77e1ac20f9a00eb53b283d269aa15a" offset="0x000000" />
+				<rom name="x-men.u1" size="2097152" crc="40242231" sha1="7ea216437c77e1ac20f9a00eb53b283d269aa15a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="xmensfh" cloneof="xmensf">
-		<description>X-Men vs. Street Fighter (World, Cracked)</description>
-		<year>19??</year>
+		<description>X-Men vs. Street Fighter (Asia, Cracked)</description>
+		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
@@ -24227,17 +24376,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sm choukyoushi hitomi vol. 3 - test version (japan) (unl) [b].sfc" size="524288" crc="b3be5f84" sha1="a0ad63ab4a262b728e0faa0e5749423cd6aa3d9c" offset="0x000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonic4" cloneof="speedy">
-		<description>Sonic the Hedgehog 4 (World)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="sonic the hedgehog 4 (world) (unl) [b].sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -41474,6 +41612,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="paramev4">
+		<!-- single cartridge source: d4s -->
 		<description>Parame ROM Cassette Vol. 4 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -41485,6 +41624,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="paramev5">
+		<!-- single cartridge source: d4s -->
 		<description>Parame ROM Cassette Vol. 5 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
