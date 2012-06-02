@@ -4633,6 +4633,7 @@ scud			// 1996.12 Scud Race
 scudj
 scuda
 vs215			// 1997.06 Virtua Striker 2
+vs215o			// 1997.06 Virtua Striker 2
 lostwsga		// 1997.07 Lost World Jurassic Park
 scudp			// 1997.09 Scud Race Plus
 lemans24		// 1997.09 Le Mans 24
@@ -5768,10 +5769,12 @@ thehustl		// GX765 (c) 1987 (Japan)
 thehustlj		// GX765 (c) 1987 (Japan)
 rackemup		// GX765 (c) 1987
 battlnts		// GX777 (c) 1987
+battlntsa		// GX777 (c) 1987
 battlntsj		// GX777 (c) 1987 (Japan)
 bladestl		// GX797 (c) 1987
 bladestll		// GX797 (c) 1987
 bladestle		// GX797 (c) 1987
+kontest			// GX800 (c) 198? (Japan)
 hcastle			// GX768 (c) 1988
 hcastleo		// GX768 (c) 1988
 hcastlej		// GX768 (c) 1988 (Japan)
