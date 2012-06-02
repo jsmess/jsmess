@@ -59,7 +59,7 @@ public:
 		{ }
 
 	required_device<device_t> m_pit;
-	required_device<device_t> m_tms5501;
+	required_device<tms5501_device> m_tms5501;
 	required_device<dai_sound_device> m_sound;
 
 	UINT8 m_paddle_select;
@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dai_amd9511_w);
 	DECLARE_READ8_MEMBER(dai_pit_r);
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
+	DECLARE_READ8_MEMBER(dai_keyboard_r);
+	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
 };
 
 

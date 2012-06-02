@@ -24,8 +24,8 @@
 
 WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 {
-	tms5501_sensor (m_tms5501, 1);
-	tms5501_sensor (m_tms5501, 0);
+	m_tms5501->set_sensor(1);
+	m_tms5501->set_sensor(0);
 }
 
 static void dai_update_memory(running_machine &machine, int dai_rom_bank)
@@ -40,41 +40,38 @@ static TIMER_CALLBACK(dai_bootstrap_callback)
 }
 
 
-static UINT8 dai_keyboard_read (device_t *device)
+READ8_MEMBER(dai_state::dai_keyboard_r)
 {
-	dai_state *state = device->machine().driver_data<dai_state>();
 	UINT8 data = 0x00;
-	int i;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (state->m_keyboard_scan_mask & (1 << i))
-			data |= device->machine().root_device().ioport(keynames[i])->read();
+		if (m_keyboard_scan_mask & (1 << i))
+			data |= ioport(keynames[i])->read();
 	}
+
 	return data;
 }
 
-static void dai_keyboard_write (device_t *device, UINT8 data)
+WRITE8_MEMBER(dai_state::dai_keyboard_w)
 {
-	dai_state *state = device->machine().driver_data<dai_state>();
-	state->m_keyboard_scan_mask = data;
+	m_keyboard_scan_mask = data;
 }
 
-static void dai_interrupt_callback(device_t *device, int intreq, UINT8 vector)
+static TMS5501_IRQ_CALLBACK(dai_interrupt_callback)
 {
 	if (intreq)
-		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, vector);
+		cputag_set_input_line_and_vector(device.machine(), "maincpu", 0, HOLD_LINE, vector);
 	else
-		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(device.machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-const tms5501_interface dai_tms5501_interface =
+TMS5501_INTERFACE( dai_tms5501_interface )
 {
-	dai_keyboard_read,
-	dai_keyboard_write,
-	dai_interrupt_callback,
-	2000000.
+	DEVCB_DRIVER_MEMBER(dai_state, dai_keyboard_r),
+	DEVCB_DRIVER_MEMBER(dai_state, dai_keyboard_w),
+	dai_interrupt_callback
 };
 
 I8255A_INTERFACE( dai_ppi82555_intf )
@@ -111,7 +108,7 @@ const struct pit8253_config dai_pit8253_intf =
 static TIMER_CALLBACK( dai_timer )
 {
 	dai_state *state = machine.driver_data<dai_state>();
-	tms5501_set_pio_bit_7 (state->m_tms5501, (machine.root_device().ioport("IN8")->read() & 0x04) ? 1:0);
+	state->m_tms5501->set_pio_bit_7((state->ioport("IN8")->read() & 0x04) ? 1:0);
 }
 
 MACHINE_START( dai )
