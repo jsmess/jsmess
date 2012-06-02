@@ -18,7 +18,8 @@
 
 #define OPTION_ID		0x01
 
-#define Z80_TAG			"z80"
+#define Z80_TAG			"l53"
+#define MK3882_TAG		"l07"
 #define SASIBUS_TAG		"sasi"
 
 
@@ -40,6 +41,9 @@ ROM_START( wangpc_wdc )
 
 	ROM_REGION( 0x1000, "address", 0 )
 	ROM_LOAD( "378-9041.l54", 0x0000, 0x1000, CRC(94e9a17d) SHA1(060c576d70069ece2d0dbce86ffc448df2b169e7) )
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "376-8002.l66", 0x000, 0x100, NO_DUMP ) // DL2212-105
 ROM_END
 
 
@@ -80,6 +84,20 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
+//  Z80CTC_INTERFACE( ctc_intf )
+//-------------------------------------------------
+
+static Z80CTC_INTERFACE( ctc_intf )
+{
+	0,              								// timer disables
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
+	DEVCB_NULL,	// ZC/TO0 callback
+	DEVCB_NULL,	// ZC/TO1 callback
+	DEVCB_NULL	// ZC/TO2 callback
+};
+
+
+//-------------------------------------------------
 //  SCSIBus_interface sasi_intf
 //-------------------------------------------------
 
@@ -110,10 +128,12 @@ static const SCSIBus_interface sasi_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL_10MHz / ?
 	//MCFG_CPU_CONFIG(wangpc_wdc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
 	MCFG_CPU_IO_MAP(wangpc_wdc_io)
+
+	MCFG_Z80CTC_ADD(MK3882_TAG, 2000000, ctc_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
@@ -166,6 +186,7 @@ wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_WDC, "Wang PC-PM001", tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
+	m_ctc(*this, MK3882_TAG),
 	m_sasibus(*this, SASIBUS_TAG)
 {
 }

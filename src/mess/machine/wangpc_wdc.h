@@ -18,6 +18,7 @@
 #include "imagedev/harddriv.h"
 #include "machine/scsibus.h"
 #include "machine/wangpcbus.h"
+#include "machine/z80ctc.h"
 
 
 
@@ -60,6 +61,7 @@ private:
 	inline void set_irq(int state);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
 	required_device<device_t> m_sasibus;
 
 	UINT8 m_status;
