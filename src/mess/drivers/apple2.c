@@ -728,6 +728,7 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
+	MCFG_MACHINE_START(tk2000)
     MCFG_VIDEO_START(apple2e)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

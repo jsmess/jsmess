@@ -825,6 +825,22 @@ static void apple2_mem_C080(running_machine &machine, offs_t begin, offs_t end, 
 	meminfo->write_handler = &wd;
 }
 
+static void tk2000_mem_C100(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
+{
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    if (state->m_flags & VAR_TK2000RAM)
+    {
+        meminfo->read_mem = 0x00C100;
+        meminfo->write_mem = 0x00C100;
+    }
+    else
+    {
+        meminfo->read_mem = (begin & 0x3fff) | APPLE2_MEM_ROM;
+        meminfo->write_mem = 0x00C100;
+    }
+}
+
 static void apple2_mem_CFFF(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
@@ -1009,6 +1025,19 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 };
 
 
+static const apple2_memmap_entry tk2000_memmap_entries[] =
+{
+	{ 0x0000, 0x01FF, apple2_mem_0000, A2MEM_MONO },
+	{ 0x0200, 0x03FF, apple2_mem_0200, A2MEM_DUAL },
+	{ 0x0400, 0x07FF, apple2_mem_0400, A2MEM_DUAL },
+	{ 0x0800, 0x1FFF, apple2_mem_0800, A2MEM_DUAL },
+	{ 0x2000, 0x3FFF, apple2_mem_2000, A2MEM_DUAL },
+	{ 0x4000, 0xBFFF, apple2_mem_4000, A2MEM_DUAL },
+	{ 0xC000, 0xC07F, apple2_mem_C000, A2MEM_IO },
+	{ 0xC080, 0xC0FF, apple2_mem_C080, A2MEM_IO },
+	{ 0xC100, 0xFFFF, tk2000_mem_C100, A2MEM_DUAL },
+	{ 0 }
+};
 
 void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask)
 {
@@ -1456,6 +1485,20 @@ READ8_MEMBER ( apple2_state::apple2_c05x_r )
 	{
 		UINT32 mask;
 
+        if (m_machinetype == TK2000)
+        {
+            if (offset == 0xa)  // RAM
+            {
+                apple2_setvar(space.machine(), VAR_TK2000RAM, ~0);
+                printf("TK2000: RAM (PC %x)\n", cpu_get_pc(m_maincpu));
+            }
+            else if (offset == 0xb) // ROM
+            {
+                apple2_setvar(space.machine(), 0, ~VAR_TK2000RAM);
+                printf("TK2000: ROM (PC %x)\n", cpu_get_pc(m_maincpu));
+            }
+        }
+
 		/* ANx has reverse SET logic */
 		if (offset >= 8)
 		{
@@ -1794,6 +1837,8 @@ MACHINE_START( apple2 )
 	if (!strcmp(machine.system().name, "apple2cp"))
 		apple2cp_ce00_ram = auto_alloc_array(machine, UINT8, 0x200);
 
+    state->m_machinetype = APPLE_IIEPLUS;
+
 	apple2_init_common(machine);
 
 	/* setup memory */
@@ -1816,6 +1861,8 @@ MACHINE_START( apple2orig )
     // II and II+ have no internal ROM or internal slot 3 h/w, so don't allow these states
     state->m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
 
+    state->m_machinetype = APPLE_II;
+
 	apple2_init_common(machine);
 
 	/* setup memory */
@@ -1829,6 +1876,28 @@ MACHINE_START( apple2orig )
 	apple2_reset(machine);
 }
 
+MACHINE_START( tk2000 )
+{
+	apple2_memmap_config mem_cfg;
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    // II and II+ have no internal ROM or internal slot 3 h/w, so don't allow these states
+    state->m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
+
+    state->m_machinetype = TK2000;
+
+	apple2_init_common(machine);
+
+	/* setup memory */
+	memset(&mem_cfg, 0, sizeof(mem_cfg));
+	mem_cfg.first_bank = 1;
+	mem_cfg.memmap = tk2000_memmap_entries;
+	mem_cfg.auxmem = (UINT8*)NULL;
+	apple2_setup_memory(machine, &mem_cfg);
+
+	/* perform initial reset */
+	apple2_reset(machine);
+}
 
 int apple2_pressed_specialkey(running_machine &machine, UINT8 key)
 {

@@ -40,6 +40,7 @@
 #define VAR_LCRAM2		0x020000
 #define VAR_LCWRITE		0x040000
 #define VAR_ROMSWITCH	0x080000
+#define VAR_TK2000RAM   0x100000        // ROM/RAM switch for TK2000
 
 #define VAR_DHIRES		VAR_AN3
 
@@ -70,6 +71,13 @@
 #define APPLE2_MEM_ROM		0xC0000000
 #define APPLE2_MEM_FLOATING	0xFFFFFFFF
 #define APPLE2_MEM_MASK		0x00FFFFFF
+
+typedef enum
+{
+    APPLE_II,           // Apple II/II+
+    APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
+    TK2000              // Microdigital TK2000
+} machine_type_t;
 
 typedef enum
 {
@@ -157,6 +165,8 @@ public:
 
     UINT8 *m_rambase;
 
+    machine_type_t m_machinetype;
+
     READ8_MEMBER(apple2_c0xx_r);
     WRITE8_MEMBER(apple2_c0xx_w);
     READ8_MEMBER(apple2_c080_r);
@@ -222,6 +232,7 @@ UINT8 apple2_iwm_getdiskreg(running_machine &machine);
 void apple2_init_common(running_machine &machine);
 MACHINE_START( apple2 );
 MACHINE_START( apple2orig );
+MACHINE_START( tk2000 );
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );

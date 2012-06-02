@@ -239,7 +239,14 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 	if (endrow < beginrow)
 		return;
 
-	vram		= state->m_a2_videoram + (page ? 0x4000 : 0x2000);
+    if (state->m_machinetype == TK2000)
+    {
+        vram		= state->m_a2_videoram + (page ? 0xa000 : 0x2000);
+    }
+    else
+    {
+        vram		= state->m_a2_videoram + (page ? 0x4000 : 0x2000);
+    }
 	columns		= ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
 	vram_row[0] = 0;
@@ -476,8 +483,15 @@ SCREEN_UPDATE_IND16( apple2 )
 	/* choose the video mode to draw */
 	if (effective_a2(state) & VAR_TEXT)
 	{
-		/* text screen */
-		apple2_text_draw(machine, bitmap, cliprect, page, 0, 191);
+		/* text screen - TK2000 uses HGR for text */
+        if (state->m_machinetype == TK2000)
+        {
+            apple2_hires_draw(machine, bitmap, cliprect, page, 0, 191);
+        }
+        else
+        {
+            apple2_text_draw(machine, bitmap, cliprect, page, 0, 191);
+        }
 	}
 	else if ((effective_a2(state) & VAR_HIRES) && (effective_a2(state) & VAR_MIXED))
 	{
