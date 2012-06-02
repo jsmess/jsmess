@@ -207,6 +207,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2themill.h"
 #include "machine/a2sam.h"
 #include "machine/a2alfam2.h"
+#include "machine/laser128.h"
 
 /***************************************************************************
     PARAMETERS
@@ -628,6 +629,10 @@ static SLOT_INTERFACE_START(apple2_cards)
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START(laser128_internal)
+    SLOT_INTERFACE("l128int", A2BUS_LASER128)
+SLOT_INTERFACE_END
+
 static SLOT_INTERFACE_START(apple2eaux_cards)
 SLOT_INTERFACE_END
 
@@ -785,6 +790,19 @@ static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( laser128, apple2c )
+	MCFG_MACHINE_START(laser128)
+
+    MCFG_A2BUS_SLOT_REMOVE("sl6")
+
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NULL)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NULL)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NULL)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)     // slots 6 and 7 are hacks for now
+//    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1038,6 +1056,14 @@ ROM_START(las128ex)
 	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(B67C8BA1) SHA1(8BD5F82A501B1CF9D988C7207DA81E514CA254B0))
 ROM_END
 
+ROM_START(las128e2)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+
+	ROM_REGION(0x8700,"maincpu",0)
+    ROM_LOAD( "laser 128ex2 v6.1 rom.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) ) 
+ROM_END
 
 ROM_START(apple2cp)
 	ROM_REGION(0x2000,"gfx1",0)
@@ -1073,8 +1099,8 @@ COMP( 1984, apple2c,  0,        apple2,	  apple2c,	   apple2e,  0,        "Apple
 COMP( 1984, tk2000,   apple2c,  0,   	  tk2000,	   apple2e,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,	   apple2p,  0,        "Video Technology",  "Laser 3000",	GAME_NOT_WORKING )
-COMP( 1987, laser128, apple2c,  0,        apple2c,	   apple2e,  0,        "Video Technology",  "Laser 128 (rev 4)", GAME_NOT_WORKING )
-COMP( 1987, las128ex, apple2c,  0,        apple2c,	   apple2e,  0,        "Video Technology",  "Laser 128ex (rev 4a)", GAME_NOT_WORKING )
+COMP( 1987, laser128, apple2c,  0,        laser128,	   apple2e,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_NOT_WORKING )
+COMP( 1988, las128ex, apple2c,  0,        laser128,	   apple2e,  0,        "Video Technology",  "Laser 128ex (version 4.5)", GAME_NOT_WORKING )
 COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Apple Computer",    "Apple //c (UniDisk 3.5)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c3, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Apple Computer",    "Apple //c (Original Memory Expansion)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c4, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_NOT_WORKING )

@@ -449,7 +449,16 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 	}
 	else
 	{
-		return apple2_slotram_r(space, slotnum, offset);
+        if (m_machinetype == LASER128)
+        {
+            UINT8 *rom = space.machine().root_device().memregion("maincpu")->base();
+            
+            return rom[(offset&0x1ff) + 0x4200];
+        }
+        else 
+        {
+            return apple2_slotram_r(space, slotnum, offset);
+        }
 	}
 
 	// else fall through to floating bus
@@ -1846,6 +1855,27 @@ MACHINE_START( apple2 )
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	apple2_setup_memory(machine, &mem_cfg);
+
+	/* perform initial reset */
+	apple2_reset(machine);
+}
+
+MACHINE_START( laser128 )
+{
+	apple2_memmap_config mem_cfg;
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    state->m_flags_mask = 0;
+    state->m_machinetype = LASER128;
+
+	apple2_init_common(machine);
+
+	/* setup memory */
+	memset(&mem_cfg, 0, sizeof(mem_cfg));
+	mem_cfg.first_bank = 1;
+	mem_cfg.memmap = apple2_memmap_entries;
+	mem_cfg.auxmem = (UINT8*)NULL;
 	apple2_setup_memory(machine, &mem_cfg);
 
 	/* perform initial reset */

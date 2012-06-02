@@ -76,7 +76,8 @@ typedef enum
 {
     APPLE_II,           // Apple II/II+
     APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
-    TK2000              // Microdigital TK2000
+    TK2000,             // Microdigital TK2000
+    LASER128            // Laser 128/128EX/128EX2
 } machine_type_t;
 
 typedef enum
@@ -233,6 +234,7 @@ void apple2_init_common(running_machine &machine);
 MACHINE_START( apple2 );
 MACHINE_START( apple2orig );
 MACHINE_START( tk2000 );
+MACHINE_START( laser128 );
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
