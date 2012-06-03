@@ -21248,6 +21248,8 @@ Alternate board (XL-1)
 
 	<software name="mk">
 		<!-- single cartridge source: Badablek -->
+		<!-- Notes: this cartridge contains the version 1.1 of the rom and an overlay 32k patch which upgrades it to version 1.2
+		            we don't know if there is a revision which consists of the version 1.1 rom only, without the patch -->
 		<description>Mortal Kombat (Euro, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -21260,16 +21262,13 @@ Alternate board (XL-1)
 			<feature name="u4" value="U4 LS32" />
 			<feature name="u5" value="U5 LS32" />
 			<feature name="u6" value="U6 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="" />
-<!--  Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping
-			<dataarea name="rom" size="524288">
-				<rom name="spal-kx-1.u2"   size="2097152" crc="" sha1="" offset="0x000000" />
-				<rom name="spal-kx-ext.u1" size="4096"    crc="" sha1="" offset="0x000000" />
-			</dataarea>
--->
+			<!--  Notes: The u1 rom is a patch over the u2 rom, so this is the correct mapping -->
 			<dataarea name="rom" size="2097152">
-				<rom name="mortal kombat (europe) (rev 1).sfc" size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
+				<rom name="spal-kx-1.u2"   size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
+				<rom name="spal-kx-ext.u1" size="32768"   crc="ffdb34f7" sha1="6526c6a75121fba961b6bdc4e4b0f76a81fc9995" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24134,6 +24133,19 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="street fighter iii - super version 12 players (unl).sfc" size="2097152" crc="ddff8ce8" sha1="e111dc69b5eec494044d1159d359decf9b01cb6a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="super20m" supported="no"> <!-- not working probably due to custom bankswitching -->
+		<!-- single cartridge source: d4s -->
+		<description>Super 20 Collection (Korea)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="c20h.u1" size="1048576" crc="ac19b8f4" sha1="3a64c817ff3fc3819f2fd726868b6f27eb4523df" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
