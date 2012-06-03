@@ -705,15 +705,6 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
 MACHINE_CONFIG_END
 
-ROM_START(las3000)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
-
-	ROM_REGION(0x8700,"maincpu",0)
-	ROM_LOAD ( "las3000.rom", 0x0000, 0x8000, CRC(9C7AEB09) SHA1(3302ADF41E258CF50210C19736948C8FA65E91DE))
-	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
-ROM_END
-
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
     MCFG_VIDEO_START(apple2e)
 	/* internal ram */
@@ -940,16 +931,6 @@ ROM_START(apple2e)
 //  ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
-ROM_START(apple2ez)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
-	ROM_LOAD ( "342-0133-a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
-
-	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
-	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-ROM_END
-
 ROM_START(mprof3)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
@@ -1038,6 +1019,16 @@ ROM_START(apple2c4)
 	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
 ROM_END
 
+ROM_START(las3000)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+
+	ROM_REGION(0x8700,"maincpu",0)
+	ROM_LOAD ( "las3000.rom", 0x4000, 0x4000, CRC(9C7AEB09) SHA1(3302ADF41E258CF50210C19736948C8FA65E91DE))
+    ROM_CONTINUE(0x0000, 0x4000)
+	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
+ROM_END
+
 ROM_START(laser128)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
@@ -1084,6 +1075,18 @@ ROM_START(ivelultr)
 	ROM_LOAD ( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
 ROM_END
 
+ROM_START(space84)
+	ROM_REGION(0x2000,"gfx1",0)
+    ROM_LOAD( "space 84 mobo chargen.bin", 0x0000, 0x2000, CRC(ceb98990) SHA1(8b2758da611bcfdd3d144edabc63ef1df2ca787b) )
+
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+    ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, CRC(4e741069) SHA1(ca1f16da9fb40e966ee4a899964cd6a7e140ab50))
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
 COMP( 1977, apple2,   0,        0,        apple2,      apple2,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
 COMP( 1979, apple2p,  apple2,   0,        apple2p,	   apple2p,  0,        "Apple Computer",    "Apple ][+", GAME_SUPPORTS_SAVE )
@@ -1106,5 +1109,7 @@ COMP( 1986, apple2c3, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Appl
 COMP( 1986, apple2c4, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_NOT_WORKING )
 COMP( 1988, apple2cp, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Apple Computer",    "Apple //c Plus", GAME_SUPPORTS_SAVE )
 COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
-COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING)
+COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
+COMP( 1985, space84,  apple2,   0,        apple2p,	   apple2p,  0,        "ComputerTechnik/IBS",  "Space 84",	GAME_NOT_WORKING )
+
