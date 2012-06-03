@@ -37,12 +37,13 @@ static const floppy_interface ibmpc_floppy_interface =
 
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_interrupt );
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq );
+static UPD765_GET_IMAGE ( pc_fdc_get_image );
 
 const upd765_interface pc_fdc_upd765_not_connected_interface =
 {
 	DEVCB_LINE(pc_fdc_hw_interrupt),
 	DEVCB_LINE(pc_fdc_hw_dma_drq),
-	NULL,
+	pc_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
@@ -136,6 +137,12 @@ static device_t *get_floppy_subdevice(device_t *device, int drive)
 	return NULL;
 }
 
+static UPD765_GET_IMAGE ( pc_fdc_get_image )
+{
+	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device->owner());
+
+	return get_floppy_subdevice(fdc, fdc->digital_output_register & 0x03);
+}
 
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_set_tc_state)
 {

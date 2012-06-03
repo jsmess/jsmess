@@ -2314,6 +2314,7 @@ void upd765_reset(device_t *device, int offset)
 
 		// HACK signal ready changed for all drives
 		fdc->ready_changed = 0x0f;
+		fdc->drive = 0;
 
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
         do not set not-ready - need to check with pc_fdc.c whether all drives
