@@ -23777,8 +23777,8 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="" /> <!-- epoxy board with surface mounted cic -->
 			<feature name="cart_model" value="SNS-006" />
-			<dataarea name="rom" size="1048576">
-				<rom name="u1" size="1048576" crc="752a25d3" sha1="a8585b3e61c610af18a077dd1a2ea3d0aa25dda8" offset="0x000000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="2097152" crc="752a25d3" sha1="a8585b3e61c610af18a077dd1a2ea3d0aa25dda8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23789,8 +23789,8 @@ Alternate board (XL-1)
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="aladdin 2000 (mega drive bootleg) (cracked).sfc" size="1048576" crc="a818cfd5" sha1="1de9a68980cac63346e3cda14a5aa0d6cea8b739" offset="0x000000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="aladdin 2000 (mega drive bootleg) (cracked).sfc" size="2097152" crc="a818cfd5" sha1="1de9a68980cac63346e3cda14a5aa0d6cea8b739" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
