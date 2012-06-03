@@ -7,18 +7,12 @@
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 8748 processor and is an intelligent device.
 
-    There are 2 major problems preventing this driver from working
-
-    - MESS is not capable of conducting realtime serial communications between devices
-
-    - MAME's z80sio implementation is lacking important deatures:
-    -- cannot change baud rate on the fly
-    -- cannot specify different rates for each channel
-    -- cannot specify different rates for Receive and Transmit
-    -- the callback doesn't appear to support channel B ??
-
-
     Things that need doing:
+
+    - MAME's z80sio implementation is unusable at this time. Needs proper callback
+      mechanism for both channels, and interface to modern standards.
+
+    - When z80sio gets updated, then see about getting keyboard to work as a serial device.
 
     - Kaypro2x/4a are not booting.
 
@@ -28,9 +22,10 @@
     - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
       to be worked out.
 
-    - RTC type MM58167A to be added.
+    - RTC type MM58167A to be added. Modem chips TMS99531, TMS99532 to be developed.
 
-    - All models: Cannot read the floppy disk any more since someone modified the WD controller.
+    - Regression all models: Cannot read the floppy disk any more since someone modified the
+      WD controller.
 
 **************************************************************************************************/
 
@@ -54,10 +49,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, stt_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80sio", kaypro_sio_r, kaypro_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80pio_g", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(kayproii_baud_b_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVWRITE("brg", com8116_device, str_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
@@ -65,9 +60,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8, kaypro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, str_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80sio", kaypro_sio_r, kaypro_sio_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(kaypro2x_baud_a_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("brg", com8116_device, stt_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80sio_2x", z80sio_cd_ba_r, z80sio_cd_ba_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro2x_system_port_r,kaypro2x_system_port_w)
@@ -165,6 +160,30 @@ static const mc6845_interface kaypro2x_crtc = {
 	NULL
 };
 
+//static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
+//{
+//	downcast<z80sio_device *>(device)->rx_clock_in();
+//	downcast<z80sio_device *>(device)->tx_clock_in();
+//}
+
+static COM8116_INTERFACE( kayproii_brg_intf )
+{
+	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL, //  DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w), z80sio implementation has no clock pin
+	DEVCB_NULL, // DEVCB_DEVICE_LINE("z80sio", rx_tx_b_w),
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
+};
+
+static COM8116_INTERFACE( kaypro2x_brg_intf )
+{
+	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio_2x", rx_tx_a_w),
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
+};
+
 
 /***********************************************************
 
@@ -201,6 +220,7 @@ static const floppy_interface kayproii_floppy_interface =
 	NULL,
 	NULL
 };
+
 static const floppy_interface kaypro2x_floppy_interface =
 {
 	DEVCB_LINE(wd17xx_idx_w),
@@ -216,7 +236,7 @@ static const floppy_interface kaypro2x_floppy_interface =
 
 static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_5MHz)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kayproii_io)
 	MCFG_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
@@ -246,6 +266,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kayproii_brg_intf)	// WD1943, SMC8116
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
@@ -254,14 +275,13 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
-
 	MCFG_DEVICE_REMOVE("z80pio_s")
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kaypro4_pio_s_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kaypro2x_io)
 	MCFG_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
@@ -291,6 +311,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kaypro2x_brg_intf)	// WD1943, SMC8116
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
 

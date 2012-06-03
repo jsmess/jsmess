@@ -199,7 +199,6 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 /***********************************************************************
 
     SIO
-    Baud rate setup commented out until MAME includes the feature.
 
     On Kaypro2x, Channel B on both SIOs is hardwired to 300 baud.
 
@@ -207,7 +206,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 ************************************************************************/
 
-/* Set baud rate. bits 0..3 Rx and Tx are tied together. Baud Rate Generator is a AY-5-8116, SMC8116, etc.
+/* Set baud rate. bits 0..3 Rx and Tx are tied together. Baud Rate Generator is a AY-5-8116, SMC8116, WD1943, etc.
     00h    50
     11h    75
     22h    110
@@ -225,31 +224,6 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     EEh    9600
     FFh    19200 */
 
-//static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
-
-WRITE8_MEMBER( kaypro_state::kaypro_baud_a_w )	/* channel A - RS232C */
-{
-//  data &= 0x0f;
-
-//  z80sio_set_rx_clock( m_sio, baud_clock[data], 0);
-//  z80sio_set_tx_clock( m_sio, baud_clock[data], 0);
-}
-
-WRITE8_MEMBER( kaypro_state::kayproii_baud_b_w )	/* Channel B - Keyboard - only usable speed is 300 baud */
-{
-//  data &= 0x0f;
-
-//  z80sio_set_rx_clock( m_sio, baud_clock[data], 1);
-//  z80sio_set_tx_clock( m_sio, baud_clock[data], 1);
-}
-
-WRITE8_MEMBER( kaypro_state::kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
-{
-//  data &= 0x0f;
-
-//  z80sio_set_rx_clock( m_sio2x, baud_clock[data], 0);
-//  z80sio_set_tx_clock( m_sio2x, baud_clock[data], 0);
-}
 
 const z80sio_interface kaypro_sio_intf =
 {

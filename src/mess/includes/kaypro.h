@@ -3,6 +3,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
+#include "machine/com8116.h"
 #include "machine/ctronics.h"
 #include "machine/wd17xx.h"
 #include "formats/basicdsk.h"
@@ -29,10 +30,10 @@ public:
 	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_pio_g;
-	optional_device<device_t> m_pio_s;
-	required_device<device_t> m_sio;
-	optional_device<device_t> m_sio2x;
+	optional_device<z80pio_device> m_pio_g;
+	optional_device<z80pio_device> m_pio_s;
+	required_device<z80sio_device> m_sio;
+	optional_device<z80sio_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_fdc;
 	optional_device<mc6845_device> m_crtc;
@@ -41,9 +42,6 @@ public:
 	DECLARE_READ8_MEMBER(kaypro2x_system_port_r);
 	DECLARE_READ8_MEMBER(kaypro2x_status_r);
 	DECLARE_READ8_MEMBER(kaypro2x_videoram_r);
-	DECLARE_WRITE8_MEMBER(kaypro_baud_a_w);
-	DECLARE_WRITE8_MEMBER(kayproii_baud_b_w);
-	DECLARE_WRITE8_MEMBER(kaypro2x_baud_a_w);
 	DECLARE_WRITE8_MEMBER(kaypro2x_system_port_w);
 	DECLARE_WRITE8_MEMBER(kaypro2x_index_w);
 	DECLARE_WRITE8_MEMBER(kaypro2x_register_w);
