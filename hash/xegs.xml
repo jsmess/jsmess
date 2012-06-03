@@ -25,7 +25,7 @@ Compiled by K1W1
 
 <!-- ROM's that have been dumped from at least 2 independant sources and have the same CRC's, have been marked as "Verified". -->
 
-	<software name="ace">
+	<software name="aceoface">
 		<description>Ace of Aces</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>

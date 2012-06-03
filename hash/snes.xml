@@ -20009,7 +20009,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wworld">
+	<software name="carmnwld">
 		<description>Where in the World is Carmen Sandiego? (Euro)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -53119,7 +53119,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wworldu" cloneof="wworld">
+	<software name="carmnwldu" cloneof="carmnwld">
 		<description>Where in the World is Carmen Sandiego? (USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -53131,7 +53131,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wtime">
+	<software name="carmntim">
 		<description>Where in Time is Carmen Sandiego? (USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>

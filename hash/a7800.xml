@@ -212,7 +212,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="aceu" cloneof="ace">
+	<software name="aceofaceu" cloneof="aceoface">
 		<description>Ace of Aces (NTSC)</description>
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>
@@ -226,7 +226,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="ace">
+	<software name="aceoface">
 		<description>Ace of Aces (PAL)</description>
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>

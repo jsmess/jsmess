@@ -38883,7 +38883,7 @@
 		</part>
 	</software>
 
-	<software name="wtime">
+	<software name="carmntim">
 		<description>Where in Time is Carmen Sandiego? (USA)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -38905,7 +38905,7 @@
 	</software>
 
 <!-- this was found on a proto cart, but the program is the same as the final -->
-	<software name="wtime1" cloneof="wtime">
+	<software name="carmntim1" cloneof="carmntim">
 		<description>Where in Time is Carmen Sandiego? (USA, TKEPROM pcb)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>

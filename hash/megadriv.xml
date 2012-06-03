@@ -1421,6 +1421,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="psycho1" cloneof="psycho">
+		<description>Psycho Pinball (Euro, 199409)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SR16V4-0" />
+			<dataarea name="rom" size="1572864">
+				<rom name="mdpp021f.bin" size="1572864" crc="11e9c3f2" sha1="2ea7befb7e52334111385667030ceb647157a397" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Old scrambled/interleaved dumps -->
 
 	<software name="13mahjan">
@@ -16780,17 +16792,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="psycho1" cloneof="psycho">
-		<description>Psycho Pinball (Euro, 199409)</description>
-		<year>1994</year>
-		<publisher>Codemasters</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="psycho pinball (euro) (september 1994).bin" size="1572864" crc="11e9c3f2" sha1="2ea7befb7e52334111385667030ceb647157a397" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="puggsy">
 		<description>Puggsy (Euro)</description>
 		<year>1993</year>
@@ -24044,7 +24045,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wworld">
+	<software name="carmnwld">
 		<description>Where in the World Is Carmen Sandiego? (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -24055,7 +24056,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wworldb" cloneof="wworld">
+	<software name="carmnwldb" cloneof="carmnwld">
 		<description>Where in the World Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
@@ -24066,7 +24067,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wtime">
+	<software name="carmntim">
 		<description>Where in Time Is Carmen Sandiego? (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -24077,7 +24078,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wtimeb" cloneof="wtime">
+	<software name="carmntimb" cloneof="carmntim">
 		<description>Where in Time Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>

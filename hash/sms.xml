@@ -6568,7 +6568,7 @@
 		</part>
 	</software>
 
-	<software name="wworld">
+	<software name="carmnwld">
 		<description>Where in the World is Carmen Sandiego? (USA)</description>
 		<year>1989</year>
 		<publisher>Parker Brothers</publisher>
@@ -6580,7 +6580,7 @@
 		</part>
 	</software>
 
-	<software name="wworldb" cloneof="wworld">
+	<software name="carmnwldb" cloneof="carmnwld">
 		<description>Where in the World is Carmen Sandiego? (Bra)</description>
 		<year>1989</year>
 		<publisher>Tec Toy</publisher>
