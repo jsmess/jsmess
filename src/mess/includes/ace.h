@@ -27,8 +27,7 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG)
-	 ,
+		  m_ram(*this, RAM_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_char_ram(*this, "char_ram"){ }
 

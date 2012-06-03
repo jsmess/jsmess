@@ -34,7 +34,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ctc;
+	required_device<z80ctc_device> m_ctc;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 
@@ -54,9 +54,6 @@ public:
 	UINT8 m_lednum;
 
 	emu_timer *m_led_refresh_timer;
-
-	/* devices */
-	device_t *m_z80ctc;
 };
 
 #endif

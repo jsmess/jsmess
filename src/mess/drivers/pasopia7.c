@@ -45,8 +45,8 @@ public:
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
-	required_device<device_t> m_ctc;
-	required_device<device_t> m_pio;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_sn1;

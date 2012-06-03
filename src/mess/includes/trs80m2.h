@@ -50,8 +50,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t>m_ctc;
-	required_device<device_t> m_pio;
+	required_device<z80ctc_device>m_ctc;
+	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<centronics_device> m_centronics;

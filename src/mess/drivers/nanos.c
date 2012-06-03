@@ -40,13 +40,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pio;
-	required_device<device_t> m_pio_0;
-	required_device<device_t> m_pio_1;
-	required_device<device_t> m_sio_0;
-	required_device<device_t> m_sio_1;
-	required_device<device_t> m_ctc_0;
-	required_device<device_t> m_ctc_1;
+	required_device<z80pio_device> m_pio;
+	required_device<z80pio_device> m_pio_0;
+	required_device<z80pio_device> m_pio_1;
+	required_device<z80sio_device> m_sio_0;
+	required_device<z80sio_device> m_sio_1;
+	required_device<z80ctc_device> m_ctc_0;
+	required_device<z80ctc_device> m_ctc_1;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_key_t;
 	const UINT8 *m_p_chargen;
@@ -574,6 +574,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1985, nanos,  0,       0, 	nanos,	nanos,	 0, 	  "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "NANOS",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                                              FULLNAME       FLAGS */
+COMP( 1985, nanos,  0,      0,       nanos,     nanos,    0,   "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow", "NANOS", GAME_NOT_WORKING | GAME_NO_SOUND)

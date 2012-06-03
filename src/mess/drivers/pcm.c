@@ -84,11 +84,11 @@ public:
 		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pio_s;
-	required_device<device_t> m_pio_u;
-	required_device<device_t> m_sio;
-	required_device<device_t> m_ctc_s;
-	required_device<device_t> m_ctc_u;
+	required_device<z80pio_device> m_pio_s;
+	required_device<z80pio_device> m_pio_u;
+	required_device<z80sio_device> m_sio;
+	required_device<z80ctc_device> m_ctc_s;
+	required_device<z80ctc_device> m_ctc_u;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER( pcm_84_r );

@@ -70,8 +70,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_6845;
-	required_device<device_t> m_ctc_84;
-	required_device<device_t> m_ctc_88;
+	required_device<z80ctc_device> m_ctc_84;
+	required_device<z80ctc_device> m_ctc_88;
 	required_device<device_t> m_fdc;
 	//required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;

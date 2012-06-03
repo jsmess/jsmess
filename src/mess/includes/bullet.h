@@ -46,9 +46,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ctc;
-	required_device<device_t> m_dart;
-	required_device<device_t> m_dmac;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80dart_device> m_dart;
+	required_device<z80dma_device> m_dmac;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;

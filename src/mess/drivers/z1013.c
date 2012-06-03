@@ -32,9 +32,8 @@ public:
 	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass(*this, CASSETTE_TAG)
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_cass(*this, CASSETTE_TAG),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;

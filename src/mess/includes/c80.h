@@ -25,7 +25,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pio1;
+	required_device<z80pio_device> m_pio1;
 	required_device<cassette_image_device> m_cassette;
 
 	virtual void machine_start();
