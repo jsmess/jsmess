@@ -248,4 +248,4 @@ ROM_END
 
 /*    YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
 CONS( 1980,  chesstrv,  0,      0,      chesstrv,    chesstrv,    0,   "Acetronic", "Chess Traveller", GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )
-CONS( 198?,  borisdpl,  0,      0,      borisdpl,    borisdpl,    0,   "Boris",     "Diplomat",        GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )
+CONS( 1979,  borisdpl,  0,      0,      borisdpl,    borisdpl,    0,   "Applied Concepts",  "Boris Diplomat",        GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )
