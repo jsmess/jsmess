@@ -26961,6 +26961,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="asscreed" cloneof="dlair">
+		<description>Assassins Creed (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="assassins creed (unl).bin" size="1048576" crc="3f2d6ccc" sha1="93817b17124dfc0fe4f5d00224229ed797817e69" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="avatar" cloneof="jimpower">
 		<description>Avatar (Rus)</description>
 		<year>199?</year>
@@ -27230,6 +27241,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+    <software name="iraqwara" cloneof="iraqwar">
+	<!-- Look the Same as iraqwar -->
+		<description>Iraq War 2003 (Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="iraq war 2003 (alt) (unl).bin" size="1048576" crc="23689237" sha1="79b51f6fd87c4ac96438d57f8af48934c7ffc055" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kolobok">
 		<!-- This is an homebrew port of "Uwol - Quest For Money" for ZX Spectrum -->
 		<!-- Apparently it got burned to real carts and sold in Russia -->
@@ -27458,6 +27481,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="pokecda" cloneof="pokecd">
+		<description>Pokemon Crazy Drummer (Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon crazy drummer (unl).bin" size="2097152" crc="84f49061" sha1="5d8122e9aa855ad2fd7cd0f94cbb79d3dc37c6b9" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rhl2k7" cloneof="nhlpa93">
 		<description>RHL 2007 (Rus)</description>
 		<year>199?</year>
@@ -27525,6 +27559,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="snow queen (unl).bin" size="2097152" crc="e6c07946" sha1="69dfe717498179d82d14749db642305d12f213fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spykids4" cloneof="dinotale">
+		<description>Spy Kids 4 - All The Time In The World (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="spy kids 4.bin" size="2097152" crc="9a045ea3" sha1="4849b577b91d8783d8845336c0b12a8a20d4f66b" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27650,6 +27695,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="wario land 3 (unl).bin" size="1048576" crc="cd5c93a5" sha1="3ace8ce26aab6fb5d47e690aa74e989c45fbcb75" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winx" cloneof="valis">
+		<description>Winx - Shkola Volshyebnits (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Винкс Школа волшебниц"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="winx (rus).bin" size="2097152" crc="16bde3e0" sha1="7462d7a7fd1c4954fb84a7064895e9dfe23f1935" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
