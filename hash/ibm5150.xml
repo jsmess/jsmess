@@ -150,15 +150,29 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="archon">
+	<software name="archon" supported="no">
 		<description>Archon - The Light and the Dark</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Free Fall Associates" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
+			<!--- Bad Dump? Doesn't work at all. MESS say invalid Image -->
 			<dataarea name="flop" size="204800">
 				<rom name="archon.img" size="204800" crc="484ebbbd" sha1="4a913c1310ad590b6947dd6ceb69e187bcb641f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon1" supported="no"> <!--Doesn't boot-->
+		<description>Archon - The Light and the Dark (Alt)</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Free Fall Associates" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="51215">
+				<rom name="archon.img" size="51215" crc="faa51229" sha1="b5cd00279d93ceceba11fc8921947d2c50785d20" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -214,7 +228,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="bcwolfen">
 		<description>Beyond Castle Wolfenstein</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Muse Software</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -224,7 +238,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="bigtop">
+	<software name="bigtop" supported="no">
 		<description>Big Top [cr]</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
@@ -1349,6 +1363,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="mule">
+		<description>M.U.L.E.</description>
+		<year>1985</year>
+		<publisher>Electronic Arts, Inc. / IBM</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88908">
+				<rom name="mule.td0" size="88908" crc="96257ba1" sha1="ea5704dcd1bf289a0d8ab9cce578f97560b0346f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulecr" cloneof="mule">
+		<description>M.U.L.E. (Cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts, Inc. / IBM</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="mule (cr).img" size="184320" crc="5e0e758b" sha1="64081a590ab59a9836260c172b82aff0a4d855ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zindrnef">
 		<description>Murder On The Zinderneuf</description>
 		<year>1984</year>
@@ -2088,7 +2126,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr3">
-		<description>wizardry III: The Legacy of Llylgamyn</description>
+		<description>Wizardry III: The Legacy of Llylgamyn</description>
 		<year>1986</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2105,7 +2143,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr4">
-		<description>wizardry IV: The Return of Werdna</description>
+		<description>Wizardry IV: The Return of Werdna</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2117,7 +2155,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr5">
-		<description>wizardry V: Heart of the Maelstrom</description>
+		<description>Wizardry V: Heart of the Maelstrom</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2177,8 +2215,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="zork">
-		<description>Zork I: The Great Underground Empire</description>
-		<year>1982</year>
+		<description>Zork: The Great Underground Empire</description>
+		<year>1980</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -2188,9 +2226,21 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="zork2">
+		<description>Zork II - The Wizard of Frobozz</description>
+		<year>1981</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="zork ii - the wizard of frobozz.img" size="163840" crc="24356f71" sha1="b0d61565dc64ba4e040a4f32344422e62c0f8c4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zork3">
 		<description>Zork III: The Dungeon Master</description>
-		<year>1984</year>
+		<year>1982</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -2235,4 +2285,32 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- These won't work as emulation of floppy drive emulation isn't complete enough-->
+
+	<software name="baddudes" supported="no">
+		<description>Bad Dudes</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="656393">
+				<rom name="bad dudes.td0" size="656393" crc="dc74c1ce" sha1="e28ff95cb1793d08a1e373a7096f9024aa1f0d89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys" supported="no">
+		<description>Ancient Land of Ys</description>
+		<year>1989</year>
+		<publisher>Kyodia Software Marketing</publisher>
+		<info name="usage" value="PC Booter" />
+		<info name="Origin Publisher" value="日本ファルコム (Nihon Falcom)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697170">
+				<rom name="ancient land of ys.td0" size="697170" crc="2ce1c65b" sha1="3e24853872cf98e10983c51ff51159dc7a61e063" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
