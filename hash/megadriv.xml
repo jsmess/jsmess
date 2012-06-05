@@ -13371,6 +13371,29 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- This was compiled from the source code
+Thanks goes to the original developers for releasing the source,
+and to MetalliC for spending time to compile it
+
+NOTE: several roms exist for this game
+- CRC: 4b8fc40d (2012-04-10) -  only part of the source of the levels was compiled
+- CRC: 7b4bc885 (2012-04-10) -  all levels compiled, but not working
+- CRC: 7674414a (2012-04-10) -  all levels compiled, working (but e.g. glitch if you pause the game)
+- CRC: 2bfcaa3e (2012-04-25) - final rom assembled by hand from the binary code (the glitches above were due to the routine used to create the rom from the binary)
+Notice that these are not working on real hardware due to bugged code with VDP init (and/or interrupts)
+- CRC: 237fb077 (2012-04-25) - 'fixed' version for hardware which patches the source code to make the game work on a console
+ -->
+	<software name="mrnutz2">
+		<description>Mr. Nutz - Hoppin' Mad (Prototype)</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mr. nutz - hoppin' mad (proto).bin" size="1048576" crc="2bfcaa3e" sha1="ef942681a5b68f3bd95cda10a03d8c15488d88f3" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mspacman">
 		<description>Ms. Pac-Man (Euro, USA)</description>
 		<year>1991</year>
@@ -27487,7 +27510,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="pokemon crazy drummer (unl).bin" size="2097152" crc="84f49061" sha1="5d8122e9aa855ad2fd7cd0f94cbb79d3dc37c6b9" offset="00000" loadflag="load16_word_swap" />
+				<rom name="pokemon crazy drummer (unl) [a].bin" size="2097152" crc="84f49061" sha1="5d8122e9aa855ad2fd7cd0f94cbb79d3dc37c6b9" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
