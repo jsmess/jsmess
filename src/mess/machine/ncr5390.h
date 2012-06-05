@@ -3,15 +3,17 @@
 
 #include "machine/nscsi_bus.h"
 
-#define MCFG_NCR5390_ADD(_tag, _subtag, _clock, _irq, _drq)	\
-	MCFG_NSCSI_DEVICE_ADD(_tag, _subtag, NCR5390, _clock)	\
-	downcast<ncr5390_device *>(device)->set_cb(_irq, _drq);
+struct ncr5390_interface
+{
+    devcb_write_line	m_irq_cb;
+    devcb_write_line	m_drq_cb;
+};
 
-class ncr5390_device : public nscsi_device
+class ncr5390_device : public nscsi_device,
+					   public ncr5390_interface
 {
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void set_cb(line_cb_t irq_cb, line_cb_t drq_cb);
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -43,6 +45,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -189,8 +192,9 @@ private:
 
 	bool irq, drq;
 
-	line_cb_t irq_cb, drq_cb;
-
+	devcb_resolved_write_line	m_irq_func;
+	devcb_resolved_write_line	m_drq_func;
+	
 	void dma_set(int dir);
 	void drq_set();
 	void drq_clear();

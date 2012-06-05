@@ -100,8 +100,8 @@ public:
 	void power_irq(bool state);
 	void nmi_irq(bool state);
 
-	void scsi_irq(bool state);
-	void scsi_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);

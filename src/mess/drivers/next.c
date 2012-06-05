@@ -782,12 +782,12 @@ void next_state::mo_drq(bool state)
 	dma_drq_w(5, state);
 }
 
-void next_state::scsi_irq(bool state)
+WRITE_LINE_MEMBER(next_state::scsi_irq)
 {
 	irq_set(12, state);
 }
 
-void next_state::scsi_drq(bool state)
+WRITE_LINE_MEMBER(next_state::scsi_drq)
 {
 	dma_drq_w(1, state);
 }
@@ -931,7 +931,14 @@ SLOT_INTERFACE_END
 static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
+	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
+
+static const ncr5390_interface next_ncr5390_interface =
+{
+	 DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_irq),
+	 DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_drq)
+};
 
 static MACHINE_CONFIG_START( next_base, next_state )
 
@@ -952,16 +959,14 @@ static MACHINE_CONFIG_START( next_base, next_state )
 					 line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
 					 line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
 					 line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, 0)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, 0)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, 0)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, 0)
-	MCFG_NCR5390_ADD("scsibus:7", "ncr5390", 10000000,
-					 line_cb_t(FUNC(next_state::scsi_irq), static_cast<next_state *>(owner)),
-					 line_cb_t(FUNC(next_state::scsi_drq), static_cast<next_state *>(owner)))
+	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, 0, 0, 0, false)
+	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", 0, &next_ncr5390_interface, 10000000, true)
 	MCFG_MB8795_ADD("net",
 					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::net_rx_irq), static_cast<next_state *>(owner)),
