@@ -1553,6 +1553,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_VIDEO)/x68k.o		\
 	$(MESS_MACHINE)/x68kexp.o	\
 	$(MESS_MACHINE)/x68k_neptunex.o	\
+	$(MESS_MACHINE)/x68k_scsiext.o	\
 	$(MESS_MACHINE)/x68k_hdc.o	\
 	$(MESS_MACHINE)/mb89352.o	\
 	$(MESS_DRIVERS)/mz80.o		\

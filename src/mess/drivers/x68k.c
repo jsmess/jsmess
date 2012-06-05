@@ -108,7 +108,6 @@
       Pacmania:      Black squares on the maze (transparency?).
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
                      Some text is drawn incorrectly.
-      Kyukyoku Tiger:Sprites offset by a looooong way.
       Dragon Buster: Text is black and unreadable. (Text layer actually covers it)
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
@@ -140,6 +139,7 @@
 #include "machine/nvram.h"
 #include "machine/x68kexp.h"
 #include "machine/x68k_neptunex.h"
+#include "machine/x68k_scsiext.h"
 #include "machine/scsihd.h"
 #include "x68000.lh"
 
@@ -2559,7 +2559,8 @@ static X68K_EXPANSION_INTERFACE(x68k_exp_intf)
 };
 
 static SLOT_INTERFACE_START(x68000_exp_cards)
-	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX)
+	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
+	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
 SLOT_INTERFACE_END
 
 static MACHINE_RESET( x68000 )
