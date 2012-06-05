@@ -96,7 +96,7 @@ void x68k_scsiext_device::device_reset()
 
 void x68k_scsiext_device::irq_w(int state)
 {
-	m_slot->irq2(state);  // correct?  Or perhaps selectable?
+	m_slot->irq2_w(state);  // correct?  Or perhaps selectable?
 }
 
 void x68k_scsiext_device::drq_w(int state)
