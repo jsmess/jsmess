@@ -21,13 +21,13 @@ static const SCSIConfigTable x68k_scsiext_devtable =
 {
 	7,                                      /* 7 SCSI devices */
 	{
-		{ SCSI_ID_0, "extharddisk0" },
-		{ SCSI_ID_1, "extharddisk1" },
-		{ SCSI_ID_2, "extharddisk2" },
-		{ SCSI_ID_3, "extharddisk3" },
-		{ SCSI_ID_4, "extharddisk4" },
-		{ SCSI_ID_5, "extharddisk5" },
-		{ SCSI_ID_6, "extharddisk6" },
+		{ SCSI_ID_0, ":exp:cz6bs1:extharddisk0" },
+		{ SCSI_ID_1, ":exp:cz6bs1:extharddisk1" },
+		{ SCSI_ID_2, ":exp:cz6bs1:extharddisk2" },
+		{ SCSI_ID_3, ":exp:cz6bs1:extharddisk3" },
+		{ SCSI_ID_4, ":exp:cz6bs1:extharddisk4" },
+		{ SCSI_ID_5, ":exp:cz6bs1:extharddisk5" },
+		{ SCSI_ID_6, ":exp:cz6bs1:extharddisk6" },
 	}
 };
 
@@ -44,7 +44,7 @@ static const mb89352_interface x68k_scsiext_intf =
 
 ROM_START( x68k_cz6bs1 )
 	ROM_REGION( 0x10000, "scsiexrom", 0 )
-	ROM_LOAD( "scsiexrom.bin",   0x0000, 0x2000, CRC(7be488de) SHA1(49616c09a8986ffe6a12ad600febe512f7ba8ae4) )
+	ROM_LOAD16_WORD_SWAP( "scsiexrom.bin",   0x0000, 0x2000, CRC(7be488de) SHA1(49616c09a8986ffe6a12ad600febe512f7ba8ae4) )
 ROM_END
 
 const rom_entry *x68k_scsiext_device::device_rom_region() const
@@ -83,8 +83,8 @@ void x68k_scsiext_device::device_start()
 	astring temp;
 	address_space* space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
-	space->install_read_bank(0xea0000,0xea1fff,0,0,"scsi_ext");
-	space->unmap_write(0xea0000,0xea1fff,0,0);
+	space->install_read_bank(0xea0020,0xea1fff,0,0,"scsi_ext");
+	space->unmap_write(0xea0020,0xea1fff,0,0);
 	ROM = machine().root_device().memregion(subtag(temp,"scsiexrom"))->base();
 	machine().root_device().membank("scsi_ext")->set_base(ROM);
 	space->install_readwrite_handler(0xea0000,0xea001f,0,0,read8_delegate(FUNC(x68k_scsiext_device::register_r),this),write8_delegate(FUNC(x68k_scsiext_device::register_w),this),0x00ff00ff);
