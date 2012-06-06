@@ -7,6 +7,16 @@
 
 **********************************************************************/
 
+/*
+	
+	TODO:
+
+	- cursor
+	- scroll
+	- option bit 1?
+
+*/
+
 #include "wangpc_lvc.h"
 
 
@@ -14,6 +24,8 @@
 //**************************************************************************
 //  MACROS/CONSTANTS
 //**************************************************************************
+
+#define LOG 0
 
 #define OPTION_ID		0x10
 
@@ -23,6 +35,7 @@
 #define RAM_SIZE		0x8000
 
 #define OPTION_VRAM		BIT(m_option, 0)
+#define OPTION_UNKNOWN	BIT(m_option, 1)
 #define OPTION_80_COL	BIT(m_option, 2)
 #define OPTION_VSYNC	BIT(m_option, 3)
 
@@ -43,7 +56,7 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x100;
+	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x80;
 
 	if (OPTION_80_COL)
 	{
@@ -56,6 +69,8 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 	        {
 	            int x = (column * 8) + bit;
 	            int color = (BIT(data, 15) << 1) | BIT(data, 7);
+
+	            if (column == cursor_x) color = 0x03;
 
 	            bitmap.pix32(y, x) = palette[color];
 
@@ -75,6 +90,8 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 	        {
 	            int x = (column * 8) + bit;
 	            int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
+
+	            if (column == cursor_x) color = 0x03;
 
 	            bitmap.pix32(y, x) = palette[color];
 
@@ -304,11 +321,13 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 		case 0x10/2:
 			if (ACCESSING_BITS_0_7)
 			{
+				if (LOG) logerror("LVC option %02x\n", data & 0xff);
 				m_option = data & 0xff;
 			}
 			break;
 
 		case 0x20/2:
+			if (LOG) logerror("LVC scroll %04x\n", data);
 			m_scroll = data;
 			break;
 

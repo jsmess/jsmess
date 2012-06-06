@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
@@ -66,12 +66,13 @@ public:
 		  m_fdc_drq(0),
 		  m_fdc_dd0(0),
 		  m_fdc_dd1(0),
+		  m_fdc_tc(0),
 		  m_ds1(1),
 		  m_ds2(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<i8237_device> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_device<device_t> m_pic;
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pit;
@@ -183,6 +184,7 @@ public:
 	int m_fdc_drq;
 	int m_fdc_dd0;
 	int m_fdc_dd1;
+	int m_fdc_tc;
 	int m_ds1;
 	int m_ds2;
 

@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/wangpcbus.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -54,7 +54,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<i8237_device> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80dart_device> m_sio;

@@ -12,7 +12,6 @@
 
 	TODO:
 
-	- boot
 	- hard disk
 
 */
@@ -25,7 +24,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
@@ -603,7 +602,7 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, mc2661_device, read, 0x00ff)
 	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, mc2661_device, write, 0x00ff)
-	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8_LEGACY(AM9517A_TAG, i8237_r, i8237_w, 0x00ff)
+	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8(AM9517A_TAG, am9517a_device, read, write, 0x00ff)
 	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
 	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
@@ -663,7 +662,7 @@ INPUT_PORTS_END
 void wangpc_state::update_fdc_tc()
 {
 	if (m_enable_eop)
-		upd765_tc_w(m_fdc, !m_dma_eop);
+		upd765_tc_w(m_fdc, m_fdc_tc);
 	else
 		upd765_tc_w(m_fdc, 0);
 }
@@ -672,20 +671,24 @@ WRITE_LINE_MEMBER( wangpc_state::hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	i8237_hlda_w(m_dmac, state);
+	m_dmac->hack_w(state);
 }
 
 WRITE_LINE_MEMBER( wangpc_state::eop_w )
 {
-	if (!state)
+	if (m_dack == 2)
 	{
-		//if (LOG) logerror("EOP set\n");
-
-		//m_dma_eop = 0;
-		//check_level2_interrupts();
+		m_fdc_tc = !state;
+		update_fdc_tc();
 	}
 
-	update_fdc_tc();
+	if (!state)
+	{
+		if (LOG) logerror("EOP set\n");
+
+		m_dma_eop = 0;
+		check_level2_interrupts();
+	}
 }
 
 READ8_MEMBER( wangpc_state::memr_r )
@@ -740,7 +743,7 @@ WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 	if (!state) m_dack = 3;
 }
 
-static I8237_INTERFACE( dmac_intf )
+static AM9517A_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, hrq_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, eop_w),
@@ -1055,9 +1058,9 @@ WRITE_LINE_MEMBER( wangpc_state::fdc_drq_w )
 void wangpc_state::update_fdc_drq()
 {
 	if (m_disable_dreq2)
-		i8237_dreq2_w(m_dmac, 1);
+		m_dmac->dreq2_w(1);
 	else
-		i8237_dreq2_w(m_dmac, !m_fdc_drq);
+		m_dmac->dreq2_w(!m_fdc_drq);
 }
 
 static UPD765_GET_IMAGE( wangpc_fdc_get_image )
@@ -1131,9 +1134,9 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir6_w),
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
-	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq1_w),
-	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq2_w),
-	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq3_w),
 	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_NMI)
 };
 
@@ -1254,7 +1257,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CPU_IO_MAP(wangpc_io)
 
 	// devices
-	MCFG_I8237_ADD(AM9517A_TAG, 4000000, dmac_intf)
+	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
@@ -1276,6 +1279,9 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wangpc")
 MACHINE_CONFIG_END
 
 
