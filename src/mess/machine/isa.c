@@ -196,27 +196,28 @@ void isa8_device::device_reset()
 {
 }
 
-void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
+
+void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
 {
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	int buswidth = m_maincpu->memory().space_config(spacenum)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
 			break;
 		case 16:
-			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+					m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
 				} else {
-					m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+					m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+				m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
 			}
 			break;
 		default:
@@ -225,27 +226,28 @@ void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t m
 	}
 }
 
-void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
+
+void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	int buswidth = m_maincpu->memory().space_config(spacenum)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			m_maincpu->memory().space(spacenum)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
 			break;
 		case 16:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			m_maincpu->memory().space(spacenum)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+					m_maincpu->memory().space(spacenum)->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
 				} else {
-					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+					m_maincpu->memory().space(spacenum)->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+				m_maincpu->memory().space(spacenum)->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
 			}
 			break;
 		default:
@@ -253,64 +255,73 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 			break;
 	}
 }
+
+
+void isa8_device::install_space(address_spacenum spacenum, device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
+{
+	int buswidth = m_maincpu->memory().space_config(spacenum)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			break;
+		case 16:
+			m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			break;
+		case 32:
+			if ((start % 4) == 0) {
+				if ((end-start)==1) {
+					m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+				} else {
+					m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+				}
+			} else {
+				// we handle just misalligned by 2
+				m_maincpu->memory().space(spacenum)->install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+			}
+			break;
+		default:
+			fatalerror("ISA8: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+
+void isa8_device::install_memory(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
+{
+	install_space(AS_PROGRAM, dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
+}
+
+
+void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
+{
+	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
+}
+
+
+void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+{   
+	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, whandler);
+}
+
 
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
-			break;
-		case 16:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
-			break;
-		case 32:
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
-				} else {
-					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
-			}
-			break;
-		default:
-			fatalerror("ISA8: Bus width %d not supported", buswidth);
-			break;
-	}
+	install_space(AS_IO, dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
 }
+
+
+void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
+{
+	install_space(AS_IO, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
+}
+
 
 void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
-				} else {
-					m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
-			}
-			break;
-		default:
-			fatalerror("ISA8: Bus width %d not supported", buswidth);
-			break;
-	}
+	install_space(AS_IO, start, end, mask, mirror, rhandler, whandler);
 }
+
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
