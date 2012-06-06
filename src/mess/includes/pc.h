@@ -71,6 +71,7 @@ public:
 extern const i8237_interface ibm5150_dma8237_config;
 extern const struct pit8253_config ibm5150_pit8253_config;
 extern const struct pit8253_config pcjr_pit8253_config;
+extern const struct pit8253_config mc1502_pit8253_config;
 extern const struct pic8259_interface ibm5150_pic8259_config;
 extern const struct pic8259_interface pcjr_pic8259_config;
 extern const ins8250_interface ibm5150_com_interface[4];
@@ -106,6 +107,7 @@ MACHINE_START( pc );
 MACHINE_RESET( pc );
 MACHINE_START( pcjr );
 MACHINE_RESET( pcjr );
+MACHINE_START( mc1502 );
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
 

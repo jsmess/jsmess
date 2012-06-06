@@ -95,6 +95,8 @@ video HW too.
 #include "machine/8237dma.h"
 #include "sound/sn76496.h"
 
+#include "machine/wd17xx.h"
+
 #include "machine/ram.h"
 #include "machine/pc_keyboards.h"
 
@@ -121,13 +123,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xbffff) AM_NOP
-	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
-	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xd0000, 0xeffff) AM_ROM
+	AM_RANGE(0x00000, 0x97fff) AM_RAMBANK("bank10")	/* 96K on mainboard + 512K on extension card */
+	AM_RANGE(0xe8000, 0xeffff) AM_ROM		/* BASIC */
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+//	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)		// keyboard poll
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)	// check
+	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE( pcjr_nmi_enable_r, pc_nmi_enable_w )			// check
+//	has extra registers at 0x0100, 0x0108, 0x010a
+	AM_RANGE(0x010c, 0x010c) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x010d, 0x010d) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x010e, 0x010e) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x010f, 0x010f) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w)
+//	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
+//	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_LEGACY("ins8250_0", ins8250_r, ins8250_w)
+ADDRESS_MAP_END 
 
 static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -698,6 +713,81 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mc1502 )			/* fix */
+	PORT_START("IN0") /* IN0 */
+	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
+	PORT_BIT ( 0x08, 0x08,	 IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
+
+	PORT_START("DSW0") /* IN1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x40, "2" )
+	PORT_DIPSETTING(	0x80, "3" )
+	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x20, "Graphics adapter")
+	PORT_DIPSETTING(	0x00, "EGA/VGA" )
+	PORT_DIPSETTING(	0x10, "Color 40x25" )
+	PORT_DIPSETTING(	0x20, "Color 80x25" )
+	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
+	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
+	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
+	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
+	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
+	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
+
+	PORT_START("DSW1") /* IN2 */
+	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "COM3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x00, "COM4: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "LPT2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_START("DSW2") /* IN3 */
+	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
+	PORT_DIPSETTING(	0x80, "COM1" )
+	PORT_DIPSETTING(	0x40, "COM2" )
+	PORT_DIPSETTING(	0x20, "COM3" )
+	PORT_DIPSETTING(	0x10, "COM4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
+	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
+
+	PORT_INCLUDE( t1000_keyboard )		/* not really */
+	PORT_INCLUDE( pcvideo_mc1502 )
+INPUT_PORTS_END
+
 
 static const unsigned i86_address_mask = 0x000fffff;
 
@@ -813,59 +903,6 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	/* keyboard */
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
-
-	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
-
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( mc1502, pc_state )
-	/* basic machine hardware */
-	MCFG_CPU_PC(mc1502, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START(pc)
-	MCFG_MACHINE_RESET(pc)
-
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
-
-	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
-
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-
-	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
-
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
-
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga32k )
 	MCFG_GFXDECODE(ibm5150)
 
 	/* sound hardware */
@@ -1206,6 +1243,48 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 
 	MCFG_GFXDECODE(ibmpcjx)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( mc1502, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(mc1502, mc1502, I8088, XTAL_16MHz/3, pcjr_frame_interrupt)
+
+	// check
+	MCFG_MACHINE_START(mc1502)
+	MCFG_MACHINE_RESET(pcjr)
+
+	MCFG_PIT8253_ADD( "pit8253", mc1502_pit8253_config )
+
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )		/* check */
+
+	/* TODO: implement i8251 */
+//	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )				/* only 1 chargen, CGA_FONT dip always 1 */
+	MCFG_GFXDECODE(ibmpcjr)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	/* printer */
+//	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)				/* TODO: non-standard */
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )	/* TODO: verify */
+
+	MCFG_FD1797_ADD( "vg93", default_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("608K")					/* 96 base + 512 on expansion card */
+MACHINE_CONFIG_END
+
 
 
 static MACHINE_CONFIG_START( iskr1031, pc_state )
@@ -2058,7 +2137,7 @@ COMP( 1989, mk88,       ibm5150,    0,          iskr1031,   pccga,      pccga,  
 COMP( 1990, poisk1,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Poisk-1", GAME_NOT_WORKING)
 COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga,      pccga,      "<unknown>", "Poisk-2", GAME_NOT_WORKING)
 COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga,      pccga,      "<unknown>", "Elektronika MC-1702", GAME_NOT_WORKING)
-COMP( 19??, mc1502,     ibm5150,    0,          mc1502,     pccga,      pccga,      "<unknown>", "Elektronika MC-1502", GAME_NOT_WORKING)
+COMP( 19??, mc1502,     ibm5150,    0,          mc1502,     mc1502,     pcjr,       "<unknown>", "Elektronika MC-1502", GAME_NOT_WORKING)
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga,      pccga,      "Zenith Data Systems", "SuperSport", 0)
 

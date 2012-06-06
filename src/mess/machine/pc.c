@@ -332,6 +332,27 @@ const struct pit8253_config pcjr_pit8253_config =
 	}
 };
 
+/* MC1502 uses single XTAL for everything -- incl. CGA? check */
+
+const struct pit8253_config mc1502_pit8253_config =
+{
+	{
+		{
+			XTAL_16MHz/12,              /* heartbeat IRQ */
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+		}, {
+			XTAL_16MHz/12,              /* dram refresh */
+			DEVCB_NULL,
+			DEVCB_NULL
+		}, {
+			XTAL_16MHz/12,              /* pio port c pin 4, and speaker polling enough */
+			DEVCB_NULL,
+			DEVCB_LINE(ibm5150_pit8253_out2_changed)
+		}
+	}
+};
+
 /**********************************************************
  *
  * COM hardware
@@ -1140,6 +1161,21 @@ MACHINE_RESET( pc )
 	st->m_ppi_shift_enable = 0;
 
 	speaker_level_w( speaker, 0 );
+}
+
+
+MACHINE_START( mc1502 )
+{
+	pc_state *st = machine.driver_data<pc_state>();
+//	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
+	pcjr_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
+	pc_int_delay_timer = machine.scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
+	st->m_maincpu = machine.device("maincpu" );
+	device_set_irq_callback(st->m_maincpu, pc_irq_callback);
+
+	st->m_pic8259 = machine.device("pic8259");
+	st->m_dma8237 = NULL;
+	st->m_pit8253 = machine.device("pit8253");
 }
 
 
