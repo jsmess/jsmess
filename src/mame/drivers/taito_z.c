@@ -9,19 +9,7 @@ David Graves
 Nicola Salmoria. Thanks to Richard Bush and the Raine team, whose open
 source was very helpful in many areas particularly the sprites.)
 
-- Changes Log -
 
-05-01-04 Added Racing Beat
-01-26-02 Added Enforce
-10-17-01 TC0150ROD support improved (e.g. Aquajack)
-09-01-01 Preliminary TC0150ROD support
-08-28-01 Fixed uncentered steer inputs, Nightstr controls
-05-27-01 Inputs through taitoic ioc routines, contcirc subwoofer filter
-04-12-01 Centered steering AD inputs, added digital steer
-02-18-01 Added Spacegun gunsights (Insideoutboy)
-
-
-                *****
 
 The Taito Z system has a number of similarities with the Taito F2 system,
 and uses some of the same custom Taito components.
@@ -70,6 +58,8 @@ The memory map for the Taito Z games is similar in outline but usually
 shuffled around: some games have different i/o because of analogue
 sticks, light guns, cockpit hardware etc.
 
+
+****************************************************************************
 
 Contcirc board (B.Troha)
 --------------
@@ -127,6 +117,8 @@ B33-01
 
 Notes: IC-41 Is 271001 Listed as JH1 (unsocketed / unused)
        IC-42 Is 271001 Listed as JL1 (unsocketed / unused)
+
+
 
 ****************************************************************************
 
@@ -235,6 +227,9 @@ Notes:
   ADC0809 - Texas Instruments ADC0809N Analog To Digital Convertor IC (DIP28)
 
 
+
+****************************************************************************
+
 ChaseHQ (Guru)
 -------
 
@@ -282,6 +277,8 @@ b52-116
          TC0040IOC  b52-133 b52-132  TC0150ROD    b52-28
 
 
+
+****************************************************************************
 
 ChaseHQ2(SCI) custom chips (Guru) (DG: same as Bshark except 0140SYT?)
 --------------------------
@@ -509,7 +506,77 @@ PINOUT CONNECTOR V
 
 
 
+****************************************************************************
 
+Enforce PCB info
+------------------
+
+Taito, 198?/199?
+
+Taito Z hardware
+PCB No: K1100406A J1100175A (CPU PCB)
+        K1100407A J1100176A (VIDEO PCB)
+
+CPU: MC68000P12 (x2)
+SND: Z80, YM2610, TCO040IOC, YM3016F
+OSC: 26.686MHz, 24.000MHz, 16.000MHz
+DIPs: 8 Position (x2)
+
+Taito Chips:
+CPU board - TCO100SCN, TCO140SYT, TCO170ABT, TCO110PCR
+Video Board - TCO150ROD, TCO050VDZ (x3), TCO020VAR
+
+Ram: CPU BOARD - 6264 (x9), 43256 (x2),
+     VIDEO BOARD - 2018 (x10), 6264 (x2)
+
+PALs/PROMs:
+CPU BOARD - All located near/around the 68000's
+b58-15 (PAL20L8)
+b58-16 (PAL20L8)
+b58-14 (PAL20L8)
+b58-13 (PAL16L8)
+b58-11 (PAL16L8)
+b58-12 (PAL16L8)
+
+VIDEO BOARD -
+b58-22 (PAL16L8) \
+b58-23 (63s141)   |  near TCO150ROD
+b58-24 (63s141)  /
+
+b58-20 (PAL16L8) \
+b58-21 (PAL16R4)  |
+b58-17 (PAL16L8)  |  near TCO020VAR
+b58-18 (PAL16R4) /
+
+b58-25 (63S141)      near b58-27
+b58-19 (PAL16R4)     near b58-04/03/02/01
+
+ROMs:
+CPU BOARD - b58-18 , 27C010  \
+        b58-19 , 27C010   |  68k Program
+        b58-26 , 27C010   |
+        b58-27 , 27C010  /
+
+        b58-07 , 27C4096 \
+        b58-08 , 27C4096  |
+        b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
+        b58-10 , 27C4096 /
+
+        b58-32 , 27C512      z80 program
+
+VIDEO PCB - b58-06 , 27C4100     near TCO150ROD
+
+        b58-26a, 27C512      ?
+        b58-27 , LH5763      ?
+
+        b58-01 , 27C4100 \
+        b58-02 , 27C4100  |
+        b58-03 , 27C4100  |  near TCO050VDZ's
+        b58-04 , 27C4100 /
+
+
+
+****************************************************************************
 
 BShark custom chips
 -------------------
@@ -525,6 +592,9 @@ TC0270MOD  ???
 TC0380BSH  ???
 TC0150ROD (known road generator chip)
 
+
+
+****************************************************************************
 
 DblAxle custom chip info
 ------------------------
@@ -604,6 +674,92 @@ OSC:    40.000MHz
 Chips:  uPD72105C
 
 
+
+****************************************************************************
+
+Racing Beat
+-------------
+
+M43E0227A
+K11E0674A
+K1100650A J1100264A CPU PCB
+|-------------------------------------------------------------|
+|6264       62256        32MHz          DSWA   DSWB           |
+|           62256                                             |
+|C84-104.2                                                    |
+|C84-110.3  TC0170ABT                          TC0510NIO      |
+|C84-103.4                                                    |
+|C84-111.5                                     MB3771         |
+|                                   C84_101.42                |
+|6264                 TC0140SYT                               |
+|                                    6264                     |
+|                                                             |
+|                                                             |
+|                         C84-85.31         Z80               |
+|68000                                                        |
+|                                                             |
+|                                                             |
+|PAL     PAL                                YM2610            |
+|                         C84-86.33                           |
+|PAL                                                          |
+|                             6264          C84-87.46         |
+|                                                             |
+|                                                             |
+|                   PAL   C84-99.35         YM3016            |
+|6264   6264                                                  |
+|                                                             |
+|                   PAL   C84-100.36        TL074             |
+|           TC0150ROD                                         |
+|C84-84.12                    6264                            |
+|                   PAL                                       |
+|                                                TL074        |
+|    C84-07.22                                        MB3735  |
+|                  68000                                      |
+|-------------------------------------------------------------|
+Notes:
+      68000s running at 16MHz
+      Z80 running at 4MHz
+      YM2610 running at 8MHz
+
+
+K11X0675A
+K1100635A
+J1100256A VIDEO PCB
+|-------------------------------------------------------------|
+|                        26.686MHz       6264                 |
+|62256    C84-89.11                              TC0260DAR    |
+|                                                             |
+|62256    C84-90.12                                           |
+|                        TC0480SCP       6264                 |
+|                                                             |
+|                                        6264                 |
+|C84-88.3                                                     |
+|                                                             |
+|                                                             |
+|         C84-19.15                                           |
+|                        TC0370MSO     TC0300FLA    PAL       |
+|         C84-10.16                                           |
+|         C84-11.17                                           |
+|                                                    C84-09.74|
+|                                                             |
+|                    62256   62256   62256   62256            |
+|                                                             |
+|                                                             |
+|            62256   62256   62256   62256   62256            |
+|                                                             |
+|                                                             |
+|            62256   62256   62256   62256   62256            |
+|                                                             |
+|                                                             |
+|                                    62256   62256            |
+|  C84-91.23    C84-93.31                                     |
+|                                                             |
+|                              TC0380BSH           TC0270MOD  |
+|  C84-92.25    C84-94.33                                     |
+|                                                             |
+|-------------------------------------------------------------|
+
+
 TODO Lists
 ==========
 
@@ -636,9 +792,6 @@ Continental Circus
 
 Road priority incompletely understood - e.g. start barrier should
 be darkening LH edge of road as well as RH edge.
-
-The 8 level accel / brake should be possible to control with
-analogue pedal. Don't think mame can do this.
 
 Junk (?) stuff often written in high byte of sound word.
 
@@ -787,90 +940,23 @@ an int6 timing/number issue: sprites seem to be ChaseHQ2ish with
 a spriteframe toggle - currently this never changes which may be
 wrong.)
 
+Double Axle seems to keep only 1 sprite frame in sprite ram,
+which is probably wrong. Game seems to work with no int 6's
+at all. Cpu control byte has 0,4,8,c poked into 2nd nibble
+and it seems possible this should be causing int6's ?
+
 
 Racing Beat
 -----------
 
-Sprites (and main road) very wrong
+Graphics problems:
+- tearing in the main road (tile layer 3 offset?)
+- car sprites palette flickering
+- some missing sprites (random?) ie. motor block sprite after inserting coin
 
-M43E0227A
-K11E0674A
-K1100650A J1100264A CPU PCB
-|-------------------------------------------------------------|
-|6264       62256        32MHz          DSWA   DSWB           |
-|           62256                                             |
-|C84-104.2                                                    |
-|C84-110.3  TC0170ABT                          TC0510NIO      |
-|C84-103.4                                                    |
-|C84-111.5                                     MB3771         |
-|                                   C84_101.42                |
-|6264                 TC0140SYT                               |
-|                                    6264                     |
-|                                                             |
-|                                                             |
-|                         C84-85.31         Z80               |
-|68000                                                        |
-|                                                             |
-|                                                             |
-|PAL     PAL                                YM2610            |
-|                         C84-86.33                           |
-|PAL                                                          |
-|                             6264          C84-87.46         |
-|                                                             |
-|                                                             |
-|                   PAL   C84-99.35         YM3016            |
-|6264   6264                                                  |
-|                                                             |
-|                   PAL   C84-100.36        TL074             |
-|           TC0150ROD                                         |
-|C84-84.12                    6264                            |
-|                   PAL                                       |
-|                                                TL074        |
-|    C84-07.22                                        MB3735  |
-|                  68000                                      |
-|-------------------------------------------------------------|
-Notes:
-      68000s running at 16MHz
-      Z80 running at 4MHz
-      YM2610 running at 8MHz
+LAN board is unemulated
 
-
-K11X0675A
-K1100635A
-J1100256A VIDEO PCB
-|-------------------------------------------------------------|
-|                        26.686MHz       6264                 |
-|62256    C84-89.11                              TC0260DAR    |
-|                                                             |
-|62256    C84-90.12                                           |
-|                        TC0480SCP       6264                 |
-|                                                             |
-|                                        6264                 |
-|C84-88.3                                                     |
-|                                                             |
-|                                                             |
-|         C84-19.15                                           |
-|                        TC0370MSO     TC0300FLA    PAL       |
-|         C84-10.16                                           |
-|         C84-11.17                                           |
-|                                                    C84-09.74|
-|                                                             |
-|                    62256   62256   62256   62256            |
-|                                                             |
-|                                                             |
-|            62256   62256   62256   62256   62256            |
-|                                                             |
-|                                                             |
-|            62256   62256   62256   62256   62256            |
-|                                                             |
-|                                                             |
-|                                    62256   62256            |
-|  C84-91.23    C84-93.31                                     |
-|                                                             |
-|                              TC0380BSH           TC0270MOD  |
-|  C84-92.25    C84-94.33                                     |
-|                                                             |
-|-------------------------------------------------------------|
+DIP switches are not verified
 
 
 ***************************************************************************/
@@ -890,35 +976,37 @@ J1100256A VIDEO PCB
 #include "contcirc.lh"
 #include "dblaxle.lh"
 
-static void parse_control( running_machine &machine )
+static void parse_cpu_control( running_machine &machine )
 {
 	/* bit 0 enables cpu B */
-	/* however this fails when recovering from a save state
-       if cpu B is disabled !! */
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
-
 }
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
+	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
 
-	if ((data & 0xff00) && ((data & 0xff) == 0))
-		data = data >> 8;	/* for Wgp */
+	if (mem_mask == 0xff00) data >>= 8;
+	data &= 0xff;
 
 	m_cpua_ctrl = data;
+	parse_cpu_control(machine());
+}
 
-	parse_control(machine());
+WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
+{
+	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	// Chase HQ: handle the lights
-	if (m_chasehq_lamps)
-	{
-		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
-		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
-	}
+	output_set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
+	output_set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+}
 
-	if (m_dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
+{
+	cpua_ctrl_w(space, offset, data, mem_mask);
+
+	output_set_value("Wheel_Vibration", (data & 0x04)>>2);
 }
 
 
@@ -942,15 +1030,6 @@ static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 	device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
 }
 
-#if 0
-static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
-{
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);
-}
-#endif
-
-
 
 /***** Routines for particular games *****/
 
@@ -966,31 +1045,6 @@ static INTERRUPT_GEN( sci_interrupt )
 	if (state->m_sci_int6)
 		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
-	device_set_input_line(device, 4, HOLD_LINE);
-}
-
-/* Double Axle seems to keep only 1 sprite frame in sprite ram,
-   which is probably wrong. Game seems to work with no int 6's
-   at all. Cpu control byte has 0,4,8,c poked into 2nd nibble
-   and it seems possible this should be causing int6's ? */
-
-static INTERRUPT_GEN( dblaxle_interrupt )
-{
-	// Unsure how many int6's per frame, copy SCI for now
-
-	taitoz_state *state = device->machine().driver_data<taitoz_state>();
-	state->m_dblaxle_int6 = !state->m_dblaxle_int6;
-
-	if (state->m_dblaxle_int6)
-		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
-
-	device_set_input_line(device, 4, HOLD_LINE);
-}
-
-static INTERRUPT_GEN( dblaxle_cpub_interrupt )
-{
-	// Unsure how many int6's per frame
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1034,7 +1088,6 @@ READ16_MEMBER(taitoz_state::eep_latch_r)
 
 WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 {
-
 	switch (offset)
 	{
 		case 0x03:
@@ -1059,31 +1112,20 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
                        GAME INPUTS
 **********************************************************/
 
+CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
+{
+	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	const char *tag = (const char *)param;
+	return retval[ioport(tag)->read_safe(0) & 7];
+}
+
+
 READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0xc0 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
-
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0x60;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0xff9f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
 	{
@@ -1104,25 +1146,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 	/* Bypass TC0220IOC controller for extra inputs */
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero */
-		steer = ioport("STEER")->read() - 0x80;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xff80;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x7f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
 	{
@@ -1209,25 +1233,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0xc0 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xffa0;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x5f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1246,7 +1252,6 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 
 READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 {
-
 	switch (offset)
 	{
 		case 0x03:
@@ -1299,25 +1304,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 
 READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 {
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0x80 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0x80) / 0x100;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xffc0;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x3f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1345,7 +1332,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space.device()),offset);
+			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space.device()),offset);
 			return 0;
 	}
 }
@@ -1355,20 +1342,20 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 	/* Writes $e00000-25 and $e00200-219 */
 	switch (offset)
 	{
-	case 0x0:
-	break;
-	case 0x101:
-	/* outputs will go here, but driver is still broken */
-	break;
+		case 0x0:
+			break;
+	
+		case 0x101:
+			/* outputs will go here, but driver is still broken */
+			break;
 	}
-logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
-
+	
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
 }
 
 
 WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 {
-
 	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
 	/* I've added this so someone else can finish it.  */
 	switch (offset)
@@ -1388,6 +1375,7 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 		output_set_value("Motor_2_Speed",(data & 60)/4);
 
 		break;
+
 	case 8:
 		output_set_value("Motor_3_Direction",0);
 		if (data & 1) output_set_value("Motor_3_Direction",1);
@@ -1395,8 +1383,10 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 		output_set_value("Motor_3_Speed",(data & 60)/4);
 
 		break;
+
 	default:
 		output_set_value("motor_debug",data);
+		break;
 	}
 
 }
@@ -1422,14 +1412,12 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 7;
 	reset_sound_region(machine());
 }
 
 WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -1448,7 +1436,6 @@ WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 
 READ16_MEMBER(taitoz_state::taitoz_sound_r)
 {
-
 	if (offset == 1)
 		return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);
 	else
@@ -1458,7 +1445,6 @@ READ16_MEMBER(taitoz_state::taitoz_sound_r)
 #if 0
 WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
@@ -1477,7 +1463,6 @@ WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 
 READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 {
-
 	if (offset == 1)
 		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff) << 8);
 	else
@@ -1490,12 +1475,6 @@ READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
 {
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
-
-	offset = offset & 3;
-
-//  m_pandata[offset] = data;
-//  popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
-
 	flt_volume_set_volume(machine().device(fltname[offset & 3]), data / 255.0f);
 }
 
@@ -1540,7 +1519,7 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(chasehq_cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
@@ -1719,7 +1698,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)	/* could this be causing int6 ? */
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(dblaxle_cpua_ctrl_w)	/* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemap mirror */
@@ -1913,7 +1892,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x7d, "-03" ) \
 	PORT_DIPSETTING(    0x7e, "-02" ) \
 	PORT_DIPSETTING(    0x7f, "-01" ) \
-	PORT_DIPSETTING(    0x80, "+-00" ) \
+	PORT_DIPSETTING(    0x80, "+00" ) \
 	PORT_DIPSETTING(    0x81, "+01" ) \
 	PORT_DIPSETTING(    0x82, "+02" ) \
 	PORT_DIPSETTING(    0x83, "+03" ) \
@@ -2045,31 +2024,33 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( contcirc )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1")
+	PORT_DIPSETTING(    0x01, "Cockpit" )			// analog pedals
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )	// digital pedals, no brake?, allow free steering wheel
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW A:2")
+ 	PORT_DIPSETTING(    0x02, "Same as Start" )
+	PORT_DIPSETTING(    0x00, "Discount" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" ) PORT_DIPLOCATION("SW B:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" )	PORT_DIPLOCATION("SW B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" )	PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" ) PORT_DIPLOCATION("SW B:5")	//not sure what effect this has
+	PORT_DIPNAME( 0x10, 0x00, "Steering Wheel" )			PORT_DIPLOCATION("SW B:5") // no function in Cockpit cabinet?
 	PORT_DIPSETTING(    0x10, "Free" )
 	PORT_DIPSETTING(    0x00, "Locked" )
-	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPNAME( 0x20, 0x00, "3D Effect" )					PORT_DIPLOCATION("SW B:6") // unlisted in manual
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
@@ -2081,32 +2062,30 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00)
 
-	PORT_START("IN1")	/* b3 not mapped: standardized on holding b4=lo gear */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear shift lo/hi */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00) // no function?
 
 	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* "handle" i.e. steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x10, EQUALS, 0x00)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_REVERSE PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x10, EQUALS, 0x10)
 
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_START("GAS")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Brake Pedal") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( contcrcu )
@@ -2118,34 +2097,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1,2")	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
-	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
-	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )
-	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )
-	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1,2") /* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
+	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )			// digital pedals, locked steering wheel
+	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )		// digital pedals, free steering wheel
+	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )	// analog pedals, locked steering wheel
+	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )		// analog pedals, locked steering wheel, motor
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )				PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" ) PORT_DIPLOCATION("SW B:6")	/* Full coin price to start, 1 coin to continue */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW B:6")
+ 	PORT_DIPSETTING(    0x20, "Same as Start" )
+	PORT_DIPSETTING(    0x00, "Discount" )
+	PORT_DIPNAME( 0x40, 0x40, "Clear Damage on Continue" )	PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -2155,19 +2134,17 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2212,15 +2189,15 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_START("GAS")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Brake Pedal") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehqj )
@@ -2399,53 +2376,53 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sci )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" ) /* Manual states "MUST REMAIN OFF" */
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )				PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" )			PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, "270 Degree" )
 	PORT_DIPSETTING(    0x20, "360 Degree" )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPNAME( 0x40, 0x40, "Clear Damage on Continue" )	PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" ) PORT_DIPLOCATION("SW B:8")
+	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" )				PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* fire */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Gun Trigger")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Center")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2453,14 +2430,7 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sciu )
@@ -2728,62 +2698,55 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dblaxle )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
-	PORT_DIPNAME( 0x02, 0x02, "Gear shift" ) PORT_DIPLOCATION("SW A:2")
+	PORT_DIPNAME( 0x02, 0x02, "Gear shift" )			PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_US_LOC(SW A)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
-	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" ) PORT_DIPLOCATION("SW B:3")	// doesn't boot if on
+	PORT_DIPNAME( 0x04, 0x00, "Network?" )				PORT_DIPLOCATION("SW B:3") // doesn't boot if on
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Player Truck" ) PORT_DIPLOCATION("SW B:4")
+	PORT_DIPNAME( 0x08, 0x08, "Player Truck" )			PORT_DIPLOCATION("SW B:4")
 	PORT_DIPSETTING(    0x08, "Red" )
 	PORT_DIPSETTING(    0x00, "Blue" )
-	PORT_DIPNAME( 0x10, 0x10, "Back button" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x10, 0x10, "Back button" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )	// causes "Root CPU Error" on "Icy Road" (Tourniquet)
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" ) // causes "Root CPU Error" on "Icy Road" (Tourniquet)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	PORT_TOGGLE /* shift */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* "back" */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Reverse")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* nitro */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nitro")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Center")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gas Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwheelsj )
@@ -2791,6 +2754,65 @@ static INPUT_PORTS_START( pwheelsj )
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW A)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( racingb )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW A:1") // don't know what is what
+	PORT_DIPSETTING(    0x00, "Type 0" ) // free steering wheel
+	PORT_DIPSETTING(    0x01, "Type 1" ) // locked steering wheel
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW A:2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW A:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_COINAGE_WORLD_LOC(SW A)
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW B:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW B:2" )
+	PORT_DIPNAME( 0x04, 0x04, "Steering Wheel Range" )	PORT_DIPLOCATION("SW B:3") // no function in Type 0 cabinet?
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x08, 0x08, "Steering Wheel Type" )	PORT_DIPLOCATION("SW B:4") // no function in Type 0 cabinet?
+	PORT_DIPSETTING(    0x00, "Free" )
+	PORT_DIPSETTING(    0x08, "Locked" )
+	PORT_DIPNAME( 0x10, 0x10, "Network" )				PORT_DIPLOCATION("SW B:5") // gives a LAN error
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Player Car" )			PORT_DIPLOCATION("SW B:6,7")
+	PORT_DIPSETTING(    0x60, "Red" )
+	PORT_DIPSETTING(    0x40, "Blue" )
+	PORT_DIPSETTING(    0x20, "Green" )
+	PORT_DIPSETTING(    0x00, "Yellow" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW B:8" ) // affects car color too?
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake Switch")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pit In")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Center")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gas Switch")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")	/* unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x08, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
@@ -2897,38 +2919,6 @@ static const ym2610_interface ym2610_interfaceb =
 };
 
 
-/**************************************************************
-                         SUBWOOFER (SOUND)
-**************************************************************/
-
-#if 0
-static DEVICE_START( subwoofer )
-{
-	/* Adjust the lowpass filter of the first three YM2610 channels */
-
-	/* 150 Hz is a common top frequency played by a generic */
-	/* subwoofer, the real Arcade Machine may differs */
-
-	mixer_set_lowpass_frequency(0, 20);
-	mixer_set_lowpass_frequency(1, 20);
-	mixer_set_lowpass_frequency(2, 20);
-}
-
-static DEVICE_GET_INFO( subwoofer )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-#endif
-
-
 /***********************************************************
                       MACHINE DRIVERS
 
@@ -2995,11 +2985,11 @@ static const tc0100scn_interface spacegun_tc0100scn_intf =
 static const tc0480scp_interface taitoz_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0,		/* pixels */
-	0x21, 0x08,		/* x_offset, y_offset */
-	4, 0,		/* text_xoff, text_yoff */
+	0,			/* pixels */
+	0x1f, 0x08,	/* x_offset, y_offset */
+	0, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	0			/* col_base */
 };
 
 static const tc0110pcr_interface taitoz_tc0110pcr_intf = { 0 };
@@ -3030,7 +3020,7 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
 
 static void taitoz_postload(running_machine &machine)
 {
-	parse_control(machine);
+	parse_cpu_control(machine);
 	reset_sound_region(machine);
 }
 
@@ -3052,7 +3042,6 @@ static MACHINE_START( bshark )
 
 	/* these are specific to various games: we ought to split the inits */
 	state->save_item(NAME(state->m_sci_int6));
-	state->save_item(NAME(state->m_dblaxle_int6));
 	state->save_item(NAME(state->m_ioc220_port));
 
 	state->save_item(NAME(state->m_banknum));
@@ -3076,7 +3065,6 @@ static MACHINE_RESET( taitoz )
 	state->m_banknum = -1;
 	state->m_cpua_ctrl = 0xff;
 	state->m_sci_int6 = 0;
-	state->m_dblaxle_int6 = 0;
 	state->m_ioc220_port = 0;
 }
 
@@ -3139,8 +3127,6 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
 	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
-
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
@@ -3266,8 +3252,6 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
@@ -3592,16 +3576,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_map)
-	MCFG_CPU_VBLANK_INT("screen", dblaxle_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz ??? */
+	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
@@ -3629,7 +3613,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3654,21 +3638,21 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( racingb, taitoz_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_map)
-	MCFG_CPU_VBLANK_INT("screen", dblaxle_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", sci_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz ??? */
+	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
 
@@ -3678,7 +3662,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(dblaxle)
+	MCFG_SCREEN_UPDATE_STATIC(racingb)
 
 	MCFG_GFXDECODE(dblaxle)
 	MCFG_PALETTE_LENGTH(4096)
@@ -3691,7 +3675,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3723,10 +3707,6 @@ ROM_START( contcirc )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) )
 	ROM_LOAD16_BYTE( "ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) )
-// this was bogus and has been removed.
-// someone hacked the copyright year from 1987 to 1989, and changed an unused byte from FF to F3 to keep
-// the checksum the same. There are no other differences.
-//  ROM_LOAD16_BYTE( "cc_26.bin", 0x00001, 0x20000, CRC(1345ebe6) SHA1(88b9cc8ba2f7061beb8f6b763583cd45b03bcea1) )
 
 	ROM_REGION( 0x40000, "sub", 0 )	/* 256K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "ic35",      0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) )
@@ -4088,73 +4068,6 @@ ROM_START( chasehqu )
 	ROM_LOAD( "pal16l8b-b52-124.ic180", 0x2600, 0x0104, NO_DUMP )	/* read protected */
 	ROM_LOAD( "pal16l8b-b52-125.ic112", 0x2800, 0x0104, CRC(7628c557) SHA1(11bf628e091dc02e0c2e17ae726061ac04705a54) )
 ROM_END
-
-
-/*
-Enforce
-Taito, 198?/199?
-
-Taito Z hardware
-PCB No: K1100406A J1100175A (CPU PCB)
-        K1100407A J1100176A (VIDEO PCB)
-
-CPU: MC68000P12 (x2)
-SND: Z80, YM2610, TCO040IOC, YM3016F
-OSC: 26.686MHz, 24.000MHz, 16.000MHz
-DIPs: 8 Position (x2)
-
-Taito Chips:
-CPU board - TCO100SCN, TCO140SYT, TCO170ABT, TCO110PCR
-Video Board - TCO150ROD, TCO050VDZ (x3), TCO020VAR
-
-Ram: CPU BOARD - 6264 (x9), 43256 (x2),
-     VIDEO BOARD - 2018 (x10), 6264 (x2)
-
-PALs/PROMs:
-CPU BOARD - All located near/around the 68000's
-b58-15 (PAL20L8)
-b58-16 (PAL20L8)
-b58-14 (PAL20L8)
-b58-13 (PAL16L8)
-b58-11 (PAL16L8)
-b58-12 (PAL16L8)
-
-VIDEO BOARD -
-b58-22 (PAL16L8) \
-b58-23 (63s141)   |  near TCO150ROD
-b58-24 (63s141)  /
-
-b58-20 (PAL16L8) \
-b58-21 (PAL16R4)  |
-b58-17 (PAL16L8)  |  near TCO020VAR
-b58-18 (PAL16R4) /
-
-b58-25 (63S141)      near b58-27
-b58-19 (PAL16R4)     near b58-04/03/02/01
-
-ROMs:
-CPU BOARD - b58-18 , 27C010  \
-        b58-19 , 27C010   |  68k Program
-        b58-26 , 27C010   |
-        b58-27 , 27C010  /
-
-        b58-07 , 27C4096 \
-        b58-08 , 27C4096  |
-        b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
-        b58-10 , 27C4096 /
-
-        b58-32 , 27C512      z80 program
-
-VIDEO PCB - b58-06 , 27C4100     near TCO150ROD
-
-        b58-26a, 27C512      ?
-        b58-27 , LH5763      ?
-
-        b58-01 , 27C4100 \
-        b58-02 , 27C4100  |
-        b58-03 , 27C4100  |  near TCO050VDZ's
-        b58-04 , 27C4100 /
-*/
 
 ROM_START( enforce )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
@@ -5136,34 +5049,19 @@ ROM_END
 
 static DRIVER_INIT( taitoz )
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 0;
-}
+	//taitoz_state *state = machine.driver_data<taitoz_state>();
 
-static DRIVER_INIT( dblaxle )
-{
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 1;
+	machine.save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine));
 }
 
 static DRIVER_INIT( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 0;
+	DRIVER_INIT_CALL(taitoz);
+
 	state->m_eep_latch = 0;
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(parse_control), &machine));
 	state->save_item(NAME(state->m_eep_latch));
-}
-
-static DRIVER_INIT( chasehq )
-{
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 1;
-	state->m_dblaxle_vibration = 0;
 }
 
 
@@ -5171,9 +5069,9 @@ static DRIVER_INIT( chasehq )
 GAMEL(1987, contcirc,   0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircu,  contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircua, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehq,    0,        chasehq,  chasehq,  chasehq,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, chasehq,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq,  chasehq,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,  chasehq,  taitoz,   ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq,  taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAME( 1988, enforce,    0,        enforce,  enforce,  taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1989, bshark,     0,        bshark,   bshark,   bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,   bsharku,  bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
@@ -5193,6 +5091,6 @@ GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz,   ROT0,           
 GAME( 1990, spacegun,   0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegunj,  spacegun, spacegun, spacegnj, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegunu,  spacegun, spacegun, spacegnu, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", GAME_SUPPORTS_SAVE )
-GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  dblaxle,  ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
-GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, dblaxle,  ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, racingb,    0,        racingb,  dblaxle,  dblaxle,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, racingb,    0,        racingb,  racingb,  taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )

@@ -1010,6 +1010,7 @@ finfurl2j		// March 1999
 crszone			// Crisis Zone - December 1999
 crszonea		// Crisis Zone - December 1999
 crszoneb		// Crisis Zone - December 1999
+crszonec		// Crisis Zone - December 1999
 
 // Namco System 246
 sys246
@@ -3551,6 +3552,7 @@ weddingr		// GX624, JAA
 tokimosh		// GE755, JAA
 tokimosp		// GE756, JAB
 nagano98		// GX720, EAA
+naganoj			// GX720, JAA
 simpbowl		// GQ829, UAA
 
 // Konami System 573
@@ -4641,8 +4643,8 @@ vs29815			// 1998.05 Virtua Striker 2 ver.98
 
 // Step 2.0
 vs2				// 1997.06 Virtua Striker 2
-harley			// 1997.12 Harley Davidson & L.A.Riders
-harleyb
+harley			// 199?.?? Harley Davidson & L.A.Riders (rev B)
+harleya			// 1997.12 Harley Davidson & L.A.Riders (rev A)
 skichamp		// 1998.01 Ski Champ
 srally2			// 1998.02 Sega Rally 2 Championship
 srally2x
@@ -8343,6 +8345,7 @@ deerhuntd		// (c) 2000 Sammy USA Corporation
 turkhunt		// (c) 2001 Sammy USA Corporation
 wschamp			// (c) 2001 Sammy USA Corporation
 wschampa		// (c) 2001 Sammy USA Corporation
+funcube			// (c) 2000 Namco
 funcube2		// (c) 2001 Namco
 funcube3		// (c) 2001 Namco
 funcube4		// (c) 2001 Namco
@@ -10217,6 +10220,7 @@ toyland			// (c) 2001 Semicom
 misncrft		// (c) 2000 Sun
 mrdig			// (c) 2000 Sun
 hidnctch		// (c) 1998 Eolith
+linkypip		// (c) 1998 Eolith
 ironfort		// (c) 1998 Eolith
 ironfortj		// (c) 1998 Eolith
 puzzlekg		// (c) 1998 Eolith
@@ -11063,6 +11067,7 @@ luckgrln		// (c) 1991 Wing Co. Ltd
 luckylad		// (c) 1985 Wing Co. Ltd
 bingowng		// (c) 1993 Wing Co. Ltd
 bingownga		// (c) 1993 Wing Co. Ltd
+excitbj			// (c) 1992 Wing Co. Ltd
 
 skill98			// (c) 1998 Amcoe
 match98			// (c) 1998 Amcoe

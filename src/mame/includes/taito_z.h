@@ -11,27 +11,23 @@ class taitoz_state : public driver_device
 {
 public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram"){ }
+		: driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int         m_sci_spriteframe;
 	int         m_road_palbank;
 
 	/* misc */
-	int         m_chasehq_lamps;
 	INT32       m_banknum;
 	UINT16      m_cpua_ctrl;
 	INT32       m_sci_int6;
-	INT32       m_dblaxle_int6;
 	INT32       m_ioc220_port;
 	UINT16      m_eep_latch;
-
-//  UINT8       pandata[4];
 
 	/* devices */
 	device_t *m_maincpu;
@@ -44,9 +40,9 @@ public:
 	device_t *m_tc0220ioc;
 	device_t *m_tc0140syt;
 
-	/* dblaxle motor flag */
-	int	    m_dblaxle_vibration;
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
@@ -74,6 +70,7 @@ public:
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 };
 
 /*----------- defined in video/taito_z.c -----------*/
@@ -88,3 +85,4 @@ SCREEN_UPDATE_IND16( sci );
 SCREEN_UPDATE_IND16( aquajack );
 SCREEN_UPDATE_IND16( spacegun );
 SCREEN_UPDATE_IND16( dblaxle );
+SCREEN_UPDATE_IND16( racingb );
