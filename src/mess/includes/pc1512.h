@@ -10,7 +10,7 @@
 #include "formats/basicdsk.h"
 #include "formats/pc_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/ctronics.h"
 #include "machine/ins8250.h"
 #include "machine/isa.h"
@@ -73,14 +73,14 @@ public:
 		  m_dint(0),
 		  m_ddrq(0),
 		  m_fdc_dsr(0),
-		  m_neop(1),
+		  m_neop(0),
 		  m_ack_int_enable(1),
 		  m_ack(0),
 		  m_speaker_drive(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<i8237_device> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_device<device_t> m_pic;
 	required_device<device_t> m_pit;
 	required_device<mc146818_device> m_rtc;

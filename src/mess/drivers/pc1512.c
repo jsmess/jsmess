@@ -550,7 +550,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	offs_t addr = offset & 0x3ff;
 	bool decoded = false;
 
-	if		(                 addr <= 0x00f) { data = i8237_r(m_dmac, offset & 0x0f); decoded = true; }
+	if		(                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
 	else if (addr >= 0x020 && addr <= 0x021) { data = pic8259_r(m_pic, offset & 0x01); decoded = true; }
 	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
@@ -611,7 +611,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8_LEGACY(I8237A5_TAG, i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8(I8237A5_TAG, am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8_LEGACY(I8259A2_TAG, pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x060, 0x06f) AM_READWRITE8(system_r, system_w, 0xffff)
@@ -645,7 +645,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ8(io_r, 0xffff)
-	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8_LEGACY(I8237A5_TAG, i8237_w, 0xffff)
+	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8_LEGACY(I8259A2_TAG, pic8259_w, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
 	AM_RANGE(0x060, 0x06f) AM_WRITE8(system_w, 0xffff)
@@ -867,20 +867,23 @@ void pc1512_state::update_fdc_tc()
 	if (m_nden)
 		upd765_tc_w(m_fdc, m_neop);
 	else
-		upd765_tc_w(m_fdc, 1);
+		upd765_tc_w(m_fdc, 0);
 }
 
 WRITE_LINE_MEMBER( pc1512_state::hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	i8237_hlda_w(m_dmac, state);
+	m_dmac->hack_w(state);
 }
 
 WRITE_LINE_MEMBER( pc1512_state::eop_w )
 {
-	m_neop = !state;
-	update_fdc_tc();
+	if (m_dma_channel == 2)
+	{
+		m_neop = !state;
+		update_fdc_tc();
+	}
 }
 
 READ8_MEMBER( pc1512_state::memr_r )
@@ -920,7 +923,7 @@ READ8_MEMBER( pc1512_state::ior3_r )
 WRITE8_MEMBER( pc1512_state::iow0_w )
 {
 	m_dreq0 = 0;
-	i8237_dreq0_w(m_dmac, m_dreq0);
+	m_dmac->dreq0_w(m_dreq0);
 }
 
 WRITE8_MEMBER( pc1512_state::iow1_w )
@@ -1015,7 +1018,7 @@ WRITE_LINE_MEMBER( pc1512_state::pit1_w )
 	if (!m_pit1 && state && !m_dreq0)
 	{
 		m_dreq0 = 1;
-		i8237_dreq0_w(m_dmac, m_dreq0);
+		m_dmac->dreq0_w(m_dreq0);
 	}
 
 	m_pit1 = state;
@@ -1072,9 +1075,9 @@ void pc1512_state::update_fdc_int()
 void pc1512_state::update_fdc_drq()
 {
 	if (m_nden)
-		i8237_dreq2_w(m_dmac, m_ddrq);
+		m_dmac->dreq2_w(m_ddrq);
 	else
-		i8237_dreq2_w(m_dmac, CLEAR_LINE);
+		m_dmac->dreq2_w(0);
 }
 
 static const floppy_interface floppy_intf =
@@ -1182,9 +1185,9 @@ static const isa8bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir7_w),
 
 	// dma request
-	DEVCB_DEVICE_LINE(I8237A5_TAG, i8237_dreq1_w),
-	DEVCB_DEVICE_LINE(I8237A5_TAG, i8237_dreq2_w),
-	DEVCB_DEVICE_LINE(I8237A5_TAG, i8237_dreq3_w)
+	DEVCB_DEVICE_LINE_MEMBER(I8237A5_TAG, am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8237A5_TAG, am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8237A5_TAG, am9517a_device, dreq3_w)
 };
 
 

@@ -128,7 +128,17 @@ inline void am9517a_device::dma_request(int channel, int state)
 
 inline bool am9517a_device::is_request_active(int channel)
 {
-	return BIT(m_status, channel + 4) ? true : false;
+	return (BIT(m_status, channel + 4) & !BIT(m_mask, channel)) ? true : false;
+}
+
+
+//-------------------------------------------------
+//  is_software_request_active -
+//-------------------------------------------------
+
+inline bool am9517a_device::is_software_request_active(int channel)
+{
+	return BIT(m_request, channel) && ((m_channel[channel].m_mode & 0xc0) == MODE_BLOCK);
 }
 
 
@@ -257,7 +267,7 @@ inline void am9517a_device::dma_advance()
 
 	m_channel[m_current_channel].m_count--;
 
-	if (m_current_channel || !COMMAND_CH0_ADDRESS_HOLD)
+	if (m_current_channel || !COMMAND_MEM_TO_MEM || !COMMAND_CH0_ADDRESS_HOLD)
 	{
 		if (MODE_ADDRESS_DECREMENT)
 		{
@@ -325,6 +335,7 @@ inline void am9517a_device::end_of_process()
 {
 	// terminal count
 	m_status |= 1 << m_current_channel;
+	m_request &= ~(1 << m_current_channel);
 
 	if (MODE_AUTOINITIALIZE)
 	{
@@ -433,6 +444,7 @@ void am9517a_device::device_reset()
 	m_state = STATE_SI;
 	m_command = 0;
 	m_status = 0;
+	m_request = 0;
 	m_mask = 0x0f;
 	m_temp = 0;
 	m_msb = 0;
@@ -461,32 +473,28 @@ void am9517a_device::execute_run()
 
 			if (!COMMAND_DISABLE)
 			{
-				if ((m_status >> 4) & ~m_mask)
+				int priority[] = { 0, 1, 2, 3 };
+
+				if (COMMAND_ROTATING_PRIORITY)
 				{
-					int priority[] = { 0, 1, 2, 3 };
+					int last_channel = m_last_channel;
 
-					if (COMMAND_ROTATING_PRIORITY)
+					for (int channel = 3; channel >= 0; channel--)
 					{
-						int last_channel = m_last_channel;
-
-						for (int channel = 3; channel >= 0; channel--)
-						{
-							priority[channel] = last_channel;
-							last_channel--;
-							if (last_channel < 0) last_channel = 3;
-						}
+						priority[channel] = last_channel;
+						last_channel--;
+						if (last_channel < 0) last_channel = 3;
 					}
+				}
 
-					for (int channel = 0; channel < 4; channel++)
+				for (int channel = 0; channel < 4; channel++)
+				{
+					if (is_request_active(priority[channel]) || is_software_request_active(priority[channel]))
 					{
-						if (is_request_active(priority[channel]))
-						{
-							m_current_channel = m_last_channel = priority[channel];
-							break;
-						}
+						m_current_channel = m_last_channel = priority[channel];
+						m_state = STATE_S0;
+						break;
 					}
-
-					m_state = STATE_S0;
 				}
 			}
 			break;
@@ -569,20 +577,11 @@ void am9517a_device::execute_run()
 			break;
 			
 		case STATE_S23:
-			if (COMMAND_EXTENDED_WRITE)
-			{
-				dma_write();
-			}
-
 			m_state = STATE_S24;
 			break;
 			
 		case STATE_S24:
-			if (!COMMAND_EXTENDED_WRITE)
-			{
-				dma_write();
-			}
-
+			dma_write();
 			dma_advance();
 			break;
 		}
@@ -717,14 +716,14 @@ WRITE8_MEMBER( am9517a_device::write )
 
 				if (BIT(data, 2))
 				{
-					m_status |= (1 << (channel + 4));
+					m_request |= (1 << (channel + 4));
 				}
 				else
 				{
-					m_status &= ~(1 << (channel + 4));
+					m_request &= ~(1 << (channel + 4));
 				}
 
-				if (LOG) logerror("AM9517A '%s' Request Register: %01x\n", tag(), m_status);
+				if (LOG) logerror("AM9517A '%s' Request Register: %01x\n", tag(), m_request);
 			}
 			break;
 			
