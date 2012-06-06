@@ -80,7 +80,8 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 	}
 	else
 	{
-    	offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
+    	//offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
+    	offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + (y * 0x80);
 
 	    for (int column = 0; column < x_count; column++)
 	    {
@@ -147,7 +148,7 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, XTAL_14_31818MHz/16, crtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -323,6 +324,15 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 			{
 				if (LOG) logerror("LVC option %02x\n", data & 0xff);
 				m_option = data & 0xff;
+				
+				if (OPTION_80_COL)
+				{
+					m_crtc->set_clock(XTAL_14_31818MHz / 8);
+				}
+				else
+				{
+					m_crtc->set_clock(XTAL_14_31818MHz / 16);
+				}
 			}
 			break;
 
