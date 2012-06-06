@@ -114,6 +114,7 @@ protected:
 private:
 	inline void dma_request(int channel, int state);
 	inline bool is_request_active(int channel);
+	inline bool is_software_request_active(int channel);
 	inline void set_hreq(int state);
 	inline void set_dack();
 	inline void set_eop(int state);
@@ -153,6 +154,7 @@ private:
 	UINT8 m_mask;
 	UINT8 m_status;
 	UINT8 m_temp;
+	UINT8 m_request;
 };
 
 
