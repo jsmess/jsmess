@@ -85,7 +85,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
 * リカちゃんになりたい！ - Likka-chan ni Naritai! (Sega Toys - 200110xx - HPC-6098)
 * プラレール・ピコ プラレールであそぼう！ - Plarail - Pico Plarail de Asobou! (Sega Toys - 20010921 - HPC-6099)
-* とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず! - Tottoko Hamtaro Haru-Natsu-Aki-Fuyu - Tottoko Nakayoshi! Ham Chance! (Sega Toys - 200112xx - HPC-6101)
 * アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
 * ECCジュニアの はじめてえいご Vol.１ - Patty And Her Family パティちゃんファミリー - ECC Junior no Hajimete Eigo Vol. 1 - Patty And Her Family - Patty-chan Family (Sega Toys - 20020307 - HPC-6103)
 * ECCジュニアの はじめてえいご Vol.２ - Patty Goes On A Picnic パティちゃんのピクニック - ECC Junior no Hajimete Eigo Vol. 2 - Patty Goes On A Picnic - Patty-chan no Picnic (Sega Toys - 20020307 - HPC-6104)
@@ -201,7 +200,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * ドラえもん えんそく･いもほり･うんどうかい - Doraemon Ensoku-Imohori-Undoukai (Shogakukan - ???? - T-226030)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
 * ドラえもん かぞえて･かんたん かず とけい - Doraemon Kazoete-Kanzan Kazu Tokei (Shogakukan - ???? - T-226050)
-* ドラえもん えいごであそぼう ＡＢＣ - Doraemon Eigo de Asobou ABC (Shogakukan - ???? - T-226060)
 * のりものスタジオ ゴーゴー！のりスタ あそびマッチョ！ - Norimo no Stage - Go Go! Noristar Asobi Maccho (Shogakukan - 200211xx - T-226070)
 * とっとこハム太郎 おえかきいっぱい! ハムちゃんず! - Tottoko Hamtaro Oekaki Ippai! Ham Chance! (Shogakukan - ???? - T-226080)
 * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
@@ -210,7 +208,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 里中満智子のたのしいおりがみ - Satonaka Machiko no Tanoshii Origami (Nayuta - 199511xx - T-227010)
 * ミッキーの東京ディズニーランド・スタンプラリー - Mickey no Tokyo Disneyland Stamp Rally (Kodansha - ???? - T-255010)
 * 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu (Kodansha - ???? - T-255020)
-* プーさんの はじめてのえいご - Pooh-san no Hajimete no Eigo (Kodansha - 2001xxxx - T-255060)
 * 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ<10th> - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu ~10th Anniversary Edition~ (Kodansha - 200305xx - T-255080)
 * くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
@@ -360,6 +357,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="donald no terebi shou (japan).bin" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraabc">
+		<description>Doraemon - Eigo de Asobou ABC! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-226060"/>
+		<info name="alt_title" value="ドラえもん えいごであそぼう ＡＢＣ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="doraemon eigo de asobou abc (japan).bin" size="2097152" crc="efd5d261" sha1="5addf4ea6cd6c022286a7979f758478eec0331f0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -766,6 +776,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="poohhaji">
+		<description>Pooh-san no Hajimete no Eigo (Jpn)</description>
+		<year>2001</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255060"/>
+		<info name="alt_title" value="プーさんの はじめてのえいご"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pooh-san no hajimete no eigo (japan).bin" size="2097152" crc="265a764a" sha1="a6fc3b973518678caf89605f841cad6407c7e861" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="profpico" supported="no">
 		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
 		<year>1995</year>
@@ -966,6 +989,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tokyo disney sea mickey to asobou! (japan).bin" size="2097152" crc="38b713b3" sha1="ad29728e7421d4b7505159dc69ba5978964c6c35" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamtnaka">
+		<description>Tottoko Hamtaro - Haru-Natsu-Aki-Fuyu - Tottoko Nakayoshi! Ham Chance! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6101"/>
+		<info name="release" value="200112xx"/>
+		<info name="alt_title" value="とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず!"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="tottoko hamtarou haru natsu aki fuyu tottoko nakayoshi! ham-chans! (japan).bin" size="2097152" crc="71f39f19" sha1="faa6a6c997c9a5a8f9da30b0db44df01097c12b8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
