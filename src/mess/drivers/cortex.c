@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 
 class cortex_state : public driver_device
 {
@@ -68,7 +68,7 @@ static const struct tms9995reset_param cortex_processor_config =
 static MACHINE_CONFIG_START( cortex, cortex_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MCFG_CPU_ADD("maincpu", TMS9995, 12000000)
+	MCFG_CPU_ADD("maincpu", TMS9995L, 12000000)
 	MCFG_CPU_CONFIG(cortex_processor_config)
 	MCFG_CPU_PROGRAM_MAP(cortex_mem)
 	MCFG_CPU_IO_MAP(cortex_io)

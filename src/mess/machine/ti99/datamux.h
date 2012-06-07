@@ -34,6 +34,15 @@ typedef struct _dmux_device_list_entry
 	UINT8					unset;				// bits that must be reset for this switch so that this device is present
 } dmux_device_list_entry;
 
+#define DMUX_CONFIG(name) \
+	const datamux_config(name) =
+
+typedef struct _datamux_config
+{
+	devcb_write_line				ready;
+	const dmux_device_list_entry	*devlist;
+} datamux_config;
+
 /*
     Device list of this datamux.
 */
@@ -62,6 +71,8 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
+	void clock_in(int state);
+
 protected:
 	/* Constructor */
 	virtual void device_start(void);
@@ -70,18 +81,17 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
+	// Ready line to the CPU
+	devcb_resolved_write_line m_ready;
+
 	/* All devices that are attached to the 8-bit bus. */
 	simple_list<attached_device> m_devices;
 
-	/* Latch which stores the first byte */
+	/* Latch which stores the first (odd) byte */
 	UINT8 m_latch;
 
-	// Intermediate storage which holds the low byte of the previous read cycle.
-	// In reality, the TMS9900 adds the low byte to the 16 bit memory word
-	// from the previous read-before-write cycle, but this is not yet handled
-	// by the TMS9900 emulation. TODO: rewrite TMS9900
-	UINT8 m_lowbyte;
-	UINT8 m_highbyte;
+	/* Counter for the wait states. */
+	int   m_waitcount;
 
 	/* Memory expansion (internal, 16 bit). */
 	UINT16 *m_ram16b;

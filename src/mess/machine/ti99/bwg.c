@@ -78,8 +78,8 @@ void snug_bwg_device::handle_hold()
 	else
 		state = CLEAR_LINE;
 
-	// TODO: use READY
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state);
+	m_slot->set_ready((state==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state);
 }
 
 /*

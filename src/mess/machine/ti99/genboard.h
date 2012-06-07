@@ -110,27 +110,34 @@ private:
 
 /*****************************************************************************/
 
+typedef struct _geneve_mapper_config
+{
+	devcb_write_line	ready;
+} geneve_mapper_config;
+
 class geneve_mapper_device : public device_t
 {
 public:
 	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void set_geneve_mode(bool geneve) { m_geneve_mode = geneve; }
-	void set_direct_mode(bool direct) { m_direct_mode = direct; }
-	void set_cartridge_size(int size) { m_cartridge_size = size; }
-	void set_cartridge_writable(int base, bool write)
+	inline void set_geneve_mode(bool geneve) { m_geneve_mode = geneve; }
+	inline void set_direct_mode(bool direct) { m_direct_mode = direct; }
+	inline void set_cartridge_size(int size) { m_cartridge_size = size; }
+	inline void set_cartridge_writable(int base, bool write)
 	{
 		if (base==0x6000)  m_cartridge6_writable = write;
 		else  m_cartridge7_writable = write;
 	}
-	void set_video_waitstates(bool wait) { m_video_waitstates = wait; }
-	void set_extra_waitstates(bool wait) { m_extra_waitstates = wait; }
-	void start_video_wait(int ws);
+	inline void set_video_waitstates(bool wait) { m_video_waitstates = wait; }
+	inline void set_extra_waitstates(bool wait) { m_extra_waitstates = wait; }
+
 	void do_wait(int min);
 
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
 
 	DECLARE_INPUT_CHANGED_MEMBER( gm_changed );
+
+	void clock_in(int state);
 
 protected:
 	void	device_start();
@@ -143,10 +150,8 @@ private:
 	int		m_grom_address;
 	DECLARE_READ8_MEMBER( read_grom );
 	DECLARE_WRITE8_MEMBER( write_grom );
-	void	device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// wait states
-	emu_timer	*m_video_waittimer;
 	bool		m_video_waiting;
 	bool		m_video_waitstates;
 	bool		m_extra_waitstates;
@@ -168,18 +173,28 @@ private:
 	int		m_sram_mask;
 	int		m_sram_val;
 
+	// Ready line to the CPU
+	devcb_resolved_write_line m_ready;
+
+	// Counter for the wait states.
+	int   m_waitcount;
+
 	// Devices
-	device_t*		m_clock;
-	device_t*		m_cpu;
+	device_t*				m_clock;
 	geneve_keyboard_device*	m_keyboard;
-	bus8z_device*	m_video;
-	bus8z_device*	m_peribox;
-	bus8z_device*	m_sound;
-	UINT8*			m_eprom;
-	UINT8*			m_sram;
-	UINT8*			m_dram;
+	bus8z_device*			m_video;
+	bus8z_device*			m_peribox;
+	bus8z_device*			m_sound;
+	UINT8*					m_eprom;
+	UINT8*					m_sram;
+	UINT8*					m_dram;
 };
 
-#define MCFG_GENEVE_MAPPER_ADD(_tag )	\
-	MCFG_DEVICE_ADD(_tag, GENEVE_MAPPER, 0)
+#define GENEVE_MAPPER_CONFIG(name) \
+	const geneve_mapper_config(name) =
+
+#define MCFG_GENEVE_MAPPER_ADD(_tag, _conf )	\
+	MCFG_DEVICE_ADD(_tag, GENEVE_MAPPER, 0)	\
+	MCFG_DEVICE_CONFIG( _conf )
+
 #endif

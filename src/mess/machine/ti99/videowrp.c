@@ -31,12 +31,7 @@ ti_video_device::ti_video_device(const machine_config &mconfig, device_type type
 }
 
 ti_std_video_device::ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_video_device(mconfig, TI994AVIDEO, "Video subsystem", tag, owner, clock)
-{
-}
-
-ti_std8_video_device::ti_std8_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_video_device(mconfig, TI998VIDEO, "Video subsystem", tag, owner, clock)
+	: ti_video_device(mconfig, TI99VIDEO, "Video subsystem", tag, owner, clock)
 {
 }
 
@@ -47,58 +42,9 @@ ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const ch
 
 /*****************************************************************************/
 /*
-    Illegal accesses; just take a wait state. Used by TI-99/4A standard or with EVPC
+    Memory access (TI-99/4A and TI-99/8)
 */
-
-READ16_MEMBER( ti_video_device::noread )
-{
-	device_adjust_icount(m_cpu, -4);
-	return 0;
-}
-
-WRITE16_MEMBER( ti_video_device::nowrite )
-{
-	device_adjust_icount(m_cpu, -4);
-}
-
-/*****************************************************************************/
-
-// TODO: device_adjust_icount(video->cpu, -4);
-
-/*
-    Memory access (TI-99/4(A))
-*/
-READ16_MEMBER( ti_std_video_device::read16 )
-{
-	if (offset & 1)
-	{	/* read VDP status */
-		return ((int) m_tms9928a->register_read(*(this->m_space), 0)) << 8;
-	}
-	else
-	{	/* read VDP RAM */
-		return ((int) m_tms9928a->vram_read(*(this->m_space), 0)) << 8;
-	}
-}
-
-WRITE16_MEMBER( ti_std_video_device::write16 )
-{
-	if (offset & 1)
-	{	/* write VDP address */
-		m_tms9928a->register_write(*(this->m_space), 0, (data >> 8) & 0xff);
-	}
-	else
-	{	/* write VDP data */
-		m_tms9928a->vram_write(*(this->m_space), 0, (data >> 8) & 0xff);
-	}
-}
-
-/******************************************************************************/
-
-/*
-    Memory access (TI-99/8)
-    Makes use of the Z memory handler.
-*/
-READ8Z_MEMBER( ti_std8_video_device::readz )
+READ8Z_MEMBER( ti_std_video_device::readz )
 {
 	if (offset & 2)
 	{       /* read VDP status */
@@ -110,7 +56,7 @@ READ8Z_MEMBER( ti_std8_video_device::readz )
 	}
 }
 
-WRITE8_MEMBER( ti_std8_video_device::write )
+WRITE8_MEMBER( ti_std_video_device::write )
 {
 	if (offset & 2)
 	{	/* write VDP address */
@@ -217,15 +163,11 @@ void ti_exp_video_device::video_update_mouse(int delta_x, int delta_y, int butto
 
 void ti_video_device::device_start(void)
 {
-	m_cpu = machine().device("maincpu");
-	m_space = m_cpu->memory().space(AS_PROGRAM);
 	m_tms9928a = static_cast<tms9928a_device*>(machine().device(TMS9928A_TAG));
 }
 
 void ti_exp_video_device::device_start(void)
 {
-	m_cpu = machine().device("maincpu");
-	m_space = m_cpu->memory().space(AS_PROGRAM);
 	m_v9938 = static_cast<v9938_device*>(machine().device(V9938_TAG));
 }
 
@@ -234,6 +176,9 @@ void ti_video_device::device_reset(void)
 }
 
 /**************************************************************************/
+
+// TODO: Should propagate READY to the system. However, READY is implemented
+// to be read instead of pushing the level.
 
 ti_sound_system_device::ti_sound_system_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, TISOUND, "TI sound chip wrapper", tag, owner, clock)
@@ -252,7 +197,6 @@ void ti_sound_system_device::device_start(void)
 
 /**************************************************************************/
 
-const device_type TI994AVIDEO = &device_creator<ti_std_video_device>;
-const device_type TI998VIDEO = &device_creator<ti_std8_video_device>;
+const device_type TI99VIDEO = &device_creator<ti_std_video_device>;
 const device_type V9938VIDEO = &device_creator<ti_exp_video_device>;
 const device_type TISOUND = &device_creator<ti_sound_system_device>;

@@ -15,16 +15,13 @@
 
 typedef struct _ti99grom_config
 {
-	bool				m_writable;
-	int 				m_ident;
-	const char			*m_regionname;
-	offs_t				m_offset_reg;
-	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a
-	// specific byte pattern which is created by a logical OR of lower
-	// regions
-	int					m_size;
-	bool				m_rollover;	// some GRAM simulations do not implement rollover
-	devcb_write_line	m_ready;
+	bool				writable;
+	int 				ident;
+	const char			*regionname;
+	offs_t				offset_reg;
+	int					size;
+	devcb_write_line	ready;
+	int					clockrate;
 } ti99grom_config;
 
 #define GROM_CONFIG(name) \
@@ -44,6 +41,24 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 private:
+	// Is this a GRAM (never seen actually, but obviously planned)
+	bool		m_writable;
+
+	// Identification of this GROM (0-7)
+	int 		m_ident;
+
+	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a
+	// specific byte pattern which is created by a logical OR of lower
+	// regions
+	int			m_size;
+
+	// Ready callback. This line is usually connected to the READY pin of the CPU.
+	devcb_resolved_write_line	m_gromready;
+
+	// Frequency of the incoming GROM clock. In most application cases the
+	// GROM gets its clock from the video display processor (TMS9918)
+	int		m_clockrate;
+
 	/* Address pointer. */
 	// This value is always expected to be in the range 0x0000 - 0xffff, even
 	// when this GROM is not addressed.
@@ -61,18 +76,22 @@ private:
 	/* Pointer to the memory region contained in this GROM. */
 	UINT8 *m_memptr;
 
-	/* Ready callback. This line is usually connected to the READY pin of the CPU. */
-	devcb_resolved_write_line m_gromready;
+	// Timer for READY line operation
+	emu_timer *m_timer;
 
 	/* Indicates whether this device will react on the next read/write data access. */
-	int is_selected()
+	inline int is_selected()
 	{
 		return (((m_address >> 13)&0x07)==m_ident);
 	}
 
+	// Calling this method causes the READY line to be cleared, which puts the
+	// CPU into wait state mode. A timer is set to raise READY again.
+	void clear_ready();
+
 	void device_start(void);
 	void device_reset(void);
-	void device_config_complete(void);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

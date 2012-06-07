@@ -324,15 +324,19 @@ void peribox_device::intb_join(int slot, int state)
 	m_console_intb((m_intb_flag != 0)? ASSERT_LINE : CLEAR_LINE);
 }
 
+/*
+    When any device pulls down READY, READY goes down.
+*/
 void peribox_device::ready_join(int slot, int state)
 {
-	if (VERBOSE>7) LOG("Peribox propagating READY from slot %d to console: %d\n", slot, state);
-	if (state==ASSERT_LINE)
+	if (VERBOSE>7) LOG("peribox: Incoming READY=%d from slot %d\n", state, slot);
+	// We store the inverse state
+	if (state==CLEAR_LINE)
 		m_ready_flag |= (1 << slot);
 	else
 		m_ready_flag &= ~(1 << slot);
 
-	m_console_ready((m_ready_flag != 0)? ASSERT_LINE : CLEAR_LINE);
+	m_console_ready((m_ready_flag != 0)? CLEAR_LINE : ASSERT_LINE);
 }
 
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)

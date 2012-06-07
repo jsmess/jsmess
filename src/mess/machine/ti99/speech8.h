@@ -18,6 +18,15 @@
 
 extern const device_type TI99_SPEECH8;
 
+#define SPEECH8_CONFIG(name) \
+	const speech8_config(name) =
+
+typedef struct _speech8_config
+{
+	devcb_write_line ready;
+} speech8_config;
+
+
 class ti998_spsyn_device : public bus8z_device
 {
 public:
@@ -44,12 +53,16 @@ protected:
 	void			device_reset(void);
 	const rom_entry *device_rom_region() const;
 	machine_config_constructor device_mconfig_additions() const;
-	void			device_config_complete();
 
 private:
 	device_t		*m_vsp;
+
+	// Ready line to the CPU
+	devcb_resolved_write_line m_ready;
 };
 
-#define MCFG_TISPEECH8_ADD(_tag)		\
-	MCFG_DEVICE_ADD(_tag, TI99_SPEECH8, 0)
+#define MCFG_TISPEECH8_ADD(_tag, _conf)		\
+	MCFG_DEVICE_ADD(_tag, TI99_SPEECH8, 0)  \
+	MCFG_DEVICE_CONFIG(_conf)
+
 #endif

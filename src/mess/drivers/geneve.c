@@ -202,7 +202,7 @@
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9995.h"
 #include "machine/tms9901.h"
 #include "machine/mm58274c.h"
 #include "sound/sn76496.h"
@@ -234,6 +234,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
 	DECLARE_WRITE_LINE_MEMBER(extbus_wait_states);
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
+
+	DECLARE_WRITE_LINE_MEMBER(clock_out);
+	DECLARE_WRITE8_MEMBER(external_operation);
+
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
 	WRITE_LINE_MEMBER( keyboard_interrupt );
@@ -243,11 +247,12 @@ public:
 	tms9901_device*			m_tms9901;
 	geneve_mapper_device*	m_mapper;
 	peribox_device*			m_peribox;
-	device_t*				m_cpu;
+	tms9995_device*			m_cpu;
 
 	WRITE_LINE_MEMBER( inta );
 	WRITE_LINE_MEMBER( intb );
-	WRITE_LINE_MEMBER( ready );
+	WRITE_LINE_MEMBER( ext_ready );
+	WRITE_LINE_MEMBER( mapper_ready );
 
 	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
@@ -256,11 +261,13 @@ public:
 	line_state	m_int2;
 	line_state	m_keyint;
 	line_state	m_video_wait; // reflects the line to the mapper for CRU query
+
+	int	m_ready_line, m_ready_line1;
+
 private:
 	int		m_joystick_select;
 	// Some values to keep. Rest is on the geneve_mapper.
 };
-
 
 /*
     Memory map
@@ -356,33 +363,43 @@ WRITE8_MEMBER ( geneve::cruwrite )
 		{
 		case 5:
 			// No one really cares...
+			if (VERBOSE>8) LOG("geneve: Set PAL flag = %02x\n", data);
 			// m_palvideo = (data!=0);
 			break;
 		case 7:
 			// m_capslock = (data!=0);
+			if (VERBOSE>8) LOG("geneve: Set capslock flag = %02x\n", data);
 			break;
 		case 8:
+			if (VERBOSE>8) LOG("geneve: Set keyboard clock flag = %02x\n", data);
 			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 9:
+			if (VERBOSE>8) LOG("geneve: Set keyboard scan flag = %02x\n", data);
 			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 10:
+			if (VERBOSE>8) LOG("geneve: Geneve mode = %02x\n", data);
 			m_mapper->set_geneve_mode(data!=0);
 			break;
 		case 11:
+			if (VERBOSE>8) LOG("geneve: Direct mode = %02x\n", data);
 			m_mapper->set_direct_mode(data!=0);
 			break;
 		case 12:
+			if (VERBOSE>8) LOG("geneve: Cartridge size 8K = %02x\n", data);
 			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
 			break;
 		case 13:
+			if (VERBOSE>8) LOG("geneve: Cartridge writable 6000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x6000, (data!=0));
 			break;
 		case 14:
+			if (VERBOSE>8) LOG("geneve: Cartridge writable 7000 = %02x\n", data);
 			m_mapper->set_cartridge_writable(0x7000, (data!=0));
 			break;
 		case 15:
+			if (VERBOSE>8) LOG("geneve: Extra wait states = %02x\n", data==0);
 			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
 			break;
 		default:
@@ -410,8 +427,8 @@ READ8_MEMBER( geneve::cruread )
 		return value;
 	}
 
-	// TMS9995-internal CRU locations (1ee0-1efe) are handled within the 99xxcore
-	// implementation (read_single_cru), so we don't arrive here
+	// TMS9995-internal CRU locations (1ee0-1efe) are handled within the processor
+	// so we just don't arrive here
 
 	// Propagate the CRU access to external devices
 	m_peribox->crureadz(addroff, &value);
@@ -535,12 +552,13 @@ WRITE_LINE_MEMBER( geneve::video_wait_states )
 /*
     Called by the 9901 core whenever the state of INTREQ and IC0-3 changes.
     As with the TI-99/4A, the interrupt level is delivered as the offset,
-    but again it is ignored.
+    but again it is ignored. Anyway, the TMS9995 has only two external inputs
+    (INT1 and INT4).
 */
 WRITE8_MEMBER( geneve::tms9901_interrupt )
 {
-	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	device_execute(m_cpu)->set_input_line(0, data);
+	/* INTREQ is connected to INT1. */
+	device_execute(m_cpu)->set_input_line(1, data);
 }
 
 /* tms9901 setup */
@@ -584,7 +602,7 @@ WRITE_LINE_MEMBER( geneve::inta )
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(1, state);
-	device_execute(m_cpu)->set_input_line(1, state);
+	device_execute(m_cpu)->set_input_line(4, state);
 }
 
 /*
@@ -596,9 +614,18 @@ WRITE_LINE_MEMBER( geneve::intb )
 	m_tms9901->set_single_int(12, state);
 }
 
-WRITE_LINE_MEMBER( geneve::ready )
+WRITE_LINE_MEMBER( geneve::ext_ready )
 {
-	if (VERBOSE>0) LOG("geneve: READY line set ... not yet connected, level=%02x\n", state);
+	if (VERBOSE>6) LOG("ti99_8: READY level (ext) =%02x\n", state);
+	m_ready_line = state;
+	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( geneve::mapper_ready )
+{
+	if (VERBOSE>6) LOG("geneve: READY level (mapper) = %02x\n", state);
+	m_ready_line1 = state;
+	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -641,11 +668,29 @@ TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 	}
 }
 
-static const struct tms9995reset_param geneve_processor_config =
+WRITE8_MEMBER( geneve::external_operation )
 {
-	0,	/* disable automatic wait state generation */
-	0,	/* no IDLE callback */
-	0	/* no MP9537 mask */
+	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	if (VERBOSE>1) LOG("External operation %s not implemented on Geneve board\n", extop[offset]);
+}
+
+/*
+    Clock line from the CPU. Used to control wait state generation.
+*/
+WRITE_LINE_MEMBER( geneve::clock_out )
+{
+	m_mapper->clock_in(state);
+}
+
+static TMS9995_CONFIG( geneve_processor_config )
+{
+	DEVCB_DRIVER_MEMBER(geneve, external_operation),
+	DEVCB_NULL,			// Instruction acquisition
+	DEVCB_DRIVER_LINE_MEMBER(geneve, clock_out),
+	DEVCB_NULL,			// wait
+	DEVCB_NULL,			// HOLDA
+	INTERNAL_RAM,		// use internal RAM
+	NO_OVERFLOW_INT		// The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
 static const mm58274c_interface geneve_mm58274c_interface =
@@ -663,8 +708,13 @@ static PERIBOX_CONFIG( peribox_conf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(geneve, inta),			// INTA
 	DEVCB_DRIVER_LINE_MEMBER(geneve, intb),			// INTB
-	DEVCB_DRIVER_LINE_MEMBER(geneve, ready),		// READY
+	DEVCB_DRIVER_LINE_MEMBER(geneve, ext_ready),	// READY
 	0x00000											// Address bus prefix (Mapper will produce prefixes)
+};
+
+static GENEVE_MAPPER_CONFIG( mapper_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(geneve, mapper_ready)	// READY
 };
 
 static DRIVER_INIT( geneve )
@@ -679,7 +729,7 @@ static MACHINE_START( geneve )
 	driver->m_keyboard = static_cast<geneve_keyboard_device*>(machine.device(GKEYBOARD_TAG));
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
 	driver->m_mouse =  static_cast<geneve_mouse_device*>(machine.device(GMOUSE_TAG));
-	driver->m_cpu = machine.device("maincpu");
+	driver->m_cpu = static_cast<tms9995_device*>(machine.device("maincpu"));
 }
 
 /*
@@ -693,30 +743,34 @@ static MACHINE_RESET( geneve )
 	driver->m_int2 = CLEAR_LINE;	// flag reflecting the INT2 line
 	driver->m_keyint = CLEAR_LINE;
 
+	// No automatic wait state (auto wait state is enabled with READY=CLEAR at RESET)
+	driver->m_cpu->set_ready(ASSERT_LINE);
+
+	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+
 	driver->m_peribox->set_genmod(machine.root_device().ioport("MODE")->read()==GENMOD);
 }
 
 static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MCFG_CPU_ADD("maincpu", TMS9995, 12000000)
-	MCFG_CPU_CONFIG(geneve_processor_config)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(crumap)
+	MCFG_TMS9995_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
 
 	MCFG_MACHINE_START( geneve )
 	MCFG_MACHINE_RESET( geneve )
 
 	/* video hardware */
-	/* FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
-    restore normal video speed for V9938-based systems until the V9938 implementation
-    is properly fixed. */
+	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.
+	// The reason is that that the number of screen lines is counted twice for the
+	// interlace mode, but in non-interlace modes only half of the lines are
+	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
+	// not 60 Hz. This should be fixed in the v9938 emulation.
 	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve, set_tms9901_INT2_from_v9938)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	/* Main board components */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
-	MCFG_GENEVE_MAPPER_ADD( GMAPPER_TAG )
+	MCFG_GENEVE_MAPPER_ADD(GMAPPER_TAG, mapper_conf)
 	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
 
 	/* Peripheral expansion box (Geneve composition) */

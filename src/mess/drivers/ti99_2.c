@@ -79,7 +79,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 
 #include "emu.h"
 #include "machine/tms9901.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 
 
 class ti99_2_state : public driver_device
@@ -375,7 +375,7 @@ static const struct tms9995reset_param ti99_2_processor_config =
 
 static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, 10700000)
+	MCFG_CPU_ADD("maincpu", TMS9995L, 10700000)
 	MCFG_CPU_CONFIG(ti99_2_processor_config)
 	MCFG_CPU_PROGRAM_MAP(ti99_2_memmap)
 	MCFG_CPU_IO_MAP(ti99_2_io)

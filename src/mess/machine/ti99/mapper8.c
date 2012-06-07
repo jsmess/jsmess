@@ -42,7 +42,7 @@
 
 #include "mapper8.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG logerror
 
 // Pseudo devices which are not implemented by a proper device. We use these
@@ -121,8 +121,9 @@ READ8_MEMBER( ti998_mapper_device::readm )
 {
 	UINT8 value = 0;
 	bool found = false;
-
+	if (VERBOSE>5) LOG("mapper8: read from %04x\n", offset);
 	found = search_logically_addressed_r(space, offset, &value, mem_mask);
+	m_waitcount = 2;
 
 	if (!found)
 	{
@@ -133,7 +134,15 @@ READ8_MEMBER( ti998_mapper_device::readm )
 
 		// So now let's do the same as above with physical addresses
 		search_physically_addressed_r(space, pas_address, &value, mem_mask);
+
+		// The PAS area requires one more wait state, as the address bus
+		// is multiplexed
+		m_waitcount = 3;
 	}
+
+	// Insert wait states and let CPU enter wait state
+	m_ready(CLEAR_LINE);
+
 	return value;
 }
 
@@ -143,6 +152,7 @@ WRITE8_MEMBER( ti998_mapper_device::writem )
 
 	// Look for components responding to the logical address
 	found = search_logically_addressed_w(space, offset, data, mem_mask);
+	m_waitcount = 2;
 
 	if (!found)
 	{
@@ -153,7 +163,14 @@ WRITE8_MEMBER( ti998_mapper_device::writem )
 
 		// So now let's do the same as above with physical addresses
 		search_physically_addressed_w(space, pas_address, data, mem_mask);
+
+		// The PAS area requires one more wait state, as the address bus
+		// is multiplexed
+		m_waitcount = 3;
 	}
+
+	// Insert wait states and let CPU enter wait state
+	m_ready(CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -256,6 +273,7 @@ bool ti998_mapper_device::search_logically_addressed_r(address_space& space, off
 	if (VERBOSE>8) LOG("mapper8: offset=%04x; CRUS=%d, PTGEN=%d\n", offset, m_CRUS? 1:0, m_PTGE? 0:1);
 	while (dev != NULL)
 	{
+		if (VERBOSE>5) LOG("mapper8: checking node=%s\n", dev->m_config->name);
 		// Check the mode
 		if (((dev->m_config->mode == NATIVE) && (m_CRUS==false))
 			|| ((dev->m_config->mode == TI99EM) && (m_CRUS==true))
@@ -430,6 +448,20 @@ void ti998_mapper_device::search_physically_addressed_w( address_space& space, o
 	}
 }
 
+/*
+    The mapper is connected to the clock line in order to operate
+    the wait state counter.
+*/
+void ti998_mapper_device::clock_in(int clock)
+{
+	if (clock==ASSERT_LINE && m_waitcount!=0)
+	{
+		m_waitcount--;
+		if (m_waitcount==0) m_ready(ASSERT_LINE);
+	}
+}
+
+
 /***************************************************************************
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
@@ -446,7 +478,11 @@ void ti998_mapper_device::device_start()
 {
 	if (VERBOSE>5) LOG("ti99_8: Starting mapper\n");
 
-	const mapper8_list_entry *entry = reinterpret_cast<const mapper8_list_entry *>(static_config());
+	const mapper8_config *conf = reinterpret_cast<const mapper8_config *>(static_config());
+
+	const mapper8_list_entry *entry = conf->devlist;
+	m_ready.resolve(conf->ready, *this);
+
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
 	m_rom  = machine().root_device().memregion("maincpu")->base();
@@ -527,6 +563,8 @@ void ti998_mapper_device::device_reset()
 
 	// Clean mapper
 	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
+
+	m_ready(ASSERT_LINE);
 }
 
 const device_type MAPPER8 = &device_creator<ti998_mapper_device>;

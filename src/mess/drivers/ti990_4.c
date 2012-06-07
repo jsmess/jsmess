@@ -36,7 +36,7 @@ TODO:
 #define VIDEO_911 0
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "machine/ti990.h"
 #if VIDEO_911
 #include "video/911_vdt.h"
@@ -242,7 +242,7 @@ static const floppy_interface ti990_4_floppy_interface =
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
+	MCFG_CPU_ADD("maincpu", TMS9900L, 3000000)
 	MCFG_CPU_PROGRAM_MAP(ti990_4_memmap)
 	MCFG_CPU_IO_MAP(ti990_4_cru_map)
 	MCFG_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)

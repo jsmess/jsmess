@@ -58,7 +58,7 @@
 ******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "video/tms9928a.h"
@@ -824,7 +824,7 @@ static const tms9980areset_param reset_params =
 
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
+	MCFG_CPU_ADD("maincpu", TMS9980L, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
 	MCFG_CPU_CONFIG(reset_params)
 	MCFG_CPU_PROGRAM_MAP(tm990_189_memmap)
 	MCFG_CPU_IO_MAP(tm990_189_cru_map)
@@ -853,7 +853,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
+	MCFG_CPU_ADD("maincpu", TMS9980L, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
 	MCFG_CPU_CONFIG(reset_params)
 	MCFG_CPU_PROGRAM_MAP(tm990_189_v_memmap)
 	MCFG_CPU_IO_MAP(tm990_189_cru_map)

@@ -18,13 +18,8 @@
 
 class ti_video_device : public bus8z_device
 {
-public:
-	DECLARE_READ16_MEMBER(noread);
-	DECLARE_WRITE16_MEMBER(nowrite);
-
 protected:
 	address_space	*m_space;
-	device_t		*m_cpu;
 	tms9928a_device *m_tms9928a;
 
 	/* Constructor */
@@ -36,23 +31,12 @@ protected:
 };
 
 /*
-    Connected to the high 8 bits of the 16 bit data bus of the TI-99/4A, D0-D7
+    Used in the TI-99/4A and TI-99/8
 */
 class ti_std_video_device : public ti_video_device
 {
 public:
 	ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_WRITE16_MEMBER(write16);
-};
-
-/*
-    Connected to the multiplexed 8 bit data bus of the TI-99/8
-*/
-class ti_std8_video_device : public ti_video_device
-{
-public:
-	ti_std8_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 };
@@ -98,25 +82,25 @@ private:
 /****************************************************************************/
 
 #define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _tmsparam)	\
-	MCFG_DEVICE_ADD(_tag, TI994AVIDEO, 0)										\
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam ) 					\
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
 
 #define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _tmsparam)		\
-	MCFG_DEVICE_ADD(_tag, TI994AVIDEO, 0)										\
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam )						\
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
 
 #define MCFG_TI998_ADD_NTSC(_tag, _chip, _tmsparam)	\
-	MCFG_DEVICE_ADD(_tag, TI998VIDEO, 0)										\
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam ) 					\
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
 
 #define MCFG_TI998_ADD_PAL(_tag, _chip, _tmsparam)		\
-	MCFG_DEVICE_ADD(_tag, TI998VIDEO, 0)										\
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam )						\
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
@@ -137,8 +121,7 @@ private:
 #define MCFG_TI_SOUND_ADD(_tag)			\
 	MCFG_DEVICE_ADD(_tag, TISOUND, 0)
 
-extern const device_type TI994AVIDEO;
-extern const device_type TI998VIDEO;
+extern const device_type TI99VIDEO;
 extern const device_type V9938VIDEO;
 extern const device_type TISOUND;
 

@@ -4,17 +4,18 @@
 
     The DMUX is used to convert the 16-bit databus of the TMS9900 into
     an 8-bit databus. The processor writes a 16 bit word which is split
-    by this circuit into two bytes that are sent serially over the 8-bit bus.
+    by this circuit into two bytes that are sent subsequently over the 8-bit bus.
     In the opposite direction, one 16-bit read request from the CPU is
     translated into two 8-bit read requests (odd address / even address) from
-    this datamux. Its 8-bit latch (LS373) holds the first byte, while the
-    datamux puts the CPU on hold, gets the second byte, and routes that second
-    byte to the D0-D7 lines, while the latch now puts the first byte on D8-D15.
-    Since we get two memory accesses each time, there are twice as many
-    wait states than for a direct 16-bit access (order LSB, MSB).
+    this datamux. Its 8-bit latch (LS373) holds the first (odd address) byte,
+    while the datamux puts the CPU on hold, gets the second byte,
+    and routes that second byte to the D0-D7 lines, while the latch now puts
+    the first byte on D8-D15. Since we get two memory accesses each time,
+    there are twice as many wait states than for a direct 16-bit access
+    (order LSB, MSB).
 
-    In addition, since the TMS 9900 also supports byte operations, every write
-    operation is automatically preceded by a read operation, so this adds even
+    In addition, since the TMS 9900 also supports byte operations, all write
+    operations are automatically preceded by a read operation, so this adds even
     more delays.
 
     Within the TI-99/4(A) console, only the internal ROM and the small internal
@@ -76,6 +77,7 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 {
 }
 
+#define VERBOSE 0
 #define LOG logerror
 
 /***************************************************************************
@@ -87,11 +89,15 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
     accesses must not occur within the loop. So we have one access on the bus,
     a delay, and then the second access (each one with possibly many attached
     devices)
+
+    TODO: Check two-pass operation
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
 	UINT8 hbyte = 0;
 	UINT16 addr = (offset << 1);
+
+	assert (mem_mask == 0xffff);
 
 	// Looks ugly, but this is close to the real thing. If the 16bit
 	// memory expansion is installed in the console, and the access hits its
@@ -107,9 +113,6 @@ READ16_MEMBER( ti99_datamux_device::read )
 		if (base != 0)
 		{
 			UINT16 reply = m_ram16b[offset-base];
-			// Store the prefetch
-			m_lowbyte = reply & 0x00ff;
-			m_highbyte = (reply & 0xff00)>>8;
 			return reply;
 		}
 	}
@@ -124,15 +127,12 @@ READ16_MEMBER( ti99_datamux_device::read )
 			// Cast to the bus8z_device (see ti99defs.h)
 			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
 			devz->readz(*m_space, addr+1, &m_latch);
-			m_lowbyte = m_latch;
 		}
 		// hope we don't have two devices answering...
 		// consider something like a logical OR and maybe some artificial smoke
 		dev = dev->m_next;
 	}
 
-	// Takes three cycles
-	device_adjust_icount(m_cpu,-3);
 	dev = m_devices.first();
 
 	// Reading the even address now (addr)
@@ -144,14 +144,16 @@ READ16_MEMBER( ti99_datamux_device::read )
 			{
 				bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
 				devz->readz(*m_space, addr, &hbyte);
-				m_highbyte = hbyte;
 			}
 		}
 		dev = dev->m_next;
 	}
 
-	// Takes three cycles
-	device_adjust_icount(m_cpu,-3);
+	// Insert four wait states and let CPU enter wait state
+	// The counter in the real console is implemented by a shift register
+	// that is triggered on a memory access
+	m_waitcount = 6;
+	m_ready(CLEAR_LINE);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
 	return (hbyte<<8) | m_latch ;
@@ -164,26 +166,14 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 {
 	UINT16 addr = (offset << 1);
 
-	// The handling of byte writing is done in MESS using mem_mask.
-	// If the mem_mask is ff00, the CPU is about to write the high byte. This
-	// is not the true story, since the real CPU never writes half a word.
-	// In reality, the TMS9900 performs a read-before-write, stores the word
-	// internally, and replaces the high or low byte when it is about to write
-	// a byte to an even or odd address, respectively. Then it writes the
-	// complete new word.
-	// Example: Memory locations 0x6000 contains the word 0x1234 (BE). If we
-	// write a 0x56 to 0x6000, the CPU first reads 0x6000, stores the 0x1234,
-	// replaces the first byte with 0x56, and then writes 0x5634 to 0x6000.
+	// Although MESS allows for using mem_mask to address parts of the
+	// data bus, this is not used in the TMS implementation. In fact, all
+	// accesses are true 16-bit accesses. We check for mem_mask always
+	// being ffff.
 
-	// Until the TMS9900 emulation is corrected in this way, we are using
-	// the DMUX in place of the internal buffer.
+//  printf("write addr=%04x, value=%04x\n", addr, data);
 
-//  LOG("write addr=%04x memmask=%04x value=%04x\n", addr, mem_mask, data);
-	if (mem_mask == 0xff00)
-		data = data | m_lowbyte;
-
-	if (mem_mask == 0x00ff)
-		data = data | (m_highbyte << 8);
+	assert (mem_mask == 0xffff);
 
 	// Handle the internal 32K expansion
 	if (m_use32k)
@@ -211,8 +201,6 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 		dev = dev->m_next;
 	}
 
-	// Takes three cycles
-	device_adjust_icount(m_cpu,-3);
 	dev = m_devices.first();
 
 	while (dev != NULL)
@@ -226,11 +214,23 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 		dev = dev->m_next;
 	}
 
-	// Takes three cycles
-	device_adjust_icount(m_cpu,-3);
+	// Insert four wait states and let CPU enter wait state
+	m_waitcount = 6;
+	m_ready(CLEAR_LINE);
 }
 
-/* CRU space is not involved in the dmux. */
+/*
+    The datamux is connected to the clock line in order to operate
+    the wait state counter.
+*/
+void ti99_datamux_device::clock_in(int clock)
+{
+	if (clock==ASSERT_LINE && m_waitcount!=0)
+	{
+		m_waitcount--;
+		if (m_waitcount==0) m_ready(ASSERT_LINE);
+	}
+}
 
 /***************************************************************************
     DEVICE LIFECYCLE FUNCTIONS
@@ -248,7 +248,10 @@ void ti99_datamux_device::device_stop(void)
 
 void ti99_datamux_device::device_reset(void)
 {
-	const dmux_device_list_entry *list = reinterpret_cast<const dmux_device_list_entry *>(static_config());
+	const datamux_config *conf = reinterpret_cast<const datamux_config *>(static_config());
+
+	const dmux_device_list_entry *list = conf->devlist;
+	m_ready.resolve(conf->ready, *this);
 
 	m_cpu = machine().device("maincpu");
 	m_space = m_cpu->memory().space(AS_PROGRAM);
@@ -288,21 +291,22 @@ void ti99_datamux_device::device_reset(void)
 					{
 						attached_device *ad = new attached_device(dev, list[i]);
 						m_devices.append(*ad);
-						LOG("ti99_datamux: Device %s mounted at index %d.\n", list[i].name, i);
+						if (VERBOSE>8) LOG("datamux: Device %s mounted at index %d.\n", list[i].name, i);
 					}
 					else
 					{
-						LOG("ti99_datamux: Device %s not found.\n", list[i].name);
+						if (VERBOSE>8) LOG("datamux: Device %s not found.\n", list[i].name);
 					}
 				}
 				else
 				{
-					LOG("ti99_datamux: Device %s not mounted due to configuration setting %s.\n", list[i].name, list[i].setting);
+					if (VERBOSE>8) LOG("datamux: Device %s not mounted due to configuration setting %s.\n", list[i].name, list[i].setting);
 				}
 			}
 		}
 	}
-	LOG("Datamux device count = %d\n", m_devices.count());
+	if (VERBOSE>8) LOG("datamux: Device count = %d\n", m_devices.count());
+	m_ready(ASSERT_LINE);
 }
 
 INPUT_PORTS_START( datamux )

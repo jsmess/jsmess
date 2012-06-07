@@ -143,9 +143,6 @@
 #include "genboard.h"
 #include "machine/mm58274c.h"
 
-#define CYCLE 333		// 333 ns for CLKOUT
-#define VIDEOWAIT 1		// timer ID
-
 #define VERBOSE 1
 #define LOG logerror
 
@@ -153,15 +150,6 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock)
 {
 	m_eprom = NULL;
-}
-
-/*
-    Callback for VDP waitstate. Not really needed, just for completeness.
-*/
-void geneve_mapper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	// Just remove that flag again.
-	m_video_waiting = false;
 }
 
 INPUT_CHANGED_MEMBER( geneve_mapper_device::gm_changed )
@@ -172,13 +160,13 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::gm_changed )
 	if (number==1)
 	{
 		// Turbo switch. May be changed at any time.
-		if (VERBOSE>0) LOG("geneve / genmod: Setting turbo flag to %d\n", value);
+		if (VERBOSE>0) LOG("genboard: Setting turbo flag to %d\n", value);
 		m_turbo = (value!=0);
 	}
 	else
 	{
 		// TIMode switch. Causes reset when changed.
-		if (VERBOSE>0) LOG("geneve / genmod: Setting timode flag to %d\n", value);
+		if (VERBOSE>0) LOG("genboard: Setting timode flag to %d\n", value);
 		m_timode = (value!=0);
 		machine().schedule_hard_reset();
 	}
@@ -275,27 +263,17 @@ TI mode:
 
 */
 
-void geneve_mapper_device::start_video_wait(int ws)
-{
-	m_video_waittimer->adjust(attotime::from_nsec(CYCLE * ws));
-	m_video_waiting = true;
-}
-
 void geneve_mapper_device::do_wait(int min)
 {
-	long ws;
-
+	min = min + 1;
 	// Extra waitstates?
-	if (m_extra_waitstates && min < 2) min = 2;
-
-	if (m_video_waiting) {
-		attotime left = m_video_waittimer->remaining();
-		ws = (left.as_attoseconds()/ATTOSECONDS_PER_NANOSECOND) / CYCLE;
+	if (m_extra_waitstates && min < 4) min = 3;
+	m_waitcount = min;
+	if (m_waitcount > 0)
+	{
+		if (VERBOSE>8) LOG("genboard: Pulling down READY line for %d cycles\n", m_waitcount);
+		m_ready(CLEAR_LINE);
 	}
-	else ws = 0;
-
-	// Now wait for the remaining time or for at least the min time
-	device_adjust_icount(m_cpu, -4 * ((ws < min)? min : ws));
 }
 
 /************************************************************************
@@ -330,9 +308,10 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// Initialize wait state timer
 			// Create 16 wait states (2 more than expected, experimenting)
 			if (m_video_waitstates)
-				start_video_wait(16);
+				do_wait(16);
 
 			m_video->readz(space, offset, &value, mem_mask);
+			if (VERBOSE>7) LOG("genboard: Read video %04x -> %02x\n", offset, value);
 			return value;
 		}
 		if ((offset & 0xfff8)==0xf110)
@@ -343,6 +322,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// Add appropriate number of waitstates
 			// 1 WS is added at least
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: read mapper %04x -> %02x\n", offset, value);
 			return value;
 		}
 		if ((offset & 0xfff8) == 0xf118)
@@ -350,6 +330,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// key
 			value = m_keyboard->get_recent_key();
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read keyboard -> %02x\n", value);
 			return value;
 		}
 		if ((offset & 0xfff0)==0xf130)
@@ -359,6 +340,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// upper nibble is 0xf (probably because of the location at 0xf130?)
 			value = mm58274c_r(m_clock, offset & 0x000f) | 0xf0;
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read clock %04x -> %02x\n", offset, value);
 			return value;
 		}
 	}
@@ -369,6 +351,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// mapper
 			value = m_map[offset & 0x0007];
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read mapper %04x -> %02x\n", offset, value);
 			return value;
 		}
 		if ((offset & 0xfff8)== 0x8008)
@@ -376,6 +359,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// key
 			value = m_keyboard->get_recent_key();
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read keyboard -> %02x\n", value);
 			return value;
 		}
 		if ((offset & 0xfff0)==0x8010)
@@ -392,6 +376,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			value |= ((offset & 0x000f)==0x000f)? 0x20 : 0x10;
 
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read clock %04x -> %02x\n", offset, value);
 			return value;
 		}
 		if ((offset & 0xfc01)==0x8800)
@@ -399,7 +384,6 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// video
 			// ++++ ++-- ---- ---+
 			// 1000 1000 0000 00x0
-			//  device_adjust_icount(m_cpu, -4);
 
 			// 1 WS is always added; any pending video waitstates are canceled
 			m_video_waiting = false;
@@ -408,9 +392,10 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// Initialize waitstate timer
 			// Create 14 waitstates (+2, see above)
 			if (m_video_waitstates)
-				start_video_wait(16);
+				do_wait(16);
 
 			m_video->readz(space, offset, &value, mem_mask);
+			if (VERBOSE>7) LOG("genboard: Read video %04x -> %02x\n", offset, value);
 			return value;
 		}
 		if ((offset & 0xfc01)==0x9000)
@@ -422,6 +407,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			m_peribox->readz(space, offset | ((m_genmod)? 0x170000 : 0x070000), &value, mem_mask);
 
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read speech -> %02x\n", value);
 			return value;
 		}
 		if ((offset & 0xfc01)==0x9800)
@@ -432,6 +418,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			value = read_grom(space, offset, mem_mask);
 
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read GROM %04x -> %02x\n", offset, value);
 			return value;
 		}
 	}
@@ -451,6 +438,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// value 0x36 = 0 0110 110x xxxx xxxx xxxx (page 1)
 			// value 0x37 = 0 0110 111x xxxx xxxx xxxx (page 2)
 			// Only use this if there are 2*8 KiB cartridge ROM
+			if (VERBOSE>7) LOG("genboard: Cartridge area\n");
 			if (m_cartridge_size==0x4000 && m_cartridge_secondpage) physaddr = 0x06e000;
 			else physaddr = 0x06c000;
 		}
@@ -468,19 +456,19 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if ((physaddr & 0x180000)==0x000000)
 		{
 			// DRAM. One wait state.
-			// device_adjust_icount(m_cpu, -4);
 			do_wait(1);
 
 			value = m_dram[physaddr & 0x07ffff];
 //          printf("dram read physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, value);
+			if (VERBOSE>7) LOG("genboard: Read DRAM %04x (%06x) -> %02x\n", offset, physaddr, value);
 			return value;
 		}
 
 		if ((physaddr & 0x180000)==0x080000)
 		{
 			// On-board memory expansion for standard Geneve (never used)
-			// device_adjust_icount(m_cpu, -4);
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Read unmapped area %06x\n", physaddr);
 			return 0;
 		}
 
@@ -489,8 +477,8 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 			value = m_eprom[physaddr & 0x003fff];
-			if (VERBOSE>8) LOG("eprom read physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, value);
-			do_wait(1);
+			do_wait(0);
+			if (VERBOSE>7) LOG("genboard: Read EPROM %04x (%06x) -> %02x\n", offset, physaddr, value);
 			return value;
 		}
 
@@ -503,6 +491,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 			// Return in any case
 //          printf("sram read physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, value);
 			do_wait(0);
+			if (VERBOSE>7) LOG("genboard: Read SRAM %04x (%06x) -> %02x\n", offset, physaddr, value);
 			return value;
 		}
 
@@ -514,6 +503,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
 		m_peribox->readz(space, physaddr, &value, mem_mask);
+		if (VERBOSE>7) LOG("genboard: Read P-Box %04x (%06x) -> %02x\n", offset, physaddr, value);
 		return value;
 	}
 	else
@@ -579,8 +569,6 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// video
 			// ++++ ++++ ++++ ---+
 			// 1111 0001 0000 .cc0
-			// device_adjust_icount(m_cpu, -4);
-
 			m_video->write(space, offset, data, mem_mask);
 
 			// 1 WS is always added; any pending video waitstates are canceled
@@ -590,8 +578,9 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// Initialize waitstate timer
 			// Create 14 waitstates (+3, experimenting)
 			if (m_video_waitstates)
-				start_video_wait(17);
+				do_wait(17);
 
+			if (VERBOSE>7) LOG("genboard: Write video %04x <- %02x\n", offset, data);
 			return;
 		}
 		if ((offset & 0xfff8)==0xf110)
@@ -599,6 +588,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// mapper
 			m_map[offset & 0x0007] = data;
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write mapper %04x <- %02x\n", offset, data);
 			return;
 		}
 		if ((offset & 0xfff1)==0xf120)
@@ -610,7 +600,9 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// Add 24 waitstates. This is an average value, as the
 			// waitstate generation seems to depend on an external timer of
 			// the sound chip
-			device_adjust_icount(m_cpu, -4 * 24);
+			m_waitcount = 24;
+			m_ready(CLEAR_LINE);
+			if (VERBOSE>7) LOG("genboard: Write sound <- %02x\n", data);
 			return;
 		}
 		if ((offset & 0xfff0)==0xf130)
@@ -619,6 +611,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// ++++ ++++ ++++ ----
 			mm58274c_w(m_clock, offset & 0x00f, data);
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write clock %04x <- %02x\n", offset, data);
 			return;
 		}
 	}
@@ -630,6 +623,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// mapper
 			m_map[offset & 0x0007] = data;
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write mapper %04x <- %02x\n", offset, data);
 			return;
 		}
 		// No key write at 8008
@@ -638,6 +632,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// clock
 			mm58274c_w(m_clock, offset & 0x00f, data);
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write clock %04x <- %02x\n", offset, data);
 			return;
 		}
 		if ((offset & 0xfc01)==0x8400)
@@ -650,7 +645,9 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// Add 24 waitstates. This is an approximation, as the
 			// waitstate generation seems to depend on an external timer of
 			// the sound chip
-			device_adjust_icount(m_cpu, -4 * 24);
+			m_waitcount = 24;
+			m_ready(CLEAR_LINE);
+			if (VERBOSE>7) LOG("genboard: Write sound <- %02x\n", data);
 			return;
 		}
 		if ((offset & 0xfc01)==0x8c00)
@@ -658,7 +655,6 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// video
 			// ++++ ++-- ---- ---+
 			// 1000 1100 0000 00c0
-			// device_adjust_icount(m_cpu, -4);
 			// Initialize waitstate timer
 			m_video->write(space, offset, data, mem_mask);
 
@@ -669,8 +665,9 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// Initialize waitstate timer
 			// Create 14 waitstates (+3)
 			if (m_video_waitstates)
-				start_video_wait(17);
+				do_wait(17);
 
+			if (VERBOSE>7) LOG("genboard: Write video %04x <- %02x\n", offset, data);
 			return;
 		}
 		if ((offset & 0xfc01)==0x9400)
@@ -681,6 +678,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// We need to add the address prefix bits
 			m_peribox->write(space, offset | ((m_genmod)? 0x170000 : 0x070000), data, mem_mask);
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write speech <- %02x\n", data);
 			return;
 		}
 		if ((offset & 0xfc01)==0x9c00)
@@ -690,6 +688,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// 1001 1100 0000 00c0
 			write_grom(space, offset, data, mem_mask);
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write GROM %04x <- %02x\n", offset, data);
 			return;
 		}
 	}
@@ -709,6 +708,8 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 				// writing to 0x6002 selects page 2
 				m_cartridge_secondpage = ((offset & 0x0002)!=0);
 				do_wait(1);
+				if (VERBOSE>7) LOG("genboard: Set cartridge page %02x\n", m_cartridge_secondpage);
+
 				return;
 			}
 			else
@@ -740,6 +741,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// DRAM write. One wait state. (only for normal Geneve)
 			m_dram[physaddr & 0x07ffff] = data;
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write DRAM %04x (%06x) <- %02x\n", offset, physaddr, data);
 			return;
 		}
 
@@ -747,6 +749,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		{
 			// On-board memory expansion for standard Geneve (never used)
 			do_wait(1);
+			if (VERBOSE>7) LOG("genboard: Write unmapped area %06x\n", physaddr);
 			return;
 		}
 
@@ -755,7 +758,8 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 			// Ignore EPROM write
-			do_wait(1);
+			do_wait(0);
+			if (VERBOSE>7) LOG("genboard: Write EPROM %04x (%06x) <- %02x, ignored\n", offset, physaddr, data);
 			return;
 		}
 
@@ -765,6 +769,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 			{
 				m_sram[physaddr & ~m_sram_mask] = data;
 			}
+			if (VERBOSE>7) LOG("genboard: Write SRAM %04x (%06x) <- %02x\n", offset, physaddr, data);
 			do_wait(0);
 			// Return in any case
 			return;
@@ -774,6 +779,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 
 		// only AMA, AMB, AMC are used; AMD and AME are not used
 		physaddr = (physaddr & 0x0007ffff);  // 19 bit address
+		if (VERBOSE>7) LOG("genboard: Write P-Box %04x (%06x) <- %02x\n", offset, physaddr, data);
 		m_peribox->write(space, physaddr, data, mem_mask);
 		do_wait(1);
 	}
@@ -803,21 +809,39 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	}
 }
 
+/*
+    The mapper is connected to the clock line in order to operate
+    the wait state counter.
+*/
+void geneve_mapper_device::clock_in(int clock)
+{
+	if (clock==ASSERT_LINE && m_waitcount!=0)
+	{
+		m_waitcount--;
+		if (m_waitcount==0) m_ready(ASSERT_LINE);
+	}
+}
+
+/***    DEVICE LIFECYCLE FUNCTIONS      ***/
+
 void geneve_mapper_device::device_start()
 {
-	if (VERBOSE>0) LOG("geneve: Starting Geneve mapper\n");
+	const geneve_mapper_config *conf = reinterpret_cast<const geneve_mapper_config *>(static_config());
+
+	if (VERBOSE>0) LOG("genboard: Starting Geneve mapper\n");
 	// Get pointers
 	m_peribox = machine().device<bus8z_device>(PERIBOX_TAG);
 	m_keyboard = machine().device<geneve_keyboard_device>(GKEYBOARD_TAG);
 	m_video = machine().device<bus8z_device>(VIDEO_SYSTEM_TAG);
 	m_sound = machine().device<bus8z_device>(TISOUND_TAG);
 	m_clock = machine().device(GCLOCK_TAG);
-	m_cpu = machine().device("maincpu");
+
+	m_ready.resolve(conf->ready, *this);
 
 	// This is a preliminary setting; the initial context switch occurs before
 	// device_reset. Luckily, the reset vector at >0000/>0002 is the same for
 	// all variants of the boot eprom.
-	m_eprom = machine().root_device().memregion("maincpu")->base();
+//  m_eprom = machine().root_device().memregion("maincpu")->base();
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
@@ -825,15 +849,12 @@ void geneve_mapper_device::device_start()
 	m_geneve_mode = false;
 	m_direct_mode = true;
 
-	// Used for generating the VDP waitstates. These are created in the
-	// Gate Array on the board and only affect external memory accesses.
-	// Therefore we cannot use the usual adjust_icount
-	m_video_waittimer = timer_alloc(VIDEOWAIT);
+	m_waitcount = 0;
 }
 
 void geneve_mapper_device::device_reset()
 {
-	if (VERBOSE>0) LOG("geneve: Resetting mapper\n");
+	if (VERBOSE>1) LOG("genboard: Resetting mapper\n");
 
 	m_extra_waitstates = false;
 	m_video_waitstates = true;
@@ -856,18 +877,18 @@ void geneve_mapper_device::device_reset()
 		switch (machine().root_device().ioport("BOOTROM")->read())
 		{
 		case GENEVE_098:
-			if (VERBOSE>0) LOG("geneve: Using 0.98 boot eprom\n");
+			if (VERBOSE>0) LOG("genboard: Using 0.98 boot eprom\n");
 			m_eprom = machine().root_device().memregion("maincpu")->base() + 0x4000;
 			break;
 		case GENEVE_100:
-			if (VERBOSE>0) LOG("geneve: Using 1.00 boot eprom\n");
+			if (VERBOSE>0) LOG("genboard: Using 1.00 boot eprom\n");
 			m_eprom = machine().root_device().memregion("maincpu")->base();
 			break;
 		}
 	}
 	else
 	{
-		if (VERBOSE>0) LOG("geneve: Using GenMod modification\n");
+		if (VERBOSE>0) LOG("genboard: Using GenMod modification\n");
 		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x8000;
 		if (m_eprom[0] != 0xf0)
 		{
@@ -947,7 +968,7 @@ void geneve_keyboard_device::post_in_key_queue(int keycode)
 	m_key_queue[(m_key_queue_head + m_key_queue_length) % KEYQUEUESIZE] = keycode;
 	m_key_queue_length++;
 
-	if (VERBOSE>5) LOG("geneve: posting keycode %02x\n", keycode);
+	if (VERBOSE>5) LOG("genboard: posting keycode %02x\n", keycode);
 }
 
 void geneve_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -962,7 +983,7 @@ void geneve_keyboard_device::poll()
 	int i, j;
 	int keycode;
 	int pressed;
-	if (VERBOSE>8) LOG("geneve: poll keyboard\n");
+	if (VERBOSE>7) LOG("genboard: poll keyboard\n");
 	if (m_key_reset) return;
 
 	/* Poll keyboard */
@@ -1168,7 +1189,7 @@ void geneve_keyboard_device::signal_when_key_available()
 	// buffer clear is disabled, and key queue is not empty. */
 	if ((!m_key_reset) && (m_keyboard_clock) && (m_keep_keybuf) && (m_key_queue_length != 0))
 	{
-		if (VERBOSE>6) LOG("geneve: signalling key available\n");
+		if (VERBOSE>6) LOG("genboard: signalling key available\n");
 		m_interrupt(ASSERT_LINE);
 		m_key_in_buffer = true;
 	}
@@ -1178,7 +1199,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
 {
 	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
 	m_keyboard_clock = (state==ASSERT_LINE);
-	if (VERBOSE>5) LOG("geneve: keyboard clock_control state=%d\n", m_keyboard_clock);
+	if (VERBOSE>5) LOG("genboard: keyboard clock_control state=%d\n", m_keyboard_clock);
 	if (rising_edge)
 		signal_when_key_available();
 }
@@ -1235,7 +1256,7 @@ void geneve_keyboard_device::device_config_complete()
 
 void geneve_keyboard_device::device_start()
 {
-	if (VERBOSE>2) LOG("geneve: Keyboard started\n");
+	if (VERBOSE>2) LOG("genboard: Keyboard started\n");
 	m_timer = timer_alloc(0);
 }
 

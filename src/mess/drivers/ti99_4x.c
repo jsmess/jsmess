@@ -56,7 +56,7 @@
 #include "machine/ti99/peribox.h"
 
 #define LOG logerror
-#define VERBOSE 1
+#define VERBOSE 0
 
 /*
     The console.
@@ -70,23 +70,33 @@ public:
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
 	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_WRITE8_MEMBER(external_operation);
 
 	// Forwarding interrupts to the CPU or CRU
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
+
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT12 );
 	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 
+	DECLARE_READ8_MEMBER( interrupt_level );
+	DECLARE_READ_LINE_MEMBER( ready_connect );
+	DECLARE_WRITE_LINE_MEMBER( clock_out );
+
 	// Some values to keep
 	int					m_mode;
-	device_t			*m_cpu;
-	tms9901_device		*m_tms9901;
-	gromport_device		*m_gromport;
-	peribox_device		*m_peribox;
-	mecmouse_device 	*m_mecmouse;
-	ti99_handset_device *m_handset;
+	tms9900_device*		m_cpu;
+	tms9901_device*		m_tms9901;
+	gromport_device*	m_gromport;
+	peribox_device*		m_peribox;
+	mecmouse_device*	m_mecmouse;
+	ti99_handset_device* m_handset;
+	ti99_datamux_device* m_datamux;
+
+	int		m_ready_line, m_ready_line1;
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -102,29 +112,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 
 private:
-	void				set_key(int number, int data);
-	int					m_keyboard_column;
-	int					m_alphalock_line;
+	void	set_key(int number, int data);
+	int		m_keyboard_column;
+	int		m_alphalock_line;
 };
 
 /*
-    Memory map
+    Memory map.
+    Most of the work is done in the datamux (see datamux.c). We only keep ROM
+    and the small 256 byte PAD RAM here because they are directly connected
+    to the 16bit bus, and the wait state logic is not active during their
+    accesses.
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
-	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
-	AM_RANGE(0x8800, 0x8bff) AM_DEVREADWRITE(VIDEO_SYSTEM_TAG, ti_std_video_device, read16, nowrite)	/*vdp read*/
-	AM_RANGE(0x8C00, 0x8fff) AM_DEVREADWRITE(VIDEO_SYSTEM_TAG, ti_std_video_device, noread, write16)	/*vdp write*/
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, ti99_datamux_device, read, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(memmap_4ev, AS_PROGRAM, 16, ti99_4x)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
-	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM			/*RAM PAD, mirrored 4 times*/
-	AM_RANGE(0x8800, 0x8bff) AM_DEVREADWRITE(VIDEO_SYSTEM_TAG, ti_exp_video_device, read16, nowrite)	/*vdp read*/
-	AM_RANGE(0x8C00, 0x8fff) AM_DEVREADWRITE(VIDEO_SYSTEM_TAG, ti_exp_video_device, noread, write16)	/*vdp write*/
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAM
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, ti99_datamux_device, read, write)
 ADDRESS_MAP_END
 
@@ -334,17 +337,17 @@ INPUT_PORTS_END
 
 static GROM_CONFIG(grom0_config)
 {
-	false, 0, region_grom, 0x0000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready)
+	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready), GROMFREQ
 };
 
 static GROM_CONFIG(grom1_config)
 {
-	false, 1, region_grom, 0x2000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready)
+	false, 1, region_grom, 0x2000, 0x1800,  DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready), GROMFREQ
 };
 
 static GROM_CONFIG(grom2_config)
 {
-	false, 2, region_grom, 0x4000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready)
+	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready), GROMFREQ
 };
 
 static GROMPORT_CONFIG(console_cartslot)
@@ -376,9 +379,15 @@ READ8_MEMBER( ti99_4x::cruread )
 
 WRITE8_MEMBER( ti99_4x::cruwrite )
 {
-//  if (VERBOSE>6) LOG("write access to CRU address %04x\n", offset << 1);
+	if (VERBOSE>6) LOG("write access to CRU address %04x\n", offset << 1);
 	m_gromport->cruwrite(offset<<1, data);
 	m_peribox->cruwrite(offset<<1, data);
+}
+
+WRITE8_MEMBER( ti99_4x::external_operation )
+{
+	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	if (VERBOSE>1) LOG("External operation %s not implemented on TI-99 board\n", extop[offset]);
 }
 
 /***************************************************************************
@@ -412,7 +421,6 @@ static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 READ8_MEMBER( ti99_4x::read_by_9901 )
 {
 	int answer=0;
-
 	switch (offset & 0x03)
 	{
 	case TMS9901_CB_INT7:
@@ -591,18 +599,24 @@ WRITE_LINE_MEMBER( ti99_4x::cassette_output )
 WRITE8_MEMBER( ti99_4x::tms9901_interrupt )
 {
 	// offset contains the interrupt level (0-15)
-	if (data==ASSERT_LINE)
-	{
-		// The TMS9901 should normally be connected with the CPU by 5 wires:
-		// INTREQ* and IC0-IC3. The last four lines deliver the interrupt level.
-		// On the TI-99 systems these IC lines are not used; the input lines
-		// at the CPU are hardwired to level 1.
-		device_execute(m_cpu)->set_input_line_and_vector(0, ASSERT_LINE, 1);
-	}
-	else
-	{
-		device_execute(m_cpu)->set_input_line(0, CLEAR_LINE);
-	}
+	// However, the TI board just ignores that level and hardwires it to 1
+	// See below (interrupt_level)
+	m_cpu->set_input_line(0, data);
+}
+
+READ8_MEMBER( ti99_4x::interrupt_level )
+{
+	// On the TI-99 systems these IC lines are not used; the input lines
+	// at the CPU are hardwired to level 1.
+	return 1;
+}
+
+/*
+    Clock line from the CPU. Used to control wait state generation.
+*/
+WRITE_LINE_MEMBER( ti99_4x::clock_out )
+{
+	m_datamux->clock_in(state);
 }
 
 /*****************************************************************************/
@@ -633,22 +647,42 @@ WRITE_LINE_MEMBER( ti99_4x::set_tms9901_INT12)
     Links to external devices
 ***********************************************************/
 
-
+/*
+    We may have lots of devices pulling down this line; so we should use a AND
+    gate to do it right. On the other hand, when READY is down, there is just
+    no chance to make another device pull down the same line; the CPU just
+    won't access any other device in this time.
+*/
 WRITE_LINE_MEMBER( ti99_4x::console_ready )
 {
-	if (VERBOSE>6) LOG("READY line set ... not yet connected, level=%02x\n", state);
+	if (VERBOSE>6) LOG("ti99_4x: READY level = %02x\n", state);
+	m_ready_line = state;
+
+	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*
+    The exception of the above rule. Memory access over the datamux also operates
+    the READY line, and the datamux raises READY depending on the clock pulse.
+    So we must make sure this does not interfere.
+*/
+WRITE_LINE_MEMBER( ti99_4x::console_ready_dmux )
+{
+	if (VERBOSE>6) LOG("ti99_4x: READY dmux level = %02x\n", state);
+	m_ready_line1 = state;
+	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( ti99_4x::extint )
 {
-	if (VERBOSE>6) LOG("EXTINT level = %02x\n", state);
+	if (VERBOSE>6) LOG("ti99_4x: EXTINT level = %02x\n", state);
 	if (m_tms9901 != NULL)
 		m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x::notconnected )
 {
-	if (VERBOSE>6) LOG("Setting a not connected line ... ignored\n");
+	if (VERBOSE>6) LOG("ti99_4x: Setting a not connected line ... ignored\n");
 }
 
 /*****************************************************************************/
@@ -737,6 +771,7 @@ const tms9901_interface tms9901_wiring_ti99_4a =
 */
 static const dmux_device_list_entry dmux_devices[] =
 {
+	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, NULL, 0, 0 },
 	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
@@ -745,6 +780,41 @@ static const dmux_device_list_entry dmux_devices[] =
 	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, NULL, 0, 0 },
 	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, NULL, 0, 0 },  // Peribox needs all addresses
 	{ NULL, 0, 0, 0, NULL, 0, 0  }
+};
+
+static const dmux_device_list_entry dmux_devices_ev[] =
+{
+	{ V9938_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, NULL, 0, 0 },
+	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
+	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
+	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
+	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, NULL, 0, 0 },
+	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, NULL, 0, 0 },
+	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, NULL, 0, 0 },
+	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, NULL, 0, 0 },  // Peribox needs all addresses
+	{ NULL, 0, 0, 0, NULL, 0, 0  }
+};
+
+static DMUX_CONFIG( datamux_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready_dmux),	// READY
+	dmux_devices
+};
+
+static DMUX_CONFIG( datamux_conf_ev )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready_dmux),	// READY
+	dmux_devices_ev
+};
+
+static TMS9900_CONFIG( ti99_cpuconf )
+{
+	DEVCB_DRIVER_MEMBER(ti99_4x, external_operation),
+	DEVCB_DRIVER_MEMBER(ti99_4x, interrupt_level),
+	DEVCB_NULL,		// Instruction acquisition
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, clock_out),
+	DEVCB_NULL,		// wait
+	DEVCB_NULL		// Hold acknowledge
 };
 
 /******************************************************************************
@@ -756,15 +826,18 @@ MACHINE_START( ti99_4 )
 	ti99_4x *driver = machine.driver_data<ti99_4x>();
 	driver->m_mode = TI994;
 
-	driver->m_cpu = machine.device("maincpu");
+	driver->m_cpu = static_cast<tms9900_device*>(machine.device("maincpu"));
 	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
 
 	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
 
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
+	driver->m_datamux = static_cast<ti99_datamux_device*>(machine.device(DATAMUX_TAG));
 
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
+
+	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
 }
 
 MACHINE_RESET( ti99_4 )
@@ -785,9 +858,9 @@ MACHINE_RESET( ti99_4 )
     TI-99/4 - the predecessor of the more popular TI-99/4A
 */
 static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(cru_map)
+	/* CPU */
+	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
 	MCFG_MACHINE_START( ti99_4 )
 	MCFG_MACHINE_RESET( ti99_4 )
 
@@ -795,7 +868,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4, 3000000)
-	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Software list */
@@ -830,9 +903,9 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(cru_map)
+	/* CPU */
+	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
 	MCFG_MACHINE_START( ti99_4 )
 	MCFG_MACHINE_RESET( ti99_4 )
 
@@ -841,7 +914,7 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
 
 	/* main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4, 3000000)
-	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Software list */
@@ -882,15 +955,18 @@ MACHINE_START( ti99_4a )
 	ti99_4x *driver = machine.driver_data<ti99_4x>();
 	driver->m_mode = TI994A;
 
-	driver->m_cpu = machine.device("maincpu");
+	driver->m_cpu = static_cast<tms9900_device*>(machine.device("maincpu"));
 	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
 
 	driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
 
+	driver->m_datamux = static_cast<ti99_datamux_device*>(machine.device(DATAMUX_TAG));
+
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
+	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
 }
 
 MACHINE_RESET( ti99_4a )
@@ -903,9 +979,9 @@ MACHINE_RESET( ti99_4a )
 }
 
 static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(cru_map)
+	/* CPU */
+	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
 	MCFG_MACHINE_START( ti99_4a )
 	MCFG_MACHINE_RESET( ti99_4a )
 
@@ -914,7 +990,7 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
-	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Software list */
@@ -946,9 +1022,9 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(cru_map)
+	/* CPU */
+	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
 	MCFG_MACHINE_START( ti99_4a )
 	MCFG_MACHINE_RESET( ti99_4a )
 
@@ -957,7 +1033,7 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
-	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Software list */
@@ -999,21 +1075,23 @@ TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
     replacing the console video processor.
 */
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
-	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
-	MCFG_CPU_PROGRAM_MAP(memmap_4ev)
-	MCFG_CPU_IO_MAP(cru_map)
+	/* CPU */
+	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
 	MCFG_MACHINE_START( ti99_4a )
 
-	/* Video hardware */
-	// FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
-	// restore normal video speed for V9938-based systems until the V9938 implementation
-	// is properly fixed.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4x, set_tms9901_INT2_from_v9938)
+	/* video hardware */
+	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.
+	// The reason is that that the number of screen lines is counted twice for the
+	// interlace mode, but in non-interlace modes only half of the lines are
+	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
+	// not 60 Hz. This should be fixed in the v9938 emulation.
+	MCFG_TI_V9938_ADD(V9938_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4x, set_tms9901_INT2_from_v9938)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4ev_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
-	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf_ev )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Software list */

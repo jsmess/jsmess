@@ -1233,23 +1233,23 @@ int cartridge_device::get_index_from_tagname()
 
 static GROM_CONFIG(grom3_config)
 {
-	false, 3, CARTGROM_TAG, 0x0000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gromport_device, ready_line)
+	false, 3, CARTGROM_TAG, 0x0000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(":gromport", gromport_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(grom4_config)
 {
-	false, 4, CARTGROM_TAG, 0x2000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gromport_device, ready_line)
+	false, 4, CARTGROM_TAG, 0x2000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(":gromport", gromport_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(grom5_config)
 {
-	false, 5, CARTGROM_TAG, 0x4000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gromport_device, ready_line)
+	false, 5, CARTGROM_TAG, 0x4000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(":gromport", gromport_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(grom6_config)
 {
-	false, 6, CARTGROM_TAG, 0x6000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gromport_device, ready_line)
+	false, 6, CARTGROM_TAG, 0x6000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(":gromport", gromport_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(grom7_config)
 {
-	false, 7, CARTGROM_TAG, 0x8000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gromport_device, ready_line)
+	false, 7, CARTGROM_TAG, 0x8000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(":gromport", gromport_device, ready_line), GROMFREQ
 };
 
 /*

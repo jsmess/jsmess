@@ -69,7 +69,7 @@ TODO :
 
 #include "emu.h"
 
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/beep.h"
 #include "machine/ti990.h"
 #include "machine/990_hd.h"
@@ -208,7 +208,7 @@ static const ti990_tpc_interface ti990_tpc =
 static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_CPU_ADD("maincpu", TI990_10, 4000000)
+	MCFG_CPU_ADD("maincpu", TI990_10L, 4000000)
 	MCFG_CPU_CONFIG(reset_params)
 	MCFG_CPU_PROGRAM_MAP(ti990_10_memmap)
 	MCFG_CPU_IO_MAP(ti990_10_io)

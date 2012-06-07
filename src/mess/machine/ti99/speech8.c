@@ -168,16 +168,14 @@ static const tms5220_interface ti99_8_tms5200interface =
 
 WRITE_LINE_MEMBER( ti998_spsyn_device::speech8_ready )
 {
-	//ti99_speech8_state *spsys = get_safe_token(device->owner());
-	if (VERBOSE>4) LOG("speech8: READY called by VSP; no forwarding implemented yet\n");
+	// TODO: Fix polarity in TMS5220
+	m_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ti998_spsyn_device::device_start()
 {
-}
-
-void ti998_spsyn_device::device_config_complete()
-{
+	const speech8_config *conf = reinterpret_cast<const speech8_config *>(static_config());
+	m_ready.resolve(conf->ready, *this);
 	m_vsp = subdevice(SPEECHSYN_TAG);
 }
 

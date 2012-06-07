@@ -175,7 +175,8 @@ static const tms5220_interface ti99_4x_tms5200interface =
 
 WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 {
-	m_slot->set_ready(state);
+	// TODO: Fix this in TMS5220
+	m_slot->set_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ti_speech_synthesizer_device::device_start()

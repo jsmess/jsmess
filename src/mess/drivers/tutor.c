@@ -168,7 +168,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
 #include "imagedev/cartslot.h"
@@ -743,7 +743,7 @@ static const struct tms9995reset_param tutor_processor_config =
 static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
-	MCFG_CPU_ADD("maincpu", TMS9995, 10700000)
+	MCFG_CPU_ADD("maincpu", TMS9995L, 10700000)
 	MCFG_CPU_CONFIG(tutor_processor_config)
 	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
 	MCFG_CPU_IO_MAP(tutor_io)

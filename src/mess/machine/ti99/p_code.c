@@ -206,35 +206,35 @@ void ti_pcode_card_device::cruwrite(offs_t offset, UINT8 data)
 
 static GROM_CONFIG(pgrom0_config)
 {
-	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom1_config)
 {
-	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom2_config)
 {
-	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom3_config)
 {
-	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom4_config)
 {
-	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom5_config)
 {
-	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom6_config)
 {
-	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 static GROM_CONFIG(pgrom7_config)
 {
-	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
 };
 
 void ti_pcode_card_device::device_start()

@@ -46,6 +46,15 @@ typedef struct _mapper8_list_entry
 	UINT32		write_select;		// Additional bits set when doing write accesses to this device
 } mapper8_list_entry;
 
+#define MAPPER8_CONFIG(name) \
+	const mapper8_config(name) =
+
+typedef struct _mapper8_config
+{
+	devcb_write_line				ready;
+	const mapper8_list_entry		*devlist;
+} mapper8_config;
+
 /*
     Device list of the mapper.
 */
@@ -101,6 +110,8 @@ public:
 	void CRUS_set(bool state);
 	void PTGE_set(bool state);
 
+	void clock_in(int state);
+
 protected:
 	void device_start(void);
 	void device_reset(void);
@@ -111,6 +122,9 @@ private:
 	void search_physically_addressed_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );
 	void search_physically_addressed_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask );
 	void mapwrite(int offset, UINT8 data);
+
+	// Ready line to the CPU
+	devcb_resolved_write_line m_ready;
 
 	// All devices that are attached to the 16-bit address bus.
 	simple_list<log_addressed_device> m_logcomp;
@@ -129,6 +143,9 @@ private:
 	// Note: this is negative logic. GROMs are present only for PTGEN=0
 	// We use PTGE as the inverse signal.
 	bool	m_PTGE;
+
+	// Counter for the wait states.
+	int   m_waitcount;
 
 	// Address mapper registers. Each offset is selected by the first 4 bits
 	// of the logical address.
