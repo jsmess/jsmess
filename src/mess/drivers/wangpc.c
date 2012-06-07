@@ -689,6 +689,8 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 		m_dma_eop = 0;
 		check_level2_interrupts();
 	}
+
+	m_bus->tc_w(state);
 }
 
 READ8_MEMBER( wangpc_state::memr_r )
@@ -710,7 +712,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 READ8_MEMBER( wangpc_state::ior2_r )
 {
 	if (m_disable_dreq2)
-		return m_bus->dack_r(2);
+		return m_bus->dack_r(space, 2);
 	else
 		return upd765_dack_r(m_fdc, 0);
 }
@@ -718,7 +720,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
 	if (m_disable_dreq2)
-		m_bus->dack_w(2, data);
+		m_bus->dack_w(space, 2, data);
 	else
 		upd765_dack_w(m_fdc, 0, data);
 }
@@ -1143,11 +1145,11 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 static SLOT_INTERFACE_START( wangpc_cards )
 	SLOT_INTERFACE("lic", WANGPC_LIC) // local interconnect option card
 	SLOT_INTERFACE("lvc", WANGPC_LVC) // low-resolution video controller
+	SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
 	SLOT_INTERFACE("rtc", WANGPC_RTC) // remote telecommunications controller
-	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
-	//SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
-	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
 	//SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
+	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
+	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
 	//SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
 SLOT_INTERFACE_END
 

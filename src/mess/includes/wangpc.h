@@ -19,7 +19,9 @@
 #include "machine/wangpckb.h"
 #include "machine/wangpc_lic.h"
 #include "machine/wangpc_lvc.h"
+#include "machine/wangpc_mvc.h"
 #include "machine/wangpc_rtc.h"
+#include "machine/wangpc_tig.h"
 #include "machine/wangpc_wdc.h"
 
 #define I8086_TAG		"i8086"

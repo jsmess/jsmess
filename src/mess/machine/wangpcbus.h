@@ -116,8 +116,8 @@ public:
 	DECLARE_READ16_MEMBER( sad_r );
 	DECLARE_WRITE16_MEMBER( sad_w );
 
-	UINT8 dack_r(int line);
-	void dack_w(int line, UINT8 data);
+	UINT8 dack_r(address_space &space, int line);
+	void dack_w(address_space &space, int line, UINT8 data);
 
 	DECLARE_READ8_MEMBER( dack0_r );
 	DECLARE_WRITE8_MEMBER( dack0_w );
@@ -192,8 +192,8 @@ public:
 	bool sad(offs_t offset) { return ((offset & 0xf80) == (0x800 | (m_sid << 7))) ? true : false; }
 
 	// DMA
-	virtual UINT8 wangpcbus_dack_r(int line) { return 0; }
-	virtual void wangpcbus_dack_w(int line, UINT8 data) { }
+	virtual UINT8 wangpcbus_dack_r(address_space &space, int line) { return 0; }
+	virtual void wangpcbus_dack_w(address_space &space, int line, UINT8 data) { }
 	virtual void wangpcbus_tc_w(int state) { }
 	virtual bool wangpcbus_have_dack(int line) { return false; }
 

@@ -304,7 +304,7 @@ void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 //  wangpcbus_dack_r - DMA acknowledge read
 //-------------------------------------------------
 
-UINT8 wangpc_wdc_device::wangpcbus_dack_r(int line)
+UINT8 wangpc_wdc_device::wangpcbus_dack_r(address_space &space, int line)
 {
 	return 0;
 }
@@ -314,7 +314,7 @@ UINT8 wangpc_wdc_device::wangpcbus_dack_r(int line)
 //  wangpcbus_dack_r - DMA acknowledge write
 //-------------------------------------------------
 
-void wangpc_wdc_device::wangpcbus_dack_w(int line, UINT8 data)
+void wangpc_wdc_device::wangpcbus_dack_w(address_space &space, int line, UINT8 data)
 {
 
 }

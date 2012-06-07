@@ -1854,7 +1854,9 @@ $(MESSOBJ)/wang.a:				\
 	$(MESS_MACHINE)/wangpckb.o	\
 	$(MESS_MACHINE)/wangpc_lic.o	\
 	$(MESS_MACHINE)/wangpc_lvc.o	\
+	$(MESS_MACHINE)/wangpc_mvc.o	\
 	$(MESS_MACHINE)/wangpc_rtc.o	\
+	$(MESS_MACHINE)/wangpc_tig.o	\
 	$(MESS_MACHINE)/wangpc_wdc.o	\
 
 $(MESSOBJ)/wavemate.a:			\

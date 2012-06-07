@@ -106,9 +106,9 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 static MC6845_UPDATE_ROW( wangpc_lvc_update_row )
 {
-	wangpc_lvc_device *lores = downcast<wangpc_lvc_device *>(device->owner());
+	wangpc_lvc_device *lvc = downcast<wangpc_lvc_device *>(device->owner());
 
-	lores->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
+	lvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }
 
 WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )

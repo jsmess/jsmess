@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Wang PC-PM001 Winchester Disk Controller emulation
+    Wang PC PM-001B Medium-Resolution Video Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,16 +9,13 @@
 
 #pragma once
 
-#ifndef __WANGPC_WDC__
-#define __WANGPC_WDC__
+#ifndef __WANGPC_MVC__
+#define __WANGPC_MVC__
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/harddriv.h"
-#include "machine/scsibus.h"
 #include "machine/wangpcbus.h"
-#include "machine/z80ctc.h"
+#include "video/mc6845.h"
 
 
 
@@ -26,52 +23,50 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_wdc_device
+// ======================> wangpc_mvc_device
 
-class wangpc_wdc_device : public device_t,
+class wangpc_mvc_device : public device_t,
 						  public device_wangpcbus_card_interface
 {
 public:
 	// construction/destruction
-	wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( status_w );
+	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "wangpc_wdc"; }
+	virtual void device_config_complete() { m_shortname = "wangpc_mvc"; }
 
 	// device_wangpcbus_card_interface overrides
 	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
-	virtual UINT8 wangpcbus_dack_r(address_space &space, int line);
-	virtual void wangpcbus_dack_w(address_space &space, int line, UINT8 data);
-	virtual bool wangpcbus_have_dack(int line);
 
 private:
 	inline void set_irq(int state);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<device_t> m_sasibus;
+	// internal state
+	required_device<mc6845_device> m_crtc;
 
-	UINT8 m_status;
+	UINT16 *m_video_ram;
+	UINT16 *m_char_ram;
+	UINT16 *m_bitmap_ram;
+	UINT8 m_option;
 	int m_irq;
-	int m_dreq;
 };
 
 
 // device type definition
-extern const device_type WANGPC_WDC;
+extern const device_type WANGPC_MVC;
 
 
 #endif
