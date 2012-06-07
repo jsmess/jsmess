@@ -33,6 +33,7 @@ public:
 	wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -54,8 +55,8 @@ private:
 	required_device<upd7220_device> m_hgdc0;
 	required_device<upd7220_device> m_hgdc1;
 
-	UINT8 m_attr[16];
 	UINT8 m_option;
+	UINT8 m_attr[16];
 	UINT8 m_underline;
 };
 

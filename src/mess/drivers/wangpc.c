@@ -1147,7 +1147,7 @@ static SLOT_INTERFACE_START( wangpc_cards )
 	SLOT_INTERFACE("lvc", WANGPC_LVC) // low-resolution video controller
 	SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
 	SLOT_INTERFACE("rtc", WANGPC_RTC) // remote telecommunications controller
-	//SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
+	SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
 	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
 	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
 	//SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board

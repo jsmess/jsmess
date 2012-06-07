@@ -757,6 +757,13 @@ void upd7220_device::device_start()
 	// find screen
 	m_screen = machine().device<screen_device>(m_screen_tag);
 
+	if (m_screen == NULL)
+	{
+		m_screen = owner()->subdevice<screen_device>(m_screen_tag);
+	}
+
+	assert(m_screen);
+
 	// register for state saving
 	save_item(NAME(m_ra));
 	save_item(NAME(m_sr));

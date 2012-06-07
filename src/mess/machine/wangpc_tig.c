@@ -38,6 +38,15 @@
 #define DMA_DREQ3			BIT(m_option, 3)
 #define DMA_ID				BIT(m_option, 4)
 
+#define ATTR_ALT_FONT		BIT(data, 8)
+#define ATTR_UNDERSCORE		BIT(data, 9)
+#define ATTR_BLINK			BIT(data, 10)
+#define ATTR_REVERSE		BIT(data, 11)
+#define ATTR_BLANK			BIT(data, 12)
+#define ATTR_BOLD			BIT(data, 13)
+#define ATTR_SUBSCRIPT		BIT(data, 14)
+#define ATTR_SUPERSCRIPT	BIT(data, 15)
+
 
 
 //**************************************************************************
@@ -48,10 +57,32 @@ const device_type WANGPC_TIG = &device_creator<wangpc_tig_device>;
 
 
 //-------------------------------------------------
+//  ROM( wangpc_tig )
+//-------------------------------------------------
+
+ROM_START( wangpc_tig )
+	ROM_REGION( 0x100, "plds", 0 )
+	ROM_LOAD( "377-3072.l26", 0x000, 0x100, NO_DUMP ) // PAL10L8
+	ROM_LOAD( "377-3073.l16", 0x000, 0x100, NO_DUMP ) // PAL10L8
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *wangpc_tig_device::device_rom_region() const
+{
+	return ROM_NAME( wangpc_tig );
+}
+
+
+//-------------------------------------------------
 //  UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( upd7220_0_map, AS_0, 8, wangpc_tig_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_RAM // frame buffer
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
 ADDRESS_MAP_END
@@ -76,6 +107,7 @@ static UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, wangpc_tig_device )
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
 ADDRESS_MAP_END
 
@@ -106,11 +138,10 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_LENGTH(3)
 
-	MCFG_UPD7220_ADD(UPD7720_0_TAG, 4000000, hgdc0_intf, upd7220_0_map)
-	MCFG_UPD7220_ADD(UPD7720_1_TAG, 4000000, hgdc1_intf, upd7220_1_map)
+	MCFG_UPD7220_ADD(UPD7720_0_TAG, XTAL_52_832MHz/10, hgdc0_intf, upd7220_0_map)
+	MCFG_UPD7220_ADD(UPD7720_1_TAG, XTAL_52_832MHz/16, hgdc1_intf, upd7220_1_map)
 MACHINE_CONFIG_END
 
 
@@ -149,6 +180,15 @@ wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *
 
 void wangpc_tig_device::device_start()
 {
+	// initialize palette
+	palette_set_color_rgb(machine(), 0, 0, 0, 0);
+	palette_set_color_rgb(machine(), 1, 0, 0x80, 0);
+	palette_set_color_rgb(machine(), 2, 0, 0xff, 0);
+
+	// state saving
+	save_item(NAME(m_option));
+	save_item(NAME(m_attr));
+	save_item(NAME(m_underline));
 }
 
 
@@ -198,7 +238,7 @@ UINT16 wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 			break;
 
 		case 0xfe/2:
-			data = 0xff00 | DMA_ID ? OPTION_ID_1 : OPTION_ID_0;
+			data = 0xff00 | (DMA_ID ? OPTION_ID_1 : OPTION_ID_0);
 			break;
 		}
 	}
