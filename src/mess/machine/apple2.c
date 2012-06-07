@@ -449,16 +449,7 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 	}
 	else
 	{
-        if (m_machinetype == LASER128)
-        {
-            UINT8 *rom = space.machine().root_device().memregion("maincpu")->base();
-            
-            return rom[(offset&0x1ff) + 0x4200];
-        }
-        else 
-        {
-            return apple2_slotram_r(space, slotnum, offset);
-        }
+        return apple2_slotram_r(space, slotnum, offset);
 	}
 
 	// else fall through to floating bus
@@ -1892,6 +1883,30 @@ MACHINE_START( apple2orig )
     state->m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
 
     state->m_machinetype = APPLE_II;
+
+	apple2_init_common(machine);
+
+	/* setup memory */
+	memset(&mem_cfg, 0, sizeof(mem_cfg));
+	mem_cfg.first_bank = 1;
+	mem_cfg.memmap = apple2_memmap_entries;
+	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	apple2_setup_memory(machine, &mem_cfg);
+
+	/* perform initial reset */
+	apple2_reset(machine);
+}
+
+MACHINE_START( space84 )
+{
+	apple2_memmap_config mem_cfg;
+	void *apple2cp_ce00_ram = NULL;
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    // II and II+ have no internal ROM or internal slot 3 h/w, so don't allow these states
+    state->m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
+
+    state->m_machinetype = SPACE84;
 
 	apple2_init_common(machine);
 

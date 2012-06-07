@@ -115,18 +115,36 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_ind16 &b
 	chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
 	/* and finally, plot the character itself */
-	for (y = 0; y < 8; y++)
-	{
-		for (x = 0; x < 7; x++)
-		{
-			color = (chardata[y] & (1 << x)) ? bg : fg;
+    if (state->m_machinetype == SPACE84)
+    {
+        for (y = 0; y < 8; y++)
+        {
+            for (x = 0; x < 7; x++)
+            {
+                color = (chardata[y] & (1 << (6-x))) ? bg : fg;
 
-			for (i = 0; i < xscale; i++)
-			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
-			}
-		}
-	}
+                for (i = 0; i < xscale; i++)
+                {
+                    bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (y = 0; y < 8; y++)
+        {
+            for (x = 0; x < 7; x++)
+            {
+                color = (chardata[y] & (1 << x)) ? bg : fg;
+
+                for (i = 0; i < xscale; i++)
+                {
+                    bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+                }
+            }
+        }
+    }
 }
 
 

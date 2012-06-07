@@ -77,7 +77,8 @@ typedef enum
     APPLE_II,           // Apple II/II+
     APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
     TK2000,             // Microdigital TK2000
-    LASER128            // Laser 128/128EX/128EX2
+    LASER128,           // Laser 128/128EX/128EX2
+    SPACE84             // "Space 84" with flipped text mode
 } machine_type_t;
 
 typedef enum
@@ -235,6 +236,7 @@ MACHINE_START( apple2 );
 MACHINE_START( apple2orig );
 MACHINE_START( tk2000 );
 MACHINE_START( laser128 );
+MACHINE_START( space84 );
 UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );

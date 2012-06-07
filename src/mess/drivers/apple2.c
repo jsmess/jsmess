@@ -629,10 +629,6 @@ static SLOT_INTERFACE_START(apple2_cards)
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START(laser128_internal)
-    SLOT_INTERFACE("l128int", A2BUS_LASER128)
-SLOT_INTERFACE_END
-
 static SLOT_INTERFACE_START(apple2eaux_cards)
 SLOT_INTERFACE_END
 
@@ -793,6 +789,10 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)     // slots 6 and 7 are hacks for now
 //    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( space84, apple2p )
+	MCFG_MACHINE_START(space84)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1111,5 +1111,5 @@ COMP( 1988, apple2cp, apple2c,  0,        apple2c_iwm, apple2e,  0,        "Appl
 COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
-COMP( 1985, space84,  apple2,   0,        apple2p,	   apple2p,  0,        "ComputerTechnik/IBS",  "Space 84",	GAME_NOT_WORKING )
+COMP( 1985, space84,  apple2,   0,        space84,	   apple2p,  0,        "ComputerTechnik/IBS",  "Space 84",	GAME_NOT_WORKING )
 
