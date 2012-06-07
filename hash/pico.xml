@@ -260,6 +260,18 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="poohcorn">
+		<description>A Year At Pooh Corner (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49021-00"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner (usa).bin" size="524288" crc="333e88d2" sha1="65581aa9b77a5011039ff88a5b282c77ef0c9e81" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohcorng" cloneof="poohcorn" supported="no">
 		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
 		<year>19??</year>
@@ -305,6 +317,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ai to yume no kuni sanrio pyuurorando chanto dekirukana minna to tanoshii oyuugikai (japan).bin" size="1048576" crc="0087112a" sha1="ce47f2a5d941597475ea1565d76d7d6c0fbf1338" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was also released together with many prototypes as Proto build 1995-01-31, meaning that after that date development was complete -->
+	<software name="berenstb">
+		<description>The Berenstain Bears' A School Day (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49036-00" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day (usa).bin" size="1048576" crc="e92af9f1" sha1="f4ae09a8a0e11cd8bec95ec3ac3908ce6da7a30f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -401,6 +426,18 @@ Games for the MIXT BOOK PLAYER COPERA
 	</software>
 
 	<software name="eccojr">
+		<description>Ecco Jr. and the Great Ocean Treasure Hunt! (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-00" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. and the great ocean treasure hunt! (usa).bin" size="524288" crc="c8862213" sha1="0eaa54e3e67469efbdb3737c8dee3b1f11fd04ed" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrg" cloneof="eccojr">
 		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
@@ -659,10 +696,22 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="mickblst">
+		<description>Mickey's Blast into the Past (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49024-00" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past (1994)(sega)(us).bin" size="524288" crc="2628f6ef" sha1="1d04a40d353f71061b206d893d2d8e7864a2faee" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickblstg" cloneof="mickblst" supported="no">
 		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mickey - ausflug in die vergangenheit (germany).bin" size="524288" crc="627ea96c" sha1="eab3c41aef6c30adc82e92e143ffc0360118b99e" offset="000000" loadflag="load16_word_swap" />
@@ -672,8 +721,8 @@ Games for the MIXT BOOK PLAYER COPERA
 
 	<software name="mickblstf" cloneof="mickblst" supported="no">
 		<description>Mickey - Fait un Voyage Eclair Dans Le Passé (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49024-09" />
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
@@ -720,6 +769,18 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="oshare pico suteki ni henshin! naruchan no oshare hair salon (japan).bin" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzl">
+		<description>Pepe's Puzzles (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49035-00" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pepe's puzzles (usa).bin" size="524288" crc="41e5618a" sha1="faf327f39af6e6f8957b307eacbd940fd02919a4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -859,6 +920,18 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sanou kaihatsu series 3 hikaku - bunrui (japan).bin" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magschol">
+		<description>Scholastic's The Magic School Bus (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49038-00"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="scholastic's the magic school bus - going places (u).bin" size="524288" crc="e6ef55f9" sha1="927e48f24745732235de4745d3acf1656750e12b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1143,7 +1216,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb">
+	<software name="berenstbp" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19941220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1154,7 +1227,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb1" cloneof="berenstb">
+	<software name="berenstbp1" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950106)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1165,7 +1238,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb2" cloneof="berenstb">
+	<software name="berenstbp2" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950113)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1176,7 +1249,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb3" cloneof="berenstb">
+	<software name="berenstbp3" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1187,7 +1260,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb4" cloneof="berenstb">
+	<software name="berenstbp4" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950126)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1198,7 +1271,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb5" cloneof="berenstb">
+	<software name="berenstbp5" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950127)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1209,25 +1282,13 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="berenstb6" cloneof="berenstb">
+	<software name="berenstbp6" cloneof="berenstb">
 		<description>The Berenstain Bears' A School Day (Prototype, 19950130)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048564">
 				<rom name="berenstain bears' a school day, the rev 19950130 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="7b53784f" sha1="7128cea20f0695b69d552d5220097f4f4993ebef" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="berenstb7" cloneof="berenstb">
-	<!-- is this the released version too? -->
-		<description>The Berenstain Bears' A School Day (Prototype, 19950131)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="berenstain bears' a school day, the rev 19950131 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="e92af9f1" sha1="f4ae09a8a0e11cd8bec95ec3ac3908ce6da7a30f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1739,17 +1800,6 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="mickblst">
-		<description>Mickey's Blast Into the Past (USA)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mickey's blast into the past (1994)(sega)(us).bin" size="524288" crc="2628f6ef" sha1="1d04a40d353f71061b206d893d2d8e7864a2faee" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mickblst1" cloneof="mickblst">
 		<description>Mickey's Blast Into the Past (Prototype, 19940608)</description>
 		<year>1994</year>
@@ -1927,7 +1977,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="pepepuzl">
+	<software name="pepepuzlp" cloneof="pepepuzl">
 		<description>Pepe's Puzzles (Prototype, 19950224)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1938,7 +1988,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="pepepuzl1" cloneof="pepepuzl">
+	<software name="pepepuzlp1" cloneof="pepepuzl">
 		<description>Pepe's Puzzles (Prototype, 19950220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1949,7 +1999,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="pepepuzl2" cloneof="pepepuzl">
+	<software name="pepepuzlp2" cloneof="pepepuzl">
 		<description>Pepe's Puzzles (Prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1994,7 +2044,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn">
+	<software name="poohcornp" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940809)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2005,7 +2055,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn1" cloneof="poohcorn">
+	<software name="poohcornp1" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940725)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2016,7 +2066,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn2" cloneof="poohcorn">
+	<software name="poohcornp2" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940723)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2027,7 +2077,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn3" cloneof="poohcorn">
+	<software name="poohcornp3" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940721)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2038,7 +2088,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn4" cloneof="poohcorn">
+	<software name="poohcornp4" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940711)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2049,7 +2099,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorn5" cloneof="poohcorn">
+	<software name="poohcornp5" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940608)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2376,17 +2426,6 @@ Notice that most of these will become parent, when the dumps surface
 		</part>
 	</software>
 
-	<software name="eccojr">
-		<description>Ecco Jr. and the Great Ocean Treasure Hunt (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Ecco Jr. and the Great Ocean Treasure Hunt (U).bin" size="????" crc="c8862213" sha1="0eaa54e3e67469efbdb3737c8dee3b1f11fd04ed" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="exchatan">
 		<description>Exciting! Hataraku Norimono-tachi (Jpn)</description>
 		<year>199?</year>
@@ -2541,17 +2580,6 @@ Notice that most of these will become parent, when the dumps surface
 		</part>
 	</software>
 
-	<software name="pepepuzl">
-		<description>Pepe's Puzzles (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Pepe's Puzzles (U).bin" size="????" crc="41e5618a" sha1="faf327f39af6e6f8957b307eacbd940fd02919a4" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="plarail">
 		<description>Plarail Pico - Plarail de Asobou! (Jpn)</description>
 		<year>199?</year>
@@ -2636,17 +2664,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Sansuu - Eigo de Mojars ni Chousen - Image Training for the Right Side of the Brain (J).bin" size="????" crc="42a578a8" sha1="5ca5f0ef8741acb5d58ce0f61e6789ec2adb00ea" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="magschol">
-		<description>Scholastic's The Magic School Bus - Going Places (U)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Scholastic's The Magic School Bus - Going Places (U).bin" size="????" crc="e6ef55f9" sha1="927e48f24745732235de4745d3acf1656750e12b" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
@@ -2790,17 +2807,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Ultraman Kids - Tobidase! Space Picnic (J).bin" size="????" crc="093357d5" sha1="4a9bf5f5352933bb18da5f7a33da83589a04241c" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poohcorn">
-		<description>A Year at Pooh Corner (USA)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Year at Pooh Corner, A (U).bin" size="????" crc="333e88d2" sha1="65581aa9b77a5011039ff88a5b282c77ef0c9e81" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
