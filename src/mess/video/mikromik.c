@@ -50,7 +50,7 @@ static const i8275_interface crtc_intf =
 	SCREEN_TAG,
 	8,
 	0,
-	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq0_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq0_w),
 	DEVCB_NULL,
 	crtc_display_pixels
 };

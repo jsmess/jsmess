@@ -88,7 +88,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 		switch ((offset >> 4) & 0x07)
 		{
 		case 0:
-			data = i8237_r(m_dmac, offset & 0x0f);
+			data = m_dmac->read(space, offset & 0x0f);
 			break;
 
 		case 1:
@@ -157,7 +157,7 @@ WRITE8_MEMBER( mm1_state::mmu_w )
 		switch ((offset >> 4) & 0x07)
 		{
 		case 0:
-			i8237_w(m_dmac, offset & 0x0f, data);
+			m_dmac->write(space, offset & 0x0f, data);
 			break;
 
 		case 1:
@@ -494,13 +494,13 @@ WRITE_LINE_MEMBER( mm1_state::dma_hrq_changed )
 	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// Assert HLDA
-	i8237_hlda_w(m_dmac, state);
+	m_dmac->hack_w(state);
 }
 
 READ8_MEMBER( mm1_state::mpsc_dack_r )
 {
 	// clear data request
-	i8237_dreq2_w(m_dmac, CLEAR_LINE);
+	m_dmac->dreq2_w(CLEAR_LINE);
 
 	return m_mpsc->dtra_r();
 }
@@ -510,7 +510,7 @@ WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 	m_mpsc->hai_w(data);
 
 	// clear data request
-	i8237_dreq1_w(m_dmac, CLEAR_LINE);
+	m_dmac->dreq1_w(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( mm1_state::tc_w )
@@ -606,7 +606,7 @@ WRITE_LINE_MEMBER( mm1_state::drq2_w )
 {
 	if (state)
 	{
-		i8237_dreq2_w(m_dmac, ASSERT_LINE);
+		m_dmac->dreq2_w(ASSERT_LINE);
 	}
 }
 
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 {
 	if (state)
 	{
-		i8237_dreq1_w(m_dmac, ASSERT_LINE);
+		m_dmac->dreq1_w(ASSERT_LINE);
 	}
 }
 
@@ -716,7 +716,7 @@ static const floppy_interface mm1_floppy_interface =
 static const upd765_interface fdc_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
-	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq3_w),
 	NULL,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }

@@ -9,7 +9,7 @@
 #include "cpu/m6800/m6800.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/apricotkb.h"
 #include "machine/ctronics.h"
 #include "machine/pic8259.h"
@@ -72,7 +72,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<i8237_device> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_device<device_t> m_pic;
 	required_device<device_t> m_pit;
 	required_device<z80dart_device> m_sio;

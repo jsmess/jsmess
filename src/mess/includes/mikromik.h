@@ -8,7 +8,7 @@
 #include "cpu/i8085/i8085.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/i8212.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -50,7 +50,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8212_device> m_iop;
-	required_device<device_t> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_device<device_t> m_pit;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_fdc;
