@@ -23,8 +23,7 @@
 *
 *    ToDo:
 *    - Proper artwork
-*    - There are various problems, seems to be another victim of inadequate
-*      6821 emulation.
+*    - Verify operation with the instructions
 *
 ******************************************************************************/
 
@@ -56,10 +55,12 @@ public:
 	DECLARE_WRITE8_MEMBER( eacc_segment_w );
 	bool m_cb1;
 	bool m_cb2;
+	bool m_nmi;
+	virtual void machine_reset();
+private:
 	UINT8 m_digit;
 	UINT8 m_segment;
 	void eacc_display();
-	virtual void machine_reset();
 };
 
 
@@ -124,7 +125,10 @@ static TIMER_DEVICE_CALLBACK( eacc_nmi )
 	eacc_state *state = timer.machine().driver_data<eacc_state>();
 
 	if (state->m_cb2)
+	{
+		state->m_nmi = true;
 		device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_NMI, ASSERT_LINE);
+	}
 }
 
 READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
@@ -191,15 +195,21 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
     //d1 segment f
     //d0 segment g
 
-	m_segment = BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3);
-	eacc_display();
+	if (!m_nmi)
+	{
+		m_segment = BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3);
+		eacc_display();
+	}
 }
 
 WRITE8_MEMBER( eacc_state::eacc_digit_w )
 {
-	device_set_input_line(machine().device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
+	if (m_nmi)
+	{
+		device_set_input_line(machine().device("maincpu"), INPUT_LINE_NMI, CLEAR_LINE);
+		m_nmi = false;
+	}
 	m_digit = data & 0xf8;
-	eacc_display();
 }
 
 static const pia6821_interface eacc_mc6821_intf =
@@ -243,7 +253,7 @@ MACHINE_CONFIG_END
 
 ROM_START(eacc)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("eacc.bin", 0x4000, 0x0800, BAD_DUMP CRC(37370cf7) SHA1(6627552f709331ea66f18d681730dd6448ca1ff2) )
+	ROM_LOAD("eacc.bin", 0x4000, 0x0800, CRC(37370cf7) SHA1(6627552f709331ea66f18d681730dd6448ca1ff2) )
 ROM_END
 
 
