@@ -1855,8 +1855,10 @@ $(MESSOBJ)/wang.a:				\
 	$(MESS_DRIVERS)/wangpc.o	\
 	$(MESS_MACHINE)/wangpcbus.o	\
 	$(MESS_MACHINE)/wangpckb.o	\
+	$(MESS_MACHINE)/wangpc_emb.o	\
 	$(MESS_MACHINE)/wangpc_lic.o	\
 	$(MESS_MACHINE)/wangpc_lvc.o	\
+	$(MESS_MACHINE)/wangpc_mcc.o	\
 	$(MESS_MACHINE)/wangpc_mvc.o	\
 	$(MESS_MACHINE)/wangpc_rtc.o	\
 	$(MESS_MACHINE)/wangpc_tig.o	\

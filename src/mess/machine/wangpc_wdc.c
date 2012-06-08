@@ -22,6 +22,10 @@
 #define MK3882_TAG		"l07"
 #define SASIBUS_TAG		"sasi"
 
+#define OPTION_DREQ1	BIT(m_option, 1)
+#define OPTION_DREQ2	BIT(m_option, 2)
+#define OPTION_DREQ3	BIT(m_option, 3)
+
 
 
 //**************************************************************************
@@ -164,12 +168,9 @@ inline void wangpc_wdc_device::set_irq(int state)
 {
 	m_irq = state;
 
-	switch (m_dreq)
-	{
-	case 1: m_bus->irq5_w(m_irq); break;
-	case 2: m_bus->irq6_w(m_irq); break;
-	case 3: m_bus->irq7_w(m_irq); break;
-	}
+	if (OPTION_DREQ1) m_bus->irq5_w(m_irq);
+	if (OPTION_DREQ2) m_bus->irq6_w(m_irq);
+	if (OPTION_DREQ3) m_bus->irq7_w(m_irq);
 }
 
 
@@ -198,6 +199,10 @@ wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *
 
 void wangpc_wdc_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_status));
+	save_item(NAME(m_option));
+	save_item(NAME(m_irq));
 }
 
 
@@ -207,7 +212,8 @@ void wangpc_wdc_device::device_start()
 
 void wangpc_wdc_device::device_reset()
 {
-	m_dreq = 0;
+	m_status = 0;
+	m_option = 0;
 
 	set_irq(CLEAR_LINE);
 }
@@ -274,7 +280,7 @@ UINT16 wangpc_wdc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 
 void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
 {
-	if (sad(offset))
+	if (sad(offset) && ACCESSING_BITS_0_7)
 	{
 		switch (offset & 0x7f)
 		{
@@ -287,13 +293,16 @@ void wangpc_wdc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 			break;
 
 		case 0xfe/2:
-			if (m_irq == ASSERT_LINE) set_irq(CLEAR_LINE);
+			{
+				bool irq = (m_irq == ASSERT_LINE);
+				bool changed = ((m_option & 0x0e) != (data & 0x0e));
 
-			if (BIT(data, 1)) m_dreq = 1;
-			if (BIT(data, 2)) m_dreq = 2;
-			if (BIT(data, 3)) m_dreq = 3;
+				if (irq && changed) set_irq(CLEAR_LINE);
 
-			if (m_irq == ASSERT_LINE) set_irq(ASSERT_LINE);
+				m_option = data & 0xff;
+
+				if (irq && changed) set_irq(ASSERT_LINE);
+			}
 			break;
 		}
 	}
@@ -326,7 +335,7 @@ void wangpc_wdc_device::wangpcbus_dack_w(address_space &space, int line, UINT8 d
 
 bool wangpc_wdc_device::wangpcbus_have_dack(int line)
 {
-	return line == m_dreq;
+	return (OPTION_DREQ1 && (line == 1)) || (OPTION_DREQ2 && (line == 2)) || (OPTION_DREQ3 && (line == 3));
 }
 
 

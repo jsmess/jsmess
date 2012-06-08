@@ -598,6 +598,7 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x1018, 0x1019) AM_MIRROR(0x0002) AM_READWRITE8(fdc_reset_r, fdc_reset_w, 0x00ff)
 	AM_RANGE(0x101c, 0x101d) AM_MIRROR(0x0002) AM_READWRITE8(fdc_tc_r, fdc_tc_w, 0x00ff)
 	AM_RANGE(0x1020, 0x1027) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x1028, 0x1029) //AM_WRITE(?)
 	AM_RANGE(0x1040, 0x1047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, mc2661_device, read, 0x00ff)
@@ -780,8 +781,6 @@ void wangpc_state::check_level1_interrupts()
 void wangpc_state::check_level2_interrupts()
 {
 	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | m_fdc_dd0 | m_fdc_dd1 | upd765_int_r(m_fdc) | m_fpu_irq | m_bus_irq2;
-
-	//logerror("level 2: %u %u %u %u %u %u %u %u\n",!m_dma_eop , m_uart_dr , m_uart_tbre , m_fdc_dd0 , m_fdc_dd1 , upd765_int_r(m_fdc) , m_fpu_irq , m_bus_irq2);
 
 	pic8259_ir2_w(m_pic, state);
 }
@@ -1143,14 +1142,14 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 };
 
 static SLOT_INTERFACE_START( wangpc_cards )
+	SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
 	SLOT_INTERFACE("lic", WANGPC_LIC) // local interconnect option card
 	SLOT_INTERFACE("lvc", WANGPC_LVC) // low-resolution video controller
+	SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
 	SLOT_INTERFACE("mvc", WANGPC_MVC) // medium-resolution video controller
 	SLOT_INTERFACE("rtc", WANGPC_RTC) // remote telecommunications controller
 	SLOT_INTERFACE("tig", WANGPC_TIG) // text/image/graphics controller
 	SLOT_INTERFACE("wdc", WANGPC_WDC) // Winchester disk controller
-	//SLOT_INTERFACE("mcc", WANGPC_MCC) // multiport communications controller
-	//SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
 SLOT_INTERFACE_END
 
 
@@ -1308,4 +1307,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_SUPPORTS_SAVE )

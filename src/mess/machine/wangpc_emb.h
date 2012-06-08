@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Wang PC-PM001 Winchester Disk Controller emulation
+    Wang PC-PM031-B Extended Memory Board emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,16 +9,12 @@
 
 #pragma once
 
-#ifndef __WANGPC_WDC__
-#define __WANGPC_WDC__
+#ifndef __WANGPC_EMB__
+#define __WANGPC_EMB__
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/harddriv.h"
-#include "machine/scsibus.h"
 #include "machine/wangpcbus.h"
-#include "machine/z80ctc.h"
 
 
 
@@ -26,52 +22,37 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_wdc_device
+// ======================> wangpc_emb_device
 
-class wangpc_wdc_device : public device_t,
+class wangpc_emb_device : public device_t,
 						  public device_wangpcbus_card_interface
 {
 public:
 	// construction/destruction
-	wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-	// not really public
-	DECLARE_WRITE8_MEMBER( status_w );
+	wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "wangpc_wdc"; }
+	virtual void device_config_complete() { m_shortname = "wangpc_emb"; }
 
 	// device_wangpcbus_card_interface overrides
 	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
-	virtual UINT8 wangpcbus_dack_r(address_space &space, int line);
-	virtual void wangpcbus_dack_w(address_space &space, int line, UINT8 data);
-	virtual bool wangpcbus_have_dack(int line);
 
 private:
-	inline void set_irq(int state);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<device_t> m_sasibus;
-
-	UINT8 m_status;
-	UINT8 m_option;
-	int m_irq;
+	UINT16 *m_ram;
+	UINT16 m_option;
+	int m_parity_error;
+	int m_parity_odd;
 };
 
 
 // device type definition
-extern const device_type WANGPC_WDC;
+extern const device_type WANGPC_EMB;
 
 
 #endif
