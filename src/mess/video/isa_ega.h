@@ -27,6 +27,8 @@ public:
 		virtual const rom_entry *device_rom_region() const;
 		virtual ioport_constructor device_input_ports() const;
 
+		DECLARE_READ8_MEMBER(read);
+		DECLARE_WRITE8_MEMBER(write);
 		DECLARE_READ8_MEMBER(pc_ega8_3b0_r);
 		DECLARE_WRITE8_MEMBER(pc_ega8_3b0_w);
 		DECLARE_READ8_MEMBER(pc_ega8_3c0_r);
@@ -49,6 +51,9 @@ public:
 		crtc_ega_update_row_func	m_update_row;
 
 		/* Video memory and related variables */
+		memory_region	*m_vram;
+		UINT8	*m_plane[4];
+		UINT8	m_read_latch[4];
 		UINT8	*m_videoram;
 		UINT8	*m_videoram_a0000;
 		UINT8	*m_videoram_b0000;

@@ -368,7 +368,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
            | | | | | | | |
            | | | | | | | +-- plane select bit 0
            | | | | | | +---- plane select bit 1
-           | | | | | +------ plane select bit 2
+           | | | | | +------ reserved/unused
            | | | | +-------- reserved/unused
            | | | +---------- reserved/unused
            | | +------------ reserved/unused
@@ -587,6 +587,8 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 
 void isa8_ega_device::device_start()
 {
+	astring tempstring;
+
 	set_isa_device();
 
 	for (int i = 0; i < 64; i++ )
@@ -597,7 +599,7 @@ void isa8_ega_device::device_start()
 
 		palette_set_color_rgb( machine(), i, r, g, b );
 	}
-	astring tempstring;
+
 	UINT8	*dst = memregion(subtag(tempstring, "user2" ))->base() + 0x0000;
 	UINT8	*src = memregion(subtag(tempstring, "user1" ))->base() + 0x3fff;
 	int		i;
@@ -608,7 +610,13 @@ void isa8_ega_device::device_start()
 		*dst++ = *src--;
 	}
 	/* Install 256KB Video ram on our EGA card */
-	m_videoram = auto_alloc_array(machine(), UINT8, 256*1024);
+	m_vram = machine().memory().region_alloc(subtag(tempstring,"vram"), 256*1024, 1, ENDIANNESS_LITTLE);
+
+	m_videoram = m_vram->base();
+	m_plane[0] = m_videoram + 0x00000;
+	m_plane[1] = m_videoram + 0x10000;
+	m_plane[2] = m_videoram + 0x20000;
+	m_plane[3] = m_videoram + 0x30000;
 
 	m_crtc_ega = subdevice(EGA_CRTC_NAME);
 
@@ -666,40 +674,56 @@ void isa8_ega_device::install_banks()
 	switch ( m_graphics_controller.data[6] & 0x0c )
 	{
 	case 0x00:		/* 0xA0000, 128KB */
-		m_videoram_a0000 = m_videoram + 0x10000;
-		m_videoram_b0000 = m_videoram;
-		m_videoram_b8000 = m_videoram + 0x8000;
+		if ( m_misc_output & 0x02 )
+		{
+			m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+		}
+		else
+		{
+			m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
+			m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
+			m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+		}
 		break;
 	case 0x04:		/* 0xA0000, 64KB */
-		m_videoram_a0000 = m_videoram + 0x10000;
-		m_videoram_b0000 = NULL;
-		m_videoram_b8000 = NULL;
+		if ( m_misc_output & 0x02 )
+		{
+			m_isa->install_memory(0xa0000, 0xaffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+		}
+		else
+		{
+			m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
+		}
+		/* These unmaps may break multi graphics card support */
+		m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
+		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
 		break;
 	case 0x08:		/* 0xB0000, 32KB */
-		m_videoram_a0000 = NULL;
-		m_videoram_b0000 = m_videoram;
-		m_videoram_b8000 = NULL;
+		if ( m_misc_output & 0x02 )
+		{
+			m_isa->install_memory(0xb0000, 0xb7fff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+		}
+		else
+		{
+			m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
+		}
+		/* These unmaps may break multi graphics card support */
+		m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
+		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
 		break;
 	case 0x0c:		/* 0xB8000, 32KB */
-		m_videoram_a0000 = NULL;
-		m_videoram_b0000 = NULL;
-		m_videoram_b8000 = m_videoram;
-		break;
-	}
-	if (m_videoram_a0000 && (m_misc_output & 0x02)) {
-		m_isa->install_bank(0xa0000, 0xaffff, 0, 0, "bank11", m_videoram_a0000);
-	} else {
+		if ( m_misc_output & 0x02 )
+		{
+			m_isa->install_memory(0xb8000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+		}
+		else
+		{
+			m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+		}
+		/* These unmaps may break multi graphics card support */
 		m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
-	}
-	if (m_videoram_b0000 && (m_misc_output & 0x02)) {
-		m_isa->install_bank(0xb0000, 0xb7fff, 0, 0, "bank12", m_videoram_b0000);
-	} else {
 		m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
-	}
-	if (m_videoram_b8000 && (m_misc_output & 0x02)) {
-		m_isa->install_bank(0xb8000, 0xbffff, 0, 0, "bank13", m_videoram_b8000);
-	} else {
-		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+		break;
 	}
 }
 
@@ -749,7 +773,7 @@ static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
 static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
 	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	UINT16	*p = &bitmap.pix16(y);
+//	UINT16	*p = &bitmap.pix16(y);
 	int	i;
 
 //  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
@@ -759,21 +783,51 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 	case 0x03:
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-			UINT8 data = ega->m_videoram[ offset ];
-
-			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
-
-			data = ega->m_videoram[ offset + 1 ];
-
-			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+//			UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+//			UINT8 data = ega->m_videoram[ offset ];
+//
+//			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+//			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+//			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+//			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+//
+//			data = ega->m_videoram[ offset + 1 ];
+//
+//			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+//			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+//			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+//			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
 		}
+		break;
+	case 0x0f:
+		for ( i = 0; i < x_count; i++ )
+		{
+//			UINT16 offset = ma + i;
+//			UINT8 data0 = ega->m_plane[0][ offset ];
+//			UINT8 data1 = ega->m_plane[1][ offset ];
+//			UINT8 data2 = ega->m_plane[2][ offset ];
+//			UINT8 data3 = ega->m_plane[3][ offset ];
+//
+//			for ( int j = 0; j < 8; j++ )
+//			{
+//				UINT16 col = ( ( data0 >> 7 ) & 0x01 ) | ( ( data1 >> 6 ) & 0x02 ) | ( ( data2 >> 5 ) & 0x04 );
+//				if ( data3 & 0x80 )
+//				{
+//					col += 0x38;
+//				}
+//
+//				*p = col;
+//				p++;
+//				data0 <<= 1;
+//				data1 <<= 1;
+//				data2 <<= 1;
+//				data3 <<= 1;
+//			}
+		}
+		break;
+	default:
+		if (y==0)
+			printf("unhandled %02x\n", ega->m_attribute.data[ 0x12 ] & 0x0f);
 		break;
 	}
 }
@@ -789,15 +843,15 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16	offset = ( ma + i ) << 1;
-		UINT8	chr = ega->m_videoram[ offset ];
-		UINT8	attr = ega->m_videoram[ offset + 1 ];
+		UINT16	offset = ma + i;
+		UINT8	chr = ega->m_plane[0][ offset ];
+		UINT8	attr = ega->m_plane[1][ offset ];
 		UINT8	data = 0;
 		UINT16	fg = ega->m_attribute.data[ attr & 0x07 ];
 		UINT16	bg = ega->m_attribute.data[ ( attr >> 4 ) & 0x07 ];
 
-		/* Is attribute bit 3 used as intensity or as character set selector? */
-		if ( ega->m_attribute.data[ 0x12 ] & 0x08 )
+		/* If character set A and B are equal attribute bit 3 is used as intensity */
+		if ( ega->m_charA == ega->m_charB )
 		{
 			/* intensity selector */
 			data = ega->m_charB[ chr * 32 + ra ];
@@ -871,13 +925,13 @@ void isa8_ega_device::change_mode()
 		/* Set character maps */
 		if ( m_sequencer.data[0x04] & 0x02 )
 		{
-			m_charA = m_videoram + 0x10000 + ( ( m_sequencer.data[0x03] & 0x0c ) >> 1 ) * 0x2000;
-			m_charB = m_videoram + 0x10000 + ( m_sequencer.data[0x03] & 0x03 ) * 0x2000;
+			m_charA = m_plane[2] + ( ( m_sequencer.data[0x03] & 0x0c ) >> 1 ) * 0x2000;
+			m_charB = m_plane[2] + ( m_sequencer.data[0x03] & 0x03 ) * 0x2000;
 		}
 		else
 		{
-			m_charA = m_videoram + 0x10000;
-			m_charB = m_videoram + 0x10000;
+			m_charA = m_plane[2] + 0x10000;
+			m_charB = m_plane[2] + 0x10000;
 		}
 	}
 
@@ -894,6 +948,179 @@ void isa8_ega_device::change_mode()
 
 if ( ! m_update_row )
 	logerror("unknown video mode\n");
+}
+
+
+READ8_MEMBER( isa8_ega_device::read )
+{
+	UINT8 data = 0xFF;
+
+	if ( !space.debugger_access() )
+	{
+		/* Fill read latches */
+		m_read_latch[0] = m_plane[0][offset & 0xffff];
+		m_read_latch[1] = m_plane[1][offset & 0xffff];
+		m_read_latch[2] = m_plane[2][offset & 0xffff];
+		m_read_latch[3] = m_plane[3][offset & 0xffff];
+	}
+
+	if ( m_graphics_controller.data[5] & 0x08 )
+	{
+		// Read mode #1
+		popmessage("ega: Read mode 1 not supported yet!");
+	}
+	else
+	{
+		// Read mode #0
+		if ( m_sequencer.data[4] & 0x04 )
+		{
+			// Normal addressing mode
+			data = m_plane[ m_graphics_controller.data[4] & 0x03 ][offset & 0xffff];
+		}
+		else
+		{
+			// Odd/Even addressing mode
+			data = m_plane[offset & 1][(offset & 0xffff) >> 1];
+		}
+	}
+
+	return data;
+}
+
+
+WRITE8_MEMBER( isa8_ega_device::write )
+{
+	UINT8 alu[4];
+
+	switch( m_graphics_controller.data[5] & 0x03 )
+	{
+	case 0:		// Write mode 0
+		// Pass through barrel shifter
+		data = ( ( ( data << 8 ) | data ) >> ( m_graphics_controller.data[3] & 0x07 ) ) & 0xFF;
+
+		// Pass through ALUs
+		switch( m_graphics_controller.data[3] & 0x18 )
+		{
+		case 0x00:		// Unmodified
+			alu[0] = data;
+			alu[1] = data;
+			alu[2] = data;
+			alu[3] = data;
+			break;
+
+		case 0x08:		// AND
+			alu[0] = m_read_latch[0] & data;
+			alu[1] = m_read_latch[1] & data;
+			alu[2] = m_read_latch[2] & data;
+			alu[3] = m_read_latch[3] & data;
+			break;
+
+		case 0x10:		// OR
+			alu[0] = m_read_latch[0] | data;
+			alu[1] = m_read_latch[1] | data;
+			alu[2] = m_read_latch[2] | data;
+			alu[3] = m_read_latch[3] | data;
+			break;
+
+		case 0x18:		// XOR
+			alu[0] = m_read_latch[0] ^ data;
+			alu[1] = m_read_latch[1] ^ data;
+			alu[2] = m_read_latch[2] ^ data;
+			alu[3] = m_read_latch[3] ^ data;
+			break;
+		}
+
+		offset &= 0xffff;
+
+		//
+		// Plane selection
+		// TODO: Get this logic clearer. The documentation is unclear on the exact magic combination of bits.
+		//
+		if ( m_sequencer.data[4] & 0x04 )
+		{
+			// Sequential addressing mode
+			if ( m_attribute.data[0x12] & 0x01 )
+			{
+				// Plane 0
+				// Bit selection
+				m_plane[0][offset] = ( m_plane[0][offset] & ~ m_graphics_controller.data[8] ) | ( alu[0] & m_graphics_controller.data[8] );
+			}
+			if ( m_attribute.data[0x12] & 0x02 )
+			{
+				// Plane 1
+				// Bit selection
+				m_plane[1][offset] = ( m_plane[1][offset] & ~ m_graphics_controller.data[8] ) | ( alu[1] & m_graphics_controller.data[8] );
+			}
+			if ( m_attribute.data[0x12] & 0x04 )
+			{
+				// Plane 2
+				// Bit selection
+				m_plane[2][offset] = ( m_plane[2][offset] & ~ m_graphics_controller.data[8] ) | ( alu[2] & m_graphics_controller.data[8] );
+			}
+			if ( m_attribute.data[0x12] & 0x08 )
+			{
+				// Plane 3
+				// Bit selection
+				m_plane[3][offset] = ( m_plane[3][offset] & ~ m_graphics_controller.data[8] ) | ( alu[3] & m_graphics_controller.data[8] );
+			}
+		}
+		else
+		{
+			// Odd/Even addressing mode
+			if ( offset & 1 )
+			{
+				// Odd addresses go to planes 1 and 3
+
+				offset >>= 1;
+
+				if ( m_attribute.data[0x12] & 0x02 )
+				{
+					// Plane 1
+					// Bit selection
+					m_plane[1][offset] = ( m_plane[1][offset] & ~ m_graphics_controller.data[8] ) | ( alu[1] & m_graphics_controller.data[8] );
+				}
+				if ( ( m_attribute.data[0x12] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
+				{
+					// Plane 3
+					// Bit selection
+					m_plane[3][offset] = ( m_plane[3][offset] & ~ m_graphics_controller.data[8] ) | ( alu[3] & m_graphics_controller.data[8] );
+				}
+			}
+			else
+			{
+				// Even addresses go to planes 0 and 2
+
+				offset >>= 1;
+
+				if ( m_attribute.data[0x12] & 0x01 )
+				{
+					// Plane 0
+					// Bit selection
+					m_plane[0][offset] = ( m_plane[0][offset] & ~ m_graphics_controller.data[8] ) | ( alu[0] & m_graphics_controller.data[8] );
+				}
+				if ( ( m_attribute.data[0x12] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
+				{
+					// Plane 2
+					// Bit selection
+					m_plane[2][offset] = ( m_plane[2][offset] & ~ m_graphics_controller.data[8] ) | ( alu[2] & m_graphics_controller.data[8] );
+				}
+			}
+		}
+
+		break;
+
+	case 1:		// Write mode 1
+		popmessage("EGA: Write mode 1 not supported!");
+		break;
+
+	case 2:		// Write mode 2
+		popmessage("EGA: Write mode 2 not supported!");
+		break;
+
+	case 3:		// Write mode 3
+		popmessage("EGA: Write mode 3 not supported!");
+		break;
+	}
 }
 
 
