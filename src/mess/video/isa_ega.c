@@ -991,6 +991,7 @@ READ8_MEMBER( isa8_ega_device::read )
 WRITE8_MEMBER( isa8_ega_device::write )
 {
 	UINT8 alu[4];
+	alu[0] =alu[1] = alu[2] = alu[3] = 0;
 
 	switch( m_graphics_controller.data[5] & 0x03 )
 	{
