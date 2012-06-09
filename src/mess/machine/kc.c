@@ -350,7 +350,7 @@ void kc_state::update_0x0c000()
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        membank("bank4")->set_base(machine().root_device().memregion("basic")->base());
+        membank("bank4")->set_base(memregion("basic")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank4");
 		space->unmap_write(0xc000, 0xdfff);
 	}
@@ -373,7 +373,7 @@ void kc_state::update_0x0e000()
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		membank("bank5")->set_base(machine().root_device().memregion("caos")->base() + 0x2000);
+		membank("bank5")->set_base(memregion("caos")->base() + 0x2000);
 		space->install_read_bank(0xe000, 0xffff, "bank5");
 		space->unmap_write(0xe000, 0xffff);
 	}
@@ -397,7 +397,7 @@ void kc_state::update_0x08000()
         /* IRM enabled */
         LOG(("IRM enabled\n"));
 
-		membank("bank3")->set_base(m_ram_base + 0x4000);
+		membank("bank3")->set_base(m_video_ram);
 		space->install_readwrite_bank(0x8000, 0xbfff, "bank3");
     }
     else
@@ -462,7 +462,7 @@ void kc85_4_state::update_0x0c000()
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		membank("bank4")->set_base(machine().root_device().memregion("caos")->base());
+		membank("bank4")->set_base(memregion("caos")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank4");
 		space->unmap_write(0xc000, 0xdfff);
 	}
@@ -475,7 +475,7 @@ void kc85_4_state::update_0x0c000()
 
 			int bank = memregion("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
 
-			membank("bank4")->set_base(machine().root_device().memregion("basic")->base() + (bank << 13));
+			membank("bank4")->set_base(memregion("basic")->base() + (bank << 13));
 			space->install_read_bank(0xc000, 0xdfff, "bank4");
 			space->unmap_write(0xc000, 0xdfff);
 		}
@@ -498,14 +498,12 @@ void kc85_4_state::update_0x08000()
 		/* IRM enabled - has priority over RAM8 enabled */
 		LOG(("IRM enabled\n"));
 
-		UINT8* ram_page = (UINT8*)kc85_4_get_video_ram_base(machine(), (m_port_84_data & 0x04), (m_port_84_data & 0x02));
+		UINT8* ram_page = m_video_ram + ((BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14));
 
 		membank("bank3")->set_base(ram_page);
 		space->install_readwrite_bank(0x8000, 0xa7ff, "bank3");
 
-		ram_page = (UINT8*)kc85_4_get_video_ram_base(machine(), 0, 0);
-
-		membank("bank6")->set_base(ram_page + 0x2800);
+		membank("bank6")->set_base(m_video_ram + 0x2800);
 		space->install_readwrite_bank(0xa800, 0xbfff, "bank6");
 	}
     else if (m_pio_data[1] & (1<<5))
@@ -645,9 +643,7 @@ WRITE8_MEMBER( kc85_4_state::kc85_4_84_w )
 
 	m_port_84_data = data;
 
-	kc85_4_video_ram_select_bank(machine(), data & 0x01);
-
-	m_high_resolution = (data & 0x08) ? 0 : 1;
+	video_control_w(data);
 
 	update_0x08000();
 }
@@ -724,39 +720,24 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 
 }
 
-static TIMER_CALLBACK(kc85_15khz_timer_callback )
+TIMER_DEVICE_CALLBACK( kc_scanline )
 {
-	kc_state *state = machine.driver_data<kc_state>();
+	kc_state *state = timer.machine().driver_data<kc_state>();
+	int scanline = (int)param;
 
-	/* toggle state of square wave */
-	state->m_kc85_15khz_state^=1;
+	/* set clock input for channel 0 and 1 to ctc */
+	z80ctc_trg0_w(state->m_z80ctc, 1);
+	z80ctc_trg0_w(state->m_z80ctc, 0);
+	z80ctc_trg1_w(state->m_z80ctc, 1);
+	z80ctc_trg1_w(state->m_z80ctc, 0);
 
-	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_trg0_w(state->m_z80ctc, state->m_kc85_15khz_state);
-	z80ctc_trg1_w(state->m_z80ctc, state->m_kc85_15khz_state);
-}
-
-static TIMER_CALLBACK(kc85_50hz_timer_callback)
-{
-	kc_state *state = machine.driver_data<kc_state>();
-
-	/* toggle state of square wave */
-	state->m_kc85_50hz_state^=1;
-
-	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_trg2_w(state->m_z80ctc, state->m_kc85_50hz_state);
-	z80ctc_trg3_w(state->m_z80ctc, state->m_kc85_50hz_state);
-}
-
-/* video blink */
-WRITE_LINE_MEMBER( kc_state::ctc_zc2_callback )
-{
-	/* is blink enabled? */
-	if (m_pio_data[1] & (1<<7))
+	if (scanline == 256)
 	{
-		/* yes */
-		/* toggle state of blink to video hardware */
-		kc85_video_set_blink_state(machine(), state);
+		/* set clock input for channel 2 and 3 to ctc */
+		z80ctc_trg2_w(state->m_z80ctc, 1);
+		z80ctc_trg2_w(state->m_z80ctc, 0);
+		z80ctc_trg3_w(state->m_z80ctc, 1);
+		z80ctc_trg3_w(state->m_z80ctc, 0);
 	}
 }
 
@@ -781,13 +762,6 @@ void kc_state::machine_start()
 	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
 	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_oneshot_timer));
 
-	// kc85 has a 50 Hz input to the ctc channel 2 and 3
-	// channel 2 this controls the video colour flash
-	// kc85 has a 15 kHz (?) input to the ctc channel 0 and 1
-	// channel 0 and channel 1 are used for cassette write
-	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(kc85_50hz_timer_callback), 0, NULL);
-	machine().scheduler().timer_pulse(attotime::from_hz(15625), FUNC(kc85_15khz_timer_callback), 0, NULL);
-
 	m_ram_base = m_ram->pointer();
 
 	m_expansions[0] = machine().device<kcexp_slot_device>("m8");
@@ -805,9 +779,6 @@ void kc_state::machine_reset()
 	update_0x08000();
 	update_0x0c000();
 	update_0x0e000();
-
-	m_kc85_50hz_state = 0;
-	m_kc85_15khz_state = 0;
 
 	// set low resolution at reset
 	m_high_resolution = 0;

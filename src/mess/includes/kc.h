@@ -122,15 +122,17 @@ public:
 
 	// defined in video/kc.c
 	virtual void video_start();
+	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
+	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 colour_byte, UINT8 gfx_byte);
 
 	// driver state
 	UINT8 *				m_ram_base;
+	UINT8 *				m_video_ram;
 	int 				m_pio_data[2];
 	int					m_high_resolution;
 	UINT8				m_ardy;
 	UINT8				m_brdy;
-	int 				m_kc85_50hz_state;
-	int 				m_kc85_15khz_state;
 	int					m_kc85_blink_state;
 	int					m_k0_line;
 	int					m_k1_line;
@@ -167,11 +169,12 @@ public:
 
 	// defined in video/kc.c
 	virtual void video_start();
+	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void video_control_w(int data);
 
 	// driver state
 	UINT8				m_port_84_data;
 	UINT8				m_port_86_data;
-	UINT8 *				m_video_ram;
 	UINT8 *				m_display_video_ram;
 };
 
@@ -180,19 +183,9 @@ public:
 
 extern PALETTE_INIT( kc85 );
 
-void kc85_video_set_blink_state(running_machine &machine, int data);
-
-SCREEN_UPDATE_IND16( kc85_3 );
-SCREEN_UPDATE_IND16( kc85_4 );
-
-/* select video ram to display */
-void kc85_4_video_ram_select_bank(running_machine &machine, int bank);
-/* select video ram which is visible in address space */
-unsigned char *kc85_4_get_video_ram_base(running_machine &machine, int bank, int colour);
-
-
 /*----------- defined in machine/kc.c -----------*/
 
 QUICKLOAD_LOAD( kc );
+TIMER_DEVICE_CALLBACK( kc_scanline );
 
 #endif /* KC_H_ */
