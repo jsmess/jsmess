@@ -773,62 +773,61 @@ static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
 static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
 	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-//	UINT16	*p = &bitmap.pix16(y);
-	int	i;
+	UINT16	*p = &bitmap.pix16(y);
 
 //  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
 
-	switch ( ega->m_attribute.data[ 0x12 ] & 0x0f )
+	if ( ega->m_graphics_controller.data[5] & 0x10 )
 	{
-	case 0x03:
-		for ( i = 0; i < x_count; i++ )
+		// Odd/Even mode (CGA compatible)
+
+		for ( int i = 0; i < x_count; i++ )
 		{
-//			UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-//			UINT8 data = ega->m_videoram[ offset ];
-//
-//			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-//			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-//			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-//			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
-//
-//			data = ega->m_videoram[ offset + 1 ];
-//
-//			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-//			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-//			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-//			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+			UINT16 offset = ( ( ma + i ) & 0x1fff ) | ( ( y & 1 ) << 12 );
+			UINT8 data = ega->m_plane[0][offset];
+
+			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+			
+			data = ega->m_plane[1][offset];
+
+			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
 		}
-		break;
-	case 0x0f:
-		for ( i = 0; i < x_count; i++ )
+	}
+	else
+	{
+		// EGA mode
+
+//		UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
+
+		for ( int i = 0; i < x_count; i++ )
 		{
-//			UINT16 offset = ma + i;
-//			UINT8 data0 = ega->m_plane[0][ offset ];
-//			UINT8 data1 = ega->m_plane[1][ offset ];
-//			UINT8 data2 = ega->m_plane[2][ offset ];
-//			UINT8 data3 = ega->m_plane[3][ offset ];
-//
-//			for ( int j = 0; j < 8; j++ )
-//			{
-//				UINT16 col = ( ( data0 >> 7 ) & 0x01 ) | ( ( data1 >> 6 ) & 0x02 ) | ( ( data2 >> 5 ) & 0x04 );
-//				if ( data3 & 0x80 )
-//				{
-//					col += 0x38;
-//				}
-//
-//				*p = col;
-//				p++;
-//				data0 <<= 1;
-//				data1 <<= 1;
-//				data2 <<= 1;
-//				data3 <<= 1;
-//			}
+			UINT16 offset = ma + i;
+			UINT16 data0 = ega->m_plane[0][offset];
+			UINT16 data1 = ega->m_plane[1][offset] << 1;
+			UINT16 data2 = ega->m_plane[2][offset] << 2;
+			UINT16 data3 = ega->m_plane[3][offset] << 3;
+
+			for ( int j = 7; j >= 0; j-- )
+			{
+				UINT16 col = ( data0 & 0x01 ) | ( data1 & 0x02 ) | ( data2 & 0x04 ) | ( data3 & 0x08 );
+
+//				col &= mask;
+
+				p[j] = ega->m_attribute.data[col];
+
+				data0 >>= 1;
+				data1 >>= 1;
+				data2 >>= 1;
+				data3 >>= 1;
+			}
+			p += 8;
 		}
-		break;
-	default:
-		if (y==0)
-			printf("unhandled %02x\n", ega->m_attribute.data[ 0x12 ] & 0x0f);
-		break;
 	}
 }
 
@@ -930,8 +929,8 @@ void isa8_ega_device::change_mode()
 		}
 		else
 		{
-			m_charA = m_plane[2] + 0x10000;
-			m_charB = m_plane[2] + 0x10000;
+			m_charA = m_plane[2];
+			m_charB = m_plane[2];
 		}
 	}
 
@@ -991,6 +990,8 @@ READ8_MEMBER( isa8_ega_device::read )
 WRITE8_MEMBER( isa8_ega_device::write )
 {
 	UINT8 alu[4];
+	UINT8 target_mask = m_graphics_controller.data[8];
+
 	alu[0] =alu[1] = alu[2] = alu[3] = 0;
 
 	switch( m_graphics_controller.data[5] & 0x03 )
@@ -1030,97 +1031,103 @@ WRITE8_MEMBER( isa8_ega_device::write )
 			alu[3] = m_read_latch[3] ^ data;
 			break;
 		}
-
-		offset &= 0xffff;
-
-		//
-		// Plane selection
-		// TODO: Get this logic clearer. The documentation is unclear on the exact magic combination of bits.
-		//
-		if ( m_sequencer.data[4] & 0x04 )
-		{
-			// Sequential addressing mode
-			if ( m_attribute.data[0x12] & 0x01 )
-			{
-				// Plane 0
-				// Bit selection
-				m_plane[0][offset] = ( m_plane[0][offset] & ~ m_graphics_controller.data[8] ) | ( alu[0] & m_graphics_controller.data[8] );
-			}
-			if ( m_attribute.data[0x12] & 0x02 )
-			{
-				// Plane 1
-				// Bit selection
-				m_plane[1][offset] = ( m_plane[1][offset] & ~ m_graphics_controller.data[8] ) | ( alu[1] & m_graphics_controller.data[8] );
-			}
-			if ( m_attribute.data[0x12] & 0x04 )
-			{
-				// Plane 2
-				// Bit selection
-				m_plane[2][offset] = ( m_plane[2][offset] & ~ m_graphics_controller.data[8] ) | ( alu[2] & m_graphics_controller.data[8] );
-			}
-			if ( m_attribute.data[0x12] & 0x08 )
-			{
-				// Plane 3
-				// Bit selection
-				m_plane[3][offset] = ( m_plane[3][offset] & ~ m_graphics_controller.data[8] ) | ( alu[3] & m_graphics_controller.data[8] );
-			}
-		}
-		else
-		{
-			// Odd/Even addressing mode
-			if ( offset & 1 )
-			{
-				// Odd addresses go to planes 1 and 3
-
-				offset >>= 1;
-
-				if ( m_attribute.data[0x12] & 0x02 )
-				{
-					// Plane 1
-					// Bit selection
-					m_plane[1][offset] = ( m_plane[1][offset] & ~ m_graphics_controller.data[8] ) | ( alu[1] & m_graphics_controller.data[8] );
-				}
-				if ( ( m_attribute.data[0x12] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
-				{
-					// Plane 3
-					// Bit selection
-					m_plane[3][offset] = ( m_plane[3][offset] & ~ m_graphics_controller.data[8] ) | ( alu[3] & m_graphics_controller.data[8] );
-				}
-			}
-			else
-			{
-				// Even addresses go to planes 0 and 2
-
-				offset >>= 1;
-
-				if ( m_attribute.data[0x12] & 0x01 )
-				{
-					// Plane 0
-					// Bit selection
-					m_plane[0][offset] = ( m_plane[0][offset] & ~ m_graphics_controller.data[8] ) | ( alu[0] & m_graphics_controller.data[8] );
-				}
-				if ( ( m_attribute.data[0x12] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
-				{
-					// Plane 2
-					// Bit selection
-					m_plane[2][offset] = ( m_plane[2][offset] & ~ m_graphics_controller.data[8] ) | ( alu[2] & m_graphics_controller.data[8] );
-				}
-			}
-		}
-
 		break;
 
 	case 1:		// Write mode 1
-		popmessage("EGA: Write mode 1 not supported!");
-		break;
+		alu[0] = m_read_latch[0];
+		alu[1] = m_read_latch[1];
+		alu[2] = m_read_latch[2];
+		alu[3] = m_read_latch[3];
+		target_mask = 0xff;
+		return;
 
 	case 2:		// Write mode 2
-		popmessage("EGA: Write mode 2 not supported!");
+		alu[0] = ( data & 0x01 ) ? 0xff : 0x00;
+		alu[1] = ( data & 0x02 ) ? 0xff : 0x00;
+		alu[2] = ( data & 0x04 ) ? 0xff : 0x00;
+		alu[3] = ( data & 0x08 ) ? 0xff : 0x00;
 		break;
 
 	case 3:		// Write mode 3
 		popmessage("EGA: Write mode 3 not supported!");
-		break;
+		return;
+	}
+
+	offset &= 0xffff;
+
+	//
+	// Plane selection
+	// TODO: Get this logic clearer. The documentation is unclear on the exact magic combination of bits.
+	//
+	if ( m_sequencer.data[4] & 0x04 )
+	{
+		// Sequential addressing mode
+		if ( m_sequencer.data[2] & 0x01 )
+		{
+			// Plane 0
+			// Bit selection
+			m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+		}
+		if ( m_sequencer.data[2] & 0x02 )
+		{
+			// Plane 1
+			// Bit selection
+			m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+		}
+		if ( m_sequencer.data[2] & 0x04 )
+		{
+			// Plane 2
+			// Bit selection
+			m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+		}
+		if ( m_sequencer.data[2] & 0x08 )
+		{
+			// Plane 3
+			// Bit selection
+			m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+		}
+	}
+	else
+	{
+		// Odd/Even addressing mode
+		if ( offset & 1 )
+		{
+			// Odd addresses go to planes 1 and 3
+
+			offset >>= 1;
+
+			if ( m_sequencer.data[2] & 0x02 )
+			{
+				// Plane 1
+				// Bit selection
+				m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+			}
+			if ( ( m_sequencer.data[2] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
+			{
+				// Plane 3
+				// Bit selection
+				m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+			}
+		}
+		else
+		{
+			// Even addresses go to planes 0 and 2
+
+			offset >>= 1;
+
+			if ( m_sequencer.data[2] & 0x01 )
+			{
+				// Plane 0
+				// Bit selection
+				m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+			}
+			if ( ( m_sequencer.data[2] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
+			{
+				// Plane 2
+				// Bit selection
+				m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+			}
+		}
 	}
 }
 

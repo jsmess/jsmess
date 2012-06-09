@@ -55,9 +55,6 @@ public:
 		UINT8	*m_plane[4];
 		UINT8	m_read_latch[4];
 		UINT8	*m_videoram;
-		UINT8	*m_videoram_a0000;
-		UINT8	*m_videoram_b0000;
-		UINT8	*m_videoram_b8000;
 		UINT8	*m_charA;
 		UINT8	*m_charB;
 
