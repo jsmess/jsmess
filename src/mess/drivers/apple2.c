@@ -208,6 +208,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2sam.h"
 #include "machine/a2alfam2.h"
 #include "machine/laser128.h"
+#include "machine/a2echoii.h"
 
 /***************************************************************************
     PARAMETERS
@@ -626,6 +627,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("themill", A2BUS_THEMILL)    /* Stellation Two The Mill (6809 card) */
     SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
     SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
+    SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
