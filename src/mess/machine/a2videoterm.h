@@ -17,18 +17,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class a2bus_videoterm_device:
+class a2bus_videx80_device:
     public device_t,
     public device_a2bus_card_interface
 {
 public:
     // construction/destruction
-    a2bus_videoterm_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-    a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
     // optional information overrides
     virtual machine_config_constructor device_mconfig_additions() const;
-    virtual const rom_entry *device_rom_region() const;
 
     DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 
@@ -54,8 +52,28 @@ private:
     int m_rambank;
 };
 
+class a2bus_videoterm_device : public a2bus_videx80_device
+{
+public:
+    a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    virtual const rom_entry *device_rom_region() const;
+};
+
+class a2bus_ap16_device : public a2bus_videx80_device
+{
+public:
+    a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    virtual const rom_entry *device_rom_region() const;
+
+    virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
+};
+
+
 // device type definition
 extern const device_type A2BUS_VIDEOTERM;
+extern const device_type A2BUS_IBSAP16;
 
 #endif /* __A2BUS_VIDEOTERM__ */
 

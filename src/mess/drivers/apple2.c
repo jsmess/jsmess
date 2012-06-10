@@ -628,6 +628,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
     SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
     SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
+    SLOT_INTERFACE("ap16", A2BUS_IBSAP16)    /* IBS AP16 (German VideoTerm clone) */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
