@@ -4,6 +4,7 @@
 *        by Robbbert, March 2011.
 *
 *    Described in Electronics Australia magazine during 1982.
+*    Construction and usage: http://messui.the-chronicles.org/comp/eacc.pdf
 *
 *    The only RAM is the 128 bytes that comes inside the CPU.
 *
@@ -12,7 +13,7 @@
 *    may be obtained.
 *
 *    Memory Map
-*    0000-00FF internal ram
+*    0000-007F internal ram
 *    4000-7FFF ROM
 *    8000-BFFF 6821
 *    C000-FFFF ROM (mirror)
@@ -21,9 +22,25 @@
 *    results compared. Only one byte was different, so I can be confident that
 *    it has been typed in properly.
 *
-*    ToDo:
-*    - Proper artwork
-*    - Verify operation with the instructions
+*    Setting up: You need to enter the number of expected pulses from the fuel
+*    and distance sensors. Paste this: 5 6M123N 7M400N  (start, set litres cal to
+*    123 pulses. set km cal to 400 pulses). Then paste this: 1950M0N 1845M0N (set
+*    petrol tank capacity to 50 litres, set current amount of petrol to 45).
+*    Now enter: 28M100N (the journey is 100km). Press 5 to start the journey.
+*    All settings are saved in nvram.
+*
+*    Stats you can see while travelling:
+*    0  - time elapsed
+*    08 - time remaining
+*    1  - fuel used
+*    18 - fuel left
+*    2  - km travelled
+*    28 - km remaining
+*    29 - km that could be travelled with the fuel you have left
+*    3  - speed now
+*    39 - average speed
+*    4  - fuel consumption now (litres per 100km)
+*    49 - fuel average consumption
 *
 ******************************************************************************/
 
@@ -32,6 +49,7 @@
 #include "cpu/m6800/m6800.h"
 #include "eacc.lh"
 #include "machine/6821pia.h"
+#include "machine/nvram.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
@@ -41,11 +59,10 @@ public:
 	eacc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_pia(*this, "pia")
+	m_pia(*this, "pia"),
+	m_p_nvram(*this, "nvram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pia;
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
@@ -56,6 +73,9 @@ public:
 	bool m_cb1;
 	bool m_cb2;
 	bool m_nmi;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pia;
+	required_shared_ptr<UINT8> m_p_nvram;
 	virtual void machine_reset();
 private:
 	UINT8 m_digit;
@@ -73,7 +93,8 @@ private:
 static ADDRESS_MAP_START(eacc_mem, AS_PROGRAM, 8, eacc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal
+	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed
+	AM_RANGE(0x0020, 0x007f) AM_RAM // inside cpu
 	AM_RANGE(0x6000, 0x67ff) AM_ROM AM_MIRROR(0x8000)
 	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x7fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 ADDRESS_MAP_END
@@ -85,27 +106,27 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(eacc)
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 Fuel Cal") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 Distance") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 Litres Cal") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('M')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 km") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5 START") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("END") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 Speed") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5 START") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("END") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('N')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 km/h") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 Distance Cal") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0 Time") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 Consumption") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 Km Cal") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0 hour.min") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 l/100km") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 Remaining") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 Fuel") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 Average") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 REM") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 litres") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 AV") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -118,6 +139,8 @@ static TIMER_DEVICE_CALLBACK( eacc_cb1 )
 {
 	eacc_state *state = timer.machine().driver_data<eacc_state>();
 	state->m_cb1 ^= 1; // 15hz
+	if (state->m_cb2)
+		device_set_input_line(timer.machine().device("maincpu"), M6800_IRQ_LINE, ASSERT_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( eacc_nmi )
@@ -133,7 +156,7 @@ static TIMER_DEVICE_CALLBACK( eacc_nmi )
 
 READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
 {
-	return m_cb1;
+	return (m_cb2) ? m_cb1 : 1;
 }
 
 READ_LINE_MEMBER( eacc_state::eacc_distance_r )
@@ -143,7 +166,7 @@ READ_LINE_MEMBER( eacc_state::eacc_distance_r )
 
 READ_LINE_MEMBER( eacc_state::eacc_fuel_sensor_r )
 {
-	return machine().rand() & 1; // needs random pulses to simulate acceleration
+	return machine().rand() & 1; // needs random pulses to simulate fuel usage
 }
 
 WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
@@ -241,6 +264,7 @@ static MACHINE_CONFIG_START( eacc, eacc_state )
 	MCFG_DEFAULT_LAYOUT(layout_eacc)
 
 	MCFG_PIA6821_ADD("pia", eacc_mc6821_intf)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_ADD_PERIODIC("eacc_nmi", eacc_nmi, attotime::from_hz(600) )
 	MCFG_TIMER_ADD_PERIODIC("eacc_cb1", eacc_cb1, attotime::from_hz(30) )
 MACHINE_CONFIG_END
@@ -261,6 +285,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, eacc,       0,          0,      eacc,       eacc,   0,     "Electronics Australia", "EA Car Computer", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
+COMP( 1982, eacc,       0,          0,      eacc,       eacc,   0,     "Electronics Australia", "EA Car Computer", GAME_NO_SOUND_HW)
 
