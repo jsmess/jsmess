@@ -21,6 +21,8 @@
 *    The ROM was typed in twice from the dump in the magazine article, and the
 *    results compared. Only one byte was different, so I can be confident that
 *    it has been typed in properly.
+*    Bugs: 1.Any hours greater than 0 shows as 60;
+*          2.when the 9 led is on, often the 8 led comes on as well.
 *
 *    Setting up: You need to enter the number of expected pulses from the fuel
 *    and distance sensors. Paste this: 5 6M123N 7M400N  (start, set litres cal to
@@ -205,7 +207,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 		if (BIT(m_digit, 7))
 		{
 			if (BIT(data, 6))
-				data &= 0x7f;
+				data &= 0x7f; // fix for bug#2
 			char lednum[6];
 			data ^= 0xff;
 

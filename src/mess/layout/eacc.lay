@@ -8,17 +8,21 @@
 	<element name="red_led">
 		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
 	</element>
-	<element name="red_button">
-		<rect><color red="0.75" green="0.25" blue="0.25" /></rect>
+	<element name="red_button" state="0">
+		<rect state="0"><color red="0.75" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><color red="1.0" green="0.25" blue="0.25" /></rect>
 	</element>
 	<element name="blue_button">
-		<rect><color red="0.25" green="0.25" blue="0.75" /></rect>
+		<rect state="0"><color red="0.25" green="0.25" blue="0.75" /></rect>
+		<rect state="1"><color red="0.25" green="0.25" blue="1.0" /></rect>
 	</element>
 	<element name="green_button">
-		<rect><color red="0.25" green="0.75" blue="0.25" /></rect>
+		<rect state="0"><color red="0.25" green="0.75" blue="0.25" /></rect>
+		<rect state="1"><color red="0.25" green="1.0" blue="0.25" /></rect>
 	</element>
 	<element name="white_button">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<rect state="0"><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 	</element>
 	<element name="background">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
@@ -90,18 +94,18 @@
 		<bezel name="led6" element="red_led">
 			<bounds left="550" right="565" top="170" bottom="185" />
 		</bezel>
-		<bezel element="blue_button"><bounds left="348" right="367" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button"><bounds left="398" right="417" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button"><bounds left="448" right="467" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button"><bounds left="498" right="517" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button"><bounds left="548" right="567" top="105" bottom="124" /></bezel>
-		<bezel element="red_button"><bounds left="598" right="617" top="105" bottom="124" /></bezel>
-		<bezel element="red_button"><bounds left="348" right="367" top="195" bottom="214" /></bezel>
-		<bezel element="green_button"><bounds left="398" right="417" top="195" bottom="214" /></bezel>
-		<bezel element="green_button"><bounds left="448" right="467" top="195" bottom="214" /></bezel>
-		<bezel element="white_button"><bounds left="498" right="517" top="195" bottom="214" /></bezel>
-		<bezel element="white_button"><bounds left="548" right="567" top="195" bottom="214" /></bezel>
-		<bezel element="red_button"><bounds left="598" right="617" top="195" bottom="214" /></bezel>
+		<bezel element="blue_button" inputtag="X2" inputmask="0x02"><bounds left="348" right="367" top="105" bottom="124" /></bezel>
+		<bezel element="blue_button" inputtag="X3" inputmask="0x02"><bounds left="398" right="417" top="105" bottom="124" /></bezel>
+		<bezel element="blue_button" inputtag="X0" inputmask="0x04"><bounds left="448" right="467" top="105" bottom="124" /></bezel>
+		<bezel element="blue_button" inputtag="X1" inputmask="0x04"><bounds left="498" right="517" top="105" bottom="124" /></bezel>
+		<bezel element="blue_button" inputtag="X2" inputmask="0x04"><bounds left="548" right="567" top="105" bottom="124" /></bezel>
+		<bezel element="red_button" inputtag="X0" inputmask="0x02"><bounds left="598" right="617" top="105" bottom="124" /></bezel>
+		<bezel element="red_button" inputtag="X1" inputmask="0x01"><bounds left="348" right="367" top="195" bottom="214" /></bezel>
+		<bezel element="green_button" inputtag="X0" inputmask="0x01"><bounds left="398" right="417" top="195" bottom="214" /></bezel>
+		<bezel element="green_button" inputtag="X2" inputmask="0x01"><bounds left="448" right="467" top="195" bottom="214" /></bezel>
+		<bezel element="white_button" inputtag="X3" inputmask="0x01"><bounds left="498" right="517" top="195" bottom="214" /></bezel>
+		<bezel element="white_button" inputtag="X3" inputmask="0x04"><bounds left="548" right="567" top="195" bottom="214" /></bezel>
+		<bezel element="red_button" inputtag="X1" inputmask="0x02"><bounds left="598" right="617" top="195" bottom="214" /></bezel>
 		<bezel element="L0"><bounds left="369" right="383" top="108" bottom="122" /></bezel>
 		<bezel element="L1"><bounds left="419" right="433" top="108" bottom="122" /></bezel>
 		<bezel element="L2"><bounds left="469" right="483" top="108" bottom="122" /></bezel>
