@@ -79,8 +79,6 @@ public:
 	virtual void machine_reset();
 private:
 	UINT8 m_digit;
-	UINT8 m_segment;
-	void eacc_display();
 };
 
 
@@ -190,23 +188,6 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 	return data;
 }
 
-void eacc_state::eacc_display()
-{
-	UINT8 i;
-	char lednum[6];
-
-	for (i = 3; i < 7; i++)
-		if (BIT(m_digit, i))
-			output_set_digit_value(i, m_segment);
-
-	if (BIT(m_digit, 7))
-		for (i = 0; i < 8; i++)
-		{
-			sprintf(lednum,"led%d",i);
-			output_set_value(lednum, BIT(m_segment, i)^1);
-		}
-}
-
 WRITE8_MEMBER( eacc_state::eacc_segment_w )
 {
     //d7 segment dot
@@ -220,8 +201,26 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 
 	if (!m_nmi)
 	{
-		m_segment = BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3);
-		eacc_display();
+		UINT8 i;
+		if (BIT(m_digit, 7))
+		{
+			if (BIT(data, 6))
+				data &= 0x7f;
+			char lednum[6];
+			data ^= 0xff;
+
+			for (i = 0; i < 8; i++)
+			{
+				sprintf(lednum,"led%d",i);
+				output_set_value(lednum, BIT(data, i));
+			}
+		}
+		else
+		{
+			for (i = 3; i < 7; i++)
+				if (BIT(m_digit, i))
+					output_set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
+		}
 	}
 }
 
