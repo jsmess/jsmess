@@ -71,9 +71,20 @@ public:
 };
 
 
+class a2bus_ap16alt_device : public a2bus_videx80_device
+{
+public:
+    a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    virtual const rom_entry *device_rom_region() const;
+
+    virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
+};
+
 // device type definition
 extern const device_type A2BUS_VIDEOTERM;
 extern const device_type A2BUS_IBSAP16;
+extern const device_type A2BUS_IBSAP16ALT;
 
 #endif /* __A2BUS_VIDEOTERM__ */
 

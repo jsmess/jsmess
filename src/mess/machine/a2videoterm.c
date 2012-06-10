@@ -35,6 +35,7 @@
 
 const device_type A2BUS_VIDEOTERM = &device_creator<a2bus_videoterm_device>;
 const device_type A2BUS_IBSAP16 = &device_creator<a2bus_ap16_device>;
+const device_type A2BUS_IBSAP16ALT = &device_creator<a2bus_ap16alt_device>;
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
 #define VIDEOTERM_GFX_REGION  "vterm_gfx"
@@ -92,6 +93,14 @@ ROM_START( a2ap16 )
     ROM_LOAD( "space 84 video chargen ap16.bin", 0x000000, 0x002000, CRC(b9447088) SHA1(19c95f91a67b948fc00a14621d574d629479d451) ) 
 ROM_END
 
+ROM_START( a2ap16alt )
+	ROM_REGION(0x1000, VIDEOTERM_ROM_REGION, 0)
+    ROM_LOAD( "unknown apple ii clone video 3.bin", 0x000000, 0x001000, CRC(af1226d2) SHA1(18a569f417a47f54a17bd9046d306a54b46ed049) ) 
+
+	ROM_REGION(0x4000, VIDEOTERM_GFX_REGION, 0)
+    ROM_LOAD( "unknown apple ii clone video 1.bin", 0x000000, 0x001000, CRC(cf84811c) SHA1(135f4f35607dd74941f0a3cae813227bf8a8a020) ) 
+ROM_END
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -120,6 +129,11 @@ const rom_entry *a2bus_ap16_device::device_rom_region() const
 	return ROM_NAME( a2ap16 );
 }
 
+const rom_entry *a2bus_ap16alt_device::device_rom_region() const
+{
+	return ROM_NAME( a2ap16alt );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -141,6 +155,12 @@ a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *
     a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "IBS AP-16 80 column card", tag, owner, clock)
 {
 	m_shortname = "a2ap16";
+}
+
+a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "IBS AP-16 80 column card (alt. version)", tag, owner, clock)
+{
+	m_shortname = "a2ap16a";
 }
 
 //-------------------------------------------------
@@ -217,14 +237,17 @@ void a2bus_videx80_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 
 UINT8 a2bus_videx80_device::read_cnxx(address_space &space, UINT8 offset)
 {
-    // one slot image at the end of the ROM, it appears
     return m_rom[offset+0x300];
 }
 
 UINT8 a2bus_ap16_device::read_cnxx(address_space &space, UINT8 offset)
 {
-    // one slot image at the end of the ROM, it appears
     return m_rom[offset+0x1f00];
+}
+
+UINT8 a2bus_ap16alt_device::read_cnxx(address_space &space, UINT8 offset)
+{
+    return m_rom[offset+0xb00];
 }
 
 /*-------------------------------------------------
