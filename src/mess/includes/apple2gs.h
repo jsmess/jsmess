@@ -129,6 +129,12 @@ public:
 
     UINT8 adb_read_datareg();
     UINT8 adb_read_kmstatus();
+
+    void apple2gs_refresh_delegates();
+
+    write8_delegate write_delegates_2gs0400[2];
+    write8_delegate write_delegates_2gs2000[2];
+    write8_delegate write_delegates_2gs4000[2];
 };
 
 

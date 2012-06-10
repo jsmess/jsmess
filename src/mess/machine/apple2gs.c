@@ -1339,23 +1339,17 @@ static void apple2gs_mem_000200(running_machine &machine,offs_t begin, offs_t en
 static void apple2gs_mem_000400(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-    static write8_delegate write_delegates[] =
-    {
-        write8_delegate(FUNC(apple2gs_state::apple2gs_aux0400_w), state),
-        write8_delegate(FUNC(apple2gs_state::apple2gs_main0400_w), state)
-    };
-
 	if (state->m_flags & VAR_80STORE)
 	{
 		meminfo->read_mem		= (state->m_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
 		meminfo->write_mem		= (state->m_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &write_delegates[0] : &write_delegates[1];
+		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
 	}
 	else
 	{
 		meminfo->read_mem		= (state->m_flags & VAR_RAMRD)	? 0x010400 : 0x000400;
 		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &write_delegates[0] : &write_delegates[1];
+		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
 	}
 }
 
@@ -1369,35 +1363,25 @@ static void apple2gs_mem_000800(running_machine &machine,offs_t begin, offs_t en
 static void apple2gs_mem_002000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-    static write8_delegate write_delegates[] =
-    {
-        write8_delegate(FUNC(apple2gs_state::apple2gs_aux2000_w), state),
-        write8_delegate(FUNC(apple2gs_state::apple2gs_main2000_w), state)
-    };
 	if ((state->m_flags & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
 	{
 		meminfo->read_mem		= (state->m_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
 		meminfo->write_mem		= (state->m_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &write_delegates[0] : &write_delegates[1];
+		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
 	}
 	else
 	{
 		meminfo->read_mem		= (state->m_flags & VAR_RAMRD)	? 0x012000 : 0x002000;
 		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &write_delegates[0] : &write_delegates[1];
+		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
 	}
 }
 
 static void apple2gs_mem_004000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-    static write8_delegate write_delegates[] =
-    {
-        write8_delegate(FUNC(apple2gs_state::apple2gs_aux4000_w), state),
-        write8_delegate(FUNC(apple2gs_state::apple2gs_main4000_w), state)
-    };
 	meminfo->read_mem			= (state->m_flags & VAR_RAMRD)	? 0x014000 : 0x004000;
-	meminfo->write_handler		= (state->m_flags & VAR_RAMWRT)	? &write_delegates[0] : &write_delegates[1];
+	meminfo->write_handler		= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs4000[0] : &state->write_delegates_2gs4000[1];
 }
 
 static void apple2gs_mem_xxD000(running_machine &machine,apple2_meminfo *meminfo, UINT32 lcmem)
@@ -1900,19 +1884,10 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-/* Something needs to be here?
-    When F3 pressed, the video mode changes and the machine goes into Basic */
-}
-
-MACHINE_START( apple2gscommon )
-{
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	apple2_init_common(machine);
 
-	/* set up Apple IIgs vectoring */
-	g65816_set_read_vector_callback(machine.device("maincpu"), apple2gs_read_vector);
+    state->apple2gs_refresh_delegates();
 
-	/* setup globals */
 	state->m_cur_slot6_image = NULL;
 	state->m_newvideo = 0x00;
 	state->m_vgcint = 0x00;
@@ -1954,7 +1929,19 @@ MACHINE_START( apple2gscommon )
 	state->m_sndglu_ctrl = 0x00;
 	state->m_sndglu_addr = 0;
 	state->m_sndglu_dummy_read = 0;
+}
 
+MACHINE_START( apple2gscommon )
+{
+	apple2gs_state *state = machine.driver_data<apple2gs_state>();
+
+    state->apple2gs_refresh_delegates();
+	apple2_init_common(machine);
+
+	/* set up Apple IIgs vectoring */
+	g65816_set_read_vector_callback(machine.device("maincpu"), apple2gs_read_vector);
+
+	/* setup globals */
 	state->m_is_rom3 = true;
 
 	machine.device<nvram_device>("nvram")->set_base(state->m_clock_bram, sizeof(state->m_clock_bram));
@@ -2033,3 +2020,14 @@ MACHINE_START( apple2gsr1 )
 	state->m_is_rom3 = false;
 	apple2gs_setup_memory(machine);
 }
+
+void apple2gs_state::apple2gs_refresh_delegates()
+{
+    write_delegates_2gs0400[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux0400_w), this);
+    write_delegates_2gs0400[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main0400_w), this);
+    write_delegates_2gs2000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux2000_w), this);
+    write_delegates_2gs2000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main2000_w), this);
+    write_delegates_2gs4000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux4000_w), this);
+    write_delegates_2gs4000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main4000_w), this);
+}
+

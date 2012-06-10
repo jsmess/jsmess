@@ -215,6 +215,26 @@ public:
     READ8_MEMBER(apple2_cfff_r);
     WRITE8_MEMBER(apple2_cfff_w);
 
+    void apple2_refresh_delegates();
+
+    read8_delegate read_delegates_master[4];
+    write8_delegate write_delegates_master[3];
+    write8_delegate write_delegates_0400[2];
+    write8_delegate write_delegates_2000[2];
+    read8_delegate rd_c000;
+    write8_delegate wd_c000;
+    read8_delegate rd_c080;
+    write8_delegate wd_c080;
+    read8_delegate rd_cfff;
+    write8_delegate wd_cfff;
+    read8_delegate rd_c800;
+    write8_delegate wd_c800;
+    read8_delegate rd_ce00;
+    write8_delegate wd_ce00;
+    read8_delegate rd_inh_d000;
+    write8_delegate wd_inh_d000;
+    read8_delegate rd_inh_e000;
+    write8_delegate wd_inh_e000;
 };
 
 
