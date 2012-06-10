@@ -260,6 +260,7 @@ racknrol		// (c) 1986 Status (Shinkia license) (Senko Kit)
 hexpool			// (c) 1986 Shinkia (Senko Kit)
 hexpoola		// (c) 1986 Shinkia (Senko Kit)
 trvchlng		// [1985] Joyland (Senko license)
+bullsdrtg		// 1985 Senko
 luctoday		// 1980 Sigma
 chewing			// ?? unknown
 catacomb		// 1982 MTM Games
@@ -4604,6 +4605,7 @@ zerogunj		// 1997.12 Zero Gunner (Japan)
 dyndeka2b		// 1998.05 Dynamite Deka 2 (Japan)
 dynamcopb		// 1998.09 Dynamite Cop (Export)
 pltkids			// 1999.03 Pilot Kids (Revision A)
+overrevb		// 1997.09 Over Rev (Revision B)
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 skisuprg		// 1996.12 Sega Ski Super G
@@ -5303,7 +5305,7 @@ tomahawk		// (c) 1980 Data East, Inc.
 tomahawk1		// (c) 1980 Data East, Inc.
 progolf			// (c) 1981
 progolfa		// (c) 1981
-deshoros		// (c) 1983
+destiny			// (c) 1983
 prosoccr		// (c) 1983
 prosport		// (c) 1983
 prosporta		// (c) 1983
@@ -6324,10 +6326,11 @@ astdelux		// 0351xx           (c) 1980
 astdelux2		// 0351xx           (c) 1980
 astdelux1		// 0351xx           (c) 1980
 bzone			// 0364xx           (c) 1980
-bzone2			// 0364xx           (c) 1980
+bzonea			// 0364xx           (c) 1980
 bzonec			// 0364xx           (c) 1980
 bradley			//     ??           (c) 1980
 redbaron		// 036995-037007    (c) 1980
+redbarona		// 036995-037007    (c) 1980
 tempest			// 136002           (c) 1980
 tempest3		// 136002           (c) 1980
 tempest2		// 136002           (c) 1980

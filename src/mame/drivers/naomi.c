@@ -21,25 +21,23 @@ Sega Naomi is Dreamcast based Arcade hardware.
 
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
-    - SH to ARM sound streaming doesn't work (used by ADX compression system)
+    - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
     - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
-
-    - Following games doesn't boot, any attempt makes it to return to the system test mode (almost likely to be JVS related):
-    * Death Crimson OX
-    * La Keyboard
-    * Lupin the Third
-    * Moeru Casinyo
-    * Puyo Puyo DA!
-    * Puyo Puyo Fever
-    * Samba de Amigo
-    * Samba de Amigo Ver. 2000
-    * Shootout Pool
+    - games using "m4" decryption have never successfully worked, may be
+      an issue there.
+ 
+    - Following games doesn't boot, any attempt makes it to return to the system test mode (note these are also "m4" type games)
+    * Illvelo
+    * Akatsuki Blitzkampf Ausf Achse
+ 
+    - Doesn't boot
+    * Shootout Pool (all 3 Shootout Pool games show an animated loading screen and then lock up)
     * Shootout Pool Medal
     * Shootout Pool Prize
+ 
+    - Boots and accepts coin, but won't accept start button
     * Usagi Yamashiro Hen
-    * Virtual On
-    * WWF Royal Rumble
-
+ 
     - missing inputs (needs rotary channels):
     * Crakin' DJ
     * Dynamic Golf
@@ -51,13 +49,14 @@ TODO (general):
     * Sega Marine Fishing
     * Wave Runner GP
 
-    - doesn't boot consistently (JVS checksum error?):
-    * Cannon Spike;
-    * Heavy Metal GeoMatrix;
-    * Moeru Justice Gakuen;
-    * Power Stone 2;
-    * Spawn;
-
+    - "com error occured between Naomi BD and I/O BD"
+    * Samba de Amigo
+    * Samba de Amigo Ver. 2000
+ 
+    - other issues:
+    * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to freeze the game)
+    * La Keyboard (boots fine & attract mode looks OK, but no keyboard)
+ 
 TODO (game-specific):
     - 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
     - Airline Pilots Deluxe: returns error 03
@@ -1850,12 +1849,12 @@ static INPUT_PORTS_START( naomi_debug )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
-	PORT_START("MIE:3")
+	PORT_START("MIE.3")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, write_bit)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_cs_line)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_clock_line)
 
-	PORT_START("MIE:5")
+	PORT_START("MIE.5")
 	PORT_DIPNAME( 0x01, 0x00, "Monitor" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "31 kHz" )
 	PORT_DIPSETTING(    0x00, "15 kHz" )
@@ -2409,7 +2408,7 @@ INPUT_PORTS_END
 
 // 2 joysticks variant
 static INPUT_PORTS_START( aw2c )
-	PORT_START("P1:0")
+	PORT_START("P1.0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -2418,7 +2417,7 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_START("P1:1")
+	PORT_START("P1.1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -2428,7 +2427,7 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
 
-	PORT_START("P2:0")
+	PORT_START("P2.0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -2437,7 +2436,7 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_START("P2:1")
+	PORT_START("P2.1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -2456,33 +2455,33 @@ INPUT_PORTS_END
 
 // Single-player wheel variant
 static INPUT_PORTS_START( aw1w )
-	PORT_START("P1:0")
+	PORT_START("P1.0")
 	PORT_BIT( 0xf1, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("P1:1")
+	PORT_START("P1.1")
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2:A0") /* steering */
+	PORT_START("P2.A0") /* steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("P2:A1")	/* gas pedal */
+	PORT_START("P2.A1")	/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("P2:A2")	/* brake */
+	PORT_START("P2.A2")	/* brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("P2:A3") /* steering */
+	PORT_START("P2.A3") /* steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("P2:A4")	/* gas pedal */
+	PORT_START("P2.A4")	/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("P2:A5")	/* brake */
+	PORT_START("P2.A5")	/* brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("COINS")
@@ -2542,8 +2541,8 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
-	MCFG_MIE_ADD("mie", 4000000, "maple_dc", 0, 0, 0, 0, "MIE:3", 0, "MIE:5", 0, 0) // Actual frequency unknown
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", "TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT")
+	MCFG_MIE_ADD("mie", 4000000, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown
+	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_93C46_8BIT_ADD("mie_eeprom")
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
@@ -2637,13 +2636,13 @@ static MACHINE_CONFIG_DERIVED( aw_base, naomi_aw_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aw1c, aw_base )
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, "P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, "P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aw2c, aw_base )
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, "P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, "P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
