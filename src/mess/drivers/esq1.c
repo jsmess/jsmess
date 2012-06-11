@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
-//	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
+//  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
     AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
@@ -332,17 +332,17 @@ ROM_END
 
 ROM_START( sq80 )
     ROM_REGION(0x10000, "osrom", 0)
-    ROM_LOAD( "sq80rom.low",  0x0000, 0x008000, CRC(97ecd9a0) SHA1(cadff16ebbc15b52cf1d3335d22dc930d430a058) ) 
-    ROM_LOAD( "sq80rom.hig",  0x8000, 0x008000, CRC(f83962b1) SHA1(e3e5cf41f15a37f8bf29b88fb1c85c0fca9ea912) ) 
+    ROM_LOAD( "sq80rom.low",  0x0000, 0x008000, CRC(97ecd9a0) SHA1(cadff16ebbc15b52cf1d3335d22dc930d430a058) )
+    ROM_LOAD( "sq80rom.hig",  0x8000, 0x008000, CRC(f83962b1) SHA1(e3e5cf41f15a37f8bf29b88fb1c85c0fca9ea912) )
 
     ROM_REGION(0x40000, "es5503", 0)
-    ROM_LOAD( "2202.bin",     0x0000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) ) 
-    ROM_LOAD( "2203.bin",     0x0000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) ) 
-    ROM_LOAD( "2204.bin",     0x0000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) ) 
-    ROM_LOAD( "2205.bin",     0x0000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) ) 
+    ROM_LOAD( "2202.bin",     0x0000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) )
+    ROM_LOAD( "2203.bin",     0x0000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) )
+    ROM_LOAD( "2204.bin",     0x0000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) )
+    ROM_LOAD( "2205.bin",     0x0000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) )
 
     ROM_REGION(0x8000, "kpc", 0)    // 68HC11 keyboard/front panel processor
-    ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) ) 
+    ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) )
 ROM_END
 
 CONS( 1986, esq1, 0   , 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )

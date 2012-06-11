@@ -1941,7 +1941,7 @@ ROM_END
 
 ROM_START( unitron )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-    ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) ) 
+    ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
 ROM_END
 
 ROM_START( mac512ke )

@@ -1,27 +1,27 @@
 /***************************************************************************
 Video Technology Genius computers:
-	VTech Genius PC (France)
-	VTech Genius IQ 512 (Germany)
-	The French packaging mentions distributions in Switzerland, the Netherlands,
-	USA, Canada, and UK as well. Looking for more information and ROM dumps.
+    VTech Genius PC (France)
+    VTech Genius IQ 512 (Germany)
+    The French packaging mentions distributions in Switzerland, the Netherlands,
+    USA, Canada, and UK as well. Looking for more information and ROM dumps.
 
 System driver:
 
-	Adrien Destugues <pulkomandy@gmail.com>, May 2012
-	  - First attempt
+    Adrien Destugues <pulkomandy@gmail.com>, May 2012
+      - First attempt
 
 Memory map:
-	00000000 System ROM (2MB)
-	00200000 RAM (256K)
-	00600000 Some memory mapped hardware
-	???????? Flash memory (128K)
-	???????? Cartridge port
+    00000000 System ROM (2MB)
+    00200000 RAM (256K)
+    00600000 Some memory mapped hardware
+    ???????? Flash memory (128K)
+    ???????? Cartridge port
 
 TODO:
     - Mostly everything besides CPU, RAM and ROM
     - Check with different countries ROMs
-	
-Not very much is known about this computer released in 1997. 
+
+Not very much is known about this computer released in 1997.
 
 ****************************************************************************/
 

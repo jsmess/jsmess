@@ -146,7 +146,7 @@ struct _upd765_t
 
 	char *data_buffer;
 	const upd765_interface *intf;
-	
+
 	bool pool;
 };
 
@@ -2061,7 +2061,7 @@ static void upd765_setup_command(device_t *device)
 			{
 				/* clear ready changed bit */
 				fdc->ready_changed &= ~(1 << fdc->drive);
-				
+
 				if (!fdc->pool) {
 					fdc->ready_changed = 0;
 				}
@@ -2426,7 +2426,7 @@ static void common_start(device_t *device, int device_type)
 	fdc->out_drq_func.resolve(fdc->intf->out_drq_func, *device);
 
 	// plain upd765 is doing pooling
-	fdc->pool = true;	
+	fdc->pool = true;
 	// register for state saving
 	//state_save_register_item(device->machine(), "upd765", device->tag(), 0, upd765->number);
 }

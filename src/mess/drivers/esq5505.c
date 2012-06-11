@@ -10,7 +10,7 @@
     Driver by R. Belmont
 
     Memory map:
- 
+
     0x000000-0x00ffff   work RAM low
     0x200000-0x20001f   OTTO(5505) regs
     0x240000-0x2400ff   DMAC (68450) regs (EPS/EPS-16)
@@ -18,14 +18,14 @@
     0x280000-0x28001f   DUART (68681) regs
     0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS/EPS-16)
     0x300000-0x300003   EPS/EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
-    0x340000-0x3bffff   EPS/EPS-16 sample RAM 
+    0x340000-0x3bffff   EPS/EPS-16 sample RAM
     0xc00000-0xc3ffff   OS ROM
     0xff0000-0xffffff   work RAM hi (may or may not be mirrored with work RAM low)
- 
+
     Interrupts:
     68681 uses custom vector 0x40 (address 0x100)
     5505 interrupts are on normal autovector IRQ 1
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -448,8 +448,8 @@ ROM_END
 
 ROM_START( vfxsd )
     ROM_REGION(0x40000, "osrom", 0)
-    ROM_LOAD16_BYTE( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad) ) 
-    ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) ) 
+    ROM_LOAD16_BYTE( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad) )
+    ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_LOAD( "vfxsd-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
@@ -458,8 +458,8 @@ ROM_END
 
 ROM_START( sd1 )
     ROM_REGION(0x40000, "osrom", 0)
-    ROM_LOAD16_BYTE( "sd1_410_lo.bin", 0x000000, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) ) 
-    ROM_LOAD16_BYTE( "sd1_410_hi.bin", 0x000001, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) ) 
+    ROM_LOAD16_BYTE( "sd1_410_lo.bin", 0x000000, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) )
+    ROM_LOAD16_BYTE( "sd1_410_hi.bin", 0x000001, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_LOAD( "sd1-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
@@ -468,8 +468,8 @@ ROM_END
 
 ROM_START( sd132 )
     ROM_REGION(0x40000, "osrom", 0)
-    ROM_LOAD16_BYTE( "sd1_32_402_lo.bin", 0x000000, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) ) 
-    ROM_LOAD16_BYTE( "sd1_32_402_hi.bin", 0x000001, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) ) 
+    ROM_LOAD16_BYTE( "sd1_32_402_lo.bin", 0x000000, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) )
+    ROM_LOAD16_BYTE( "sd1_32_402_hi.bin", 0x000001, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_LOAD( "sd1-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
@@ -529,7 +529,7 @@ static DRIVER_INIT(sq1)
 CONS( 1988, eps,   0, 0, eps,   vfx, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,   0, 0, vfx,   vfx, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
 CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, sd1,   0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD 
+CONS( 1990, sd1,   0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
 CONS( 1990, sd132, 0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
 CONS( 1990, sq1,   0, 0, sq1,   vfx, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
 

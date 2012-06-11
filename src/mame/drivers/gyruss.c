@@ -66,6 +66,23 @@ and 1 SFX channel controlled by an 8039:
 #include "includes/gyruss.h"
 
 
+#define MASTER_CLOCK	XTAL_18_432MHz
+#define SOUND_CLOCK		XTAL_14_31818MHz
+
+// Video timing
+// PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
+// --> VTOTAL should be OK, HTOTAL not 100% certain
+#define PIXEL_CLOCK		MASTER_CLOCK/3
+
+#define HTOTAL			396
+#define HBEND			0
+#define HBSTART			256
+
+#define VTOTAL			256
+#define VBEND			0+2*8
+#define VBSTART			224+2*8
+
+
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */
 /* feeding the sound CPU Z80.  It is a divide by                        */
@@ -96,8 +113,7 @@ READ8_MEMBER(gyruss_state::gyruss_portA_r)
 
 WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
-	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, NODE(16), data);
+	discrete_sound_w(m_discrete, NODE(16), data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
@@ -121,14 +137,12 @@ static void filter_w( device_t *device, int chip, int data )
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
 {
-	device_t *device = machine().device("discrete");
-	filter_w(device, 0, data);
+	filter_w(m_discrete, 0, data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 {
-	device_t *device = machine().device("discrete");
-	filter_w(device, 1, data);
+	filter_w(m_discrete, 1, data);
 }
 
 
@@ -145,13 +159,11 @@ WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
 
 WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
 {
-
 	m_master_nmi_mask = data & 1;
 }
 
 WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
 {
-
 	m_slave_irq_mask = data & 1;
 }
 
@@ -385,13 +397,13 @@ static const ay8910_interface ay8910_interface_5 =
 
 static const discrete_mixer_desc konami_right_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
-		{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
-		{0,0,0,0,0,0},	/* no variable resistors   */
-		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, 200,
-		CAP_U(0.1),
-		CAP_U(1),		/* DC - Removal, not in schematics */
-		0, 1};
+	{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
+	{0,0,0,0,0,0},	/* no variable resistors   */
+	{0,0,0,0,0,0},  /* no node capacitors      */
+	0, 200,
+	CAP_U(0.1),
+	CAP_U(1),		/* DC - Removal, not in schematics */
+	0, 1};
 
 static const discrete_mixer_desc konami_left_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
@@ -480,15 +492,15 @@ static MACHINE_START( gyruss )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_audiocpu_2 = machine.device<cpu_device>("audio2");
+	state->save_item(NAME(state->m_master_nmi_mask));
+	state->save_item(NAME(state->m_slave_irq_mask));
 }
 
 static INTERRUPT_GEN( master_vblank_irq )
 {
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if(state->m_master_nmi_mask)
+	if (state->m_master_nmi_mask)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -496,26 +508,26 @@ static INTERRUPT_GEN( slave_vblank_irq )
 {
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if(state->m_slave_irq_mask)
+	if (state->m_slave_irq_mask)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
 	MCFG_CPU_VBLANK_INT("screen", master_vblank_irq)
 
-	MCFG_CPU_ADD("sub", M6809, 2000000)        /* 2 MHz ??? */
+	MCFG_CPU_ADD("sub", M6809, MASTER_CLOCK/12)		/* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
 	MCFG_CPU_VBLANK_INT("screen", slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)	/* 3.579545 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)
 	MCFG_CPU_IO_MAP(audio_cpu1_io_map)
 
-	MCFG_CPU_ADD("audio2", I8039,8000000)	/* 8MHz crystal */
+	MCFG_CPU_ADD("audio2", I8039, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 
@@ -525,10 +537,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(gyruss)
 
 	MCFG_GFXDECODE(gyruss)
@@ -540,31 +549,31 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_3)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 6)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 7)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 8)
 
-	MCFG_SOUND_ADD("ay4", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay4", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_4)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 9)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 10)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 11)
 
-	MCFG_SOUND_ADD("ay5", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay5", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_5)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 12)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 13)
@@ -723,7 +732,7 @@ static DRIVER_INIT( gyruss )
 }
 
 
-GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss, ROT90, "Konami", "Gyruss (Konami)", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss, ROT90, "Konami", "Gyruss", GAME_SUPPORTS_SAVE )
 GAME( 1983, gyrussce, gyruss,   gyruss,   gyrussce, gyruss, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", GAME_SUPPORTS_SAVE )
-GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Gyruss", GAME_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
-GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Venus", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg?", "Gyruss (bootleg?)", GAME_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
+GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Venus (bootleg of Gyruss)", GAME_SUPPORTS_SAVE )

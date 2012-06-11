@@ -106,7 +106,7 @@ void wangpc_lic_device::device_reset()
 UINT16 wangpc_lic_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 data = 0xffff;
-	
+
 	return data;
 }
 

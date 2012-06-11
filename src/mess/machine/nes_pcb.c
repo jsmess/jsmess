@@ -4902,23 +4902,23 @@ static WRITE8_HANDLER( cony_w )
 }
 
 /*************************************************************
- 
+
  Yoko Bootleg Board
- 
+
  Games: Mortal Kombat II, Master Figther VI'
- 
- 
+
+
  Very similar to Cony board
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( yoko_l_w )
 {
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("cony_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset >= 0x1300) // from 0x5400
 		state->m_mapper83_low_reg[offset & 0x03] = data;
 }
@@ -4927,7 +4927,7 @@ static READ8_HANDLER( yoko_l_r )
 {
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
-	
+
 	if (offset >= 0x0f00 && offset < 0x1300)	// 0x5000
 	{
 		// read dipswitch bit! - currently unimplemented
@@ -4971,7 +4971,7 @@ static WRITE8_HANDLER( yoko_w )
 {
 	nes_state *state = space->machine().driver_data<nes_state>();
 	LOG_MMC(("yoko_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x0c17)
 	{
 		case 0x0000:
@@ -8576,15 +8576,15 @@ static WRITE8_HANDLER( unl_kof97_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-KS7057
- 
+
  Games: Street Fighter VI / Fight Street VI
- 
+
  MMC3 clone (identical, but for switched address lines)
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( ks7057_w )
@@ -9238,15 +9238,15 @@ static WRITE8_HANDLER( unl_racmate_w )
 
 
 /*************************************************************
- 
+
  Board UNL-FS304
- 
+
  Games: A Link to the Past by Waixing
-  
+
  iNES: mapper 162? (only found in UNIF format)
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( unl_fs304_l_w )

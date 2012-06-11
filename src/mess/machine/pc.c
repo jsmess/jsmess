@@ -1167,7 +1167,7 @@ MACHINE_RESET( pc )
 MACHINE_START( mc1502 )
 {
 	pc_state *st = machine.driver_data<pc_state>();
-//	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
+//  pc_fdc_init( machine, &pcjr_fdc_interface_nc );
 	pcjr_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
 	pc_int_delay_timer = machine.scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
 	st->m_maincpu = machine.device("maincpu" );

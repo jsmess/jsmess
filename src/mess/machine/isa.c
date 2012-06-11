@@ -300,7 +300,7 @@ void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t m
 
 
 void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
-{   
+{
 	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, whandler);
 }
 
@@ -562,7 +562,7 @@ void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, off
 				// we handle just misalligned by 2
 				m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
 			}
-			
+
 			break;
 		default:
 			fatalerror("ISA16: Bus width %d not supported", buswidth);
@@ -590,7 +590,7 @@ void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_
 				// we handle just misalligned by 2
 				m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
 			}
-			
+
 			break;
 		default:
 			fatalerror("ISA16: Bus width %d not supported", buswidth);

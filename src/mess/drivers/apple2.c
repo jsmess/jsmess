@@ -985,7 +985,7 @@ ROM_START(tk2000)
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x4000,"maincpu",0)
-    ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) ) 
+    ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
 ROM_START(prav8c)
@@ -1059,7 +1059,7 @@ ROM_START(las128e2)
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
 	ROM_REGION(0x8700,"maincpu",0)
-    ROM_LOAD( "laser 128ex2 v6.1 rom.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) ) 
+    ROM_LOAD( "laser 128ex2 v6.1 rom.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
 ROM_END
 
 ROM_START(apple2cp)
@@ -1105,7 +1105,7 @@ COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multit
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,	  apple2c,	   apple2e,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
-COMP( 1984, tk2000,   apple2c,  0,   	  tk2000,	   apple2e,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, tk2000,   apple2c,  0,  	  tk2000,	   apple2e,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,	   apple2p,  0,        "Video Technology",  "Laser 3000",	GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        laser128,	   apple2e,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_NOT_WORKING )

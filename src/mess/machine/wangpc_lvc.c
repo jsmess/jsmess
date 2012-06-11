@@ -8,12 +8,12 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- cursor
-	- scroll
-	- option bit 1?
+    TODO:
+
+    - cursor
+    - scroll
+    - option bit 1?
 
 */
 
@@ -130,7 +130,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lvc_device, vsync_w),
-	NULL 
+	NULL
 };
 
 
@@ -324,7 +324,7 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 			{
 				if (LOG) logerror("LVC option %02x\n", data & 0xff);
 				m_option = data & 0xff;
-				
+
 				if (OPTION_80_COL)
 				{
 					m_crtc->set_clock(XTAL_14_31818MHz / 8);

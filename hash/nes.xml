@@ -69204,7 +69204,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed 
+<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed
 to check why this is different -->
 	<software name="mc_mario">
 		<description>Mario 7 in 1 (Bad Dump)</description>

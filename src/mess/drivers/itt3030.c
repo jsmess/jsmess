@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	ITT 3030
+    ITT 3030
 
 ***************************************************************************/
 
@@ -30,8 +30,8 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-public:	
-	
+public:
+
 	DECLARE_READ8_MEMBER(unk1_r);
 	DECLARE_READ8_MEMBER(unk2_r);
 private:
@@ -67,7 +67,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, x*8,y*16);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -148,7 +148,7 @@ ROM_START( itt3030 )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "gb136-0.bin", 0x0000, 0x0800, CRC(6a3895a8) SHA1(f3b977ffa2f54c346521c9ef034830de8f404621))
 	ROM_REGION( 0x0400, "gfxcpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))	
+	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
 
 GAME( 1982, itt3030,  0,   itt3030,  itt3030,  0,       ROT0, "ITT RFA",      "ITT3030", GAME_NOT_WORKING | GAME_NO_SOUND )

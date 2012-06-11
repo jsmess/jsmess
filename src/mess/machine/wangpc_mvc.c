@@ -8,11 +8,11 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- character clock
-	- blink
+    TODO:
+
+    - character clock
+    - blink
 
 */
 
@@ -77,7 +77,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			bitmap.pix32(y, x) = palette[color];
 
 			data <<= 1;
-		}		
+		}
 	}
 
 	for (int column = 0; column < x_count; column++)
@@ -143,7 +143,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_mvc_device, vsync_w),
-	NULL 
+	NULL
 };
 
 
@@ -346,7 +346,7 @@ void wangpc_mvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 		case 0x10/2:
 		case 0x12/2:
 			if (LOG) logerror("MVC option %02x\n", data & 0xff);
-			
+
 			m_option = data & 0xff;
 			break;
 		}

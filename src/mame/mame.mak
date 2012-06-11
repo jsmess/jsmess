@@ -456,6 +456,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/nitedrvr.o $(MACHINE)/nitedrvr.o $(AUDIO)/nitedrvr.o $(VIDEO)/nitedrvr.o \
 	$(DRIVERS)/offtwall.o $(VIDEO)/offtwall.o \
 	$(DRIVERS)/orbit.o $(AUDIO)/orbit.o $(VIDEO)/orbit.o \
+	$(DRIVERS)/pong.o \
 	$(DRIVERS)/poolshrk.o $(AUDIO)/poolshrk.o $(VIDEO)/poolshrk.o \
 	$(DRIVERS)/quantum.o \
 	$(DRIVERS)/quizshow.o \
@@ -1961,10 +1962,10 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 			$(LAYOUT)/sltblgtk.lh
 
 $(DRIVERS)/bfm_sc4.o:	$(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh 
+			$(LAYOUT)/sc4_dmd.lh
 
 $(DRIVERS)/bfm_sc4h.o:	$(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh 
+			$(LAYOUT)/sc4_dmd.lh
 
 $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 

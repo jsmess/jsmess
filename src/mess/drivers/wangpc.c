@@ -10,9 +10,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- hard disk
+    - hard disk
 
 */
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
 	m_enable_eop = BIT(data, 0);
 	m_disable_dreq2 = BIT(data, 1);
-	
+
 	if (BIT(data, 2)) m_fdc_dd0 = 0;
 	if (BIT(data, 3)) m_fdc_dd1 = 0;
 
@@ -404,9 +404,9 @@ WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 READ8_MEMBER( wangpc_state::uart_r )
 {
 	m_uart_dr = 0;
-	
+
 	check_level2_interrupts();
-	
+
 	UINT8 data = m_uart->read(space, 0);
 
     if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
@@ -1236,7 +1236,7 @@ void wangpc_state::on_disk1_change(device_image_interface &image)
     wangpc_state *state = static_cast<wangpc_state *>(image.device().owner());
 
     if (LOG) logerror("Door 2 disturbed\n");
-	
+
 	state->m_fdc_dd1 = 1;
 
 	state->check_level2_interrupts();

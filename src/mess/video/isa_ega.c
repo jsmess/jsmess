@@ -790,7 +790,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
 			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
 			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
-			
+
 			data = ega->m_plane[1][offset];
 
 			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
@@ -803,7 +803,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 	{
 		// EGA mode
 
-//		UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
+//      UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
 
 		for ( int i = 0; i < x_count; i++ )
 		{
@@ -817,7 +817,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 			{
 				UINT16 col = ( data0 & 0x01 ) | ( data1 & 0x02 ) | ( data2 & 0x04 ) | ( data3 & 0x08 );
 
-//				col &= mask;
+//              col &= mask;
 
 				p[j] = ega->m_attribute.data[col];
 

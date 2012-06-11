@@ -8,10 +8,10 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- all
+    TODO:
+
+    - all
 
 */
 
@@ -199,7 +199,7 @@ UINT16 wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 	{
 		switch (offset & 0x7f)
 		{
- 		case 0x00/2:
+		case 0x00/2:
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -215,7 +215,7 @@ UINT16 wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 			}
 			break;
 
- 		case 0x08/2:
+		case 0x08/2:
 		case 0x0a/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -234,27 +234,27 @@ UINT16 wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 		case 0x10/2:
 			// board status
 			/*
-			
-			    bit     description
-			
-			    0       SIO channel A WAIT/RDY
-			    1       SIO channel B WAIT/RDY
-			    2       SIO channel A DSR
-			    3       SIO channel B DSR
-			    4       SIO channel A RI
-			    5       SIO channel B RI
-			    6       DART channel A WAIT/RDY
-			    7		DART channel A DSR
-			    8		DART channel B WAIT/RDY
-			    9		0 (1 for PC-PM042)
-			    10		0 (1 for PC-PM042)
-			    11		0 (1 for PC-PM042)
-			    12		1
-			    13		1
-			    14		1
-			    15		1       
-			
-			*/
+
+                bit     description
+
+                0       SIO channel A WAIT/RDY
+                1       SIO channel B WAIT/RDY
+                2       SIO channel A DSR
+                3       SIO channel B DSR
+                4       SIO channel A RI
+                5       SIO channel B RI
+                6       DART channel A WAIT/RDY
+                7       DART channel A DSR
+                8       DART channel B WAIT/RDY
+                9       0 (1 for PC-PM042)
+                10      0 (1 for PC-PM042)
+                11      0 (1 for PC-PM042)
+                12      1
+                13      1
+                14      1
+                15      1
+
+            */
 			data = 0xf000;
 			break;
 
@@ -278,7 +278,7 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 	{
 		switch (offset & 0x7f)
 		{
- 		case 0x00/2:
+		case 0x00/2:
 		case 0x02/2:
 			m_sio->data_write(offset & 0x01, data & 0xff);
 			break;
@@ -288,7 +288,7 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 			m_sio->control_write(offset & 0x01, data & 0xff);
 			break;
 
- 		case 0x08/2:
+		case 0x08/2:
 		case 0x0a/2:
 			m_dart->data_write(offset & 0x01, data & 0xff);
 			break;

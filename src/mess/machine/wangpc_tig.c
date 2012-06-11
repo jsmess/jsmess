@@ -8,10 +8,10 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- all
+    TODO:
+
+    - all
 
 */
 
@@ -282,7 +282,7 @@ void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 
 		case 0x2a/2:
 			if (LOG) logerror("TIG option %02x\n", data & 0xff);
-			
+
 			m_option = data & 0xff;
 			break;
 

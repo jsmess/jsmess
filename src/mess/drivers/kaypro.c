@@ -162,8 +162,8 @@ static const mc6845_interface kaypro2x_crtc = {
 
 //static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
 //{
-//	downcast<z80sio_device *>(device)->rx_clock_in();
-//	downcast<z80sio_device *>(device)->tx_clock_in();
+//  downcast<z80sio_device *>(device)->rx_clock_in();
+//  downcast<z80sio_device *>(device)->tx_clock_in();
 //}
 
 static COM8116_INTERFACE( kayproii_brg_intf )

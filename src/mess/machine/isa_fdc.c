@@ -360,7 +360,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 		case 6: /* FDC reserved */
 			hdd = device->machine().device(":board3:ide:ide");
 			if (hdd)
-				data = ide_controller16_r(hdd, 0x3f6/2, 0x00ff);		
+				data = ide_controller16_r(hdd, 0x3f6/2, 0x00ff);
 			break;
 		case 7:
 			device_t *dev = get_floppy_subdevice(device, fdc->digital_output_register & 0x03);

@@ -400,7 +400,7 @@ void wangpc_keyboard_device::device_reset()
 {
     transmit_register_reset();
     receive_register_reset();
-    
+
     set_out_data_bit(1);
     serial_connection_out();
 }
@@ -420,7 +420,7 @@ void wangpc_keyboard_device::input_callback(UINT8 state)
     {
         m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
         receive_register_extract();
-        
+
         if (LOG) logerror("Wang PC keyboard receive data %02x\n", get_received_char());
     }
 }
@@ -506,7 +506,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
         P1.3    led 3
         P1.4    led 4
         P1.5    led 5
-        P1.6    
+        P1.6
         P1.7
 
     */
@@ -542,7 +542,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
     */
 
 	m_y = data & 0x0f;
-    
+
     if (LOG) logerror("P2 %02x\n", data);
 }
 
@@ -567,6 +567,6 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
         P3.7
 
     */
-    
+
     if (LOG) logerror("P3 %02x\n", data);
 }

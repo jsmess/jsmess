@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 
 	/* ENET - ASIX AX88796 */
 	AM_RANGE(0x72000300, 0x720003ff) AM_READWRITE16(dm7000_enet_r, dm7000_enet_w, 0xffffffff)
-	
+
 	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
 	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
@@ -312,7 +312,7 @@ static const powerpc_config ppc405_config =
 
 static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4? 
+	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
 	MCFG_CPU_CONFIG(ppc405_config)
 	MCFG_CPU_PROGRAM_MAP(dm7000_mem)

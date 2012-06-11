@@ -132,17 +132,17 @@ static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-//	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)		// keyboard poll
+//  AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)      // keyboard poll
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)	// check
 	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE( pcjr_nmi_enable_r, pc_nmi_enable_w )			// check
-//	has extra registers at 0x0100, 0x0108, 0x010a
+//  has extra registers at 0x0100, 0x0108, 0x010a
 	AM_RANGE(0x010c, 0x010c) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0x010d, 0x010d) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x010e, 0x010e) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x010f, 0x010f) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w)
-//	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
-//	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_LEGACY("ins8250_0", ins8250_r, ins8250_w)
-ADDRESS_MAP_END 
+//  AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
+//  AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_LEGACY("ins8250_0", ins8250_r, ins8250_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1260,7 +1260,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )		/* check */
 
 	/* TODO: implement i8251 */
-//	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )
+//  MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )				/* only 1 chargen, CGA_FONT dip always 1 */
@@ -1272,7 +1272,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-//	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)				/* TODO: non-standard */
+//  MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)             /* TODO: non-standard */
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )	/* TODO: verify */

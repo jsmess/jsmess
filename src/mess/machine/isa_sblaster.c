@@ -317,7 +317,7 @@ void sb8_device::process_fifo(UINT8 cmd)
                 break;
 
             case 0x1c:  // 8-bit DMA with autoinit
-//            	printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
+//              printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
                 m_dsp.dma_autoinit = 1;
                 m_dsp.dma_timer_started = false;

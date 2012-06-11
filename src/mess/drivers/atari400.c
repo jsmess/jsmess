@@ -1100,7 +1100,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_POKEY_CONFIG(atari_pokey_interface)
 	MCFG_POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
-	
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
@@ -1291,7 +1291,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_POKEY_CONFIG(a5200_pokey_interface)
 	MCFG_POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
-	
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_PIA6821_MODIFY( "pia", a5200_pia_interface )

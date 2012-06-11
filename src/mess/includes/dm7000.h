@@ -27,7 +27,7 @@ public:
 	UINT8 m_scc0_lcr;
 	UINT8 m_scc0_lsr;
 	UINT8 m_term_data;
-	
+
 
 	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
 	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );

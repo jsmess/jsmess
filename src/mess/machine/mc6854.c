@@ -59,11 +59,11 @@
 
 typedef struct
 {
-	devcb_resolved_write_line 	out_irq_func;
-	devcb_resolved_read_line 	in_rxd_func;
-	devcb_resolved_write_line 	out_txd_func;
-	devcb_resolved_write_line 	out_rts_func;
-	devcb_resolved_write_line 	out_dtr_func;
+	devcb_resolved_write_line	out_irq_func;
+	devcb_resolved_read_line	in_rxd_func;
+	devcb_resolved_write_line	out_txd_func;
+	devcb_resolved_write_line	out_rts_func;
+	devcb_resolved_write_line	out_dtr_func;
 
 	/* interface */
 	const mc6854_interface* iface;

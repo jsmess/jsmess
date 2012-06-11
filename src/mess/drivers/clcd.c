@@ -55,12 +55,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(rambank_w)
 	{
-//		printf( "ram bank:%02x %02x\n", offset, data );
+//      printf( "ram bank:%02x %02x\n", offset, data );
 	}
 
 	DECLARE_WRITE8_MEMBER(rombank_w)
 	{
-//		printf( "rom bank %02x\n", data);
+//      printf( "rom bank %02x\n", data);
 		membank("bankedroms")->set_entry(0);
 	}
 

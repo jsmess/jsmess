@@ -166,26 +166,26 @@ WRITE_LINE_MEMBER(m20_state::kbd_tx)
 
 
 /*
-port21		=	0x21		!TTL latch
-!	(see hw1 document, fig 2-33, pg 2-47)
-!		Output						Input
-!		======						=====
-!	B0	0 selects floppy 0
-!		1 deselects floppy 0
-!	B1	0 selects floppy 1
-!		1 deselects floppy 1
-!	B2	Motor On (Not Used)
-!	B3	0 selects double density	0 => Skip basic tests
-!		1 selects single density	1 => Perform basic tests
-!									Latched copy when B7 is written to Port21
-!	B4	Uncommitted output			0 => 128K card(s) present
-!									1 => 32K(s) card present
-!									Cannot mix types!
-!	B5	Uncommitted output			0 => 8-colour card present
-!									1 => 4-colour card present
-!	B6	Uncommitted output			0 => RAM
-!									1 => ROM (???)
-!	B7	See B3 input				0 => colour card present
+port21      =   0x21        !TTL latch
+!   (see hw1 document, fig 2-33, pg 2-47)
+!       Output                      Input
+!       ======                      =====
+!   B0  0 selects floppy 0
+!       1 deselects floppy 0
+!   B1  0 selects floppy 1
+!       1 deselects floppy 1
+!   B2  Motor On (Not Used)
+!   B3  0 selects double density    0 => Skip basic tests
+!       1 selects single density    1 => Perform basic tests
+!                                   Latched copy when B7 is written to Port21
+!   B4  Uncommitted output          0 => 128K card(s) present
+!                                   1 => 32K(s) card present
+!                                   Cannot mix types!
+!   B5  Uncommitted output          0 => 8-colour card present
+!                                   1 => 4-colour card present
+!   B6  Uncommitted output          0 => RAM
+!                                   1 => ROM (???)
+!   B7  See B3 input                0 => colour card present
 */
 
 READ16_MEMBER(m20_state::port21_r)
@@ -265,13 +265,13 @@ WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 {
 	/* Using HOLD_LINE is not completely correct:
-	 * The output of the 8253 is connected to a 74LS74 flop chip.
-	 * The output of the flop chip is connected to NVI CPU input.
-	 * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
-	 * outputs to detect an interrupt acknowledge transaction.
-	 * 8253 is programmed in square wave mode, not rate
-	 * generator mode.
-	 */
+     * The output of the 8253 is connected to a 74LS74 flop chip.
+     * The output of the flop chip is connected to NVI CPU input.
+     * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
+     * outputs to detect an interrupt acknowledge transaction.
+     * 8253 is programmed in square wave mode, not rate
+     * generator mode.
+     */
 	device_set_input_line(m_maincpu, 0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 

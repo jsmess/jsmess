@@ -194,7 +194,7 @@ private:
 
 	devcb_resolved_write_line	m_irq_func;
 	devcb_resolved_write_line	m_drq_func;
-	
+
 	void dma_set(int dir);
 	void drq_set();
 	void drq_clear();

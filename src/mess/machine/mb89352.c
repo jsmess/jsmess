@@ -531,7 +531,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			}
 			if(m_phase == SCSI_PHASE_STATUS)
 			{
-	 			void *image;
+				void *image;
 				m_SCSIdevices[m_target]->GetDevice(&image);
 				if (image != NULL)
 					m_temp = 0x00;

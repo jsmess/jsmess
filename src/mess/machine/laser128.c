@@ -66,7 +66,7 @@ void a2bus_laser128_device::device_start()
 
 void a2bus_laser128_device::device_reset()
 {
-    m_rom = device().machine().root_device().memregion("maincpu")->base(); 
+    m_rom = device().machine().root_device().memregion("maincpu")->base();
     m_slot7_bank = 0;
 }
 
