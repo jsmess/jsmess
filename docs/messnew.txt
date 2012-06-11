@@ -1,4 +1,163 @@
-﻿0.146
+﻿0.146u1
+
+MAMETesters Bugs Fixed
+----------------------
+- 04885: [Documentation] (chesstrv.c) borisdpl: The correct 
+  year of manufacture is 1979.
+- 04880: [Documentation] (chesstrv.c) chesstrv: The correct 
+  year of manufacture is 1980.
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Unknown HP Z80-based mainframe. [Robbbert,Lord Nightmare]
+- VTech Genius PC. [PulkoMandy]
+- ITT3030 [rfka01]
+
+System Driver Changes:
+----------------------
+-tvc: Added .cas cassette image support. [Sandro Ronco]
+
+-apple II: Added the S.A.M. speech card.  Literally an 8-bit DAC and
+ speaker and that's it.  [R. Belmont]
+
+-apple II: Add ALF Apple Music II card (3x SN76489s) [R. Belmont]
+
+-m20: Now passes POST, need to get FDC booting next [Christian
+ Grössler]
+
+-pcw8256: added software list for disk images and hooked up to the
+ driver. [Fabio Priuli]
+
+-c64: Added a 16KB EPROM cartridge, to which you can map your own ROMs
+ either to ROML, ROMH, or both. E.g. "mess c64p -exp 16k -cart2
+ roml.bin -cart3 romh.bin". The cartridge can operate in 8KB/16KB or
+ Ultimax mode. [Curt Coder]
+
+-elektor: added support for pgm quickloads. Added notes on how to use
+quickloads on vc4000 etc. [Robbbert]
+
+-nes.c: fixed emulation of mapper 52 variant with switched CHR bank
+ lines, used by several pirate multigame carts [Fabio Priuli]
+
+-nes.c: added support for the MMC3 variant used by Fight Street VI
+ [Fabio Priuli]
+
+-nes.c: added support for UNL-FS304 board used by A Link to the Past
+ (Waixing) [Fabio Priuli]
+
+-nes.c: added support for a bootleg board by YOKO Soft used by a couple
+ of fighting games. [Fabio Priuli]
+
+-nes.c: fixed emulation of DAOU306 pcb needed by Janggun ui Adeul.
+ [Fabio Priuli]
+
+-Added "Mac 512" bootleg by Unitron Brazil [rbanffy]
+
+-dm7000: connected terminal keyboard [Lukasz Markowski]
+
+-Lots of Ensoniq work: [R. Belmont]
+ * Added SQ-80, VFX-SD, SD-1, and SD-1 32 voice.
+ * Added ubiqitous 2x40 line VFD display
+ * Hooked up floppy drive and controller on VFX-SD, SD-1, SD-1 32, and
+    EPS-16
+ * Fixed battery level readback on all 16-bit Ensoniqs and respond
+    correctly to keyboard calibration command
+
+-m20: More floppy drive hookup.  A trivial booter disk works; the OS
+ does not. [Christian Grössler]
+
+-ensoniq: EPS-16 ROMs turned out to be plain EPS. [R. Belmont]
+
+-vidbrain: Improved sound slightly. [Kurt Woloch]
+
+-ensoniq: add floppy side select control and EPS/EPS-16+'s 68450 DMAC. 
+ EPS OS now boots and says "ERROR 129" instead of crashing. [R.
+ Belmont]
+
+-apple II: Make Brazilian quasi-clone TK2000 show something.
+ [R. Belmont]
+
+-apple II: Laser 128 and 128EX partially working, can boot ProDOS, DOS
+ 3.3 dies. [R. Belmont]
+
+-megadriv.c: confirmed Asia MegaCD dump [Jakovasaur, ElBarto]
+
+-apple II: Preliminary support for German "Space 84" clone
+ [R. Belmont, rfka01]
+
+-wangpc: Driver now boots from floppy. [Curt Coder]
+
+-apple II: Clean up Laser 128 support, support Space 84 h-flipped char
+ roms. [R. Belmont]
+
+-wangpc: Emulated the medium resolution video controller. [Curt Coder]
+
+-eacc: fixed nmi operation. System boots. [Robbbert]
+
+-apple II: Add the Street Electronics Echo II speech card [R. Belmont]
+
+-apple II: Add support for IBS AP16 VideoTerm clone [R. Belmont,
+ rfka01]
+
+-apple II: Support an alternate version of the AP-16 card
+ [R. Belmont, rfka01]
+
+-apple II: fix crash on hard reset/multisession and improved IIgs soft
+ reset behavior. [R. Belmont]
+
+-eacc: fixed remaining bugs [Robbbert]
+
+-apple II: Add two more VideoTerm clones of unknown manufacture
+ [R. Belmont, Lord Nightmare]
+
+Software Lists:
+----------------
+-vsmile.xml: added some new dumps [rimsky82] 
+
+-pico.xml: new Japanese dumps [Team Europe] 
+
+-pico.xml: added info about Japanese releases and list of undumped items [Fabio Priuli]
+
+-apple1.xml: added a few more tapes [Anon01]
+
+-megadriv.xml: documented more carts and dumps. [ElBarto]
+
+-snes.xml: documented the copy protection algorithm of many pirate
+ cartridges [d4s]
+
+-snes.xml: a couple of new dumps [Badablek, d4s]
+
+-megadriv.xml: added a few Russian pirate dumps. [Kaylee]
+
+-ibm5150.xml: Updated the IBM 5150 list with a few more dumps, and
+ fixed a few errors. [Kaylee]
+
+-pico.xml: new US dumps added. [TeamEurope]
+
+Source Changes:
+----------------
+-upd765.c: Trigger RDY active during reset interrupt for each drive
+ independently so that 4 consecutive Sense Interrupt commands will
+ return the correct status. [Curt Coder]
+
+-SoundBlaster: first-pass somewhat naive working version.  Autoinit DMA
+ does not work; use sblaster1_0, not 1_5!  [R. Belmont]
+
+-New TMS9900 and TMS9995 implementation with proper control line
+ handling and wait state generation. Previous implementation has been
+ renamed and drivers point to the old implementation until they are
+ adapted to the new one. [Michael Zapf]
+
+
+0.146
 
 MAMETesters Bugs Fixed
 ----------------------
