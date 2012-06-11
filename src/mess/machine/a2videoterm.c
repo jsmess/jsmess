@@ -36,6 +36,8 @@
 const device_type A2BUS_VIDEOTERM = &device_creator<a2bus_videoterm_device>;
 const device_type A2BUS_IBSAP16 = &device_creator<a2bus_ap16_device>;
 const device_type A2BUS_IBSAP16ALT = &device_creator<a2bus_ap16alt_device>;
+const device_type A2BUS_VTC1 = &device_creator<a2bus_vtc1_device>;
+const device_type A2BUS_VTC2 = &device_creator<a2bus_vtc2_device>;
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
 #define VIDEOTERM_GFX_REGION  "vterm_gfx"
@@ -101,6 +103,24 @@ ROM_START( a2ap16alt )
     ROM_LOAD( "unknown apple ii clone video 1.bin", 0x000000, 0x001000, CRC(cf84811c) SHA1(135f4f35607dd74941f0a3cae813227bf8a8a020) ) 
 ROM_END
 
+ROM_START( vtc1 )
+	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
+    ROM_LOAD( "10.ic10.bin",  0x000000, 0x000800, CRC(ddbbc2fb) SHA1(15d6142b177b47c016f2745e1d95767b440d77c7) ) 
+
+	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
+    ROM_LOAD( "9.ic9.bin",    0x000000, 0x000800, CRC(094670f1) SHA1(aefae76fb07740d042cf294f01424efa7cc7a199) ) 
+    ROM_LOAD( "8.ic8.bin",    0x000800, 0x000800, CRC(fbd98d77) SHA1(0d9b1c3917e23ca35d5fbd405f05ff6e87122b92) ) 
+ROM_END
+
+ROM_START( vtc2 )
+	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
+    ROM_LOAD( "6.ic6.bin",    0x000000, 0x000800, CRC(5776fa24) SHA1(19f69011ed7d2551c39d5c1cac1f5a2defc8f8fb) ) 
+
+	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
+    ROM_LOAD( "5.ic5.bin",    0x000000, 0x000800, CRC(aafa7085) SHA1(54d7c358f1927ba8f3b61145215a806d8cb6b673) ) 
+    ROM_LOAD( "4.ic4.bin",    0x000800, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) ) 
+ROM_END
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -134,6 +154,16 @@ const rom_entry *a2bus_ap16alt_device::device_rom_region() const
 	return ROM_NAME( a2ap16alt );
 }
 
+const rom_entry *a2bus_vtc1_device::device_rom_region() const
+{
+	return ROM_NAME( vtc1 );
+}
+
+const rom_entry *a2bus_vtc2_device::device_rom_region() const
+{
+	return ROM_NAME( vtc2 );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -152,15 +182,27 @@ a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, co
 }
 
 a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "IBS AP-16 80 column card", tag, owner, clock)
+    a2bus_videx80_device(mconfig, A2BUS_IBSAP16, "IBS AP-16 80 column card", tag, owner, clock)
 {
 	m_shortname = "a2ap16";
 }
 
 a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "IBS AP-16 80 column card (alt. version)", tag, owner, clock)
+    a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, "IBS AP-16 80 column card (alt. version)", tag, owner, clock)
 {
 	m_shortname = "a2ap16a";
+}
+
+a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_videx80_device(mconfig, A2BUS_VTC1, "Unknown VideoTerm clone #1", tag, owner, clock)
+{
+	m_shortname = "a2vtc1";
+}
+
+a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_videx80_device(mconfig, A2BUS_VTC2, "Unknown VideoTerm clone #2", tag, owner, clock)
+{
+	m_shortname = "a2vtc2";
 }
 
 //-------------------------------------------------
