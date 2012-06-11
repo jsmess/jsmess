@@ -63,7 +63,7 @@ quickloads on vc4000 etc. [Robbbert]
 
 -dm7000: connected terminal keyboard [Lukasz Markowski]
 
--Lots of Ensoniq work: [R. Belmont]
+-Lots of Ensoniq work: [R. Belmont, Christian Brunschen]
  * Added SQ-80, VFX-SD, SD-1, and SD-1 32 voice.
  * Added ubiqitous 2x40 line VFD display
  * Hooked up floppy drive and controller on VFX-SD, SD-1, SD-1 32, and
