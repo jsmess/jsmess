@@ -631,7 +631,7 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 
     */
 
-	vic2_lightpen_write(m_vic, BIT(data, 4));
+	m_vic->lp_w(BIT(data, 4));
 }
 
 static const mos6526_interface cia1_intf =
