@@ -41,6 +41,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
 #include "sound/dac.h"
 #include "machine/6821pia.h"
@@ -314,6 +315,45 @@ static const cassette_interface d6800_cassette_interface =
 	NULL
 };
 
+static QUICKLOAD_LOAD( d6800 )
+{
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	int i;
+	int quick_addr = 0x0200;
+	int exec_addr = 0xc000;
+	int quick_length;
+	UINT8 *quick_data;
+	int read_;
+
+	quick_length = image.length();
+	quick_data = (UINT8*)malloc(quick_length);
+	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	for (i = 0; i < quick_length; i++)
+		if ((quick_addr + i) < 0x800)
+			space->write_byte(i + quick_addr, quick_data[i]);
+
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
+
+	// Start the quickload
+	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( d6800, d6800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
@@ -343,6 +383,9 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("d6800_p", d6800_p, attotime::from_hz(40000) )
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", d6800, "ch8", 1)
 MACHINE_CONFIG_END
 
 /* ROMs */
