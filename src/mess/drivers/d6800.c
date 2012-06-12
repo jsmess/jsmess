@@ -5,6 +5,14 @@
     in May 1979. It has 1k of ROM and 1k of RAM. The video consists of 64x32
     pixels. The keyboard is a hexcode 4x4 matrix, plus a Function key.
 
+    Designed by Michael Bauer, of the Division of Computing and Mathematics
+    at Deakin University, Australia.
+
+    NOTE that the display only updates after each 4 digits is entered, and
+    you can't see what you type as you change bytes. This is by design.
+    The speaker is supposed to bleep on each keystroke, but it only gets
+    one pulse - which is almost inaudible.
+
     Function keys:
     FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
                     the address will increment by itself, enter the next byte.
@@ -12,31 +20,20 @@
 
     FN 1 - Tape load
 
-    FN 2 - Tape save
+    FN 2 - Tape save. You must have entered the start address at 0002, and
+           the end address+1 at 0004 (big-endian).
 
-    FN 3 - Run. Enter the 4-digit go address, then it starts executing.
+    FN 3 - Run. You must have entered the 4-digit go address first.
 
+    All CHIP-8 programs load at 0x200 (max size 4k), and exec address
+    is C000.
 
     Information and programs can be found at http://chip8.com/?page=78
 
 
-    To change the large numbers at the bottom, start in debug mode, enter
-    some data at memory 6 and 7, then G to run.
-
-
     TODO:
     - Cassette
-    - CPU should freeze while screen is being drawn
-    - Keyboard (should work but it doesn't, due to inadequate PIA emulation)
 
-    Current situation:
-    - It starts, displays initial screen
-    - It checks the status bits looking for a keypress
-    - When a key is pressed, it gets into a loop at C2E8-C2EB, waiting for
-      a memory location to change. This means it needs an interrupt to kick
-      in, from a keypress.
-    - The pia only looks for an interrupt when it gets polled, which is
-      not the case here, so the emulation hangs.
 */
 
 
@@ -45,7 +42,7 @@
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-#include "sound/speaker.h"
+#include "sound/dac.h"
 #include "machine/6821pia.h"
 
 
@@ -57,13 +54,9 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_cass(*this, CASSETTE_TAG),
 		  m_pia(*this, "pia"),
-		  m_speaker(*this, SPEAKER_TAG),
+		  m_dac(*this, "dac"),
 		  m_videoram(*this, "videoram") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_pia;
-	required_device<device_t> m_speaker;
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
@@ -72,10 +65,16 @@ public:
 	DECLARE_READ_LINE_MEMBER( d6800_keydown_r );
 	DECLARE_READ_LINE_MEMBER( d6800_rtc_pulse );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
-	UINT8 m_keylatch;
-	UINT8 m_screen_on;
 	UINT8 m_rtc;
+	bool m_screen_on;
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_device<device_t> m_pia;
+	required_device<device_t> m_dac;
 	required_shared_ptr<UINT8> m_videoram;
+private:
+	UINT8 m_kbd_s;
+	UINT8 m_portb;
 };
 
 
@@ -92,36 +91,60 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( d6800 )
-	PORT_START("LINE0")
+	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
-	PORT_START("LINE1")
+	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
-	PORT_START("LINE2")
+	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
-	PORT_START("LINE3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED )
 
-	PORT_START("SPECIAL")
+	PORT_START("Y0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+
+	PORT_START("Y1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+
+	PORT_START("Y2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("Y3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
+
+	PORT_START("VS")
+	/* vblank */
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 /* Video */
@@ -129,7 +152,7 @@ INPUT_PORTS_END
 static SCREEN_UPDATE_IND16( d6800 )
 {
 	d6800_state *state = screen.machine().driver_data<d6800_state>();
-	UINT8 x,y,gfx=0,i;
+	UINT8 x,y,gfx=0;
 
 	for (y = 0; y < 32; y++)
 	{
@@ -140,8 +163,14 @@ static SCREEN_UPDATE_IND16( d6800 )
 			if (state->m_screen_on)
 				gfx = state->m_videoram[ x | (y<<3)];
 
-			for (i = 0; i < 8; i++)
-				*p++ = BIT(gfx, 7-i);
+			*p++ = BIT(gfx, 7);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 0);
 		}
 	}
 	return 0;
@@ -149,32 +178,35 @@ static SCREEN_UPDATE_IND16( d6800 )
 
 /* PIA6821 Interface */
 
-static INTERRUPT_GEN( d6800_interrupt )
+static TIMER_DEVICE_CALLBACK( d6800_p )
 {
-	d6800_state *state = device->machine().driver_data<d6800_state>();
-	state->m_rtc = 1;
+	d6800_state *state = timer.machine().driver_data<d6800_state>();
+	state->m_rtc++;
+	device_set_input_line(state->m_maincpu, M6800_IRQ_LINE, (state->m_rtc > 0xf8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+// not used
 READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 {
-	UINT8 res = m_rtc;
-	m_rtc = 0;
-	return res;
+	return 1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	UINT8 data = ioport("LINE0")->read()
-	           & ioport("LINE1")->read()
-	           & ioport("LINE2")->read()
-	           & ioport("LINE3")->read();
+	UINT8 data = ioport("X0")->read()
+	           & ioport("X1")->read()
+	           & ioport("X2")->read()
+	           & ioport("X3")->read();
 
-	return (data==0xff) ? 0 : 1;
+	m_kbd_s = (data == 15) ? 0 : 1;
+
+	return m_kbd_s;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 {
-	return ioport("SPECIAL")->read();
+	return ioport("SHIFT")->read();
 }
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
@@ -191,7 +223,7 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
     knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
     */
 
-	return 0xff;
+	return ((m_cass->input() > 0.03) ? 1 : 0) | m_portb;
 }
 
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
@@ -202,19 +234,28 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
     bit 0 of the PIA. Bit 6 drives the speaker.
     */
 
-	speaker_level_w(m_speaker, BIT(data, 6));
+	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+
+	dac_data_w(m_dac, data);
+	m_portb = data;
 }
 
 READ8_MEMBER( d6800_state::d6800_keyboard_r )
 {
-	UINT8 data = 15;
+	/*
+    This system reads the key matrix one way, then swaps the input and output
+    lines around and reads it another way. This isolates the key that was pressed.
+    */
 
-	if (!BIT(m_keylatch, 4)) data &= ioport("LINE0")->read();
-	if (!BIT(m_keylatch, 5)) data &= ioport("LINE1")->read();
-	if (!BIT(m_keylatch, 6)) data &= ioport("LINE2")->read();
-	if (!BIT(m_keylatch, 7)) data &= ioport("LINE3")->read();
+	m_kbd_s++;
 
-	return data | m_keylatch;
+	if (m_kbd_s == 3)
+		return 0x0f & ioport("X0")->read() & ioport("X1")->read() & ioport("X2")->read() & ioport("X3")->read();
+	else
+	if (m_kbd_s == 6)
+		return 0xf0 & ioport("Y0")->read() & ioport("Y1")->read() & ioport("Y2")->read() & ioport("Y3")->read();
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
@@ -234,8 +275,6 @@ WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
 
     */
 
-
-	m_keylatch = data & 0xf0;
 }
 
 static const pia6821_interface d6800_mc6821_intf =
@@ -279,7 +318,6 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
-	MCFG_CPU_VBLANK_INT("screen", d6800_interrupt)
 
 	MCFG_MACHINE_START(d6800)
 	MCFG_MACHINE_RESET(d6800)
@@ -297,13 +335,14 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_interface)
+	MCFG_TIMER_ADD_PERIODIC("d6800_p", d6800_p, attotime::from_hz(40000) )
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -313,5 +352,5 @@ ROM_START( d6800 )
 	ROM_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                             FULLNAME                FLAGS */
-COMP( 1979, d6800,	0,	0,	d6800,	    d6800,	0,	"Electronics Australia",	"Dream 6800",	GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT       INIT        COMPANY             FULLNAME      FLAGS */
+COMP( 1979, d6800, 0,      0,      d6800,    d6800,      0,   "Electronics Australia", "Dream 6800", GAME_NOT_WORKING )
