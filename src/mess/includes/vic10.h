@@ -11,7 +11,7 @@
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
-#include "video/vic6567.h"
+#include "video/mos6566.h"
 
 #define M6510_TAG		"u3"
 #define MOS6566_TAG		"u2"
@@ -39,7 +39,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_vic;
+	required_device<mos6566_device> m_vic;
 	required_device<device_t> m_sid;
 	required_device<mos6526_device> m_cia;
 	required_device<vic10_expansion_slot_device> m_exp;
@@ -48,19 +48,18 @@ public:
 	optional_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
-	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
-	DECLARE_READ8_MEMBER( vic_dma_read );
-	DECLARE_READ8_MEMBER( vic_dma_read_color );
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_READ8_MEMBER( vic_rdy_cb );
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_pa_r );

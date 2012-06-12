@@ -2793,6 +2793,6 @@ WRITE8_MEMBER( mos6566_device::write )
 //  lp_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( lp_w )
+WRITE_LINE_MEMBER( mos6566_device::lp_w )
 {
 }

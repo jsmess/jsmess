@@ -16,7 +16,6 @@
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
-#include "video/vic6567.h"
 #include "video/mos6566.h"
 
 #define M6510_TAG		"u7"

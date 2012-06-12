@@ -56,7 +56,7 @@ READ8_MEMBER( vic10_state::read )
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		data = vic2_port_r(m_vic, offset & 0x3f);
+		data = m_vic->read(space, offset & 0x3f);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
@@ -101,7 +101,7 @@ WRITE8_MEMBER( vic10_state::write )
 	}
 	else if (offset >= 0xd000 && offset < 0xd400)
 	{
-		vic2_port_w(m_vic, offset & 0x3f, data);
+		m_vic->write(space, offset & 0x3f, data);
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
@@ -120,6 +120,31 @@ WRITE8_MEMBER( vic10_state::write )
 }
 
 
+//-------------------------------------------------
+//  vic_videoram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( vic10_state::vic_videoram_r )
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+
+	if (offset < 0x3000)
+		return program->read_byte(offset);
+
+	return program->read_byte(0xe000 + (offset & 0x1fff));
+}
+
+
+//-------------------------------------------------
+//  vic_colorram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( vic10_state::vic_colorram_r )
+{
+	return m_color_ram[offset];
+}
+
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -131,6 +156,24 @@ WRITE8_MEMBER( vic10_state::write )
 
 static ADDRESS_MAP_START( vic10_mem, AS_PROGRAM, 8, vic10_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( vic_videoram_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, vic10_state )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( vic_colorram_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, vic10_state )
+	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
 
@@ -161,36 +204,6 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-static const unsigned char vic10_palette[] =
-{
-// black, white, red, cyan
-// purple, green, blue, yellow
-// orange, brown, light red, dark gray,
-// medium gray, light green, light blue, light gray
-// taken from the vice emulator
-	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
-	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
-	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
-	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
-};
-
-static PALETTE_INIT( vic10 )
-{
-	int i;
-
-	for (i = 0; i < sizeof(vic10_palette) / 3; i++)
-	{
-		palette_set_color_rgb(machine, i, vic10_palette[i * 3], vic10_palette[i * 3 + 1], vic10_palette[i * 3 + 2]);
-	}
-}
-
-UINT32 vic10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	vic2_video_update(m_vic, bitmap, cliprect);
-
-	return 0;
-}
-
 static INTERRUPT_GEN( vic10_frame_interrupt )
 {
 	cbm_common_interrupt(device);
@@ -211,21 +224,6 @@ READ8_MEMBER( vic10_state::vic_lightpen_button_cb )
 	return ioport("OTHER")->read() & 0x04;
 }
 
-READ8_MEMBER( vic10_state::vic_dma_read )
-{
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
-	if (offset < 0x3000)
-		return program->read_byte(offset);
-
-	return program->read_byte(0xe000 + (offset & 0x1fff));
-}
-
-READ8_MEMBER( vic10_state::vic_dma_read_color )
-{
-	return m_color_ram[offset & 0x3ff] & 0x0f;
-}
-
 WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 {
 	m_vic_irq = state;
@@ -238,17 +236,15 @@ READ8_MEMBER( vic10_state::vic_rdy_cb )
 	return ioport("CYCLES")->read() & 0x07;
 }
 
-static const vic2_interface vic_intf =
+static MOS6566_INTERFACE( vic_intf )
 {
 	SCREEN_TAG,
 	M6510_TAG,
-	VIC6567,
+	DEVCB_DRIVER_LINE_MEMBER(vic10_state, vic_irq_w),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vic10_state, vic_lightpen_x_cb),
 	DEVCB_DRIVER_MEMBER(vic10_state, vic_lightpen_y_cb),
 	DEVCB_DRIVER_MEMBER(vic10_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(vic10_state, vic_dma_read),
-	DEVCB_DRIVER_MEMBER(vic10_state, vic_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(vic10_state, vic_irq_w),
 	DEVCB_DRIVER_MEMBER(vic10_state, vic_rdy_cb)
 };
 
@@ -451,7 +447,7 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 
     */
 
-	vic2_lightpen_write(m_vic, BIT(data, 4));
+	m_vic->lp_w(BIT(data, 4));
 }
 
 static const mos6526_interface cia_intf =
@@ -608,20 +604,10 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_CPU_VBLANK_INT(SCREEN_TAG, vic10_frame_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(vic10_state, screen_update)
-
-	MCFG_PALETTE_INIT(vic10)
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(vic10_palette) / 3)
-
-	MCFG_VIC2_ADD(MOS6566_TAG, vic_intf)
+	MCFG_MOS6566_ADD(MOS6566_TAG, SCREEN_TAG, VIC6566_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
