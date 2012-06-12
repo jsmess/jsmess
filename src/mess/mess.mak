@@ -856,6 +856,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/vic10exp.o	\
 	$(MESS_MACHINE)/vic10std.o	\
 	$(MESS_DRIVERS)/vic20.o		\
+	$(MESS_MACHINE)/vic20ctrl.o	\
 	$(MESS_MACHINE)/vic20exp.o	\
 	$(MESS_MACHINE)/vic20std.o	\
 	$(MESS_MACHINE)/vic20user.o	\

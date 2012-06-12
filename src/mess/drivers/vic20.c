@@ -797,6 +797,8 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
 
+	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
 

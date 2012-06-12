@@ -14,6 +14,7 @@
 #include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/ram.h"
+#include "machine/vic20ctrl.h"
 #include "machine/vic20exp.h"
 #include "machine/vic20user.h"
 #include "sound/dac.h"
@@ -38,6 +39,8 @@ public:
 		  m_via1(*this, M6522_1_TAG),
 		  m_vic(*this, M6560_TAG),
 		  m_iec(*this, CBM_IEC_TAG),
+		  m_joy1(*this, VIC20_CONTROL_PORT_1_TAG),
+		  m_joy2(*this, VIC20_CONTROL_PORT_2_TAG),
 		  m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
 		  m_user(*this, VIC20_USER_PORT_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
@@ -50,6 +53,8 @@ public:
 	required_device<via6522_device> m_via1;
 	required_device<device_t> m_vic;
 	required_device<cbm_iec_device> m_iec;
+	required_device<vic20_control_port_device> m_joy1;
+	required_device<vic20_control_port_device> m_joy2;
 	required_device<vic20_expansion_slot_device> m_exp;
 	required_device<vic20_user_port_device> m_user;
 	required_device<cassette_image_device> m_cassette;
