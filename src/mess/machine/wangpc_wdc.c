@@ -78,12 +78,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wangpc_wdc_io, AS_IO, 8, wangpc_wdc_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x01, 0x01) AM_READ() should return 0x72 during self-test
+	AM_RANGE(0x01, 0x01) AM_READ(port_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(status_w)
-	//AM_RANGE(0x10, 0x10) AM_WRITE()
-	//AM_RANGE(0x14, 0x14) AM_WRITE()
-	//AM_RANGE(0x18, 0x18) AM_WRITE()
-	//AM_RANGE(0x1c, 0x1c) AM_WRITE()
+	AM_RANGE(0x10, 0x10) AM_READWRITE(ctc_ch0_r, ctc_ch0_w)
+	AM_RANGE(0x14, 0x14) AM_READWRITE(ctc_ch1_r, ctc_ch1_w)
+	AM_RANGE(0x18, 0x18) AM_READWRITE(ctc_ch2_r, ctc_ch2_w)
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(ctc_ch3_r, ctc_ch3_w)
 ADDRESS_MAP_END
 
 
@@ -226,7 +226,7 @@ void wangpc_wdc_device::device_reset()
 UINT16 wangpc_wdc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 data = 0xffff;
-
+	
 	return data;
 }
 
@@ -340,10 +340,47 @@ bool wangpc_wdc_device::wangpcbus_have_dack(int line)
 
 
 //-------------------------------------------------
+//  port_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_wdc_device::port_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       
+	
+	*/
+
+	return 0x72; // TODO
+}
+
+
+//-------------------------------------------------
 //  status_w - status register write
 //-------------------------------------------------
 
 WRITE8_MEMBER( wangpc_wdc_device::status_w )
 {
+	logerror("WDC status %02x\n", data);
+	
 	m_status = data;
 }
+
+
+READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(0); };
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(0, data); };
+READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(1); };
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(1, data); };
+READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(2); };
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(2, data); };
+READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(3); };
+WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(3, data); };

@@ -40,7 +40,16 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
+	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( status_w );
+	DECLARE_READ8_MEMBER( ctc_ch0_r );
+	DECLARE_WRITE8_MEMBER( ctc_ch0_w );
+	DECLARE_READ8_MEMBER( ctc_ch1_r );
+	DECLARE_WRITE8_MEMBER( ctc_ch1_w );
+	DECLARE_READ8_MEMBER( ctc_ch2_r );
+	DECLARE_WRITE8_MEMBER( ctc_ch2_w );
+	DECLARE_READ8_MEMBER( ctc_ch3_r );
+	DECLARE_WRITE8_MEMBER( ctc_ch3_w );
 
 protected:
 	// device-level overrides
