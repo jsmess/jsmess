@@ -56,7 +56,7 @@
 		<description>Apple 30th</description> <!-- Graphics demo -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load at 300.BFFR, enter at 300R" />
+		<info name="usage" value="Load at 280.FFFR, enter at 280R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="5279280">
 				<rom name="apple30th.wav" size="5279280" crc="eec88347" sha1="bf9000c304510322c968e4e42a1d0d0276ae352f" offset="0" />
@@ -68,6 +68,7 @@
 		<description>ASMmchess</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.BFFR, enter at 300R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="4117948">
 				<rom name="asmmchess.wav" size="4117948" crc="72a2127c" sha1="6abb19063981426efebe9a6ea048146808cb0be4" offset="0" />
@@ -261,7 +262,7 @@
 		<description>Deal or No Deal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18392504">
 				<rom name="deal or no deal.wav" size="18392504" crc="28ad3585" sha1="bf59a22794a755c711b429f6633135402cd12e36" offset="0" />
@@ -381,7 +382,7 @@
 		<description>Star Trek 2003</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18338436">
 				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
