@@ -99,6 +99,9 @@ TODO: Tests on a real machine
 
 #include "tms9901.h"
 
+#define VERBOSE 1
+#define LOG logerror
+
 /*
     Constructor
 */
@@ -120,10 +123,14 @@ void tms9901_device::field_interrupts(void)
 	{	/* if timer is enabled, INT3 pin is overriden by timer */
 		if (m_timer_int_pending)
 		{
+			if (VERBOSE>8) LOG("tms9901: timer fires\n");
 			current_ints |= TMS9901_INT3;
 		}
-		else
+		else 
+		{
+			if (VERBOSE>8) LOG("tms9901: timer clear\n");
 			current_ints &= ~TMS9901_INT3;
+		}
 	}
 
 	/* enabled_ints: enabled interrupts */
@@ -315,10 +322,12 @@ WRITE8_MEMBER ( tms9901_device::write )
 		{
 			/* we are quitting clock mode */
 			m_clock_mode = false;
+			if (VERBOSE>5) LOG("tms9901: int mode\n");
 		}
 		else
 		{
 			m_clock_mode = true;
+			if (VERBOSE>5) LOG("tms9901: clock mode\n");
 			// we are switching to clock mode: latch the current value of
 			// the decrementer register
 			if (m_clock_register != 0)
@@ -357,6 +366,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 				m_clock_register &= ~mask;		/* clear bit */
 
 			/* reset clock timer (page 8) */
+			if (VERBOSE>6) LOG("tms9901: clock register = %04x\n", m_clock_register);
 			timer_reload();
 		}
 		else
@@ -371,6 +381,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 			if (offset == 3)
 				m_timer_int_pending = false;	/* SBO 3 clears pending timer interrupt (??) */
 
+			if (VERBOSE>6) LOG("tms9901: interrupts = %04x\n", m_enabled_ints);
 			field_interrupts();		/* changed interrupt state */
 		}
 		break;
@@ -388,6 +399,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 				// Spec is not clear on whether the mask bits are also reset by RST2*
 				// TODO: Check on a real machine. (I'd guess from the text they are not touched)
 				m_enabled_ints = 0;
+				if (VERBOSE>5) LOG("tms9901: Soft reset (RST2*)\n");
 			}
 		}
 		else
@@ -397,6 +409,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 			else
 				m_enabled_ints &= ~0x4000;		/* unset bit */
 
+			if (VERBOSE>6) LOG("tms9901: interrupts = %04x\n", m_enabled_ints);
 			field_interrupts();		/* changed interrupt state */
 		}
 		break;
@@ -417,6 +430,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 	case 0x1E:
 	case 0x1F:
 		int pin = offset & 0x0F;
+		if (VERBOSE>6) LOG("tms9901: output on P%d = %d\n", pin, data);
 		int mask = (1 << pin);
 
 		// MZ: see above - I think this is wrong
@@ -460,6 +474,7 @@ void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id==DECREMENTER) // we have only that one
 	{
 		m_decrementer_value--;
+		if (VERBOSE>6) LOG("tms9901: decrementer = %d\n", m_decrementer_value);
 		if (m_decrementer_value<=0)
 		{
 			m_timer_int_pending = true;			// decrementer interrupt requested
