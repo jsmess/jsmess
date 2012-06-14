@@ -924,6 +924,8 @@ MACHINE_RESET( ti99_8 )
 	else
 		driver->m_mecmouse = NULL;
 
+	driver->m_cpu->set_hold(CLEAR_LINE);
+
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
 

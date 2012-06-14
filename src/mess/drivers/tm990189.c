@@ -58,7 +58,7 @@
 ******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9980a.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "video/tms9928a.h"
@@ -74,17 +74,19 @@ class tm990189_state : public driver_device
 public:
 	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
+	m_tms9980a(*this, "maincpu"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG),
 	m_tms9918(*this, "tms9918" )
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9980a_device> m_tms9980a;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
-	DECLARE_WRITE8_MEMBER(ext_instr_decode);
+
+	READ8_MEMBER( interrupt_level );
+
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
@@ -105,6 +107,8 @@ public:
 	UINT8 m_rs232_rts;
 	emu_timer *m_rs232_input_timer;
 	UINT8 m_bogus_read_save;
+
+	DECLARE_WRITE8_MEMBER( external_operation );
 
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
@@ -152,6 +156,9 @@ static void hold_load(running_machine &machine);
 
 static MACHINE_RESET( tm990_189 )
 {
+	tm990189_state *state = machine.driver_data<tm990189_state>();
+	state->m_tms9980a->set_ready(ASSERT_LINE);
+	state->m_tms9980a->set_hold(CLEAR_LINE);
 	hold_load(machine);
 }
 
@@ -182,21 +189,18 @@ static MACHINE_START( tm990_189_v )
 
 static MACHINE_RESET( tm990_189_v )
 {
+	tm990189_state *state = machine.driver_data<tm990189_state>();
+	state->m_tms9980a->set_ready(ASSERT_LINE);
+	state->m_tms9980a->set_hold(CLEAR_LINE);
 	hold_load(machine);
 }
 
-
 /*
-    Interrupt handlers
+    Will be called back from the CPU when triggering an interrupt.
 */
-
-static void field_interrupts(running_machine &machine)
+READ8_MEMBER( tm990189_state::interrupt_level )
 {
-	tm990189_state *state = machine.driver_data<tm990189_state>();
-	if (state->m_load_state)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 2);
-	else
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->m_ic_state);
+	return m_ic_state;
 }
 
 /*
@@ -207,14 +211,15 @@ static TIMER_CALLBACK(clear_load)
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
 	state->m_load_state = FALSE;
-	field_interrupts(machine);
+	state->m_tms9980a->set_input_line(0, CLEAR_LINE);
 }
 
 static void hold_load(running_machine &machine)
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
 	state->m_load_state = TRUE;
-	field_interrupts(machine);
+	state->m_ic_state = 2;		// LOAD interrupt
+	state->m_tms9980a->set_input_line(0, ASSERT_LINE);
 	machine.scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
 }
 
@@ -237,8 +242,6 @@ static TIMER_DEVICE_CALLBACK( display_callback )
 	tm990189_state *state = timer.machine().driver_data<tm990189_state>();
 	UINT8 i;
 	char ledname[8];
-	field_interrupts(timer.machine());
-
     // since the segment data is cleared after being used, the old_segment is there
     // in case the segment data hasn't been refreshed yet.
 	for (i = 0; i < 10; i++)
@@ -263,9 +266,13 @@ static TIMER_DEVICE_CALLBACK( display_callback )
 
 WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
-	m_ic_state = offset & 7;  // offset = IC0..IC3 (interrupt level)
+	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
+	// or by keyboard interrupt (level 6)
+	m_ic_state = offset & 7;  // offset = IC0..IC2 (interrupt level)
 	if (!m_load_state)
-		field_interrupts(machine());
+	{
+		m_tms9980a->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 void tm990189_state::led_set(int offset, bool state)
@@ -518,44 +525,33 @@ WRITE8_MEMBER( tm990189_state::xmit_callback )
 /*
     External instruction decoding
 */
-WRITE8_MEMBER( tm990189_state::ext_instr_decode )
+WRITE8_MEMBER( tm990189_state::external_operation )
 {
-	int ext_op_ID;
-
-	ext_op_ID = ((offset+0x800) >> 11) & 0x3;
-	if (data)
-		ext_op_ID |= 4;
-	switch (ext_op_ID)
+	switch (offset)
 	{
-	case 2: /* IDLE: handle elsewhere */
+	case 2: // IDLE
+		if (data)
+			m_LED_state |= 0x40;
+		else
+			m_LED_state &= ~0x40;
 		break;
-
-	case 3: /* RSET: not used in default board */
+	case 3:	// RSET
+		// Not used on the default board
 		break;
-
-	case 5: /* CKON: set DECKCONTROL */
+	case 5: // CKON: set DECKCONTROL
 		m_LED_state |= 0x20;
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		break;
-
-	case 6: /* CKOF: clear DECKCONTROL */
+	case 6: // CKOF: clear DECKCONTROL
 		m_LED_state &= ~0x20;
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		break;
-
-	case 7: /* LREX: trigger LOAD */
+	case 7: // LREX: trigger LOAD
 		hold_load(machine());
 		break;
+	default: // undefined
+		break;
 	}
-}
-
-static void idle_callback(device_t *device, int state)
-{
-	tm990189_state *drvstate = device->machine().driver_data<tm990189_state>();
-	if (state)
-		drvstate->m_LED_state |= 0x40;
-	else
-		drvstate->m_LED_state &= ~0x40;
 }
 
 /*
@@ -774,8 +770,10 @@ ADDRESS_MAP_END
             keyboard row)
         - CRU bits 20-27: SEGMENTA*-SEGMENTG* and SEGMENTP* (drives digit
             segments)
-        - CRU bit 28: DSPLYTRGR* (will generate a pulse to drive the digit
-            segments)
+        - CRU bit 28: DSPLYTRGR*: used as an alive signal for a watchdog circuit
+                      which turns off the display when the program hangs and
+                      LED segments would continuously emit light
+
         - bit 29: SHIFTLIGHT (controls shift light)
         - bit 30: SPKRDRIVE (controls buzzer)
         - bit 31: WDATA (tape out)
@@ -812,22 +810,21 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901_0", tms9901_device, write)	/* user I/O tms9901 */
 	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE("tms9901_1", tms9901_device, write)	/* system I/O tms9901 */
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)	/* optional tms9902 */
-
-	AM_RANGE(0x0800, 0x1fff) AM_WRITE(ext_instr_decode)	/* external instruction decoding (IDLE, RSET, CKON, CKOF, LREX) */
 ADDRESS_MAP_END
 
-
-static const tms9980areset_param reset_params =
+static TMS99xx_CONFIG( cpuconf )
 {
-	idle_callback
+	DEVCB_DRIVER_MEMBER(tm990189_state, external_operation),
+	DEVCB_DRIVER_MEMBER(tm990189_state, interrupt_level),
+	DEVCB_NULL,		// Instruction acquisition
+	DEVCB_NULL,		// Clock out
+	DEVCB_NULL,		// wait
+	DEVCB_NULL		// Hold acknowledge
 };
 
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
-	MCFG_CPU_CONFIG(reset_params)
-	MCFG_CPU_PROGRAM_MAP(tm990_189_memmap)
-	MCFG_CPU_IO_MAP(tm990_189_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map, cpuconf)
 
 	MCFG_MACHINE_START( tm990_189 )
 	MCFG_MACHINE_RESET( tm990_189 )
@@ -849,14 +846,14 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
+	// Need to delay the timer, or it will spoil the initial LOAD
+	// TODO: Fix this, probably inside CPU
+	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, 2000000)	/* TMS9980 CPU @ 2.0 MHz */
-	MCFG_CPU_CONFIG(reset_params)
-	MCFG_CPU_PROGRAM_MAP(tm990_189_v_memmap)
-	MCFG_CPU_IO_MAP(tm990_189_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map, cpuconf)
 
 	MCFG_MACHINE_START( tm990_189_v )
 	MCFG_MACHINE_RESET( tm990_189_v )
@@ -881,6 +878,7 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_TMS9902_ADD("tms9902", tms9902_params,	2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
+	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 
 

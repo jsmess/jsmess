@@ -126,7 +126,7 @@ void tms9901_device::field_interrupts(void)
 			if (VERBOSE>8) LOG("tms9901: timer fires\n");
 			current_ints |= TMS9901_INT3;
 		}
-		else 
+		else
 		{
 			if (VERBOSE>8) LOG("tms9901: timer clear\n");
 			current_ints &= ~TMS9901_INT3;

@@ -35,7 +35,6 @@
 
 *****************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
@@ -778,7 +777,7 @@ static PERIBOX_CONFIG( peribox_conf )
 	0x70000												// Address bus prefix (AMA/AMB/AMC)
 };
 
-static TMS9900_CONFIG( sgcpu_cpuconf )
+static TMS99xx_CONFIG( sgcpu_cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(ti99_4p, external_operation),
 	DEVCB_DRIVER_MEMBER(ti99_4p, interrupt_level),
@@ -829,6 +828,9 @@ MACHINE_RESET( ti99_4p )
 {
 	ti99_4p *driver = machine.driver_data<ti99_4p>();
 	driver->m_tms9901->set_single_int(12, 0);
+
+	driver->m_cpu->set_ready(ASSERT_LINE);
+	driver->m_cpu->set_hold(CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK( sgcpu_hblank_interrupt )
@@ -842,7 +844,7 @@ TIMER_DEVICE_CALLBACK( sgcpu_hblank_interrupt )
 static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, sgcpu_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, sgcpu_cpuconf)
 	MCFG_MACHINE_START( ti99_4p )
 
 	/* video hardware */

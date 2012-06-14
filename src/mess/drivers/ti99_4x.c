@@ -807,7 +807,7 @@ static DMUX_CONFIG( datamux_conf_ev )
 	dmux_devices_ev
 };
 
-static TMS9900_CONFIG( ti99_cpuconf )
+static TMS99xx_CONFIG( ti99_cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(ti99_4x, external_operation),
 	DEVCB_DRIVER_MEMBER(ti99_4x, interrupt_level),
@@ -852,6 +852,9 @@ MACHINE_RESET( ti99_4 )
 		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	else
 		driver->m_mecmouse = NULL;
+
+	driver->m_cpu->set_ready(ASSERT_LINE);
+	driver->m_cpu->set_hold(CLEAR_LINE);
 }
 
 /*
@@ -859,7 +862,7 @@ MACHINE_RESET( ti99_4 )
 */
 static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 	/* CPU */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
 	MCFG_MACHINE_START( ti99_4 )
 	MCFG_MACHINE_RESET( ti99_4 )
@@ -904,7 +907,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
 	/* CPU */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
 	MCFG_MACHINE_START( ti99_4 )
 	MCFG_MACHINE_RESET( ti99_4 )
@@ -976,11 +979,14 @@ MACHINE_RESET( ti99_4a )
 		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
 	else
 		driver->m_mecmouse = NULL;
+
+	driver->m_cpu->set_ready(ASSERT_LINE);
+	driver->m_cpu->set_hold(CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 	/* CPU */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
 	MCFG_MACHINE_START( ti99_4a )
 	MCFG_MACHINE_RESET( ti99_4a )
@@ -1023,7 +1029,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 	/* CPU */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
 	MCFG_MACHINE_START( ti99_4a )
 	MCFG_MACHINE_RESET( ti99_4a )
@@ -1076,7 +1082,7 @@ TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
 */
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 	/* CPU */
-	MCFG_TMS9900_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
 
 	MCFG_MACHINE_START( ti99_4a )
 

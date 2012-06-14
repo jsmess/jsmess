@@ -745,6 +745,7 @@ static MACHINE_RESET( geneve )
 
 	// No automatic wait state (auto wait state is enabled with READY=CLEAR at RESET)
 	driver->m_cpu->set_ready(ASSERT_LINE);
+	driver->m_cpu->set_hold(CLEAR_LINE);
 
 	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
 
