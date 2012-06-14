@@ -37,10 +37,10 @@
                    DB1   6 |             | 35  DB11
                    DB0   7 |             | 34  A10
                   _IRQ   8 |             | 33  A9
-                    LP   9 |             | 32  A8
-                   _CS  10 |   MOS6567   | 31  A7
-                   R/W  11 |   MOS6569   | 30  A6
-                    BA  12 |             | 29  A5/A13
+                    LP   9 |   MOS6567   | 32  A8
+                   _CS  10 |   MOS6569   | 31  A7
+                   R/W  11 |   MOS8562   | 30  A6
+                    BA  12 |   MOS8565   | 29  A5/A13
                    Vdd  13 |             | 28  A4/A12
                  COLOR  14 |             | 27  A3/A11
                  S/LUM  15 |             | 26  A2/A10
@@ -49,6 +49,32 @@
                   _RAS  18 |             | 23  A11
                    CAS  19 |             | 22  PHIN
                    Vss  20 |_____________| 21  PHCL
+
+                            _____   _____
+                    D6   1 |*    \_/     | 48  Vcc
+                    D5   2 |             | 47  D7
+                    D4   3 |             | 46  D8
+                    D3   4 |             | 45  D9
+                    D2   5 |             | 44  D10
+                    D1   6 |             | 43  D11
+                    D0   7 |             | 42  MA10
+                  _IRQ   8 |             | 41  MA9
+                   _LP   9 |             | 40  MA8
+                    BA  10 |             | 39  A7
+              _DMARQST  11 |             | 38  A6
+                   AEC  12 |   MOS8564   | 37  MA5
+                   _CS  13 |   MOS8566   | 36  MA4
+                   R/W  14 |             | 35  MA3
+               _DMAACK  15 |             | 34  MA2
+                CHROMA  16 |             | 33  MA1
+              SYNC/LUM  17 |             | 32  MA0
+                 1 MHZ  18 |             | 31  MA11
+                  _RAS  19 |             | 30  PHI IN
+                  _CAS  20 |             | 29  PHI COLOR
+                   MUX  21 |             | 28  K2
+                _IOACC  22 |             | 27  K1
+                 2 MHZ  23 |             | 26  K0
+                   Vss  24 |_____________| 25  Z80 PHI
 
 ***************************************************************************/
 
@@ -89,6 +115,18 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6567_device, screen_update) \
 	MCFG_PALETTE_LENGTH(16)
 
+#define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_DEVICE_ADD(_tag, MOS8562, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16)
+
 #define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
@@ -99,6 +137,18 @@
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6569_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16)
+
+#define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_DEVICE_ADD(_tag, MOS8565, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update) \
 	MCFG_PALETTE_LENGTH(16)
 
 
@@ -250,9 +300,17 @@ public:
 protected:
 	enum
 	{
-		TYPE_6566,
-		TYPE_6567,
-		TYPE_6569
+		TYPE_6566, 	// NTSC-M (SRAM)
+		TYPE_6567, 	// NTSC-M (NMOS)
+		TYPE_8562, 	// NTSC-M (HMOS)
+		TYPE_8564, 	// NTSC-M VIC-IIe (C128)
+
+		TYPE_6569, 	// PAL-B 
+		TYPE_6572, 	// PAL-N
+		TYPE_6573, 	// PAL-M
+		TYPE_8565, 	// PAL-B (HMOS)
+		TYPE_8566, 	// PAL-B VIC-IIe (C128)
+		TYPE_8569 	// PAL-N VIC-IIe (C128)
 	};
 
 	// device-level overrides
@@ -380,26 +438,50 @@ class mos6567_device :  public mos6566_device
 public:
     // construction/destruction
     mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
-// ======================> mos6566_device
+// ======================> mos8562_device
+
+class mos8562_device :  public mos6567_device
+{
+public:
+    // construction/destruction
+    mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> mos6569_device
 
 class mos6569_device :  public mos6566_device
 {
 public:
     // construction/destruction
     mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
     virtual void execute_run();
 };
 
 
+// ======================> mos8565_device
+
+class mos8565_device :  public mos6569_device
+{
+public:
+    // construction/destruction
+    mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // device type definition
 extern const device_type MOS6566;
 extern const device_type MOS6567;
+extern const device_type MOS8562;
 extern const device_type MOS6569;
+extern const device_type MOS8565;
 
 
 

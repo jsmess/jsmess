@@ -556,6 +556,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/n82077aa.o	\
 	$(MESS_MACHINE)/mb8795.o	\
 	$(MESS_MACHINE)/null_modem.o	\
+	$(MESS_MACHINE)/vcsctrl.o	\
+	$(MESS_MACHINE)/vcs_joy.o	\
 
 
 
@@ -708,7 +710,7 @@ $(MESSOBJ)/arcadia.a:			\
 	$(MESS_AUDIO)/arcadia.o		\
 	$(MESS_VIDEO)/arcadia.o		\
 
-$(MESSOBJ)/ascii.a:                     \
+$(MESSOBJ)/ascii.a:				\
 	$(MESS_DRIVERS)/msx.o		\
 	$(MESS_MACHINE)/msx.o		\
 	$(MESS_MACHINE)/msx_slot.o	\
@@ -736,10 +738,10 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_MACHINE)/lynx.o		\
 	$(MESS_DRIVERS)/portfoli.o	\
 
-$(MESSOBJ)/att.a:			\
+$(MESSOBJ)/att.a:				\
 	$(MESS_DRIVERS)/unixpc.o	\
 
-$(MESSOBJ)/bally.a:                     \
+$(MESSOBJ)/bally.a:				\
 	$(MESS_DRIVERS)/astrocde.o	\
 
 $(MESSOBJ)/bandai.a:			\
@@ -856,7 +858,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/vic10exp.o	\
 	$(MESS_MACHINE)/vic10std.o	\
 	$(MESS_DRIVERS)/vic20.o		\
-	$(MESS_MACHINE)/vic20ctrl.o	\
 	$(MESS_MACHINE)/vic20exp.o	\
 	$(MESS_MACHINE)/vic20std.o	\
 	$(MESS_MACHINE)/vic20user.o	\

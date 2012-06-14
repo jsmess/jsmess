@@ -79,6 +79,7 @@
 #include "machine/vic10std.h"
 #include "machine/vic20std.h"
 #include "machine/vic20_megacart.h"
+#include "machine/vcs_joy.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \

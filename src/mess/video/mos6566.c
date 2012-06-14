@@ -24,6 +24,7 @@
 	- light pen
 	- 1:1 sync with CPU
 	- remove RDY hack
+	- VIC IIe
 
 */
 
@@ -115,6 +116,9 @@ static const UINT8 PALETTE[] =
 		} \
 	} while (0)
 
+#define IS_PAL					((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
+#define IS_VICIIE				((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
+
 #define ROW25_YSTART      0x33
 #define ROW25_YSTOP       0xfb
 #define ROW24_YSTART      0x37
@@ -139,8 +143,8 @@ static const UINT8 PALETTE[] =
 #define VIC6567_Y_BEGIN			-6			   /* first 6 lines after retrace not for lightpen! */
 #define VIC6569_X_BEGIN			38
 #define VIC6569_Y_BEGIN			-6
-#define VIC2_X_BEGIN			((m_variant == TYPE_6569) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
-#define VIC2_Y_BEGIN			((m_variant == TYPE_6569) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
+#define VIC2_X_BEGIN			(IS_PAL ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
+#define VIC2_Y_BEGIN			(IS_PAL ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
 #define VIC2_X_VALUE			((LIGHTPEN_X_VALUE / 1.3) + 12)
 #define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE      ) + 10)
 
@@ -186,14 +190,15 @@ static const UINT8 PALETTE[] =
 #define MULTICOLOR2				(m_reg[0x23] & 0x0f)
 #define FOREGROUNDCOLOR			(m_reg[0x24] & 0x0f)
 
-#define VIC2_LINES				((m_variant == TYPE_6569) ? VIC6569_LINES : VIC6567_LINES)
-#define VIC2_FIRST_DMA_LINE		((m_variant == TYPE_6569) ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
-#define VIC2_LAST_DMA_LINE		((m_variant == TYPE_6569) ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
-#define VIC2_FIRST_DISP_LINE	((m_variant == TYPE_6569) ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
-#define VIC2_LAST_DISP_LINE		((m_variant == TYPE_6569) ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
-#define VIC2_RASTER_2_EMU(a)	((m_variant == TYPE_6569) ? VIC6569_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
-#define VIC2_FIRSTCOLUMN		((m_variant == TYPE_6569) ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
-#define VIC2_X_2_EMU(a)			((m_variant == TYPE_6569) ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
+#define VIC2_LINES				(IS_PAL ? VIC6569_LINES : VIC6567_LINES)
+#define VIC2_FIRST_DMA_LINE		(IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
+#define VIC2_LAST_DMA_LINE		(IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
+#define VIC2_FIRST_DISP_LINE	(IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
+#define VIC2_LAST_DISP_LINE		(IS_PAL ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
+#define VIC2_RASTER_2_EMU(a)	(IS_PAL ? VIC6569_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
+#define VIC2_FIRSTCOLUMN		(IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
+#define VIC2_X_2_EMU(a)			(IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
+
 
 
 
@@ -203,7 +208,9 @@ static const UINT8 PALETTE[] =
 
 const device_type MOS6566 = &device_creator<mos6566_device>;
 const device_type MOS6567 = &device_creator<mos6567_device>;
+const device_type MOS8562 = &device_creator<mos8562_device>;
 const device_type MOS6569 = &device_creator<mos6569_device>;
+const device_type MOS8565 = &device_creator<mos8565_device>;
 
 
 // default address maps
@@ -545,8 +552,20 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock) { m_variant = TYPE_6567; }
 
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	:mos6566_device(mconfig, type, name, tag, owner, clock) { }
+
+mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock) { m_variant = TYPE_8562; }
+
 mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock) { m_variant = TYPE_6569; }
+
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	:mos6566_device(mconfig, type, name, tag, owner, clock) { }
+
+mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock) { m_variant = TYPE_8565; }
 
 
 //-------------------------------------------------
@@ -2522,12 +2541,12 @@ READ8_MEMBER( mos6566_device::read )
 
 	case 0x2f:
 	case 0x30:
-		/*if (m_variant == VIC8564 || m_variant == VIC8566)
+		if (IS_VICIIE)
 		{
 			val = m_reg[offset];
 			DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
 		}
-		else*/
+		else
 			val = 0xff;
 		break;
 
@@ -2749,18 +2768,18 @@ WRITE8_MEMBER( mos6566_device::write )
 		break;
 
 	case 0x2f:
-		/*if (m_variant == VIC8564 || m_variant == VIC8566)
+		if (IS_VICIIE)
 		{
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 			m_reg[offset] = data;
-		}*/
+		}
 		break;
 
 	case 0x30:
-		/*if (m_variant == VIC8564 || m_variant == VIC8566)
+		if (IS_VICIIE)
 		{
 			m_reg[offset] = data;
-		}*/
+		}
 		break;
 
 	case 0x31:

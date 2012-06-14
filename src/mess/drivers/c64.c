@@ -2,6 +2,13 @@
 
     TODO:
 
+	- tsuit215 test failures
+
+		- CPUPORT (0=FF 1=FF 0=00 1=FF 1=FF 1=FF, AFTER 00 17, RIGHT 00 DF)
+		- IRQ (WRONG $DC0D)
+		- NMI (WRONG $DD0D)
+		- all CIA tests
+
     - 64C PLA dump
     - clean up inputs
     - Multiscreen crashes on boot
@@ -1100,8 +1107,8 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1162,8 +1169,8 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1215,8 +1222,8 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541", NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1247,7 +1254,7 @@ static MACHINE_CONFIG_START( ntsc_c, c64c_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6567_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8562_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1265,8 +1272,8 @@ static MACHINE_CONFIG_START( ntsc_c, c64c_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1315,8 +1322,8 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1368,8 +1375,8 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1400,7 +1407,7 @@ static MACHINE_CONFIG_START( pal_c, c64c_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8565_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1418,8 +1425,8 @@ static MACHINE_CONFIG_START( pal_c, c64c_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1450,7 +1457,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8565_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1465,8 +1472,8 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_CBM_IEC_BUS_ADD(iec_intf)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_CONTROL_PORT_ADD(VIC20_CONTROL_PORT_2_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 

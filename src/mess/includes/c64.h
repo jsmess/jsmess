@@ -14,7 +14,7 @@
 #include "machine/cbmipt.h"
 #include "machine/pls100.h"
 #include "machine/ram.h"
-#include "machine/vic20ctrl.h"
+#include "machine/vcsctrl.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
@@ -28,6 +28,8 @@
 #define PLA_TAG			"u17"
 #define SCREEN_TAG		"screen"
 #define TIMER_C1531_TAG	"c1531"
+#define CONTROL1_TAG	"joy1"
+#define CONTROL2_TAG	"joy2"
 
 class c64_state : public driver_device
 {
@@ -41,8 +43,8 @@ public:
 		  m_cia1(*this, MOS6526_1_TAG),
 		  m_cia2(*this, MOS6526_2_TAG),
 		  m_iec(*this, CBM_IEC_TAG),
-		  m_joy1(*this, VIC20_CONTROL_PORT_1_TAG),
-		  m_joy2(*this, VIC20_CONTROL_PORT_2_TAG),
+		  m_joy1(*this, CONTROL1_TAG),
+		  m_joy2(*this, CONTROL2_TAG),
 		  m_exp(*this, C64_EXPANSION_SLOT_TAG),
 		  m_user(*this, C64_USER_PORT_TAG),
 		  m_ram(*this, RAM_TAG),
@@ -69,8 +71,8 @@ public:
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	optional_device<cbm_iec_device> m_iec;
-	required_device<vic20_control_port_device> m_joy1;
-	required_device<vic20_control_port_device> m_joy2;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
 	required_device<c64_expansion_slot_device> m_exp;
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
