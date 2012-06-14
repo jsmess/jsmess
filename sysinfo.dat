@@ -8088,6 +8088,38 @@ Also notice that the "printer" (prin) is supported as well.
 
 
 
+== Cassettes ==
+
+
+
+MESS supports BBC A and B emulation with a "cassette" (cass) device to read tapes in .wav, .csw and .uef format. You can run a tape image by launching MESS at the command line with the image specified:
+
+
+
+  mess bbca -cass "C:\pathtogame\gamename.uef"
+
+
+
+Once you are at the BASIC prompt, the procedure to run the program on the cassette is the following: you first enter the command *TAPE (this is needed because by default BBC computers in MESS have a floppy drive connected) and then you enter the command needed to run the BASIC program or the assembled machine code program on the cassette, which are respectively 
+
+
+
+  CHAIN "" 
+
+
+
+and
+
+
+
+  *RUN
+
+
+
+A small number of titles may require loading in different ways (e.g. *LOAD, for some earlier titles from Micro Power) so read the loading instructions in the software's documentation, where appropriate.
+
+
+
 == Floppy Disks ==
 
 
@@ -8164,15 +8196,11 @@ Notice that at the bottom left corner (to the left of the Spacebar) there are th
 
 
 
-The keys ''^~%%'', ''%%\|%%'', ''%%[{%%'', ''%%]}%%'' and ''%%£_'' can be somewhat confusing because they seem to generate the wrong characters on screen. The problem is that there are two international standards for displayed characters (Teletext and ASCII) and the BBC Microcomputer can 
-
-display either. MODE 7 generates the Teletext display characters and MODES 0 to 6 show the ASCII characters. In both cases, the computer recognises the key correctly regardless of what is displayed on the screen. 
+The keys ''^~%%'', ''%%\|%%'', ''%%[{%%'', ''%%]}%%'' and ''%%£_'' can be somewhat confusing because they seem to generate the wrong characters on screen. The problem is that there are two international standards for displayed characters (Teletext and ASCII) and the BBC Microcomputer can display either. MODE 7 generates the Teletext display characters and MODES 0 to 6 show the ASCII characters. In both cases, the computer recognises the key correctly regardless of what is displayed on the screen. 
 
 
 
-In MESS, emulations starts in MODE 7. To correctly see the characters, type at the BASIC prompt ''MODE n'' (//n// between 0 and 6) and 
-
-press enter.
+In MESS, emulations starts in MODE 7. To correctly see the characters, type at the BASIC prompt ''MODE n'' (//n// between 0 and 6) and press enter.
 
 
 
@@ -8386,43 +8414,27 @@ MESS supports BBC Master 128 emulation with a "cassette" (cass) device to read t
 
 
 
-Change the keyboard emulation status to Partial, and then hold down 'r' to reset the CMOS as the driver starts.  When the driver has finished booting, hit F3 to perform a soft-reset of the system which should drop you out at the BASIC prompt.
+Change the keyboard emulation status to Partial, and then hold down 'R' while hitting 'F3' to reset the machine (to pass to BASIC).  When asked to "Press break to continue', hit 'F3' again to perform a soft-reset of the system which should drop you out at the BASIC prompt.
 
 
 
-Once you are at the BASIC prompt, you can use this to run the next BASIC program on the cassette:
+Once you are at the BASIC prompt, the procedure to run the program on the cassette is the following: you first enter the command *TAPE (this is needed because by default BBC computers in MESS have a floppy drive connected) and then you enter the command needed to run the BASIC program or the assembled machine code program on the cassette, which are respectively 
 
 
 
-<code>
-
-*TAPE
-
-PAGE=&E00
-
-CHAIN ""
-
-</code>
+  CHAIN "" 
 
 
 
-or this to run the next assembled machine code program on the cassette:
+and
 
 
 
-<code>
-
-*TAPE
-
-PAGE=&E00
-
-*RUN
-
-</code>
+  *RUN
 
 
 
-A small number of titles may require loading in different ways so read the loading instructions in the software's documentation, where appropriate.
+A small number of titles may require loading in different ways (e.g. *LOAD, for some earlier titles from Micro Power) so read the loading instructions in the software's documentation, where appropriate.
 
 
 
@@ -8482,7 +8494,7 @@ Then programs can either be run individually - for BASIC:
 
 
 
-, for assembled machine code:
+for assembled machine code:
 
 
 

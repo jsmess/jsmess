@@ -712,7 +712,7 @@ static const cassette_interface bbc_cassette_interface =
 	bbc_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
+	"bbc_cass",
 	NULL
 };
 
@@ -860,6 +860,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_interface )
 
+	/* software list */
+	MCFG_SOFTWARE_LIST_ADD("cass_ls_a","bbca_cass")
+
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
@@ -886,50 +889,34 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
+	/* software list */
+	MCFG_DEVICE_REMOVE("cass_ls_a")
+	MCFG_SOFTWARE_LIST_ADD("cass_ls_b","bbcb_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a","bbca_cass")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcbp, bbca )
+static MACHINE_CONFIG_DERIVED( bbcbp, bbcb )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( bbcbp_mem)
 	MCFG_MACHINE_START( bbcbp )
 	MCFG_MACHINE_RESET( bbcbp )
 	MCFG_VIDEO_START( bbcbp )
 
-	/* devices */
-	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
-	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
-
-	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
-
-	MCFG_FRAGMENT_ADD(bbc_cartslot)
-
+	MCFG_DEVICE_REMOVE("i8271")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcbp128, bbca )
+static MACHINE_CONFIG_DERIVED( bbcbp128, bbcbp )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( bbcbp128_mem)
 	MCFG_MACHINE_START( bbcbp )
 	MCFG_MACHINE_RESET( bbcbp )
 	MCFG_VIDEO_START( bbcbp )
-
-	/* devices */
-	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
-	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
-
-	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
-
-	MCFG_FRAGMENT_ADD(bbc_cartslot)
-
 MACHINE_CONFIG_END
 
 
-/****BBC MASTER */
+/* BBC MASTER */
 static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
@@ -969,6 +956,11 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_interface )
+
+	/* software list */
+	MCFG_SOFTWARE_LIST_ADD("cass_ls_m","bbcm_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a","bbca_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b","bbcb_cass")
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
