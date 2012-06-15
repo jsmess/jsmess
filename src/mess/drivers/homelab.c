@@ -3,17 +3,21 @@
     Homelab driver by Miodrag Milanovic
 
     31/08/2008 Preliminary driver.
+    15/06/2012 Various updates [Robbbert]
 
+    No info available on the Brailab4, apart from the fact it has
+    a speech unit. As the name suggests,  it is meant for use by
+    blind people. Looks like speech could be output from port F8.
+    It also seems that there is no screen, however some video
+    circuitry is retained, because it still reads the vertical
+    sync pulse.
 
     ToDO:
-    - Devices, speaker
-    - Keyboard and cursor on homelab3 & up
-    - Cursor on homelab2
-    - Can't press same key twice in a row on homelab2
-    - Brailab4 doesn't seem to do anything
+    - Devices, speaker?
+    - homelab2 - No cursor; Can't press same key twice in a row
+    - Brailab4 - had to patch, to stop stack getting wiped out.
+                 currently reads keys and outputs noise.
 
-    Note: the speed of the homelab3 is largely controlled by the time taken
-    to draw a screen.
 
 ****************************************************************************/
 
@@ -37,6 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( key_w );
+	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 	const UINT8 *m_p_chargen;
 	//virtual void machine_reset();
@@ -44,7 +49,7 @@ public:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	optional_device<device_t> m_speaker;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	optional_shared_ptr<const UINT8> m_p_videoram;
 private:
 };
 
@@ -71,6 +76,13 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
+READ8_MEMBER( homelab_state::io_r )
+{
+	return 0xff;
+}
+
+
+// this could be some sort of speech device, rather than a speaker
 WRITE8_MEMBER( homelab_state::io_w )
 {
 	speaker_level_w(m_speaker, BIT(offset, 7) );
@@ -120,8 +132,36 @@ static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(homelab3_io, AS_IO, 8, homelab_state)
-	AM_RANGE( 0x0000, 0xffff ) AM_WRITE(io_w)
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(io_r,io_w)
 ADDRESS_MAP_END
+
+// this is a guess
+static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
+	AM_RANGE( 0x4000, 0xdfff ) AM_RAM
+	AM_RANGE( 0xe800, 0xe800 ) AM_READ_PORT("X00")
+	AM_RANGE( 0xe801, 0xe801 ) AM_READ_PORT("X01")
+	AM_RANGE( 0xe802, 0xe802 ) AM_READ_PORT("X02")
+	AM_RANGE( 0xe803, 0xe803 ) AM_READ_PORT("X03")
+	AM_RANGE( 0xe804, 0xe804 ) AM_READ_PORT("X04")
+	AM_RANGE( 0xe805, 0xe805 ) AM_READ_PORT("X05")
+	AM_RANGE( 0xe806, 0xe806 ) AM_READ_PORT("X06")
+	AM_RANGE( 0xe807, 0xe807 ) AM_READ_PORT("X07")
+	AM_RANGE( 0xe808, 0xe808 ) AM_READ_PORT("X08")
+	AM_RANGE( 0xe809, 0xe809 ) AM_READ_PORT("X09")
+	AM_RANGE( 0xe80a, 0xe80a ) AM_READ_PORT("X0A")
+	AM_RANGE( 0xe80b, 0xe80b ) AM_READ_PORT("X0B")
+	AM_RANGE( 0xe80c, 0xe80c ) AM_READ_PORT("X0C")
+	AM_RANGE( 0xe80d, 0xe80d ) AM_READ_PORT("X0D")
+	AM_RANGE( 0xe80e, 0xe80e ) AM_READ_PORT("X0E")
+	AM_RANGE( 0xe80f, 0xe80f ) AM_READ_PORT("X0F")
+	AM_RANGE( 0xe810, 0xe810 ) AM_READ_PORT("X10")
+	AM_RANGE( 0xe811, 0xe811 ) AM_READ_PORT("X11")
+	AM_RANGE( 0xe812, 0xe812 ) AM_READ_PORT("X12")
+	AM_RANGE( 0xe813, 0xe813 ) AM_READ_PORT("X13")
+	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+
 
 
 /* Input ports */
@@ -471,6 +511,13 @@ static MACHINE_CONFIG_DERIVED( homelab3, homelab )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( brailab4, homelab3 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
+MACHINE_CONFIG_END
+
+
 /* ROM definition */
 
 ROM_START( homelab2 )
@@ -479,6 +526,7 @@ ROM_START( homelab2 )
 	ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696AF3C1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
 	ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69E57E8C) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
 	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97CBBE74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
+
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
 ROM_END
@@ -489,6 +537,7 @@ ROM_START( homelab3 )
 	ROM_LOAD( "hl3_2.rom", 0x1000, 0x1000, CRC(BCAC3C24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52))
 	ROM_LOAD( "hl3_3.rom", 0x2000, 0x1000, CRC(AB1B4AB0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719))
 	ROM_LOAD( "hl3_4.rom", 0x3000, 0x1000, CRC(BF67EFF9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b))
+
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl3.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
@@ -499,6 +548,7 @@ ROM_START( homelab4 )
 	ROM_LOAD( "hl4_2.rom", 0x1000, 0x1000, CRC(151D33E8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44))
 	ROM_LOAD( "hl4_3.rom", 0x2000, 0x1000, CRC(39571AB1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944))
 	ROM_LOAD( "hl4_4.rom", 0x3000, 0x1000, CRC(F4B77CA2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5))
+
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
@@ -509,7 +559,10 @@ ROM_START( brailab4 )
 	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
 	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
 	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
+	// this rom is mostly random data, not in the memory map, assumed optional
 	ROM_LOAD( "brl5.rom", 0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
+	ROM_FILL(0x220,1,0xc9) // do not delete the stack
+
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
@@ -520,4 +573,4 @@ ROM_END
 COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   homelab, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1984, brailab4,   homelab2,  0,      homelab3,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, brailab4,   homelab2,  0,      brailab4,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING | GAME_NO_SOUND)
