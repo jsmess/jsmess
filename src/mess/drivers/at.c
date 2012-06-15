@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP // used for timing?
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r, pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)		
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megapc_io, AS_IO, 32, at_state )
