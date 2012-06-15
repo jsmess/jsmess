@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE64_MEMBER( write_64be );
 	
 	void set_busnum(int busnum) { m_busnum = busnum; }
+	void set_father(const char *father) { m_father = father; }
 	void set_device(int num, const char *tag, pci_read_func read_func, pci_write_func write_func) { 
 		m_devtag[num] = tag; m_read_callback[num] = read_func; m_write_callback[num] = write_func; }
 		
