@@ -360,7 +360,17 @@ f10
 fp
 
 // Cambridge Computers
-z88	   //
+z88      // Z88 (UK)
+z88de    // Z88 (German)
+z88es    // Z88 (Spanish)
+z88fr    // Z88 (French)
+z88it    // Z88 (Italian)
+z88se    // Z88 (Swedish)
+z88fi    // Z88 (Finnish)
+z88no    // Z88 (Norwegian)
+z88dk    // Z88 (Danish)
+z88ch    // Z88 (Swiss)
+z88tr    // Z88 (Turkish)
 
 // Amstrad / Schneider
 cpc464	// Amstrad (Schneider in Germany) 1984
