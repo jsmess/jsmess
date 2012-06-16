@@ -97,7 +97,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * コスメピコ もっとかわいくなりたいな - Kosume Pico Motto Kawai Kunaritaina! (Sega Toys - 20020604 - HPC-6112)
 * ポケットモンスター すうじをつかまえよう！ - Pocket Monsters Suuji wo Tsukamaeyou! (Sega Toys - 200208xx - HPC-6113)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう！ はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
-* 学研 アンパンマンと知能アップ！ - Gakken Anpanman to Chinou Appu! (Sega Toys - 200209xx - HPC-6115)
 * ハローキティのたのしいおみせやさん - Hello Kitty no Tanoshii Omiseyasan (Sega Toys - 200211xx - HPC-6117)
 * ダンスピコ はしっておどって超ハッピー! - Dance Pico with Hashitte Odotte Chou Happy! (Sega Toys - 200302xx - HPC-6118)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
@@ -460,6 +459,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="anpanchi">
+		<description>Gakken Anpanman to Chinou Up! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6115"/>
+		<info name="release" value="200209xx"/>
+		<info name="alt_title" value="学研 アンパンマンと知能アップ！"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="gakken anpanman to chinou up! (japan).bin" size="2097152" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gakkehir">
 		<description>Gakken no Obenkyou Soft - Hiragana (Jpn)</description>
 		<year>199?</year>
@@ -541,7 +554,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="hucklowlfr" cloneof="hucklowl">
+<!-- This was also released together with many prototypes as Proto build 19940510-D, meaning that probably after that date development was complete.
+But how do later protos fit with this theory? Maybe the later protos were from the Euro or Jpn versions? -->
+	<software name="hucklowl">
+		<description>Richard Scarry's - Huckle and Lowly's Busiest Day Ever (USA)</description>
+		<year>1994</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever (usa).bin" size="1048576" crc="42007e92" sha1="ce0b387427226baa4067d6eacebe90cef760a18e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlf" cloneof="hucklowl">
 		<description>Richard Scarry's - Une Journee Bien Remplie pour Cassis et Asticot (Fra)</description>
 		<year>199?</year>
 		<publisher>Sega?</publisher>
@@ -553,7 +579,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="hucklowlit" cloneof="hucklowl">
+	<software name="hucklowli" cloneof="hucklowl">
 		<description>Richard Scarry's - La Giornata Indaffaratissima di Sandrino e Zigo-Zago (Ita)</description>
 		<year>199?</year>
 		<publisher>Sega?</publisher>
@@ -1396,7 +1422,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowl">
+	<software name="hucklowlp" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1407,7 +1433,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowla" cloneof="hucklowl">
+	<software name="hucklowlpa" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940919)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1418,7 +1444,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlb" cloneof="hucklowl">
+	<software name="hucklowlpb" cloneof="hucklowl">
 		<description>La Journee La Plus Occupee de Huckle et Lowly (Fra, Prototype, 19940721)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1429,19 +1455,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlc" cloneof="hucklowl">
-	<!-- is this the released version too? -->
-		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940510-D)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="huckle and lowly's busiest day ever rev 19940510 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="42007e92" sha1="ce0b387427226baa4067d6eacebe90cef760a18e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hucklowld" cloneof="hucklowl">
+	<software name="hucklowlpd" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1452,7 +1466,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowle" cloneof="hucklowl">
+	<software name="hucklowlpe" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1463,7 +1477,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlf" cloneof="hucklowl">
+	<software name="hucklowlpf" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1474,7 +1488,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlg" cloneof="hucklowl">
+	<software name="hucklowlpg" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1485,7 +1499,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlh" cloneof="hucklowl">
+	<software name="hucklowlph" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1496,7 +1510,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowli" cloneof="hucklowl">
+	<software name="hucklowlpi" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1507,7 +1521,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlj" cloneof="hucklowl">
+	<software name="hucklowlpj" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1518,7 +1532,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlk" cloneof="hucklowl">
+	<software name="hucklowlpk" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1529,7 +1543,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowll" cloneof="hucklowl">
+	<software name="hucklowlpl" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1540,7 +1554,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlm" cloneof="hucklowl">
+	<software name="hucklowlpm" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1551,7 +1565,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowln" cloneof="hucklowl">
+	<software name="hucklowlpn" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940427)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1562,7 +1576,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlo" cloneof="hucklowl">
+	<software name="hucklowlpo" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-E)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1573,7 +1587,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlp" cloneof="hucklowl">
+	<software name="hucklowlpp" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-D, Lower Half Broken)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1584,7 +1598,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlq" cloneof="hucklowl">
+	<software name="hucklowlpq" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1595,7 +1609,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlr" cloneof="hucklowl">
+	<software name="hucklowlpr" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1606,7 +1620,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowls" cloneof="hucklowl">
+	<software name="hucklowlps" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940424)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1617,7 +1631,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlt" cloneof="hucklowl">
+	<software name="hucklowlpt" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940422)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1628,7 +1642,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="hucklowlu" cloneof="hucklowl">
+	<software name="hucklowlpu" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940302)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2315,17 +2329,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom  name="Adventures in Letterland with Jack &amp; Jill (U).bin" size="????" crc="e846858b" sha1="fe4412ba81673894167841f47780a3f67d93c4e7" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="anpanman">
-		<description>Anpanman to Chinou Up (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Anpanman to Chinou Up (J).bin" size="????" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c"  offset="000000" >
 			</dataarea>
 		</part>
 	</software>
