@@ -29,9 +29,36 @@ LED patterns
 08 |     |
     _____
      10
-
+        76543210
 PORT A: 111xyzzz
-
+ 
+PA4/PA5 are the "enable" for the two LEDs 
+ 
+7seg Display    Bits
+'0'  %11111100 $FC
+'1'  %01100000 $60
+'2'  %11011010 $DA
+'3'  %11110010 $F2
+'4'  %01100110 $66
+'5'  %10110110 $B6
+'6'  %10111110 $BE
+'7'  %11100000 $E0
+'8'  %11111110 $FE
+'9'  %11100110 $E6
+'A'  %11101110 $EE
+'b'  %00111110 $3E
+'C'  %10011100 $9C
+'d'  %01111010 $7A
+'E'  %10011110 $9E
+'F'  %10001110 $8E
+'L'  %00011100 $1C
+'n'  %00101010 $2A
+'o'  %00111010 $3A
+'P'  %11001110 $CE
+'r'  %00001010 $0A
+'U' %01111100 $7C
+'c' %00011010 $1A
+'u' %01111000 $38 
 
 ***************************************************************************/
 
@@ -40,22 +67,47 @@ PORT A: 111xyzzz
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd1772.h"
+#include "formats/esq8_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/dfi_dsk.h"
+#include "formats/ipf_dsk.h"
 #include "sound/es5503.h"
 
 class mirage_state : public driver_device
 {
 public:
     mirage_state(const machine_config &mconfig, device_type type, const char *tag)
-    : driver_device(mconfig, type, tag) { }
+    : driver_device(mconfig, type, tag),
+    m_maincpu(*this, "maincpu"),
+    m_fdc(*this, "wd1772")
+    { }
+
+    required_device<device_t> m_maincpu;
+    required_device<wd1772_t> m_fdc;
 
 	virtual void machine_reset();
 
     int last_sndram_bank;
+
+	static const floppy_format_type floppy_formats[];
+
+    void fdc_intrq_w(bool state);
 };
 
+const floppy_format_type mirage_state::floppy_formats[] = {
+	FLOPPY_ESQ8IMG_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT, FLOPPY_DFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( ensoniq_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+
+void mirage_state::fdc_intrq_w(bool state)
+{
+    device_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+}
 
 static void mirage_doc_irq(device_t *device, int state)
 {
@@ -84,14 +136,12 @@ void mirage_state::machine_reset()
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sndbank")	// 32k window on 128k of wave RAM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM			// main RAM
+    AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
 	AM_RANGE(0xe100, 0xe100) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xe101, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_status_r,wd17xx_command_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_track_r,wd17xx_track_w)
-	AM_RANGE(0xe802, 0xe802) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_sector_r,wd17xx_sector_w)
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_data_r,wd17xx_data_w)
-//  AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
+	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_t, read, write)
+    AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
 ADDRESS_MAP_END
 
@@ -192,36 +242,6 @@ static ACIA6850_INTERFACE( mirage_acia6850_interface )
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
 };
 
-static LEGACY_FLOPPY_OPTIONS_START(mirage)
-	LEGACY_FLOPPY_OPTION(mirage, "img", "Mirage disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface mirage_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(mirage),
-	NULL,
-	NULL
-};
-
-const wd17xx_interface mirage_wd17xx_interface =
-{
-	DEVCB_NULL,			// dden
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),	// intrq
-	DEVCB_NULL,			// drq
-	{FLOPPY_0, NULL, NULL, NULL}
-};
-
 static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mirage_map)
@@ -242,8 +262,8 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 
 	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
 
-	MCFG_WD1770_ADD("wd177x", mirage_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mirage_floppy_interface)
+    MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", ensoniq_floppies, "35dd", 0, mirage_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirage )
@@ -256,5 +276,20 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, 0, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
+static DRIVER_INIT(mirage)
+{
+    mirage_state *state = machine.driver_data<mirage_state>();
+
+    floppy_connector *con = machine.device<floppy_connector>("fd0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+    if (floppy)
+    {
+        state->m_fdc->set_floppy(floppy);
+        state->m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), state));
+
+        floppy->ss_w(0);
+    }
+}
+
+CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
 
