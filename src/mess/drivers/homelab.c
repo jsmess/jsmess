@@ -559,12 +559,21 @@ ROM_START( brailab4 )
 	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
 	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
 	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
-	// this rom is mostly random data, not in the memory map, assumed optional
-	ROM_LOAD( "brl5.rom", 0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
 	ROM_FILL(0x220,1,0xc9) // do not delete the stack
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+
+	// these roms were found on the net, to be investigated
+	ROM_REGION( 0xa020, "user1", 0 )
+	// unknown
+	ROM_LOAD( "brl5.rom",        0x0000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff) )
+	// 256k Homelab 1000  Bios 1.2, 1988
+	ROM_LOAD( "brailabplus.bin", 0x1000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
+	// probably brl1 to 5 merged
+	ROM_LOAD( "brl.rom",         0x5000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b) )
+	// a small prom
+	ROM_LOAD( "brlcpm.rom",      0xa000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
 ROM_END
 
 /* Driver */
