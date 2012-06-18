@@ -1551,7 +1551,7 @@ void psxcd_device::stop_read()
 			if (m_timers[i] == next_read_event->timer)
 			{
 				m_timerinuse[i] = false;
-				m_eventfortimer[i] = false;
+				m_eventfortimer[i] = NULL;
 				break;
 			}
 		}
