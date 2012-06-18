@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "mpc105.h"
-#include "machine/pci.h"
 #include "machine/ram.h"
 
 #define LOG_MPC105		0
@@ -19,27 +18,6 @@
 
 const device_type MPC105 = &device_creator<mpc105_device>;
 
-//-------------------------------------------------
-//  static_set_bank_base - configuration helper
-//  to set the bank base
-//-------------------------------------------------
-
-void mpc105_device::static_set_bank_base(device_t &device, int bank_base)
-{
-	mpc105_device &mpc105 = downcast<mpc105_device &>(device);
-	mpc105.m_bank_base_default = bank_base;
-}
-
-//-------------------------------------------------
-//  static_set_cputag - configuration helper
-//  to set the cpu tag
-//-------------------------------------------------
-
-void mpc105_device::static_set_cputag(device_t &device, const char *tag)
-{
-	mpc105_device &mpc105 = downcast<mpc105_device &>(device);
-	mpc105.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -51,6 +29,7 @@ void mpc105_device::static_set_cputag(device_t &device, const char *tag)
 
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
+	pci_device_interface( mconfig, *this ),
 	m_maincpu(NULL)
 {
 }
@@ -75,6 +54,30 @@ void mpc105_device::device_reset()
 	memset(m_bank_registers,0,sizeof(m_bank_registers));
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mpc105_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mpc105_interface *intf = reinterpret_cast<const mpc105_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<mpc105_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_cputag, 0, sizeof(m_cputag));
+		m_bank_base_default = 0;
+    	
+	}
+	m_shortname = "mpc105";
+}
 
 //-------------------------------------------------
 //  update_memory - MMU update
@@ -130,7 +133,7 @@ void mpc105_device::update_memory()
 //  pci_read - implementation of PCI read
 //-------------------------------------------------
 
-UINT32 mpc105_device::pci_read(device_t *busdevice, int function, int offset, UINT32 mem_mask)
+UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result;
 
@@ -204,12 +207,11 @@ UINT32 mpc105_device::pci_read(device_t *busdevice, int function, int offset, UI
 	return result;
 }
 
-
 //-------------------------------------------------
 //  pci_write - implementation of PCI write
 //-------------------------------------------------
 
-void mpc105_device::pci_write(device_t *busdevice, int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	int i;
 	if (function != 0)
@@ -251,17 +253,4 @@ void mpc105_device::pci_write(device_t *busdevice, int function, int offset, UIN
 			//fatalerror("mpc105_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X", offset, data);
 			break;
 	}
-}
-
-
-UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
-{
-	mpc105_device *mpc105 = dynamic_cast<mpc105_device *>(device);
-	return mpc105->pci_read(busdevice, function, offset, mem_mask);
-}
-
-void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
-{
-	mpc105_device *mpc105 = dynamic_cast<mpc105_device *>(device);
-	mpc105->pci_write(busdevice, function, offset, data, mem_mask);
 }

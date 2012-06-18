@@ -93,8 +93,6 @@ pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, d
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
 		m_devtag[i]= NULL;
-		m_read_callback[i] = NULL;
-		m_write_callback[i] = NULL;
 	}
 	m_siblings_count = 0;
 }
@@ -119,12 +117,11 @@ READ32_MEMBER( pci_bus_device::read )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				pci_read_func read = m_busnumaddr->m_read_callback[m_devicenum];
-				if (read != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != NULL)
 				{
 					function = (m_address >> 8) & 0x07;
 					reg = (m_address >> 0) & 0xfc;
-					result = (*read)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, mem_mask);
+					result = m_busnumaddr->m_device[m_devicenum]->pci_read(m_busnumaddr, function, reg, mem_mask);
 				}
 			}
 			break;
@@ -191,12 +188,11 @@ WRITE32_MEMBER( pci_bus_device::write )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				pci_write_func write = m_busnumaddr->m_write_callback[m_devicenum];
-				if (write != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != NULL)
 				{
 					int function = (m_address >> 8) & 0x07;
 					int reg = (m_address >> 0) & 0xfc;
-					(*write)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, data, mem_mask);
+					m_busnumaddr->m_device[m_devicenum]->pci_write(m_busnumaddr, function, reg, data, mem_mask);
 				}
 				if (LOG_PCI)
 					logerror("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
@@ -259,10 +255,17 @@ void pci_bus_device::device_start()
 	/* store a pointer back to the device */
 	m_devicenum = -1;
 
+	char id[3];
 	/* find all our devices */
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
-		if (m_devtag[i] != NULL)
-			m_device[i] = machine().device(m_devtag[i]);
+	{
+		sprintf(id, "%d", i);
+		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
+		if (conn!=NULL)
+			m_device[i] = conn->get_device();
+		else 
+			m_device[i] = NULL;
+	}
 
 	if (m_father != NULL) {
 		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
@@ -286,4 +289,44 @@ void pci_bus_device::device_reset()
 	/* reset the drive state */
 	m_devicenum = -1;
 	m_address = 0;
+}
+
+//-------------------------------------------------
+//  pci_device_interface - constructor
+//-------------------------------------------------
+
+pci_device_interface::pci_device_interface(const machine_config &mconfig, device_t &device)
+	: device_slot_card_interface(mconfig, device)
+{
+}
+
+//-------------------------------------------------
+//  ~pci_device_interface - destructor
+//-------------------------------------------------
+
+pci_device_interface::~pci_device_interface()
+{
+}
+
+
+const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
+
+
+pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+pci_connector::~pci_connector()
+{
+}
+
+void pci_connector::device_start()
+{
+}
+
+pci_device_interface *pci_connector::get_device()
+{
+	return dynamic_cast<pci_device_interface *>(get_card_device());
 }

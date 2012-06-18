@@ -9,36 +9,48 @@
 #ifndef __I82439TX_H__
 #define __I82439TX_H__
 
+#include "machine/pci.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _i82439tx_config i82439tx_config;
-struct _i82439tx_config
+// ======================> i82439tx_interface
+
+struct i82439tx_interface
 {
-	const char *cputag;
-	const char *rom_region;
+	const char *m_cputag;
+	const char *m_rom_region;	
 };
 
+// ======================> i82439tx_device
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
-void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+class i82439tx_device :  public device_t,
+						 public pci_device_interface,
+						 public i82439tx_interface
+{
+public:
+    // construction/destruction
+    i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+    virtual void device_config_complete();
+	
+	void i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t end);
+	
+private:
+	address_space *m_space;
+	UINT8 *m_rom;
 
-DECLARE_LEGACY_DEVICE(I82439TX, i82439tx);
+	UINT32 m_regs[8];
+	UINT32 m_bios_ram[0x40000 / 4];
+	
+};
 
-#define MCFG_I82439TX_ADD(_tag, _cputag, _rom_region) \
-	MCFG_DEVICE_ADD(_tag, I82439TX, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(i82439tx_config, cputag, _cputag) \
-	MCFG_DEVICE_CONFIG_DATAPTR(i82439tx_config, rom_region, _rom_region)
-
+// device type definition
+extern const device_type I82439TX;
 
 #endif /* __I82439TX_H__ */

@@ -615,17 +615,27 @@ static MACHINE_CONFIG_DERIVED( ct486, at386 )
 MACHINE_CONFIG_END
 
 
+const struct i82439tx_interface tx_config =
+{
+	"maincpu", 
+	"isa"
+};
+
+static SLOT_INTERFACE_START( pci_devices )
+	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
+	SLOT_INTERFACE_INTERNAL("i82371ab", I82371AB)
+	SLOT_INTERFACE_INTERNAL("i82371sb", I82371SB)
+SLOT_INTERFACE_END
+
+
 static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
 
-	MCFG_I82371AB_ADD("i82371ab")
-	MCFG_I82439TX_ADD("i82439tx", "maincpu", "isa")
-
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write) // Intel 82371AB PCI IDE ISA Xcelerator (PIIX4)
-	MCFG_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
+	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,	   0, true)
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
@@ -638,12 +648,9 @@ static MACHINE_CONFIG_DERIVED( at586x3, at386 )
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
 
-	MCFG_I82371SB_ADD("i82371sb")
-	MCFG_I82439TX_ADD("i82439tx", "maincpu", "isa")
-
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write) // Intel 82371SB PCI IDE ISA Xcelerator (PIIX3)
-	MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
+	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", NULL, NULL,	   0, true)
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)

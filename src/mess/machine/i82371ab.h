@@ -9,33 +9,43 @@
 #ifndef __I82371AB_H__
 #define __I82371AB_H__
 
+#include "machine/pci.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+// ======================> i82371ab_device
 
-typedef struct _i82371ab_config i82371ab_config;
-struct _i82371ab_config
+class i82371ab_device :  public device_t,
+						 public pci_device_interface
 {
-	int dummy;
+public:
+    // construction/destruction
+    i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "i82371ab"; }
+
+	UINT32 pci_isa_r(device_t *busdevice, int offset, UINT32 mem_mask);
+	void pci_isa_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
+
+	UINT32 pci_ide_r(device_t *busdevice, int offset, UINT32 mem_mask);
+	void pci_ide_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
+	
+	UINT32 pci_usb_r(device_t *busdevice, int offset, UINT32 mem_mask);
+	void pci_usb_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
+
+	UINT32 pci_acpi_r(device_t *busdevice, int offset, UINT32 mem_mask);
+	void pci_acpi_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
+	
+private:
+	UINT8 m_regs[4][0x100];
 };
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-UINT32 i82371ab_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
-void i82371ab_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(I82371AB, i82371ab);
-
-#define MCFG_I82371AB_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, I82371AB, 0)
-
+// device type definition
+extern const device_type I82371AB;
 
 #endif /* __I82371AB_H__ */
