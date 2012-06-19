@@ -12,6 +12,7 @@
 
 #include "includes/at.h"
 #include "machine/pc_keyboards.h"
+#include "machine/southbridge.h"
 
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
@@ -51,7 +52,7 @@ static ADDRESS_MAP_START( ct486_map, AS_PROGRAM, 32, at_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( at586_map, AS_PROGRAM, 32, at_state )
+static ADDRESS_MAP_START( at586_map, AS_PROGRAM, 32, at586_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
 	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
@@ -205,18 +206,8 @@ static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( at586_io, AS_IO, 32, at_state )
+static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
-	AM_RANGE(0x00e0, 0x00ef) AM_NOP // used for timing?
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)		
 ADDRESS_MAP_END
 
@@ -628,34 +619,50 @@ static SLOT_INTERFACE_START( pci_devices )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_DERIVED( at586, at386 )
-	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
+static MACHINE_CONFIG_START( at586, at586_state )
+	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,	   0, true)
-
-	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+
+	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0);	
+
+	MCFG_PCI_BUS_ADD("pcibus", 0)	
+	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,	   0, true)
+
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa4", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
+	
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( at586x3, at386 )
-	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
+static MACHINE_CONFIG_START( at586x3, at586_state )
+	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+
+	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0);
+	
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", NULL, NULL,	   0, true)
 
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa4", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c386sx16, at386 )
@@ -1405,8 +1412,8 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,      atcga,  "<generi
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,      atvga,  "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,      atvga,  "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga,      atvga,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,      0,  	"<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
+COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga,      0,	    "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atcga,      atcga,  "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,      atvga,  "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
@@ -1436,5 +1443,5 @@ COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     atvga,      atvga,  "Apricot
 COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga,      atvga,  "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga,      atcga,  "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga,      atvga,  "FIC", "486-PIO-2", GAME_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,      atvga,  "FIC", "VT-503", GAME_NOT_WORKING )
+COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,      0,      "FIC", "VT-503", GAME_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       c386sx16,  atvga,      atvga,  "Toshiba",  "T2000SX", GAME_NOT_WORKING )
