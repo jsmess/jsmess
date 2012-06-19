@@ -84,7 +84,6 @@ public:
 		required_device<at_keyboard_controller_device> m_keybc;
 		required_device<isa16_device> m_isabus;
 		required_device<device_t> m_speaker;
-		required_device<ram_device> m_ram;
 		required_device<mc146818_device> m_mc146818;
 		required_device<pc_kbdc_device> m_pc_kbdc;
 		DECLARE_READ8_MEMBER(at_page8_r);

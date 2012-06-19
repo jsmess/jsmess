@@ -722,6 +722,7 @@ $(MESSOBJ)/at.a:				\
 	$(MESS_MACHINE)/cs8221.o	\
 	$(MESS_MACHINE)/at.o		\
 	$(MESS_DRIVERS)/at.o		\
+	$(MESS_MACHINE)/northbridge.o \
 	$(MESS_MACHINE)/southbridge.o \
 
 $(MESSOBJ)/atari.a:				\

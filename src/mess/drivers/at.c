@@ -12,6 +12,7 @@
 
 #include "includes/at.h"
 #include "machine/pc_keyboards.h"
+#include "machine/northbridge.h"
 #include "machine/southbridge.h"
 
 
@@ -628,7 +629,8 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 
-	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0);	
+	MCFG_DEVICE_ADD("nb",NORTHBRIDGE,0)
+	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0)
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)	
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
@@ -651,7 +653,8 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 
-	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0);
+	MCFG_DEVICE_ADD("nb",NORTHBRIDGE,0)
+	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0)
 	
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)

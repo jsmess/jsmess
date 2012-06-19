@@ -201,7 +201,6 @@ southbridge_device::southbridge_device(const machine_config &mconfig, const char
 	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, SPEAKER_TAG),
-	m_ram(*this, ":" RAM_TAG),
 	m_mc146818(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc")
 { 
@@ -225,17 +224,6 @@ IRQ_CALLBACK(southbridge_device::at_irq_callback)
 
 void southbridge_device::device_start()
 {
-	address_space* space = machine().device(":maincpu")->memory().space(AS_PROGRAM);
-
-	machine().root_device().membank("bank10")->set_base(m_ram->pointer());
-
-	if (m_ram->size() > 0x0a0000)
-	{
-		offs_t ram_limit = 0x100000 + m_ram->size() - 0x0a0000;
-		space->install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space->install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		machine().root_device().membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
-	}
 	address_space* spaceio = machine().device(":maincpu")->memory().space(AS_IO);
 	
 	spaceio->install_legacy_readwrite_handler(*m_dma8237_1, 0x0000, 0x001f, FUNC(i8237_r), FUNC(i8237_w), 0xffffffff);
