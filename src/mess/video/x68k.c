@@ -758,6 +758,18 @@ WRITE16_HANDLER( x68k_spritereg_w )
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
 		state->m_crtc.bg_vshift = state->m_crtc.vshift;
 		break;
+	case 0x408:  // BG H/V-Res
+		state->m_crtc.bg_hvres = data & 0x1f;
+		if(data != 0xff)
+		{  // Handle when the PCG is using 256 and the CRTC is using 512
+			if((state->m_crtc.bg_hvres & 0x0c) == 0x00 && (state->m_crtc.reg[20] & 0x0c) == 0x04)
+				state->m_crtc.bg_double = 2;
+			else
+				state->m_crtc.bg_double = 1;
+		}
+		else
+			state->m_crtc.bg_double = 1;
+		break;
 	}
 }
 
@@ -1037,10 +1049,7 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, in
 			sx += state->m_crtc.bg_hshift;
 			sx += state->m_sprite_shift;
 
-			if(state->m_crtc.interlace != 0)
-				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
-			else
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+sy,0x00);
+			drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+(sy*state->m_crtc.bg_double),0x10000,0x10000*state->m_crtc.bg_double,0x00);
 		}
 	}
 }

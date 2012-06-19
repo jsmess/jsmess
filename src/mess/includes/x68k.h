@@ -172,6 +172,8 @@ public:
 		int bg_visible_width;
 		int bg_hshift;
 		int bg_vshift;
+		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
+		int bg_double;  // 1 if PCG is to be doubled.
 		int interlace;  // 1024 vertical resolution is interlaced
 	} m_crtc;  // CRTC
 	struct
