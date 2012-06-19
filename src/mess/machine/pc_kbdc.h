@@ -26,7 +26,7 @@ set the data line and then set the clock line.
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot, _def_inp ) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
-	pc_kbdc_slot_device::static_set_pc_kbdc_slot(*device, _kbdc_tag ); \
+	pc_kbdc_slot_device::static_set_pc_kbdc_slot(*device, owner->subdevice(_kbdc_tag) ); \
 
 
 //**************************************************************************
@@ -45,10 +45,10 @@ public:
 	virtual void device_start();
 
 	// inline configuration
-	static void static_set_pc_kbdc_slot(device_t &device, const char *tag);
+	static void static_set_pc_kbdc_slot(device_t &device, device_t *kbdc_device);
 protected:
 	// configuration
-	const char *m_pc_kbdc_tag;
+	device_t *m_kbdc_device;
 };
 
 
@@ -134,7 +134,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write );
 
 	// inline configuration
-	static void static_set_pc_kbdc_tag(device_t &device, const char *tag);
+	static void static_set_pc_kbdc(device_t &device, device_t *kbdc_device);
 
 	pc_kbdc_device			*m_pc_kbdc;
 	const char				*m_pc_kbdc_tag;

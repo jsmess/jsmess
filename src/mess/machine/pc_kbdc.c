@@ -36,10 +36,10 @@ pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const ch
 }
 
 
-void pc_kbdc_slot_device::static_set_pc_kbdc_slot(device_t &device, const char *tag)
+void pc_kbdc_slot_device::static_set_pc_kbdc_slot(device_t &device, device_t *kbdc_device)
 {
 	pc_kbdc_slot_device &pc_kbdc = dynamic_cast<pc_kbdc_slot_device &>(device);
-	pc_kbdc.m_pc_kbdc_tag = tag;
+	pc_kbdc.m_kbdc_device = kbdc_device;
 }
 
 //-------------------------------------------------
@@ -52,7 +52,7 @@ void pc_kbdc_slot_device::device_start()
 
 	if (pc_kbd)
 	{
-		device_pc_kbd_interface::static_set_pc_kbdc_tag( *pc_kbd, m_pc_kbdc_tag );
+		device_pc_kbd_interface::static_set_pc_kbdc( *pc_kbd, m_kbdc_device );
 	}
 }
 
@@ -235,17 +235,15 @@ WRITE_LINE_MEMBER( device_pc_kbd_interface::data_write )
 }
 
 
-void device_pc_kbd_interface::static_set_pc_kbdc_tag(device_t &device, const char *tag)
+void device_pc_kbd_interface::static_set_pc_kbdc(device_t &device, device_t *kbdc_device)
 {
 	device_pc_kbd_interface &pc_kbd = dynamic_cast<device_pc_kbd_interface &>(device);
-	pc_kbd.m_pc_kbdc_tag = tag;
+	pc_kbd.m_pc_kbdc = dynamic_cast<pc_kbdc_device *>(kbdc_device);
 }
 
 
 void device_pc_kbd_interface::set_pc_kbdc_device()
 {
-	m_pc_kbdc = dynamic_cast<pc_kbdc_device *>(device().machine().device(m_pc_kbdc_tag));
-
 	if ( m_pc_kbdc )
 	{
 		m_pc_kbdc->set_keyboard( this );

@@ -155,7 +155,7 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD(":sb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, NULL)
 
 	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
@@ -166,10 +166,10 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 
 	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)
 	// on board devices
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","board1", pc_isa16_cards, "fdcsmc", NULL, true)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","board2", pc_isa16_cards, "comat", NULL, true)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","board3", pc_isa16_cards, "ide", NULL, true)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","board4", pc_isa16_cards, "lpt", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "ide", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", NULL, true)
 MACHINE_CONFIG_END
 
 
