@@ -20,7 +20,6 @@
 
 #define Z80_TAG			"l53"
 #define MK3882_TAG		"l07"
-#define SASIBUS_TAG		"sasi"
 
 #define OPTION_DREQ1	BIT(m_option, 1)
 #define OPTION_DREQ2	BIT(m_option, 2)
@@ -102,32 +101,6 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 
 //-------------------------------------------------
-//  SCSIBus_interface sasi_intf
-//-------------------------------------------------
-
-static const SCSIConfigTable sasi_dev_table =
-{
-	1,
-	{
-		{ SCSI_ID_0, "harddisk0" }
-	}
-};
-
-static const SCSIBus_interface sasi_intf =
-{
-    &sasi_dev_table,
-    NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 //-------------------------------------------------
 
@@ -139,7 +112,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_wdc )
 
 	MCFG_Z80CTC_ADD(MK3882_TAG, 2000000, ctc_intf)
 
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
 MACHINE_CONFIG_END
 
@@ -187,8 +159,7 @@ wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_WDC, "Wang PC-PM001", tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
-	m_ctc(*this, MK3882_TAG),
-	m_sasibus(*this, SASIBUS_TAG)
+	m_ctc(*this, MK3882_TAG)
 {
 }
 
