@@ -7,7 +7,7 @@
 
     The Taito sound system in taito_en.c is directly derived from the SQ-1.
 
-    Driver by R. Belmont
+    Driver by R. Belmont with thanks to Parduz, Christian Brunschen, and Phil Bennett
 
     Memory map:
 
@@ -17,14 +17,25 @@
     0x260000-0x2601ff   ESP (5510) regs
     0x280000-0x28001f   DUART (68681) regs
     0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS/EPS-16)
+    0x2E0000-0x2FFFFF   Expansion cartridge (VFX, unknown other models)
     0x300000-0x300003   EPS/EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
     0x340000-0x3bffff   EPS/EPS-16 sample RAM
     0xc00000-0xc3ffff   OS ROM
     0xff0000-0xffffff   work RAM hi (may or may not be mirrored with work RAM low)
-
+ 
     Interrupts:
     68681 uses custom vector 0x40 (address 0x100)
     5505 interrupts are on normal autovector IRQ 1
+ 
+    68681 GPIO lines (from VFX schematics):
+    I0: CARTIN (if cartridge is present)
+ 
+    O0: "AN0"
+    O1: "AN1"
+    O2: "AN2" (disk side select on EPS/EPS-16)
+    O6: To ESPHALT pin on ES5510
+    O7: "SACK"
+ 
 
 ***************************************************************************/
 
@@ -44,6 +55,12 @@
 #define GENERIC (0)
 #define EPS     (1)
 #define SQ1     (2)
+
+#define KEYBOARD_HACK (0)   // turn on to play the SQ-1: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
+
+#if KEYBOARD_HACK
+static int program = 0;
+#endif
 
 class esq5505_state : public driver_device
 {
@@ -221,7 +238,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
     AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
-    AM_RANGE(0x580000, 0x77ffff) AM_RAM         // sample RAM?
+    AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
     AM_RANGE(0xc00000, 0xc0ffff) AM_ROM AM_REGION("osrom", 0)
     AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
@@ -373,6 +390,59 @@ static void esq_fdc_write_byte(running_machine &machine, int addr, int data)
     state->m_fdc->data_w(data & 0xff);
 }
 
+#if KEYBOARD_HACK
+static INPUT_CHANGED( key_stroke )
+{
+    esq5505_state *state = device.machine().driver_data<esq5505_state>();
+
+    // send a MIDI Note On
+    if (oldval == 0 && newval == 1)
+    {
+        if ((UINT8)(FPTR)param < 0x40)
+        {
+            int code = (int)(FPTR)param;
+
+            if (code == 0)
+            {
+                program--;
+                if (program < 0)
+                {
+                    program = 0;
+                }
+                printf("program to %d\n", program);
+            }
+            if (code == 1)
+            {
+                program++;
+                if (program > 127)
+                {
+                    program = 127;
+                }
+                printf("program to %d\n", program);
+            }
+
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)0xc0); // program change
+            duart68681_rx_data(state->m_duart, 0, program); // program
+        }
+        else
+        {
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)0x90); // note on
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)param);
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)0x7f);
+        }
+    }
+    else if (oldval == 1 && newval == 0)
+    {
+        if ((UINT8)(FPTR)param != 0x40)
+        {
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)0x80); // note off
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)param);
+            duart68681_rx_data(state->m_duart, 0, (UINT8)(FPTR)0x7f);
+        }
+    }
+}
+#endif
+
 static const hd63450_intf dmac_interface =
 {
 	"maincpu",  // CPU - 68000
@@ -387,13 +457,13 @@ static const hd63450_intf dmac_interface =
 static const es5505_interface es5505_config =
 {
 	"waverom",	/* Bank 0 */
-	"waverom",	/* Bank 1 */
+	"waverom2",	/* Bank 1 */
 	NULL,       /* irq */
     esq5505_read_adc
 };
 
 static MACHINE_CONFIG_START( vfx, esq5505_state )
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 
     MCFG_ESQ2x40_ADD("vfd")
@@ -434,6 +504,29 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )
+#if KEYBOARD_HACK
+    PORT_START("KEY0")
+    PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED(key_stroke, 0x40)
+    PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') PORT_CHANGED(key_stroke, 0x41)
+    PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED(key_stroke, 0x42)
+    PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHANGED(key_stroke, 0x43)
+    PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHANGED(key_stroke, 0x44)
+    PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_CHANGED(key_stroke, 0x45)
+    PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHANGED(key_stroke, 0x46)
+    PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_CHANGED(key_stroke, 0x47)
+    PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHANGED(key_stroke, 0x48)
+    PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHANGED(key_stroke, 0x49)
+    PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHANGED(key_stroke, 0x4a)
+    PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('e') PORT_CHAR('E') PORT_CHANGED(key_stroke, 0x4b)
+    PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED(key_stroke, 0x4c)
+    PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('t') PORT_CHAR('T') PORT_CHANGED(key_stroke, 0x4d)
+    PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHANGED(key_stroke, 0x4e)
+    PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('u') PORT_CHAR('U') PORT_CHANGED(key_stroke, 0x4f)
+
+    PORT_START("KEY1")
+    PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHANGED(key_stroke, 0x0)
+    PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHANGED(key_stroke, 0x1)
+#endif
 INPUT_PORTS_END
 
 ROM_START( vfx )
@@ -442,8 +535,9 @@ ROM_START( vfx )
     ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "vfx-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
-    ROM_LOAD( "vfx-waves-2.bin",  0x100000, 0x080000, NO_DUMP )
+    ROM_LOAD( "u14.bin",  0x000000, 0x080000, NO_DUMP ) // type 234000 on the schematic
+    ROM_LOAD( "u15.bin",  0x080000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "u16.bin",  0x100000, 0x080000, NO_DUMP ) 
 ROM_END
 
 ROM_START( vfxsd )
@@ -452,8 +546,15 @@ ROM_START( vfxsd )
     ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "vfxsd-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
-    ROM_LOAD( "vfxsd-waves-2.bin",  0x100000, 0x080000, NO_DUMP )
+    ROM_LOAD( "u54.bin",  0x000000, 0x010000, NO_DUMP )
+    ROM_LOAD( "u55.bin",  0x010000, 0x010000, NO_DUMP ) 
+    ROM_LOAD( "u56.bin",  0x020000, 0x010000, NO_DUMP ) 
+    ROM_LOAD( "u57.bin",  0x030000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "u58.bin",  0x038000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "u59.bin",  0x040000, 0x010000, NO_DUMP ) 
+    ROM_LOAD( "u60.bin",  0x050000, 0x080000, NO_DUMP ) 
+
+    ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( sd1 )
