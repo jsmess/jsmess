@@ -13,8 +13,10 @@
     sync pulse.
 
     ToDO:
-    - homelab2 - No cursor; Can't press same key twice in a row
-    - homelab3 etc - sound, cassout. Need a dump of the TM188 prom.
+    - homelab2 - sound, cassette
+                 Note that rom code 0x40-48 is meaningless garbage,
+                 had to patch to stop it crashing. Need a new dump.
+    - homelab3 etc - sound, cassout. Need a dump of the TM188.
     - Brailab4 - had to patch, to stop stack getting wiped out.
                  currently reads keys and outputs noise. Needs
                  unknown speech device and maybe other devices.
@@ -23,6 +25,9 @@
                  machine. /CE connects to A6, A/B = A0, C/D = A1.
                  The bios never talks to it. Not fitted to homelab2.
                  Official port numbers are 3C-3F.
+
+TM188 is (it seems) equivalent to 27S19, TBP18S030N, 6331-1, 74S288, 82S123,
+MB7051 - fuse programmed prom.
 
 ****************************************************************************/
 
@@ -48,24 +53,38 @@ public:
 	m_p_videoram(*this, "videoram"){ }
 
 	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
+	DECLARE_READ8_MEMBER(cass2_r);
 	DECLARE_READ8_MEMBER(exxx_r);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(cass_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
 	const UINT8 *m_p_chargen;
 	//virtual void machine_reset();
 	//virtual void machine_start();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_speaker;
-	optional_device<cassette_image_device> m_cass;
+	required_device<device_t> m_speaker;
+	required_device<cassette_image_device> m_cass;
 	optional_shared_ptr<const UINT8> m_p_videoram;
 private:
 };
 
 
+static INTERRUPT_GEN( homelab_frame )
+{
+	homelab_state *state = device->machine().driver_data<homelab_state>();
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 {
+	if (offset == 0x38) // 0x3838
+	{
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		return 0;
+	}
+
 	UINT8 i,data = 0xff;
 	char kbdrow[8];
 
@@ -94,7 +113,24 @@ WRITE8_MEMBER( homelab_state::io_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-CUSTOM_INPUT_MEMBER( homelab_state::cass_r )
+READ8_MEMBER( homelab_state::cass2_r )
+{
+	return (m_cass->input() > 0.03);
+}
+
+WRITE8_MEMBER( homelab_state::cass_w )
+{
+	if (offset == 0x73f) // 0x3f3f
+		speaker_level_w(m_speaker, 1);
+	else
+	if (offset == 0x139) // 0x3939
+		speaker_level_w(m_speaker, 0);
+	else
+	if (offset == 0x400) // 0x3c00
+		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
+}
+
+CUSTOM_INPUT_MEMBER( homelab_state::cass3_r )
 {
 	return (m_cass->input() > 0.03);
 }
@@ -126,9 +162,10 @@ static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x2000, 0x27ff ) AM_ROM  // ROM 5
 	AM_RANGE( 0x2800, 0x2fff ) AM_ROM  // ROM 6
 	AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
-	AM_RANGE( 0x3800, 0x3fff ) AM_READ(key_r) AM_WRITENOP
+	AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(key_r,cass_w)
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_SHARE("videoram") AM_MIRROR(0x3c00) // Video RAM 1K
+	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_SHARE("videoram") // Video RAM 1K
+	AM_RANGE( 0xe000, 0xe0ff ) AM_READ(cass2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
@@ -253,7 +290,7 @@ static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homelab_state, cass_r, " ")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homelab_state, cass3_r, " ")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -440,8 +477,9 @@ static DRIVER_INIT(homelab)
 /* Machine driver */
 static MACHINE_CONFIG_START( homelab, homelab_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
+	MCFG_CPU_VBLANK_INT("screen", homelab_frame)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -453,18 +491,33 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( homelab3, homelab )
+static MACHINE_CONFIG_START( homelab3, homelab_state )
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
 	MCFG_CPU_IO_MAP(homelab3_io)
 
-	MCFG_SCREEN_MODIFY("screen")
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC( homelab3 )
+	MCFG_GFXDECODE(homelab)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -491,7 +544,9 @@ ROM_START( homelab2 )
 	ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696AF3C1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
 	ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69E57E8C) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
 	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97CBBE74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
-	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
+	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, BAD_DUMP CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
+	ROM_FILL(0x46, 1, 0x18) // fix bad code
+	ROM_FILL(0x47, 1, 0x0E)
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
