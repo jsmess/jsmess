@@ -10,7 +10,7 @@
 #define __I82439TX_H__
 
 #include "machine/pci.h"
-
+#include "machine/northbridge.h"
 
 // ======================> i82439tx_interface
 
@@ -22,7 +22,7 @@ struct i82439tx_interface
 
 // ======================> i82439tx_device
 
-class i82439tx_device :  public device_t,
+class i82439tx_device :  public northbridge_device,
 						 public pci_device_interface,
 						 public i82439tx_interface
 {

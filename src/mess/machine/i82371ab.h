@@ -10,10 +10,11 @@
 #define __I82371AB_H__
 
 #include "machine/pci.h"
+#include "machine/southbridge.h"
 
 // ======================> i82371ab_device
 
-class i82371ab_device :  public device_t,
+class i82371ab_device :  public southbridge_device,
 						 public pci_device_interface
 {
 public:

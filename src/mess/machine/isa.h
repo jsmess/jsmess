@@ -80,7 +80,7 @@
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
     MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
-	isa8_slot_device::static_set_isa8_slot(*device, owner->subdevice(_isatag)); \
+	isa8_slot_device::static_set_isa8_slot(*device, owner, _isatag); \
 
 #define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
     MCFG_DEVICE_ADD(_tag, ISA16, 0) \
@@ -90,7 +90,7 @@
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
     MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
-	isa16_slot_device::static_set_isa16_slot(*device, owner->subdevice(_isatag)); \
+	isa16_slot_device::static_set_isa16_slot(*device, owner, _isatag); \
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -110,10 +110,11 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_isa8_slot(device_t &device, device_t *isa_device);
+    static void static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag);
 protected:
 	// configuration
-	device_t *m_isa;
+	device_t *m_owner;
+	const char *m_isa_tag;
 };
 
 // device type definition
@@ -276,7 +277,7 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_isa16_slot(device_t &device, device_t *isa_device);
+    static void static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag);
 };
 
 

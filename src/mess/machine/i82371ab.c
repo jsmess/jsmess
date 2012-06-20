@@ -21,7 +21,7 @@ const device_type I82371AB = &device_creator<i82371ab_device>;
 
 
 i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, I82371AB, "Intel 82371AB", tag, owner, clock),
+      : southbridge_device(mconfig, I82371AB, "Intel 82371AB", tag, owner, clock),
 		pci_device_interface( mconfig, *this )
 {
 }
@@ -208,6 +208,11 @@ void i82371ab_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	}
 }
 
+static IRQ_CALLBACK(at_irq_callback)
+{
+	device_t *pic = device->machine().device(":pcibus:1:i82371ab:pic8259_master");
+	return pic8259_acknowledge(pic);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -215,8 +220,11 @@ void i82371ab_device::pci_write(pci_bus_device *pcibus, int function, int offset
 
 void i82371ab_device::device_start()
 {
+	southbridge_device::device_start();
 	/* setup save states */
 	save_item(NAME(m_regs));
+	
+	device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
 }
 
 //-------------------------------------------------
@@ -225,6 +233,7 @@ void i82371ab_device::device_start()
 
 void i82371ab_device::device_reset()
 {
+	southbridge_device::device_reset();
 	UINT32 (*regs32)[64] = (UINT32 (*)[64])(m_regs);
 
 	/* isa */

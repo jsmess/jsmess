@@ -15,7 +15,7 @@ const device_type I82439TX = &device_creator<i82439tx_device>;
 
 
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock),
+      : northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock),
 		pci_device_interface( mconfig, *this )
 {
 }
@@ -282,6 +282,7 @@ void i82439tx_device::device_config_complete()
 
 void i82439tx_device::device_start()
 {
+	northbridge_device::device_start();
 	/* get address space we are working on */
 	device_t *cpu = machine().device(m_cputag);
 	assert(cpu != NULL);
@@ -302,6 +303,7 @@ void i82439tx_device::device_start()
 
 void i82439tx_device::device_reset()
 {
+	northbridge_device::device_reset();
 	/* setup initial values */
 	m_regs[0x00] = 0x14020000;
 	m_regs[0x01] = 0x01520000;

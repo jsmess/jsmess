@@ -34,10 +34,11 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 {
 }
 
-void isa8_slot_device::static_set_isa8_slot(device_t &device, device_t *isa_device)
+void isa8_slot_device::static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag)
 {
 	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
-	isa_card.m_isa = isa_device;
+	isa_card.m_owner = owner;
+	isa_card.m_isa_tag = isa_tag;
 }
 
 //-------------------------------------------------
@@ -51,7 +52,7 @@ void isa8_slot_device::device_start()
 	if (get_card_device()->interface(intf))
 		fatalerror("Error ISA16 device in ISA8 slot\n");
 
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_isa);
+	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
 }
 
 
@@ -74,10 +75,11 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *isa_device)
+void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag)
 {
 	isa16_slot_device &isa_card = dynamic_cast<isa16_slot_device &>(device);
-	isa_card.m_isa = isa_device;
+	isa_card.m_owner = owner;
+	isa_card.m_isa_tag = isa_tag;
 }
 
 //-------------------------------------------------
@@ -87,7 +89,7 @@ void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *isa_de
 void isa16_slot_device::device_start()
 {
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_isa);
+	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
 }
 
 

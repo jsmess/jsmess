@@ -12,8 +12,6 @@
 
 #include "includes/at.h"
 #include "machine/pc_keyboards.h"
-#include "machine/northbridge.h"
-#include "machine/southbridge.h"
 
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
@@ -629,19 +627,15 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 
-	MCFG_DEVICE_ADD("nb",NORTHBRIDGE,0)
-	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0)
-
 	MCFG_PCI_BUS_ADD("pcibus", 0)	
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,	   0, true)
 
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa4", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
-	
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)		
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, NULL, NULL, false)	
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( at586x3, at586_state )
@@ -653,19 +647,15 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 
-	MCFG_DEVICE_ADD("nb",NORTHBRIDGE,0)
-	MCFG_DEVICE_ADD("sb",SOUTHBRIDGE,0)
-	
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", NULL, NULL,	   0, true)
 
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa4", pc_isa16_cards, NULL, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
-
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c386sx16, at386 )

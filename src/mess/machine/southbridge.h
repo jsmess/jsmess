@@ -62,11 +62,10 @@ class southbridge_device :
 {
 public:
 		// construction/destruction
-        southbridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		//virtual ioport_constructor device_input_ports() const;
 
 protected:
         // device-level overrides
@@ -74,7 +73,7 @@ protected:
         virtual void device_reset();
 public:
 
-		static IRQ_CALLBACK(at_irq_callback);
+		//static IRQ_CALLBACK(at_irq_callback);
 		required_device<cpu_device> m_maincpu;
 		required_device<device_t> m_pic8259_master;
 		required_device<device_t> m_pic8259_slave;
@@ -145,9 +144,5 @@ protected:
 		UINT8 m_channel_check;
 		UINT8 m_nmi_enabled;
 };
-
-
-// device type definition
-extern const device_type SOUTHBRIDGE;
 
 #endif  /* __SOUTHBRIDGE_H__ */

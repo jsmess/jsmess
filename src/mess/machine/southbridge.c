@@ -113,35 +113,12 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq3_w),
 };
 
-static SLOT_INTERFACE_START(pc_isa16_cards)
-	// ISA 8 bit
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("ega", ISA8_EGA)
-	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
-	SLOT_INTERFACE("svga_s3",ISA8_SVGA_S3)
-	SLOT_INTERFACE("svga_dm",ISA8_SVGA_CIRRUS)
-	SLOT_INTERFACE("com", ISA8_COM)
+static SLOT_INTERFACE_START(pc_isa_onboard)
 	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("fdc", ISA8_FDC)
-	SLOT_INTERFACE("hdc", ISA8_HDC)
-	SLOT_INTERFACE("adlib", ISA8_ADLIB)
-	SLOT_INTERFACE("hercules", ISA8_HERCULES)
-	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
-	SLOT_INTERFACE("sblaster1_0", ISA8_SOUND_BLASTER_1_0)
-	SLOT_INTERFACE("sblaster1_5", ISA8_SOUND_BLASTER_1_5)
-	SLOT_INTERFACE("ne1000", NE1000)
-	SLOT_INTERFACE("3c503", EL2_3C503)
-	SLOT_INTERFACE("mpu401", ISA8_MPU401)
 	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
 	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-	// ISA 16 bit
 	SLOT_INTERFACE("ide", ISA16_IDE)
 	SLOT_INTERFACE("ide_cd", ISA16_IDE_CD)
-	SLOT_INTERFACE("ne2000", NE2000)
-	SLOT_INTERFACE("aha1542", AHA1542)
-	SLOT_INTERFACE("gus",ISA16_GUS)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( southbridge )
@@ -166,19 +143,11 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 
 	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", NULL, true)
-	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", NULL, true)
-	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "ide", NULL, true)
-	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "ide", NULL, true)
+	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa_onboard, "lpt", NULL, true)
 MACHINE_CONFIG_END
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type SOUTHBRIDGE = &device_creator<southbridge_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -190,8 +159,8 @@ machine_config_constructor southbridge_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( southbridge );
 }
 
-southbridge_device::southbridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SOUTHBRIDGE, "Southbridge", tag, owner, clock),
+southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),
@@ -210,14 +179,14 @@ southbridge_device::southbridge_device(const machine_config &mconfig, const char
  * Init functions
  *
  **********************************************************/
-
+/*
 IRQ_CALLBACK(southbridge_device::at_irq_callback)
 {
-	device_t *pic = device->machine().device(":sb:pic8259_master");
+	device_t *pic = device->machine().device(":pcibus:1:i82371ab:pic8259_master");
 	//return pic8259_acknowledge(m_pic8259_master);
 	return pic8259_acknowledge(pic);
 }
-
+*/
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -239,7 +208,7 @@ void southbridge_device::device_start()
 	
 
 	m_at_offset1 = 0xff;
-	device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
+	//device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
 }
 
 //-------------------------------------------------

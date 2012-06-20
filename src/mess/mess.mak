@@ -504,9 +504,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ay31015.o	\
 	$(MESS_MACHINE)/er59256.o	\
 	$(MESS_MACHINE)/hd63450.o	\
-	$(MESS_MACHINE)/i82371ab.o	\
-	$(MESS_MACHINE)/i82371sb.o	\
-	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/ieee488.o	\
 	$(MESS_MACHINE)/isa.o		\
@@ -722,8 +719,6 @@ $(MESSOBJ)/at.a:				\
 	$(MESS_MACHINE)/cs8221.o	\
 	$(MESS_MACHINE)/at.o		\
 	$(MESS_DRIVERS)/at.o		\
-	$(MESS_MACHINE)/northbridge.o \
-	$(MESS_MACHINE)/southbridge.o \
 
 $(MESSOBJ)/atari.a:				\
 	$(MESS_MACHINE)/ataricrt.o	\
@@ -1442,6 +1437,11 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/isa_svga_tseng.o		\
 	$(MESS_VIDEO)/isa_svga_s3.o	\
 	$(MESS_VIDEO)/isa_svga_cirrus.o	\
+	$(MESS_MACHINE)/i82371ab.o	\
+	$(MESS_MACHINE)/i82371sb.o	\
+	$(MESS_MACHINE)/i82439tx.o	\
+	$(MESS_MACHINE)/northbridge.o \
+	$(MESS_MACHINE)/southbridge.o \
 
 $(MESSOBJ)/pdp1.a:				\
 	$(MESS_VIDEO)/pdp1.o		\
