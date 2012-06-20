@@ -49,7 +49,7 @@
 		</part>
 	</software>
 
-	<software name="smcity2k">
+	<software name="simcit2k">
 		<description>Sim City 2000  (Ver 1.00)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
@@ -65,7 +65,7 @@
 		</part>
 	</software>
 
-	<software name="smcity2ka" cloneof="smcity2k">
+	<software name="simcit2ka" cloneof="simcit2k">
 		<description>Sim City 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
@@ -81,7 +81,7 @@
 		</part>
 	</software>
 
-	<software name="smcity2ksc1" cloneof="smcity2k">
+	<software name="simcit2ksc1" cloneof="simcit2k">
 		<description>SimCity 2000 Scenarios Volume 1 - Great Disasters</description>
 		<year>1994</year>
 		<publisher>Maxis</publisher>

@@ -1252,7 +1252,7 @@
 	</software>
 
 	<software name="mk2ju" cloneof="mk2" supported="no">
-		<description>Mortal Kombat II: Kyuukyoku Shinken (Jpn) ~ Mortal Kombat II (USA)</description>
+		<description>Mortal Kombat II - Kyuukyoku Shinken (Jpn) ~ Mortal Kombat II (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8104A (JPN)"/>
@@ -1470,7 +1470,7 @@
 	</software>
 
 	<software name="pitfall" supported="no">
-		<description>Pitfall: The Mayan Adventure (USA)</description>
+		<description>Pitfall - The Mayan Adventure (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -1656,7 +1656,7 @@
 	</software>
 
 	<software name="startr" supported="no">
-		<description>Star Trek: Starfleet Academy - Starship Bridge Simulator (USA)</description>
+		<description>Star Trek - Starfleet Academy - Starship Bridge Simulator (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
@@ -2198,7 +2198,7 @@
 	</software>
 
 	<software name="wwfag" supported="no">
-		<description>WWF WrestleMania: The Arcade Game (USA)</description>
+		<description>WWF WrestleMania - The Arcade Game (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="_32x_cart">

@@ -5,10 +5,10 @@
 <software name="frogfeas">
 	<description>Frog Feast (Demo)</description>
 	<year>2000</year>
-	<publisher>&lt;unknown&gt;</publisher>
+	<publisher>Rastersoft</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 	<diskarea name="cdrom">
-		<disk name="frog feast" sha1="1ab1eb988458c39e171c8704176617df5730f56e"/>
+		<disk name="frog feast" sha1="67f7e06f8c7157963b980ddb1d5bf7fd5f22bbc5"/>
 	</diskarea>
 	</part>
 </software>
@@ -5831,8 +5831,9 @@
 	</part>
 </software>
 
+<!--  This is included twice in TOSEC... was it released only in France or in the whole Europe? -->
 <software name="quelestd">
-	<description>Quel est donc cet oiseau - Nature on CDI (Fra)</description>
+	<description>Quel est donc cet Oiseau - Nature on CDI (Fra) ~ What's that Bird (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
@@ -7035,17 +7036,6 @@
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="web-i (1996)(philips)(us)" sha1="889e7d8b3f11af9df9fba674334f859e525ccff3"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="whatbird">
-	<description>What's that Bird (Euro)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="what's that bird (1992)(philips)(eu)" sha1="f925f9b6ad061472e45015dd9b4f652b00935626"/>
 		</diskarea>
 	</part>
 </software>

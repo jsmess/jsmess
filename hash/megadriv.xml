@@ -6676,7 +6676,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="doomtrop">
 		<description>Doom Troopers - The Mutant Chronicles (USA)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="doom troopers - the mutant chronicles (usa).bin" size="2097152" crc="11194414" sha1="aff5e0651fecbc07d718ed3cea225717ce18a7aa" offset="000000" loadflag="load16_word_swap" />
@@ -7240,7 +7240,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1994</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="earthworm jim (usa).bin" size="3145728" crc="df3acf59" sha1="a544211d1ebab1f096f6e72a0d724f74f9ddbce8" offset="000000" loadflag="load16_word_swap" />
@@ -7262,7 +7262,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="ejim2u" cloneof="ejim2">
 		<description>Earthworm Jim 2 (USA)</description>
 		<year>1996</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="earthworm jim 2 (usa).bin" size="3145728" crc="d57f8ba7" sha1="ef7cccfc5eafa32fc6acc71dd9b71693f64eac94" offset="000000" loadflag="load16_word_swap" />
@@ -7888,7 +7888,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="exosquadu" cloneof="exosquad">
 		<description>Exo Squad (USA)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="exo squad (usa).bin" size="1048576" crc="10ec03f3" sha1="d958c3f2365162cb2ffa37fcea36695a1d4ab287" offset="000000" loadflag="load16_word_swap" />
@@ -7899,7 +7899,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="exosquadup" cloneof="exosquad">
 		<description>Exo Squad (USA, Prototype)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="exo squad (usa) (beta).bin" size="1048576" crc="70edf964" sha1="d165e0057a5d290ae02ff6cae9f99c2ebc8a3f7c" offset="000000" loadflag="load16_word_swap" />
@@ -20294,7 +20294,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="stds9u" cloneof="stds9">
 		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="star trek - deep space nine - crossroads of time (usa).bin" size="1048576" crc="a771e1a4" sha1="3918dcf48d99d075a6062d967a0f27fb56f89ad2" offset="000000" loadflag="load16_word_swap" />

@@ -4659,7 +4659,7 @@
 	<software name="ejim">
 		<description>Earthworm Jim (Euro)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<info name="serial" value="DMG-AEJP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
@@ -4671,7 +4671,7 @@
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1995</year>
-		<publisher>Playmates</publisher>
+		<publisher>Playmates Interactive</publisher>
 		<info name="serial" value="DMG-AEJE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
@@ -9593,7 +9593,7 @@
 		</part>
 	</software>
 
-	<software name="magicray">
+	<software name="rayearth">
 		<!-- Notes: SGB enhanced -->
 		<description>Magic Knight RayEarth (Jpn)</description>
 		<year>1995</year>
@@ -9608,7 +9608,7 @@
 		</part>
 	</software>
 
-	<software name="magicry2">
+	<software name="rayeart2">
 		<!-- Notes: SGB enhanced -->
 		<description>Magic Knight RayEarth 2nd. - The Missing Colors (Jpn)</description>
 		<year>1995</year>

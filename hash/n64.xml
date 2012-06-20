@@ -7349,7 +7349,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="rampagew">
+	<software name="rampage">
 		<description>Rampage - World Tour (Euro)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
@@ -7360,7 +7360,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="rampagewu" cloneof="rampagew">
+	<software name="rampageu" cloneof="rampage">
 		<description>Rampage - World Tour (USA)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
