@@ -655,10 +655,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 				state->m_sh_count = 0;
 				signal >>= 1;
 				/* Loop sound */
-				if( state->m_o2_vdc.s.sound & 0x40 )
-				{
-					signal |= *buffer << 23;
-				}
+				signal |= *buffer << 23;
 				/* Check if noise should be applied */
 				if ( state->m_o2_vdc.s.sound & 0x10 )
 				{
@@ -669,6 +666,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 				state->m_o2_vdc.s.shift3 = signal & 0xFF;
 				state->m_o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
 				state->m_o2_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
+				old_signal = signal;
 			}
 
 			/* Throw an interrupt if enabled */
