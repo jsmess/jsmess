@@ -57,6 +57,18 @@
 		} \
 	} while (0)
 
+#define VERBOSE_DBG 0       /* general debug messages */
+
+#define DBG_LOG(N,M,A) \
+	do { \
+		if(VERBOSE_DBG>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
+
 /*************************************************************************
  *
  *      PC DMA stuff
@@ -342,7 +354,7 @@ const struct pit8253_config mc1502_pit8253_config =
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
-			XTAL_16MHz/12,              /* dram refresh */
+			XTAL_16MHz/12,              /* serial port */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
@@ -828,6 +840,98 @@ I8255_INTERFACE( pc_ppi8255_interface )
 };
 
 
+static struct {
+	UINT8		latch;		/* keyboard scan code */
+	UINT16		mask;		/* input lines */
+	emu_timer	*keyb_signal_timer;
+} mc1502_keyb;
+
+
+/* check if any keys are pressed, raise IRQ1 if so */
+
+static TIMER_CALLBACK( mc1502_keyb_signal_callback )
+{
+	pc_state *st = machine.driver_data<pc_state>();
+	UINT8 key = 0;
+
+	key |= machine.root_device().ioport("Y1")->read();
+	key |= machine.root_device().ioport("Y2")->read();
+	key |= machine.root_device().ioport("Y3")->read();
+	key |= machine.root_device().ioport("Y4")->read();
+	key |= machine.root_device().ioport("Y5")->read();
+	key |= machine.root_device().ioport("Y6")->read();
+	key |= machine.root_device().ioport("Y7")->read();
+	key |= machine.root_device().ioport("Y8")->read();
+	key |= machine.root_device().ioport("Y9")->read();
+	key |= machine.root_device().ioport("Y10")->read();
+	key |= machine.root_device().ioport("Y11")->read();
+	key |= machine.root_device().ioport("Y12")->read();
+	DBG_LOG(1,"mc1502_k_s_c",("= %02X%s\n", key, key ? " will IRQ" : ""));
+
+	if (key) {
+		pic8259_ir1_w(st->m_pic8259, 1);
+	}
+}
+
+static READ8_DEVICE_HANDLER ( mc1502_ppi_porta_r )
+{
+	running_machine &machine = device->machine();
+	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
+	return mc1502_keyb.latch;
+}
+
+static WRITE8_DEVICE_HANDLER ( mc1502_ppi_porta_w )
+{
+	running_machine &machine = device->machine();
+	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
+	mc1502_keyb.latch = data;
+}
+
+static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
+{
+	running_machine &machine = device->machine();
+	UINT8 key = 0;
+
+	if (mc1502_keyb.mask & 0x0001) { key |= machine.root_device().ioport("Y1")->read(); }
+	if (mc1502_keyb.mask & 0x0002) { key |= machine.root_device().ioport("Y2")->read(); }
+	if (mc1502_keyb.mask & 0x0004) { key |= machine.root_device().ioport("Y3")->read(); }
+	if (mc1502_keyb.mask & 0x0008) { key |= machine.root_device().ioport("Y4")->read(); }
+	if (mc1502_keyb.mask & 0x0010) { key |= machine.root_device().ioport("Y5")->read(); }
+	if (mc1502_keyb.mask & 0x0020) { key |= machine.root_device().ioport("Y6")->read(); }
+	if (mc1502_keyb.mask & 0x0040) { key |= machine.root_device().ioport("Y7")->read(); }
+	if (mc1502_keyb.mask & 0x0080) { key |= machine.root_device().ioport("Y8")->read(); }
+	if (mc1502_keyb.mask & 0x0100) { key |= machine.root_device().ioport("Y9")->read(); }
+	if (mc1502_keyb.mask & 0x0200) { key |= machine.root_device().ioport("Y10")->read(); }
+	if (mc1502_keyb.mask & 0x0400) { key |= machine.root_device().ioport("Y11")->read(); }
+	if (mc1502_keyb.mask & 0x0800) { key |= machine.root_device().ioport("Y12")->read(); }
+	key ^= 0xff;
+	DBG_LOG(1,"mc1502_kppi_porta_r",("= %02X\n", key));
+	return key;
+}
+
+static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portb_w )
+{
+	running_machine &machine = device->machine();
+
+	mc1502_keyb.mask &= ~255;
+	mc1502_keyb.mask |= data ^ 255;
+	if (!BIT(data, 0))
+		mc1502_keyb.mask |= 1 << 11;
+	else
+		mc1502_keyb.mask &= ~(1 << 11);
+	DBG_LOG(1,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+}
+
+static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
+{
+	running_machine &machine = device->machine();
+
+	mc1502_keyb.mask &= ~(7 << 8);
+	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
+	DBG_LOG(1,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+}
+
+
 static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 {
 	pc_state *st = device->machine().driver_data<pc_state>();
@@ -912,6 +1016,26 @@ I8255_INTERFACE( pcjr_ppi8255_interface )
 	DEVCB_HANDLER(pcjr_ppi_portb_w),
 	DEVCB_HANDLER(pcjr_ppi_portc_r),
 	DEVCB_NULL
+};
+
+I8255_INTERFACE( mc1502_ppi8255_interface )
+{
+	DEVCB_HANDLER(mc1502_ppi_porta_r),
+	DEVCB_HANDLER(mc1502_ppi_porta_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(pcjr_ppi_portb_w),	// hack
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+I8255_INTERFACE( mc1502_ppi8255_interface_2 )
+{
+	DEVCB_HANDLER(mc1502_kppi_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(mc1502_kppi_portb_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(mc1502_kppi_portc_w)
 };
 
 
@@ -1098,6 +1222,12 @@ DRIVER_INIT( pcjr )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
+  
+DRIVER_INIT( mc1502 )
+{
+	mess_init_pc_common(machine, 0, NULL, pc_set_irq_line);
+	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
+}
 
 static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
 
@@ -1167,15 +1297,15 @@ MACHINE_RESET( pc )
 MACHINE_START( mc1502 )
 {
 	pc_state *st = machine.driver_data<pc_state>();
-//  pc_fdc_init( machine, &pcjr_fdc_interface_nc );
-	pcjr_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
-	pc_int_delay_timer = machine.scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
 	st->m_maincpu = machine.device("maincpu" );
 	device_set_irq_callback(st->m_maincpu, pc_irq_callback);
 
 	st->m_pic8259 = machine.device("pic8259");
 	st->m_dma8237 = NULL;
 	st->m_pit8253 = machine.device("pit8253");
+
+	mc1502_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));
+	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(40), 0, attotime::from_msec(40) );
 }
 
 
@@ -1305,18 +1435,6 @@ TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt )
 		pc_keyboard();
 }
 
-
-#define VERBOSE_DBG 0       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
 
 /*
 ibm xt bios

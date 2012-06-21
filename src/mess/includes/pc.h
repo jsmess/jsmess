@@ -80,6 +80,8 @@ extern const i8255_interface ibm5150_ppi8255_interface;
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;
+extern const i8255_interface mc1502_ppi8255_interface;
+extern const i8255_interface mc1502_ppi8255_interface_2;
 
 UINT8 pc_speaker_get_spk(running_machine &machine);
 void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data);
@@ -102,6 +104,7 @@ DRIVER_INIT( pc1640 );
 DRIVER_INIT( pc_vga );
 DRIVER_INIT( t1000hx );
 DRIVER_INIT( pcjr );
+DRIVER_INIT( mc1502 );
 
 MACHINE_START( pc );
 MACHINE_RESET( pc );
