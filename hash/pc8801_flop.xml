@@ -13265,7 +13265,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gingaed">
-		<description>Ginga Eiyu Densetsu</description>
+		<description>Ginga Eiyuu Densetsu</description>
 		<year>1989</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801mk2SR -->
@@ -13304,7 +13304,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gingaeda" cloneof="gingaed">
-		<description>Ginga Eiyu Densetsu (Alt)</description>
+		<description>Ginga Eiyuu Densetsu (Alt)</description>
 		<year>1989</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801mk2SR -->
@@ -13343,7 +13343,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gingaedp">
-		<description>Ginga Eiyu Densetsu - Power Up &amp; Scenario Shu</description>
+		<description>Ginga Eiyuu Densetsu - Power Up &amp; Scenario Shu</description>
 		<year>1989</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801mk2SR -->
@@ -13375,7 +13375,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gingaed2">
-		<description>Ginga Eiyu Densetsu II</description>
+		<description>Ginga Eiyuu Densetsu II</description>
 		<year>1990</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801mk2SR -->
@@ -13428,7 +13428,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="ginga2dx">
-		<description>Ginga Eiyu Densetsu II &amp; DX Kit (Fixed)</description>
+		<description>Ginga Eiyuu Densetsu II &amp; DX Kit (Fixed)</description>
 		<year>1991</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801mk2SR -->
