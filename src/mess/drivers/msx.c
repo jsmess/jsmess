@@ -4505,8 +4505,8 @@ COMP(19??, mpc25fd,   msx2,     0,      msx2,     msx2,     msx,     "Sanyo", "W
 COMP(1988, phc23,     msx2,     0,      msx2,     msx2jp,   msx,     "Sanyo", "Wavy PHC-23 (Japan)", 0)
 COMP(1986, cpc300,    msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "IQ-2000 CPC-300 (Korea)", 0)
 COMP(1986, cpc300e,   msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "IQ-2000 CPC-300E (Korea)", 0)
-COMP(1986, cpc400,    msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "X-II CPC-400 (Korea)", 0 )
-COMP(1986, cpc400s,   msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "X-II CPC-400S (Korea)", 0 )
+COMP(1988, cpc400,    msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "X-II CPC-400 (Korea)", 0 )
+COMP(1988, cpc400s,   msx2,     0,      msx2,     msx2kr,   msx,     "Daewoo", "X-II CPC-400S (Korea)", 0 )
 
 COMP(1988, msx2p,     0,        msx,    msx2,     msx2jp,   msx,     "ASCII & Microsoft", "MSX2+", 0)
 COMP(19??, expert3i,  msx2p,    0,      msx2,     msx2,     msx,     "Ciel", "Expert 3 IDE", GAME_NOT_WORKING )
