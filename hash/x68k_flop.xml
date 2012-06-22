@@ -7163,6 +7163,820 @@
 		</part>
 	</software>
 
+	<software name="hacchake">
+		<description>Hacchake Ayayosan Pro-68k</description>
+		<year>19??</year>
+		<publisher>Hard</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hacchake ayayosan pro-68k (19xx)(hard).dim" size="1261824" crc="834c99b6" sha1="6a08f0e864b223a8ad47c15099f7a08cc0c41e01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacchak2">
+		<description>Hacchake Ayatosan II Ikenai Holiday</description>
+		<year>19??</year>
+		<publisher>Hard</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hacchake ayatosan ii ikenai holiday (19xx)(hard).dim" size="1261824" crc="f31cb2bc" sha1="6858017288f23d7b22d8e49a2b178c92575b85af" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="htdash">
+		<description>Haita Tsuun Dash</description>
+		<year>199?</year>
+		<publisher>QTQ's Workshop</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haita tsuun dash (199x)(qtq's workshop).dim" size="1261824" crc="0f24d068" sha1="13fc5b5fa317ebc36d79dc49a51b067e2b990527" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hakobune">
+		<description>Hakobune ni Notte</description>
+		<year>1991</year>
+		<publisher>Moai</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hakobune ni notte (1991)(moai).dim" size="1261824" crc="4789cf09" sha1="a2634a24c346477517add1ded0d27e3ad18c9f44" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="halfmind">
+		<description>Half Mind</description>
+		<year>19??</year>
+		<publisher>Pasoket</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="half mind (19xx)(pasoket).dim" size="1261824" crc="f3db00f7" sha1="0ff1b5d772088d152df15565e751540d81798c48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hanahour">
+		<description>Hanafuda Hourouki</description>
+		<year>1988</year>
+		<publisher>Dot Kikaku</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hanafuda hourouki (1988)(dot kikaku)(disk 1 of 2)(disk a).dim" size="1261824" crc="7a33a933" sha1="92b3b087e8b1757464d24f1424e1324a97c5bd9e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hanafuda hourouki (1988)(dot kikaku)(disk 2 of 2)(disk b).dim" size="1261824" crc="b9ee785a" sha1="f691721cdc82bba6f5f24d517f838d149436a5fe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hanakoi">
+		<description>Hanafuda Koi Koi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hanafuda koi koi (19xx)(-).dim" size="1261824" crc="d58106d4" sha1="fae94479291e06a0363625a06cf0b684f1b93267" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hanaten">
+		<description>Hanafuda Tengoku</description>
+		<year>1990</year>
+		<publisher>Junk</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hanafuda tengoku (1990)(junk).dim" size="1261824" crc="e0ac3a2d" sha1="3dbf6b4c205b60198966b661f8b96fb17a0168b2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hanaiko">
+		<description>Hanaikoku Pro Uso-68k</description>
+		<year>1990</year>
+		<publisher>Hazama Kuroo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hanaikoku pro uso-68k (1990)(hazama kuroo).dim" size="1261824" crc="6fa7d511" sha1="91e4f6361d098d20640024e24698817076d6c594" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hanayori">
+		<description>Hana Yori Dango</description>
+		<year>1991</year>
+		<publisher>Active</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hana yori dango (1991)(active)(disk 1 of 3)(disk a).dim" size="1261824" crc="0c69dd9a" sha1="63d21b9adf525839e651bc3173a9c7928f854998" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hana yori dango (1991)(active)(disk 2 of 3)(disk b).dim" size="1261824" crc="9067487d" sha1="fc32c068e415d0d7841dad0f4e4c8269613d2a44" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hana yori dango (1991)(active)(disk 3 of 3)(disk c).dim" size="1261824" crc="478c744d" sha1="ee2094df8326165862b545545d83a7d47fb98f53" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="harenoch">
+		<description>Hare Nochi Oosawagi</description>
+		<year>1989</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hare nochi oosawagi (1989)(cocktail soft)(disk 1 of 2).dim" size="1261824" crc="3b7302fe" sha1="0bc2a8027be6e13ea5bebf90c23009a4fcbd2eb1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hare nochi oosawagi (1989)(cocktail soft)(disk 2 of 2).dim" size="1261824" crc="9477ccc8" sha1="085aded1a3099cc80f49c72647cc9f146c2a09c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hnaugust">
+		<description>Haruka Naru Augusta</description>
+		<year>1991</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haruka naru augusta (1991)(t&amp;e soft)(disk 1 of 3)(system).dim" size="1261824" crc="aef59aa2" sha1="2365b0593406a0794fe280aac2d6131a4d38f8dc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haruka naru augusta (1991)(t&amp;e soft)(disk 2 of 3)(course 1).dim" size="1261824" crc="110cbfa9" sha1="7300f167c32ec9e955f2337e4bcedb8865e253c6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haruka naru augusta (1991)(t&amp;e soft)(disk 3 of 3)(course 2).dim" size="1261824" crc="0472f846" sha1="d34280a1f0ada7d43d279f34749be92cb83b5d2c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- not bootable, perhaps expansion disks for Haruka Naru Augusta? -->
+	<software name="hn8lakes">
+		<description>Haruka Naru Eight Lakes</description>
+		<year>1991</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haruka naru eight lakes (1991)(t&amp;e soft)(disk 1 of 2).dim" size="1261824" crc="bb47616b" sha1="5e903f204bfb4c307f139f67f047935444574839" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="haruka naru eight lakes (1991)(t&amp;e soft)(disk 2 of 2).dim" size="1261824" crc="fa872e72" sha1="e4464660204e2792a88a530423cf8979a1c2fa25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hatenkou">
+		<description>Hatenkou</description>
+		<year>1998</year>
+		<publisher>Haiteidoradorazu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hatenkou (1998)(haiteidoradorazu)(disk 1 of 2)(disk 0).dim" size="1261824" crc="0ebd0145" sha1="6cdcc30a53846be3a6c812117253c662a5f56028" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hatenkou (1998)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="ae420def" sha1="c5cf44f7be2738a2c466596452b6fabf351ea647" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hrtsaph">
+		<description>Heart of Saphilamun</description>
+		<year>1991</year>
+		<publisher>Annandule Project</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heart of saphilamun (1991)(annandule project)(disk 1 of 4)(disk a).dim" size="1261824" crc="e395d6ab" sha1="2d1031088a98db4a5b260be543a041af6fbf7b39" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heart of saphilamun (1991)(annandule project)(disk 2 of 4)(disk b).dim" size="1261824" crc="4da4a4ed" sha1="d3ba716b5674edbff72baa2e00f8c3ff75af0720" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heart of saphilamun (1991)(annandule project)(disk 3 of 4)(disk c).dim" size="1261824" crc="299ac8cd" sha1="7660230c07fc4a48c6f1c34e0f64fe33fd04b0f2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heart of saphilamun (1991)(annandule project)(disk 4 of 4)(disk d).dim" size="1261824" crc="17ed0342" sha1="c7fa17382870b86db5a00de30a7bc01fbc896166" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hvynova">
+		<description>Heavy Nova</description>
+		<year>1991</year>
+		<publisher>Micronet</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heavy nova (1991)(micronet).dim" size="1261824" crc="8a653729" sha1="4a4df3cd196807fb4c40df81e63568cef0790a0b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hnkyo68k">
+		<description>Heiankyo Alien 68k</description>
+		<year>1988</year>
+		<publisher>Tiny-Tomo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heiankyou alien 68k (1988)(tiny-tomo).dim" size="1261824" crc="8c08709a" sha1="124ce9ef85b86d67fa6df6632ab44a78f46e64ce" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heiankyo">
+		<description>Heiankyo Alien</description>
+		<year>19??</year>
+		<publisher>Kin-chan</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="heiankyou alien (19xx)(kin-chan).dim" size="1261824" crc="6b715a97" sha1="c0d5813545a5b9992e973ea63a29ff6ffdece532" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hellhoun">
+		<description>Hellhound</description>
+		<year>1994</year>
+		<publisher>Breakthrough</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hellhound (1994)(breakthrough).dim" size="1261824" crc="d77721d0" sha1="828fdd7271246083dc60c81a6fcb5e0b9182ea26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="helmet">
+		<description>Helmet</description>
+		<year>1991</year>
+		<publisher>Ma</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="helmet (1991)(ma).dim" size="1261824" crc="fd4d6366" sha1="1e2ce49a388a346c4ddbae1e1fd23b5e6cda8183" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="herohero">
+		<description>Hero Hero Disk 1</description>
+		<year>19??</year>
+		<publisher>Opt. 1</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hero hero disk 1 (19xx)(opt. 1).dim" size="1261824" crc="f72e2e5a" sha1="6ec3487f66041007654bc6948680540c70a522b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heroher4">
+		<description>Hero Hero Disk 4 Indojin no Yabou</description>
+		<year>1990</year>
+		<publisher>Opt. 1</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hero hero disk 4 indojin no yabou (1990)(opt. 1).dim" size="1261824" crc="876af4b4" sha1="1930d8887f040200514810d768f18357a1ce3d5b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heroher6">
+		<description>Hero Hero Disk 6</description>
+		<year>1992</year>
+		<publisher>Opt. 1</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hero hero disk 6 (1992)(opt. 1).dim" size="1261824" crc="8259477a" sha1="0b092501742135bf1e6c5e0c71eafe511042ff5f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heroher8">
+		<description>Hero Hero Disk 8</description>
+		<year>199?</year>
+		<publisher>Opt. 1</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hero hero disk 8 (199x)(opt. 1).dim" size="1261824" crc="88fc8546" sha1="c43e995a786f3a07edc55b8ed282fbab8db00b34" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- screen doesn't clear after updating each frame -->
+	<software name="hetzer">
+		<description>Hetzer</description>
+		<year>19??</year>
+		<publisher>Inoue Ken</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hetzer (19xx)(inoue ken).dim" size="1261824" crc="8f6663be" sha1="7cef537b7061d5f6ddae05c4cf80f402998df50a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hextris">
+		<description>Hextris</description>
+		<year>199?</year>
+		<publisher>Ken1</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hextris (199x)(ken1).dim" size="1261824" crc="9d7c6eb5" sha1="c95878201f8d0b5eca492ea6ff36ac31c7b62f32" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heysay">
+		<description>Hey! Say! Education Committee (v0.12)</description>
+		<year>1993</year>
+		<publisher>Taka-P</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hey! say! education committee v0.12 (1993)(taka-p).dim" size="1261824" crc="0ec31ba9" sha1="725b07e0f60c770869cf9dc4a550f4fd5386cc76" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="heysay010" cloneof="heysay">
+		<description>Hey! Say! Education Committee (v0.10)</description>
+		<year>1993</year>
+		<publisher>Taka-P</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hey! say! education committee v0.10 (1993)(taka-p).dim" size="1261824" crc="4b414e14" sha1="ae45bc7175787009a698ec9639b46d6142ad3527" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="higesori">
+		<description>Higesori Pro Uso-68k</description>
+		<year>1990</year>
+		<publisher>Hazama Kuroo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="higesori pro uso-68k (1990)(hazama kuroo).dim" size="1261824" crc="6c441acf" sha1="900a62f797ff2f5ce57350a13ed94d1491b667a0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="highlow">
+		<description>High &amp; Low</description>
+		<year>199?</year>
+		<publisher>Sacchin &amp; Nima Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="high &amp; low (199x)(sacchin &amp; nima company).dim" size="1261824" crc="61b049a9" sha1="fb95691cc0cdef1121036a0df4983b58363d6a39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="highpos">
+		<description>High Position</description>
+		<year>1989</year>
+		<publisher>Michael Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="high position (1989)(michael company).dim" size="1261824" crc="8371c04c" sha1="dcd361f343b4c86c742b185d07f463d2fd7330ac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="himegas">
+		<description>Hi Mega Sister</description>
+		<year>1990</year>
+		<publisher>Chan Chan Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hi mega sister (1990)(chan chan soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="f43e79b8" sha1="8c4cc4324f27679efc5fd1fccd69ac9dabefa6cd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hi mega sister (1990)(chan chan soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="26f51d95" sha1="130209313a9564333ba2fb4ea45232da91679746" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="himihana">
+		<description>Himitsu no Hanazono</description>
+		<year>1992</year>
+		<publisher>Technopolis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="himitsu no hanazono (1992)(technopolis)(disk 1 of 3)(disk a).dim" size="1261824" crc="6176b460" sha1="b54c273d55c87affd96df89d4317cb344b4dcecf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="himitsu no hanazono (1992)(technopolis)(disk 2 of 3)(disk b).dim" size="1261824" crc="165474c4" sha1="15046bb90a488799f455cbdb733752de3ab92211" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="himitsu no hanazono (1992)(technopolis)(disk 3 of 3)(disk c).dim" size="1261824" crc="6d3a3efa" sha1="ba464f7ba288b5cd94454480ddb2bce62b75298a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hiroshi">
+		<description>Hiroshi</description>
+		<year>19??</year>
+		<publisher>Rats</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hiroshi (19xx)(rats).dim" size="1261824" crc="e4c9d818" sha1="290ccd29b9da8439ff070c5be50b0a806f397b11" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hiroshi2">
+		<description>Hiroshi II</description>
+		<year>1998</year>
+		<publisher>Rats</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hiroshi ii (1998)(rats).dim" size="1261824" crc="f42b5434" sha1="5d29dcbfa0f57c6c943f2162691d4496375cb665" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hishouza">
+		<description>Hishouzame Flying Shark</description>
+		<year>1991</year>
+		<publisher>Kaneko</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hishouzame flying shark (1991)(kaneko).dim" size="1261824" crc="06ecda0d" sha1="0b2e2a82edf8890fc0abda24733fd65de76ed2fa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hishouzd">
+		<description>Hishouzame Flying Shark (Demo)</description>
+		<year>1991</year>
+		<publisher>Kaneko</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hishouzame flying shark (demo) (1991)(kaneko).dim" size="1261824" crc="f63713fd" sha1="4c2fa0f5773bf4aa0909f2a03e3abf3aaa7c9164" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hyuusha">
+		<description>Hissatsu Yuusha Tsuitoshi</description>
+		<year>19??</year>
+		<publisher>Mugen Unagi Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hissatsu yuusha tsuitoshi (19xx)(mugen unagi team).dim" size="1261824" crc="ccc444f0" sha1="f9d56048a77316feb94838bffc4749ce784b9ac3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="helthled">
+		<description>History of Elthlead</description>
+		<year>19??</year>
+		<publisher>NCS - Masaya</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="history of elthlead (19xx)(ncs - masaya)(disk 1 of 3).dim" size="1261824" crc="60a0174e" sha1="51fc8aafbe1fc8b5428ae0b223604ddf4ff2500c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="history of elthlead (19xx)(ncs - masaya)(disk 2 of 3).dim" size="1261824" crc="6dd98d0c" sha1="833b0ba2f68728c0fcaa9b949df804c259808d0d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="history of elthlead (19xx)(ncs - masaya)(disk 3 of 3).dim" size="1261824" crc="e6e081bc" sha1="c64f6bd5cdb165fd40af42c407a1aa1266667607" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hitomiza">
+		<description>Hitomi Zaka</description>
+		<year>19??</year>
+		<publisher>Higashikaihotsujuku</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hitomi zaka (19xx)(higashikaihotsujuku)(disk 1 of 2)(disk a).dim" size="1261824" crc="78d8592f" sha1="ba9ce0ca27508f66c1f5bc73c25801787e2cd935" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hitomi zaka (19xx)(higashikaihotsujuku)(disk 2 of 2)(disk b).dim" size="1261824" crc="3e80393c" sha1="5ba0528975ba04cddb497a62b6e6da6d50d3a7db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="horiume">
+		<description>Hori Hori Ume Ume</description>
+		<year>199?</year>
+		<publisher>Ora Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hori hori ume ume (199x)(ora soft)(disk 1 of 2).dim" size="1261824" crc="4867e8f2" sha1="9f0307c65dad1fb5c46b2251669d9cc231901e01" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hori hori ume ume (199x)(ora soft)(disk 2 of 2).dim" size="1261824" crc="87aecaf8" sha1="706ce3f5921c6334a142a32d2b4a3a1aafec7b71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="horror">
+		<description>Horror of Cridewell</description>
+		<year>1990</year>
+		<publisher>Annandule Project</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="horror of cridewell (1990)(annandule project).dim" size="1261824" crc="14c50dc3" sha1="99dded8b635d2fc666d18dc9b653efc4cbebe562" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hoshisu2">
+		<description>Hoshi no Suna Monogatari 2</description>
+		<year>1992</year>
+		<publisher>DO</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 01 of 10)(system).dim" size="1261824" crc="f9e07774" sha1="8748d285eb50e37ce37f74bbe2a2e88ee94ad119" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 02 of 10)(disk 1).dim" size="1261824" crc="5d3abf09" sha1="64043ee9f7d5d2a8e33d3384ce2f1669cd9ab179" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 03 of 10)(disk 2).dim" size="1261824" crc="694171c9" sha1="6772417404d776bfa067d3686133fe29285f99eb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 04 of 10)(disk 3).dim" size="1261824" crc="58ca1c29" sha1="090e5ff213c156b3dcb6f22a3b2f11316497b05d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 05 of 10)(disk 4).dim" size="1261824" crc="b0b13e65" sha1="40f218a5014cdb28c03e32d78f0b9a6f9560a21a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 06 of 10)(disk 5).dim" size="1261824" crc="eb9697e6" sha1="e93bfa37c7a143235608130edef6a0242f6e8597" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 07 of 10)(disk 6).dim" size="1261824" crc="a10474b8" sha1="03fbe4de444defefe6cfb8dfe7687f4a4ae5cbe4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 08 of 10)(disk 7).dim" size="1261824" crc="c2fa97a5" sha1="273ba233e3cb4df5aa14c35c3e9f8005909be828" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 09 of 10)(disk 8).dim" size="1261824" crc="0c4dcabe" sha1="37e50f31ceb36f8112248019ad145c65d401ac0f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari 2 (1992)(do)(disk 10 of 10)(disk 9).dim" size="1261824" crc="8f7e7e7d" sha1="75d5b8b8342239e7b1f2bbccc1be18fdea5a0c42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hoshisun">
+		<description>Hoshi no Suna Monogatari</description>
+		<year>1991</year>
+		<publisher>DO</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari (1991)(do)(disk 1 of 3)(disk a).dim" size="1261824" crc="aa423be2" sha1="c408dd7f56c460cdea689b12a35336717836bcda" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari (1991)(do)(disk 2 of 3)(disk b).dim" size="1261824" crc="118f2a89" sha1="5ab630b06572fca1a685faed1177a79bd385148a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hoshi no suna monogatari (1991)(do)(disk 3 of 3)(disk c).dim" size="1261824" crc="ff3ca5af" sha1="da658a1ac7bb724399300d6022732906af745bf5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hotelwar">
+		<description>Hotel Wars</description>
+		<year>19??</year>
+		<publisher>Bothtec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hotel wars (19xx)(bothtec)(disk 1 of 2)(disk a).dim" size="1261824" crc="4a7da09e" sha1="1ec68d29d7de12d8d378f705d4785539236fd4af" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hotel wars (19xx)(bothtec)(disk 2 of 2)(disk b).dim" size="1261824" crc="785b771c" sha1="101d0694f6905a5e861abd394c1268cb254298be" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hotjump">
+		<description>Hot Jump (v0.00)</description>
+		<year>199?</year>
+		<publisher>Hayabusa Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hot jump v0.00 (199x)(hayabusa soft).dim" size="1261824" crc="98f3e5fe" sha1="1df7e23d6888f600d98578f25a96cf78272e392b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="houmahnt">
+		<description>Houma Hunter Lime 1</description>
+		<year>1993</year>
+		<publisher>Silence</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 1 (1993)(silence)(disk 1 of 2)(system).dim" size="1261824" crc="6e40e675" sha1="1e4575d43ce2bb240ed7e2dcb7b4882a7bb48b59" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 1 (1993)(silence)(disk 2 of 2)(data).dim" size="1261824" crc="fed48d87" sha1="111678bdf8d2e09a8eb29c1acd38033c32ae85c1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="houmahn2">
+		<description>Houma Hunter Lime 2</description>
+		<year>1993</year>
+		<publisher>Silence</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 2 (1993)(silence)(disk 1 of 2)(system).dim" size="1261824" crc="4e5cb6e9" sha1="68723fa6901db26a3a6ece9db1e97afb6fe1531d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 2 (1993)(silence)(disk 2 of 2)(data).dim" size="1261824" crc="332d1efd" sha1="dfad164a98425d3e9f009712422f6496efcb8554" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="houmahn3">
+		<description>Houma Hunter Lime 3</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 3 (1993)(silence)(disk 1 of 2)(system).dim" size="1261824" crc="51942c67" sha1="b97cc1bbbae9f782a789e757fadad93a66d28e1e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 3 (1993)(silence)(disk 2 of 2)(data).dim" size="1261824" crc="9ce2551b" sha1="a3519dead843e31b825da71452d65c963cf1dfeb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="houmahn6">
+		<description>Houma Hunter Lime 6</description>
+		<year>1993</year>
+		<publisher>Silence</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 6 (1993)(silence)(disk 1 of 2)(system).dim" size="1261824" crc="0437c44f" sha1="932c8bc957a57c36f518d421849b171a5cd0d110" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 6 (1993)(silence)(disk 2 of 2)(data).dim" size="1261824" crc="915ef9c2" sha1="5ea7444a897c4c73adc5d4455a6889507b8eebc4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="houmah11">
+		<description>Houma Hunter Lime 11</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 11 (1994)(silence)(disk 1 of 3).dim" size="1261824" crc="dbdd2e57" sha1="4e5bc721127d0a8de2a577b87b7d2f08cec5cad3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 11 (1994)(silence)(disk 2 of 3).dim" size="1261824" crc="a0679a54" sha1="334397852252b76126fc18f5c890ae5ba8a8e8a3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houma hunter lime 11 (1994)(silence)(disk 3 of 3).dim" size="1261824" crc="8d01c067" sha1="86b5681b000eb5e14046175ced2b0fec5db76d74" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="htjewel">
+		<description>Houseki Tsukai Jewel Master</description>
+		<year>199?</year>
+		<publisher>TFS - Nekono Kokoubou</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="houseki tsukai jewel master (199x)(tfs - nekono kokoubou).dim" size="1261824" crc="1fc492bc" sha1="8ca68f9c66a8c50e86bb8b9651fd173548b2cea5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hvrcraft">
+		<description>Hover Craft 68k</description>
+		<year>1993</year>
+		<publisher>Yamaco</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hover craft 68k (1993)(yamaco).dim" size="1261824" crc="f7dc56e5" sha1="0d9d95e2b5e9a62c9accf48e65e7f18ec83a1038" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="howmanyr">
+		<description>How Many Robot</description>
+		<year>1988</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="how many robot (1988)(artdink).dim" size="1261824" crc="4ec1cff5" sha1="8f3d5170dbd26e3366d10487a3fc1d95e20426a0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hydlide3">
+		<description>Hydlide 3 The Space Memories Special Version</description>
+		<year>1990</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hydlide 3 the space memories special version (1990)(t&amp;e soft)(disk 1 of 2).dim" size="1261824" crc="13133882" sha1="9ddc4abe58826a3bb6e986cb6faf51d2ad2a1bb9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hydlide 3 the space memories special version (1990)(t&amp;e soft)(disk 2 of 2).dim" size="1261824" crc="fe25f330" sha1="f112946fe85f7d64cdd59ef02d8799c7da15c6be" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hydlide">
+		<description>Hydlide</description>
+		<year>1994</year>
+		<publisher>Yokoshiba Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hydlide (1994)(yokoshiba soft).dim" size="1261824" crc="6775d6e6" sha1="4359c2431e7d79adcce4e29cd0d81cfb9dbbe751" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hydlide2">
+		<description>Hydlide II Shine of Darkness</description>
+		<year>199?</year>
+		<publisher>Yokoshiba Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="hydlide ii shine of darkness (199x)(yokoshiba soft).dim" size="1261824" crc="371f6ab8" sha1="c2a060267ef3953953cf44f80176f7c67cf5bc28" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="shortname">
 		<description>desc</description>
@@ -7170,7 +7984,6 @@
 		<publisher>&lt;unknown&gt;</publisher>
 	</software>
 -->
-
 	<software name="human68k">
 		<description>Human 68k OS (v2.0)</description>
 		<year>198?</year>
