@@ -5,10 +5,8 @@
 
 Undumped carts:
 
- * GPA-107 - Turpin ~ ターピン
  * GPA-108 - ??? [possibly no game used this ID]
  * GPA-110 - Fighting Bug ~ ファイティング バグ
- * GPA-111 - Space Panic ~ スペースパニック
  * GPA-113 - ??? [possibly no game used this ID]
 
 -->
@@ -93,6 +91,19 @@ Undumped carts:
 		</part>
 	</software>
 
+	<software name="turpin">
+		<description>Turpin</description>
+		<year>1981?</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="GPA-107"/>
+		<info name="alt_title" value="ターピン"/>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="07-turpin.bin" size="8192" crc="a3aef98d" sha1="1f49371b0ebf4fe6c5fb606fd9744f3bb15a619b" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pachiufo" supported="no">
 		<description>Pachinko - UFO</description>
 		<year>1982</year>
@@ -102,6 +113,19 @@ Undumped carts:
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcpanic" supported="no">
+		<description>Space Panic</description>
+		<year>1981?</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="GPA-111"/>
+		<info name="alt_title" value="スペースパニック"/>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="11-space_panic.bin" size="8192" crc="23547111" sha1="b16dbea89ba9f934a08c274d8bb6cce06da13193" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
