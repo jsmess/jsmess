@@ -28,6 +28,8 @@
 
 #define SPEECHROM_TAG "speechrom"
 
+#define REAL_TIMING 0
+
 /****************************************************************************/
 
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -37,14 +39,78 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 }
 
 /*
+    Comments on real timing in the TMS5200 emulation
+
+    Real timing means that the synthesizer clears the /READY line (puts high)
+    whenever a read or write access is in progress. This is done by setting
+    /RS and /WS lines, according to the read or write operation. The /READY line
+    is asserted again after some time. Real timing is used once the tms5220_wsq_w
+    and tms5220_rsq_w are called.
+
+    Within the TI systems, the /RS and /WS lines are controlled directly by the
+    address bus. There is currently no way to insert wait states between
+    the address setting and the data bus sampling, since this is an atomic
+    operation in the emulator (read_byte). It would be necessary to somehow
+    announce the pending read before it actually happens so that devices
+    like this VSP may insert wait states before the read.
+
+    The TMS5220 implementation assumes that wait states are respected and
+    therefore delivers bad values when queried too early. It uses a latch that
+    gets the new value after some time has expired.
+
+    To fix this we have to modify the RS/WS methods in TMS5200 to immediately
+    set the status (after updating the sound status, or the status will be
+    outdated too early).
+
+    Also note that the /RS and /WS lines must be cleared (put to high) when the
+    read is done. Again, this is not possible with the current implementation.
+    So we do this in the ready callback.
+
+    On the bottom line we will stay with the not-REAL_TIMING for now and wait
+    for the core to allow for split read accesses.
+*/
+
+
+/*
     Memory read
 */
+#if REAL_TIMING
+// ======  This is the version with real timing =======
+READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
+{
+	if ((offset & m_select_mask)==m_select_value)
+	{
+		tms5220_wsq_w(m_vsp, TRUE);
+		tms5220_rsq_w(m_vsp, FALSE);
+		*value = tms5220_status_r(m_vsp, offset) & 0xff;
+		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
+	}
+}
+
+/*
+    Memory write
+*/
+WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+{
+	if ((offset & m_select_mask)==(m_select_value | 0x0400))
+	{
+		tms5220_rsq_w(m_vsp, TRUE);
+		tms5220_wsq_w(m_vsp, FALSE);
+		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);
+		tms5220_data_w(m_vsp, offset, data);
+	}
+}
+
+#else
+// ======  This is the version without real timing =======
+
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
 	if ((offset & m_select_mask)==m_select_value)
 	{
 		device_adjust_icount(machine().device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(m_vsp, offset) & 0xff;
+		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
 	}
 }
 
@@ -70,9 +136,11 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 			device_adjust_icount(machine().device("maincpu"),-cycles_to_ready);
 			machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 		}
+		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);
 		tms5220_data_w(m_vsp, offset, data);
 	}
 }
+#endif
 
 /****************************************************************************
     Callbacks from TMS5220
@@ -175,8 +243,20 @@ static const tms5220_interface ti99_4x_tms5200interface =
 
 WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 {
-	// TODO: Fix this in TMS5220
+	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
+	// and we have to adapt a /READY to a READY line.
+	// The real synthesizer board uses a transistor for that purpose.
 	m_slot->set_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
+	if (VERBOSE>5) LOG("spchsyn: READY = %d\n", (state==0));
+
+#if REAL_TIMING
+	// Need to do that here (see explanations above)
+	if (state==0)
+	{
+		tms5220_rsq_w(m_vsp, TRUE);
+		tms5220_wsq_w(m_vsp, TRUE);
+	}
+#endif
 }
 
 void ti_speech_synthesizer_device::device_start()
@@ -210,7 +290,7 @@ void ti_speech_synthesizer_device::device_reset()
 
 MACHINE_CONFIG_FRAGMENT( ti99_speech )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speechsyn", TMC0285, 680000L)
+	MCFG_SOUND_ADD("speechsyn", TMC0285, 640000L)
 	MCFG_SOUND_CONFIG(ti99_4x_tms5200interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

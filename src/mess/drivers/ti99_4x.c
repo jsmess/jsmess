@@ -56,7 +56,7 @@
 #include "machine/ti99/peribox.h"
 
 #define LOG logerror
-#define VERBOSE 0
+#define VERBOSE 1
 
 /*
     The console.
@@ -96,7 +96,7 @@ public:
 	ti99_handset_device* m_handset;
 	ti99_datamux_device* m_datamux;
 
-	int		m_ready_line, m_ready_line1;
+	int		m_ready_line, m_ready_line_dmux;
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -115,6 +115,7 @@ private:
 	void	set_key(int number, int data);
 	int		m_keyboard_column;
 	int		m_alphalock_line;
+	int		m_ready_prev;		// for debugging purposes only
 };
 
 /*
@@ -379,7 +380,7 @@ READ8_MEMBER( ti99_4x::cruread )
 
 WRITE8_MEMBER( ti99_4x::cruwrite )
 {
-	if (VERBOSE>6) LOG("write access to CRU address %04x\n", offset << 1);
+	if (VERBOSE>6) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	m_gromport->cruwrite(offset<<1, data);
 	m_peribox->cruwrite(offset<<1, data);
 }
@@ -387,7 +388,12 @@ WRITE8_MEMBER( ti99_4x::cruwrite )
 WRITE8_MEMBER( ti99_4x::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (VERBOSE>1) LOG("External operation %s not implemented on TI-99 board\n", extop[offset]);
+	// Some games (e.g. Slymoids) actually use IDLE for synchronization
+	if (offset == IDLE_OP) return;
+	else
+	{
+		if (VERBOSE>1) LOG("ti99_4x: External operation %s not implemented on TI-99 board\n", extop[offset]);
+	}
 }
 
 /***************************************************************************
@@ -626,7 +632,7 @@ WRITE_LINE_MEMBER( ti99_4x::clock_out )
 */
 WRITE_LINE_MEMBER( ti99_4x::set_tms9901_INT2 )
 {
-	if (VERBOSE>6) LOG("ti99_4x: VDP int 2 on tms9901, level=%02x\n", state);
+	if (VERBOSE>6) LOG("ti99_4x: VDP int 2 on tms9901, level=%d\n", state);
 	m_tms9901->set_single_int(2, state);
 }
 
@@ -655,10 +661,15 @@ WRITE_LINE_MEMBER( ti99_4x::set_tms9901_INT12)
 */
 WRITE_LINE_MEMBER( ti99_4x::console_ready )
 {
-	if (VERBOSE>6) LOG("ti99_4x: READY level = %02x\n", state);
 	m_ready_line = state;
+	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
 
-	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+	if (VERBOSE>6)
+	{
+		if (m_ready_prev != combined) LOG("ti99_4x: READY level = %d\n", combined);
+	}
+	m_ready_prev = combined;
+	m_cpu->set_ready(combined);
 }
 
 /*
@@ -668,9 +679,15 @@ WRITE_LINE_MEMBER( ti99_4x::console_ready )
 */
 WRITE_LINE_MEMBER( ti99_4x::console_ready_dmux )
 {
-	if (VERBOSE>6) LOG("ti99_4x: READY dmux level = %02x\n", state);
-	m_ready_line1 = state;
-	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+	m_ready_line_dmux = state;
+	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
+
+	if (VERBOSE>7)
+	{
+		if (m_ready_prev != combined) LOG("ti99_4x: READY dmux level = %d\n", state);
+	}
+	m_ready_prev = combined;
+	m_cpu->set_ready(combined);
 }
 
 WRITE_LINE_MEMBER( ti99_4x::extint )
@@ -837,7 +854,7 @@ MACHINE_START( ti99_4 )
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
 
-	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
 }
 
 MACHINE_RESET( ti99_4 )
@@ -867,7 +884,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 	MCFG_MACHINE_START( ti99_4 )
 	MCFG_MACHINE_RESET( ti99_4 )
 
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, ti99_4_tms9928a_interface)
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4, 3000000)
@@ -969,7 +986,7 @@ MACHINE_START( ti99_4a )
 
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
-	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
 }
 
 MACHINE_RESET( ti99_4a )
