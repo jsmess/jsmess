@@ -5,22 +5,20 @@
     31/08/2008 Preliminary driver.
     15/06/2012 Various updates [Robbbert]
 
-    No info available on the Brailab4, apart from the fact it has
-    a speech unit. As the name suggests,  it is meant for use by
-    blind people. Looks like speech could be output from port F8.
-    It also seems that there is no screen, however some video
-    circuitry is retained, because it still reads the vertical
-    sync pulse.
-
     ToDO:
-    - homelab2 - sound, cassette
+    - homelab2 - cassette
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
-    - homelab3 etc - sound, cassout. Need a dump of the TM188.
-    - Brailab4 - had to patch, to stop stack getting wiped out.
-                 currently reads keys and outputs noise. Needs
-                 unknown speech device and maybe other devices.
-                 Need a schematic.
+    - homelab3 etc - Need a dump of the TM188 prom.
+                 Sound and cassette are disrupted by the frame sync
+                 pulse causing a 50Hz hum. There must be a way of
+                 switching it off.
+    - Brailab4 - Seems there should be a ram bank at F800-FFFF, one
+                 for the screen and the other for the stack. Unable
+                 to find any bankswitching. As a consequence, had
+                 to add a patch, to prevent stack getting destroyed
+                 by a clear-screen, and the stack is visible at the
+                 bottom of the screen and gets scrolled.
     - Z80PIO   - expansion only, doesn't do anything in the
                  machine. /CE connects to A6, A/B = A0, C/D = A1.
                  The bios never talks to it. Not fitted to homelab2.
@@ -36,9 +34,11 @@ MB7051 - fuse programmed prom.
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
+#include "audio/mea8000.h"
+#include "sound/dac.h"
 
 
-//#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 //#define MACHINE_START_MEMBER(name) void name::machine_start()
 #define VIDEO_START_MEMBER(name) void name::video_start()
 
@@ -56,11 +56,14 @@ public:
 	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(cass2_r);
 	DECLARE_READ8_MEMBER(exxx_r);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_WRITE8_MEMBER(port7f_w);
+	DECLARE_WRITE8_MEMBER(portff_w);
+	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
+	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
 	const UINT8 *m_p_chargen;
-	//virtual void machine_reset();
+	bool m_nmi;
+	virtual void machine_reset();
 	//virtual void machine_start();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
@@ -70,11 +73,16 @@ public:
 private:
 };
 
+MACHINE_RESET_MEMBER( homelab_state )
+{
+	m_nmi = true;
+}
 
 static INTERRUPT_GEN( homelab_frame )
 {
 	homelab_state *state = device->machine().driver_data<homelab_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	if (state->m_nmi)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
@@ -100,31 +108,40 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
-READ8_MEMBER( homelab_state::io_r )
+WRITE8_MEMBER( homelab_state::port7f_w )
 {
-	return 0xff;
+	m_cass->output(-1.0);
+	speaker_level_w(m_speaker, 0 );
 }
 
-
-WRITE8_MEMBER( homelab_state::io_w )
+WRITE8_MEMBER( homelab_state::portff_w )
 {
-	bool state = BIT(offset, 7);
-	speaker_level_w(m_speaker, state );
-	m_cass->output(state ? -1.0 : +1.0);
+	m_cass->output(+1.0);
+	speaker_level_w(m_speaker, 1 );
+}
+
+WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
+{
+	m_cass->output(-1.0);
+}
+
+WRITE8_MEMBER( homelab_state::brailab4_portff_w )
+{
+	m_cass->output(+1.0);
 }
 
 READ8_MEMBER( homelab_state::cass2_r )
 {
-	return (m_cass->input() > 0.03);
+	return (m_cass->input() > 0.03) ? 0xff : 0;
 }
 
 WRITE8_MEMBER( homelab_state::cass_w )
 {
 	if (offset == 0x73f) // 0x3f3f
-		speaker_level_w(m_speaker, 1);
+		m_nmi = true;
 	else
-	if (offset == 0x139) // 0x3939
-		speaker_level_w(m_speaker, 0);
+	if (offset == 0x63e) // 0x3e3e
+		m_nmi = false;
 	else
 	if (offset == 0x400) // 0x3c00
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
@@ -172,19 +189,30 @@ static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
-	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM AM_SHARE("videoram") AM_MIRROR(0x800) // Video RAM 2K
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram") // Video RAM 2K
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(homelab3_io, AS_IO, 8, homelab_state)
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(io_r,io_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(port7f_w)
+	AM_RANGE( 0xff, 0xff ) AM_WRITE(portff_w)
 ADDRESS_MAP_END
 
-// this is a guess
 static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0xdfff ) AM_RAM
+	AM_RANGE( 0x4000, 0xcfff ) AM_RAM
+	AM_RANGE( 0xd000, 0xdfff ) AM_ROM
 	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(brailab4_io, AS_IO, 8, homelab_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0xf8, 0xf9 ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r,mea8000_w)
+	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(brailab4_port7f_w)
+	AM_RANGE( 0xff, 0xff ) AM_WRITE(brailab4_portff_w)
 ADDRESS_MAP_END
 
 
@@ -470,9 +498,7 @@ static GFXDECODE_START( homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
-static DRIVER_INIT(homelab)
-{
-}
+static const mea8000_interface brailab4_speech_intf = { "speech", NULL };
 
 /* Machine driver */
 static MACHINE_CONFIG_START( homelab, homelab_state )
@@ -529,10 +555,34 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( brailab4, homelab3 )
+static MACHINE_CONFIG_START( brailab4, homelab_state )
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
+	MCFG_CPU_IO_MAP(brailab4_io)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE_STATIC( homelab3 )
+	MCFG_GFXDECODE(homelab)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_green)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD ( "speech", DAC, 0 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_MEA8000_ADD("mea8000", brailab4_speech_intf)
 MACHINE_CONFIG_END
 
 
@@ -540,11 +590,11 @@ MACHINE_CONFIG_END
 
 ROM_START( homelab2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hl2_1.rom", 0x0000, 0x0800, CRC(205365F7) SHA1(da93b65befd83513dc762663b234227ba804124d))
+	ROM_LOAD( "hl2_1.rom", 0x0000, 0x0800, BAD_DUMP CRC(205365F7) SHA1(da93b65befd83513dc762663b234227ba804124d))
 	ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696AF3C1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
 	ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69E57E8C) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
 	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97CBBE74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
-	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, BAD_DUMP CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
+	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
 	ROM_FILL(0x46, 1, 0x18) // fix bad code
 	ROM_FILL(0x47, 1, 0x0E)
 
@@ -582,27 +632,26 @@ ROM_START( brailab4 )
 	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
 	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
 	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
+	ROM_LOAD( "brl5.rom", 0xd000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
 	ROM_FILL(0x220,1,0xc9) // do not delete the stack
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 
 	// these roms were found on the net, to be investigated
-	ROM_REGION( 0xa020, "user1", 0 )
-	// unknown
-	ROM_LOAD_OPTIONAL( "brl5.rom",        0x0000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff) )
+	ROM_REGION( 0x9020, "user1", 0 )
 	// 256k Homelab 1000  Bios 1.2, 1988
-	ROM_LOAD_OPTIONAL( "brailabplus.bin", 0x1000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
+	ROM_LOAD_OPTIONAL( "brailabplus.bin", 0x0000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
 	// probably brl1 to 5 merged
-	ROM_LOAD_OPTIONAL( "brl.rom",         0x5000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b) )
+	ROM_LOAD_OPTIONAL( "brl.rom",         0x4000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b) )
 	// a small prom
-	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0xa000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
+	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x9000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT      COMPANY                    FULLNAME   FLAGS */
-COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   homelab, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1984, brailab4,   homelab2,  0,      brailab4,    homelab3,  homelab, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,       "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,       "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,       "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1984, brailab4,   homelab2,  0,      brailab4,    homelab3,  0,       "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
