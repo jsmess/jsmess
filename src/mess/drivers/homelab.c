@@ -6,6 +6,7 @@
     15/06/2012 Various updates [Robbbert]
 
     ToDO:
+    - Quickload loads the files ok, but the machine crashes.
     - homelab2 - cassette
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
@@ -36,6 +37,7 @@ MB7051 - fuse programmed prom.
 #include "imagedev/cassette.h"
 #include "audio/mea8000.h"
 #include "sound/dac.h"
+#include "imagedev/snapquik.h"
 
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -500,6 +502,107 @@ GFXDECODE_END
 
 static const mea8000_interface brailab4_speech_intf = { "speech", NULL };
 
+static QUICKLOAD_LOAD(homelab)
+{
+	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	int i=0;
+	UINT8 ch;
+	UINT16 quick_addr;
+	UINT16 quick_length;
+	UINT8 *quick_data;
+	char pgmname[256];
+	UINT16 args[3];
+	int read_;
+
+	quick_length = image.length();
+	quick_data = (UINT8*)malloc(quick_length);
+	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	image.fseek(0x100, SEEK_SET);
+	ch = image.fgetc();
+	if (ch != 0xA5)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+		image.message(" Invalid header");
+		return IMAGE_INIT_FAIL;
+	}
+
+	while((ch = image.fgetc()))
+	{
+		if (ch == EOF)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file name");
+			image.message(" Unexpected EOF while getting file name");
+			return IMAGE_INIT_FAIL;
+		}
+
+		if (ch != '\0')
+		{
+			if (i >= (ARRAY_LENGTH(pgmname) - 1))
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
+				image.message(" File name too long");
+				return IMAGE_INIT_FAIL;
+			}
+
+			pgmname[i] = ch;	/* build program name */
+			i++;
+		}
+	}
+
+	pgmname[i] = '\0';	/* terminate string with a null */
+
+	if (image.fread(args, sizeof(args)) != sizeof(args))
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
+		image.message(" Unexpected EOF while getting file size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	quick_addr = LITTLE_ENDIANIZE_INT16(args[0]);
+	quick_length = LITTLE_ENDIANIZE_INT16(args[1]);
+	int quick_end = quick_addr+quick_length-1;
+
+	if (quick_end > 0x7fff)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too large");
+		image.message(" File too large");
+		return IMAGE_INIT_FAIL;
+	}
+
+	/* display a message about the loaded quickload */
+	image.message(" %s\nsize=%04X : start=%04X : end=%04X",pgmname,quick_length,quick_addr,quick_end);
+
+	for (i = 0; i < quick_length; i++)
+	{
+		int j = (quick_addr + i);
+		if (image.fread(&ch, 1) != 1)
+		{
+			char message[256];
+			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
+			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
+			return IMAGE_INIT_FAIL;
+		}
+		space->write_byte(j, ch);
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
 /* Machine driver */
 static MACHINE_CONFIG_START( homelab, homelab_state )
 	/* basic machine hardware */
@@ -526,6 +629,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( homelab3, homelab_state )
@@ -553,6 +657,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( brailab4, homelab_state )
@@ -583,6 +688,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_MEA8000_ADD("mea8000", brailab4_speech_intf)
+	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 8)
 MACHINE_CONFIG_END
 
 
