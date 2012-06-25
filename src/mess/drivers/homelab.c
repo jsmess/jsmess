@@ -621,9 +621,10 @@ static QUICKLOAD_LOAD(homelab)
 	UINT8 ch;
 	UINT16 quick_addr;
 	UINT16 quick_length;
+	UINT16 quick_end;
 	UINT8 *quick_data;
 	char pgmname[256];
-	UINT16 args[3];
+	UINT16 args[2];
 	int read_;
 
 	quick_length = image.length();
@@ -654,25 +655,15 @@ static QUICKLOAD_LOAD(homelab)
 
 	while((ch = image.fgetc()))
 	{
-		if (ch == EOF)
+		if (i >= (ARRAY_LENGTH(pgmname) - 1))
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file name");
-			image.message(" Unexpected EOF while getting file name");
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
+			image.message(" File name too long");
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (ch != '\0')
-		{
-			if (i >= (ARRAY_LENGTH(pgmname) - 1))
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
-				image.message(" File name too long");
-				return IMAGE_INIT_FAIL;
-			}
-
-			pgmname[i] = ch;	/* build program name */
-			i++;
-		}
+		pgmname[i] = ch;	/* build program name */
+		i++;
 	}
 
 	pgmname[i] = '\0';	/* terminate string with a null */
@@ -686,7 +677,7 @@ static QUICKLOAD_LOAD(homelab)
 
 	quick_addr = LITTLE_ENDIANIZE_INT16(args[0]);
 	quick_length = LITTLE_ENDIANIZE_INT16(args[1]);
-	int quick_end = quick_addr+quick_length-1;
+	quick_end = quick_addr+quick_length-1;
 
 	if (quick_end > 0x7fff)
 	{
@@ -845,7 +836,7 @@ ROM_START( homelab4 )
 ROM_END
 
 ROM_START( brailab4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "brl1.rom", 0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9))
 	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
 	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
