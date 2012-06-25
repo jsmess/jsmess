@@ -10,16 +10,11 @@
     - homelab2 - cassette
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
-    - homelab3 etc - Need a dump of the TM188 prom.
+    - homelab3/4 - Need a dump of the TM188 prom.
                  Sound and cassette are disrupted by the frame sync
                  pulse causing a 50Hz hum. There must be a way of
                  switching it off.
-    - Brailab4 - Seems there should be a ram bank at F800-FFFF, one
-                 for the screen and the other for the stack. Unable
-                 to find any bankswitching. As a consequence, had
-                 to add a patch, to prevent stack getting destroyed
-                 by a clear-screen, and the stack is visible at the
-                 bottom of the screen and gets scrolled.
+    - Brailab4 - same as homelab3.
     - Z80PIO   - expansion only, doesn't do anything in the
                  machine. /CE connects to A6, A/B = A0, C/D = A1.
                  The bios never talks to it. Not fitted to homelab2.
@@ -40,9 +35,6 @@ MB7051 - fuse programmed prom.
 #include "imagedev/snapquik.h"
 
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-//#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class homelab_state : public driver_device
 {
@@ -51,8 +43,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_speaker(*this, SPEAKER_TAG),
-	m_cass(*this, CASSETTE_TAG),
-	m_p_videoram(*this, "videoram"){ }
+	m_cass(*this, CASSETTE_TAG)
+	{ }
 
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
@@ -64,20 +56,25 @@ public:
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
 	const UINT8 *m_p_chargen;
+	const UINT8 *m_p_videoram;
 	bool m_nmi;
-	virtual void machine_reset();
-	//virtual void machine_start();
-	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	optional_shared_ptr<const UINT8> m_p_videoram;
 private:
 };
 
-MACHINE_RESET_MEMBER( homelab_state )
+MACHINE_RESET( homelab3 )
 {
-	m_nmi = true;
+	homelab_state *state = machine.driver_data<homelab_state>();
+	state->m_nmi = true;
+}
+
+MACHINE_RESET( brailab4 )
+{
+	homelab_state *state = machine.driver_data<homelab_state>();
+	state->m_nmi = true;
+	state->membank("bank1")->set_entry(0);
 }
 
 static INTERRUPT_GEN( homelab_frame )
@@ -125,11 +122,13 @@ WRITE8_MEMBER( homelab_state::portff_w )
 WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
 {
 	m_cass->output(-1.0);
+	membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER( homelab_state::brailab4_portff_w )
 {
 	m_cass->output(+1.0);
+	membank("bank1")->set_entry(1);
 }
 
 READ8_MEMBER( homelab_state::cass2_r )
@@ -183,7 +182,7 @@ static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
 	AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(key_r,cass_w)
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_SHARE("videoram") // Video RAM 1K
+	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_REGION("maincpu",0xc000)
 	AM_RANGE( 0xe000, 0xe0ff ) AM_READ(cass2_r)
 ADDRESS_MAP_END
 
@@ -191,7 +190,7 @@ static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram") // Video RAM 2K
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_REGION("maincpu",0xf800)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(homelab3_io, AS_IO, 8, homelab_state)
@@ -206,7 +205,7 @@ static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x4000, 0xcfff ) AM_RAM
 	AM_RANGE( 0xd000, 0xdfff ) AM_ROM
 	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(brailab4_io, AS_IO, 8, homelab_state)
@@ -523,12 +522,28 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER( homelab_state )
+static VIDEO_START( homelab2 )
 {
-	m_p_chargen = memregion("chargen")->base();
+	homelab_state *state = machine.driver_data<homelab_state>();
+	state->m_p_chargen = state->memregion("chargen")->base();
+	state->m_p_videoram = state->memregion("maincpu")->base()+0xc000;
 }
 
-static SCREEN_UPDATE_IND16( homelab )
+static VIDEO_START( homelab3 )
+{
+	homelab_state *state = machine.driver_data<homelab_state>();
+	state->m_p_chargen = state->memregion("chargen")->base();
+	state->m_p_videoram = state->memregion("maincpu")->base()+0xf800;
+}
+
+static VIDEO_START( brailab4 )
+{
+	homelab_state *state = machine.driver_data<homelab_state>();
+	state->m_p_chargen = state->memregion("chargen")->base();
+	state->m_p_videoram = state->memregion("maincpu")->base()+0x17800;
+}
+
+static SCREEN_UPDATE_IND16( homelab2 )
 {
 	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
@@ -719,7 +734,8 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_SCREEN_UPDATE_STATIC( homelab )
+	MCFG_VIDEO_START(homelab2)
+	MCFG_SCREEN_UPDATE_STATIC(homelab2)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -740,6 +756,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
 	MCFG_CPU_IO_MAP(homelab3_io)
+	MCFG_MACHINE_RESET(homelab3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -747,7 +764,8 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC( homelab3 )
+	MCFG_VIDEO_START(homelab3)
+	MCFG_SCREEN_UPDATE_STATIC(homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -768,6 +786,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
 	MCFG_CPU_IO_MAP(brailab4_io)
+	MCFG_MACHINE_RESET(brailab4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -775,7 +794,8 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC( homelab3 )
+	MCFG_VIDEO_START(brailab4)
+	MCFG_SCREEN_UPDATE_STATIC(homelab3)
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -794,6 +814,12 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 8)
 MACHINE_CONFIG_END
 
+static DRIVER_INIT( brailab4 )
+{
+	homelab_state *state = machine.driver_data<homelab_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
+}
 
 /* ROM definition */
 
@@ -842,7 +868,6 @@ ROM_START( brailab4 )
 	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
 	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
 	ROM_LOAD( "brl5.rom", 0xd000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
-	ROM_FILL(0x220,1,0xc9) // do not delete the stack
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
@@ -859,8 +884,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT      COMPANY                    FULLNAME   FLAGS */
-COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,       "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,       "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,       "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4,  0,       "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT       COMPANY                    FULLNAME   FLAGS */
+COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
