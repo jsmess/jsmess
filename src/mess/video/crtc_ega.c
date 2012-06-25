@@ -13,139 +13,62 @@
 #define LOG		(1)
 
 
-/* device types */
-enum
+const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
+
+
+void crtc_ega_device::device_config_complete()
 {
-	TYPE_CRTC_EGA=0,
-	TYPE_CRTC_VGA,
+	const crtc_ega_interface *intf = reinterpret_cast<const crtc_ega_interface *>(static_config());
 
-	NUM_TYPES
-};
-
-
-/* tags for state saving */
-static const char * const device_tags[NUM_TYPES] = { "crtc_ega", "crtc_vga" };
-
-
-typedef struct _crtc_ega_t crtc_ega_t;
-struct _crtc_ega_t
-{
-	int device_type;
-	const crtc_ega_interface *intf;
-	screen_device *screen;
-
-	/* ega/vga register file */
-	UINT8	horiz_char_total;	/* 0x00 */
-	UINT8	horiz_disp;			/* 0x01 */
-	UINT8	horiz_blank_start;	/* 0x02 */
-	UINT8	horiz_blank_end;	/* 0x03/0x05 */
-	UINT8	ena_vert_access;	/* 0x03 */
-	UINT8	de_skew;			/* 0x03 */
-	UINT8	horiz_retr_start;	/* 0x04 */
-	UINT8	horiz_retr_end;		/* 0x05 */
-	UINT8	horiz_retr_skew;	/* 0x05 */
-	UINT16	vert_total;			/* 0x06/0x07 */
-	UINT8	preset_row_scan;	/* 0x08 */
-	UINT8	byte_panning;		/* 0x08 */
-	UINT8	max_ras_addr;		/* 0x09 */
-	UINT8	scan_doubling;		/* 0x09 */
-	UINT8	cursor_start_ras;	/* 0x0a */
-	UINT8	cursor_disable;		/* 0x0a */
-	UINT8	cursor_end_ras;		/* 0x0b */
-	UINT8	cursor_skew;		/* 0x0b */
-	UINT16	disp_start_addr;	/* 0x0c/0x0d */
-	UINT16	cursor_addr;		/* 0x0e/0x0f */
-	UINT16	light_pen_addr;		/* 0x10/0x11 */
-	UINT16	vert_retr_start;	/* 0x10/0x07 */
-	UINT8	vert_retr_end;		/* 0x11 */
-	UINT8	protect;			/* 0x11 */
-	UINT8	bandwidth;			/* 0x11 */
-	UINT16	vert_disp_end;		/* 0x12/0x07 */
-	UINT8	offset;				/* 0x13 */
-	UINT8	underline_loc;		/* 0x14 */
-	UINT16	vert_blank_start;	/* 0x15/0x07/0x09 */
-	UINT8	vert_blank_end;		/* 0x16 */
-	UINT8	mode_control;		/* 0x17 */
-	UINT16	line_compare;		/* 0x18/0x07/0x09 */
-
-	/* other internal state */
-	UINT64	clock;
-	UINT8	register_address_latch;
-	UINT8	hpixels_per_column;
-	UINT8	cursor_state;	/* 0 = off, 1 = on */
-	UINT8	cursor_blink_count;
-
-	/* timers */
-	emu_timer *de_changed_timer;
-	emu_timer *hsync_on_timer;
-	emu_timer *hsync_off_timer;
-	emu_timer *vsync_on_timer;
-	emu_timer *vsync_off_timer;
-	emu_timer *vblank_on_timer;
-	emu_timer *vblank_off_timer;
-	emu_timer *light_pen_latch_timer;
-
-	/* computed values - do NOT state save these! */
-	UINT16	horiz_pix_total;
-	UINT16	vert_pix_total;
-	UINT16	max_visible_x;
-	UINT16	max_visible_y;
-	UINT16	hsync_on_pos;
-	UINT16	hsync_off_pos;
-	UINT16	vsync_on_pos;
-	UINT16	vsync_off_pos;
-	UINT16  current_disp_addr;	/* the display address currently drawn */
-	UINT8	light_pen_latched;
-	int		has_valid_parameters;
-};
-
-//static DEVICE_GET_INFO( crtc_vga );
-
-static void recompute_parameters(crtc_ega_t *crtc_ega, int postload);
-static void update_de_changed_timer(crtc_ega_t *crtc_ega);
-static void update_hsync_changed_timers(crtc_ega_t *crtc_ega);
-static void update_vsync_changed_timers(crtc_ega_t *crtc_ega);
-static void update_vblank_changed_timers(crtc_ega_t *crtc_ega);
-
-
-/* makes sure that the passed in device is the right type */
-INLINE crtc_ega_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == CRTC_EGA) ||
-		   /*(device->type() == DEVICE_GET_INFO_NAME(crtc_vga))*/0 );
-
-	return (crtc_ega_t *)downcast<legacy_device_base *>(device)->token();
+	if ( intf != NULL )
+	{
+		*static_cast<crtc_ega_interface *>(this) = *intf;
+	}
+	else
+	{
+		m_screen_tag = NULL;
+		m_hpixels_per_column = 0;
+		m_begin_update = NULL;
+		m_update_row = NULL;
+		m_end_update = NULL;
+		memset(&m_out_de_func, 0, sizeof(m_out_de_func));
+		memset(&m_out_hsync_func, 0, sizeof(m_out_hsync_func));
+		memset(&m_out_vsync_func, 0, sizeof(m_out_vsync_func));
+		memset(&m_out_vblank_func, 0, sizeof(m_out_vblank_func));
+	}
 }
 
 
-static void crtc_ega_state_save_postload(crtc_ega_t *state)
+crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock)
 {
-	recompute_parameters(state, TRUE);
 }
 
 
-WRITE8_DEVICE_HANDLER( crtc_ega_address_w )
+void crtc_ega_device::device_post_load()
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	crtc_ega->register_address_latch = data & 0x1f;
+	recompute_parameters(true);
 }
 
 
-READ8_DEVICE_HANDLER( crtc_ega_register_r )
+WRITE8_MEMBER( crtc_ega_device::address_w )
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
+	m_register_address_latch = data & 0x1f;
+}
+
+
+READ8_MEMBER( crtc_ega_device::register_r )
+{
 	UINT8 ret = 0;
 
-	switch (crtc_ega->register_address_latch)
+	switch (m_register_address_latch)
 	{
-		case 0x0c:  ret = (crtc_ega->disp_start_addr >> 8) & 0xff; break;
-		case 0x0d:  ret = (crtc_ega->disp_start_addr >> 0) & 0xff; break;
-		case 0x0e:  ret = (crtc_ega->cursor_addr    >> 8) & 0xff; break;
-		case 0x0f:  ret = (crtc_ega->cursor_addr    >> 0) & 0xff; break;
-		case 0x10:  ret = (crtc_ega->light_pen_addr >> 8) & 0xff; crtc_ega->light_pen_latched = FALSE; break;
-		case 0x11:  ret = (crtc_ega->light_pen_addr >> 0) & 0xff; crtc_ega->light_pen_latched = FALSE; break;
+		case 0x0c:  ret = (m_disp_start_addr >> 8) & 0xff; break;
+		case 0x0d:  ret = (m_disp_start_addr >> 0) & 0xff; break;
+		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
+		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = FALSE; break;
+		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = FALSE; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -155,720 +78,618 @@ READ8_DEVICE_HANDLER( crtc_ega_register_r )
 }
 
 
-WRITE8_DEVICE_HANDLER( crtc_ega_register_w )
+WRITE8_MEMBER( crtc_ega_device::register_w )
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
+	if (LOG)  logerror("CRTC_EGA PC %04x: reg 0x%02x = 0x%02x\n", cpu_get_pc(machine().firstcpu), m_register_address_latch, data);
 
-	if (LOG)  logerror("CRTC_EGA PC %04x: reg 0x%02x = 0x%02x\n", cpu_get_pc(device->machine().firstcpu), crtc_ega->register_address_latch, data);
-
-	switch (crtc_ega->register_address_latch)
+	switch (m_register_address_latch)
 	{
-		case 0x00:  crtc_ega->horiz_char_total  =   data & 0xff; break;
-		case 0x01:  crtc_ega->horiz_disp        =   data & 0xff; break;
-		case 0x02:  crtc_ega->horiz_blank_start =   data & 0xff; break;
-		case 0x03:  crtc_ega->horiz_blank_end   =  ((data & 0x1f) << 0) | (crtc_ega->horiz_blank_end & 0x20);
-					crtc_ega->de_skew           =  ((data & 0x60) >> 5);
-					crtc_ega->ena_vert_access   =  data & 0x80;
+		case 0x00:  m_horiz_char_total  =   data & 0xff; break;
+		case 0x01:  m_horiz_disp        =   data & 0xff; break;
+		case 0x02:  m_horiz_blank_start =   data & 0xff; break;
+		case 0x03:  m_horiz_blank_end   =  ((data & 0x1f) << 0) | (m_horiz_blank_end & 0x20);
+					m_de_skew           =  ((data & 0x60) >> 5);
+					m_ena_vert_access   =  data & 0x80;
 					break;
-		case 0x04:  crtc_ega->horiz_retr_start  =   data & 0xff; break;
-		case 0x05:  crtc_ega->horiz_retr_end    =   data & 0x1f;
-					crtc_ega->horiz_retr_skew   = ((data & 0x60) >> 5);
-					crtc_ega->horiz_blank_end   = ((data & 0x80) >> 2) | (crtc_ega->horiz_blank_end & 0x1f);
+		case 0x04:  m_horiz_retr_start  =   data & 0xff; break;
+		case 0x05:  m_horiz_retr_end    =   data & 0x1f;
+					m_horiz_retr_skew   = ((data & 0x60) >> 5);
+					m_horiz_blank_end   = ((data & 0x80) >> 2) | (m_horiz_blank_end & 0x1f);
 					break;
-		case 0x06:  crtc_ega->vert_total        = ((data & 0xff) << 0) | (crtc_ega->vert_total & 0x0300); break;
-		case 0x07:  crtc_ega->vert_total        = ((data & 0x01) << 8) | (crtc_ega->vert_total & 0x02ff);
-					crtc_ega->vert_disp_end     = ((data & 0x02) << 7) | (crtc_ega->vert_disp_end & 0x02ff);
-					crtc_ega->vert_retr_start   = ((data & 0x04) << 6) | (crtc_ega->vert_retr_start & 0x02ff);
-					crtc_ega->vert_blank_start  = ((data & 0x08) << 5) | (crtc_ega->vert_blank_start & 0x02ff);
-					crtc_ega->line_compare      = ((data & 0x10) << 4) | (crtc_ega->line_compare & 0x02ff);
-					crtc_ega->vert_total        = ((data & 0x20) << 4) | (crtc_ega->vert_total & 0x01ff);
-					crtc_ega->vert_disp_end     = ((data & 0x40) << 3) | (crtc_ega->vert_disp_end & 0x1ff);
-					crtc_ega->vert_retr_start   = ((data & 0x80) << 2) | (crtc_ega->vert_retr_start & 0x01ff);
+		case 0x06:  m_vert_total        = ((data & 0xff) << 0) | (m_vert_total & 0x0300); break;
+		case 0x07:  m_vert_total        = ((data & 0x01) << 8) | (m_vert_total & 0x02ff);
+					m_vert_disp_end     = ((data & 0x02) << 7) | (m_vert_disp_end & 0x02ff);
+					m_vert_retr_start   = ((data & 0x04) << 6) | (m_vert_retr_start & 0x02ff);
+					m_vert_blank_start  = ((data & 0x08) << 5) | (m_vert_blank_start & 0x02ff);
+					m_line_compare      = ((data & 0x10) << 4) | (m_line_compare & 0x02ff);
+					m_vert_total        = ((data & 0x20) << 4) | (m_vert_total & 0x01ff);
+					m_vert_disp_end     = ((data & 0x40) << 3) | (m_vert_disp_end & 0x1ff);
+					m_vert_retr_start   = ((data & 0x80) << 2) | (m_vert_retr_start & 0x01ff);
 					break;
-		case 0x08:  crtc_ega->preset_row_scan   =   data & 0x1f;
-					crtc_ega->byte_panning      = ((data & 0x60) >> 5);
+		case 0x08:  m_preset_row_scan   =   data & 0x1f;
+					m_byte_panning      = ((data & 0x60) >> 5);
 					break;
-		case 0x09:  crtc_ega->max_ras_addr      =   data & 0x1f;
-					crtc_ega->vert_blank_start  = ((data & 0x20) << 4) | (crtc_ega->vert_blank_start & 0x01ff);
-					crtc_ega->line_compare      = ((data & 0x40) << 3) | (crtc_ega->line_compare & 0x01ff);
-					crtc_ega->scan_doubling     =   data & 0x80;
+		case 0x09:  m_max_ras_addr      =   data & 0x1f;
+					m_vert_blank_start  = ((data & 0x20) << 4) | (m_vert_blank_start & 0x01ff);
+					m_line_compare      = ((data & 0x40) << 3) | (m_line_compare & 0x01ff);
+					m_scan_doubling     =   data & 0x80;
 					break;
-		case 0x0a:  crtc_ega->cursor_start_ras  =   data & 0x1f;
-					crtc_ega->cursor_disable    =   data & 0x20;
+		case 0x0a:  m_cursor_start_ras  =   data & 0x1f;
+					m_cursor_disable    =   data & 0x20;
 					break;
-		case 0x0b:  crtc_ega->cursor_end_ras    =   data & 0x1f;
-					crtc_ega->cursor_skew       = ((data & 0x60) >> 5);
+		case 0x0b:  m_cursor_end_ras    =   data & 0x1f;
+					m_cursor_skew       = ((data & 0x60) >> 5);
 					break;
-		case 0x0c:  crtc_ega->disp_start_addr   = ((data & 0xff) << 8) | (crtc_ega->disp_start_addr & 0x00ff); break;
-		case 0x0d:  crtc_ega->disp_start_addr   = ((data & 0xff) << 0) | (crtc_ega->disp_start_addr & 0xff00); break;
-		case 0x0e:  crtc_ega->cursor_addr       = ((data & 0xff) << 8) | (crtc_ega->cursor_addr & 0x00ff); break;
-		case 0x0f:  crtc_ega->cursor_addr       = ((data & 0xff) << 0) | (crtc_ega->cursor_addr & 0xff00); break;
-		case 0x10:	crtc_ega->vert_retr_start   = ((data & 0xff) << 0) | (crtc_ega->vert_retr_start & 0x03ff); break;
-		case 0x11:	crtc_ega->vert_retr_end     =   data & 0x0f;
-					crtc_ega->bandwidth         =   data & 0x40;
-					crtc_ega->protect           =   data & 0x80;
+		case 0x0c:  m_disp_start_addr   = ((data & 0xff) << 8) | (m_disp_start_addr & 0x00ff); break;
+		case 0x0d:  m_disp_start_addr   = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
+		case 0x0e:  m_cursor_addr       = ((data & 0xff) << 8) | (m_cursor_addr & 0x00ff); break;
+		case 0x0f:  m_cursor_addr       = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
+		case 0x10:	m_vert_retr_start   = ((data & 0xff) << 0) | (m_vert_retr_start & 0x0300); break;
+		case 0x11:	m_vert_retr_end     =   data & 0x0f;
+					m_bandwidth         =   data & 0x40;
+					m_protect           =   data & 0x80;
 					break;
-		case 0x12:	crtc_ega->vert_disp_end     = ((data & 0xff) << 0) | (crtc_ega->vert_disp_end & 0x0300); break;
-		case 0x13:	crtc_ega->offset            =  data & 0xff; break;
-		case 0x14:	crtc_ega->underline_loc     =  data & 0x7f; break;
-		case 0x15:	crtc_ega->vert_blank_start  = ((data & 0xff) << 0) | (crtc_ega->vert_blank_start & 0x0300); break;
-		case 0x16:	crtc_ega->vert_blank_end    =   data & 0x7f; break;
-		case 0x17:	crtc_ega->mode_control      =   data & 0xff; break;
-		case 0x18:	crtc_ega->line_compare      = ((data & 0xff) << 0) | (crtc_ega->line_compare & 0x0300); break;
+		case 0x12:	m_vert_disp_end     = ((data & 0xff) << 0) | (m_vert_disp_end & 0x0300); break;
+		case 0x13:	m_offset            =  data & 0xff; break;
+		case 0x14:	m_underline_loc     =  data & 0x7f; break;
+		case 0x15:	m_vert_blank_start  = ((data & 0xff) << 0) | (m_vert_blank_start & 0x0300); break;
+		case 0x16:	m_vert_blank_end    =   data & 0x7f; break;
+		case 0x17:	m_mode_control      =   data & 0xff; break;
+		case 0x18:	m_line_compare      = ((data & 0xff) << 0) | (m_line_compare & 0x0300); break;
 		default:	break;
 	}
 
-//  /* display message if the Mode Control register is not zero */
-//  if ((crtc_ega->register_address_latch == 0x08) && (crtc_ega->mode_control != 0))
-//      popmessage("Mode Control %02X is not supported!!!", crtc_ega->mode_control);
-
-	recompute_parameters(crtc_ega, FALSE);
+	recompute_parameters(false);
 }
 
 
-static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
+void crtc_ega_device::recompute_parameters(bool postload)
 {
-	if (crtc_ega->intf != NULL)
+	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
+
+	/* compute the screen sizes */
+	UINT16 horiz_pix_total = (m_horiz_char_total + 2) * m_hpixels_per_column;
+	UINT16 vert_pix_total = m_vert_total + 1;
+
+	/* determine the visible area, avoid division by 0 */
+	UINT16 max_visible_x = ( m_horiz_disp + 1 ) * m_hpixels_per_column - 1;
+	UINT16 max_visible_y = m_vert_disp_end;
+
+	/* determine the syncing positions */
+	int horiz_sync_char_width = ( m_horiz_retr_end + 1 ) - ( m_horiz_retr_start & 0x1f );
+	int vert_sync_pix_width = m_vert_retr_end - ( m_vert_retr_start & 0x0f );
+
+	if (horiz_sync_char_width <= 0)
+		horiz_sync_char_width += 0x10;
+
+	if (vert_sync_pix_width <= 0)
+		vert_sync_pix_width += 0x10;
+
+	hsync_on_pos = m_horiz_retr_start * m_hpixels_per_column;
+	hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * m_hpixels_per_column);
+	vsync_on_pos = m_vert_retr_start;		/* + 1 ?? */
+	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
+
+	if (hsync_off_pos > horiz_pix_total)
+		hsync_off_pos = horiz_pix_total;
+
+	if (vsync_off_pos > vert_pix_total)
+		vsync_off_pos = vert_pix_total;
+
+	if ( vsync_on_pos >= vsync_off_pos )
 	{
-		UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
-
-		/* compute the screen sizes */
-		UINT16 horiz_pix_total = (crtc_ega->horiz_char_total + 5) * crtc_ega->hpixels_per_column;
-		UINT16 vert_pix_total = crtc_ega->vert_total + 1;
-
-		/* determine the visible area, avoid division by 0 */
-		UINT16 max_visible_x = ( crtc_ega->horiz_disp + 1 ) * crtc_ega->hpixels_per_column - 1;
-		UINT16 max_visible_y = crtc_ega->vert_disp_end;
-
-		/* determine the syncing positions */
-		int horiz_sync_char_width = ( crtc_ega->horiz_retr_end + 1 ) - ( crtc_ega->horiz_retr_start & 0x1f );
-		int vert_sync_pix_width = crtc_ega->vert_retr_end - ( crtc_ega->vert_retr_start & 0x0f );
-
-		if (horiz_sync_char_width <= 0)
-			horiz_sync_char_width += 0x10;
-
-		if (vert_sync_pix_width <= 0)
-			vert_sync_pix_width += 0x10;
-
-		hsync_on_pos = crtc_ega->horiz_retr_start * crtc_ega->hpixels_per_column;
-		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * crtc_ega->hpixels_per_column);
-		vsync_on_pos = crtc_ega->vert_retr_start;		/* + 1 ?? */
-		vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
-
-		if (hsync_off_pos > horiz_pix_total)
-			hsync_off_pos = horiz_pix_total;
-
-		if (vsync_off_pos > vert_pix_total)
-			vsync_off_pos = vert_pix_total;
-
-		if ( vsync_on_pos >= vsync_off_pos )
-		{
-			vsync_on_pos = vsync_off_pos - 2;
-		}
-
-		/* update only if screen parameters changed, unless we are coming here after loading the saved state */
-		if (postload ||
-		    (horiz_pix_total != crtc_ega->horiz_pix_total) || (vert_pix_total != crtc_ega->vert_pix_total) ||
-			(max_visible_x != crtc_ega->max_visible_x) || (max_visible_y != crtc_ega->max_visible_y) ||
-			(hsync_on_pos != crtc_ega->hsync_on_pos) || (vsync_on_pos != crtc_ega->vsync_on_pos) ||
-			(hsync_off_pos != crtc_ega->hsync_off_pos) || (vsync_off_pos != crtc_ega->vsync_off_pos))
-		{
-			/* update the screen if we have valid data */
-			if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
-				(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
-				(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
-				(hsync_on_pos != hsync_off_pos))
-			{
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(crtc_ega->clock) * (crtc_ega->horiz_char_total + 1) * vert_pix_total;
-
-				rectangle visarea(0, max_visible_x, 0, max_visible_y);
-
-				if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-
-				crtc_ega->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
-
-				crtc_ega->has_valid_parameters = TRUE;
-			}
-			else
-			{
-				crtc_ega->has_valid_parameters = FALSE;
-				if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
-				                   horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
-
-			}
-
-			crtc_ega->horiz_pix_total = horiz_pix_total;
-			crtc_ega->vert_pix_total = vert_pix_total;
-			crtc_ega->max_visible_x = max_visible_x;
-			crtc_ega->max_visible_y = max_visible_y;
-			crtc_ega->hsync_on_pos = hsync_on_pos;
-			crtc_ega->hsync_off_pos = hsync_off_pos;
-			crtc_ega->vsync_on_pos = vsync_on_pos;
-			crtc_ega->vsync_off_pos = vsync_off_pos;
-
-			update_de_changed_timer(crtc_ega);
-			update_hsync_changed_timers(crtc_ega);
-			update_vsync_changed_timers(crtc_ega);
-			update_vblank_changed_timers(crtc_ega);
-		}
+		vsync_on_pos = vsync_off_pos - 2;
 	}
-}
 
-
-INLINE int is_display_enabled(crtc_ega_t *crtc_ega)
-{
-	return !crtc_ega->screen->vblank() && !crtc_ega->screen->hblank();
-}
-
-
-static void update_de_changed_timer(crtc_ega_t *crtc_ega)
-{
-	if (crtc_ega->has_valid_parameters && (crtc_ega->de_changed_timer != NULL))
+	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
+	if (postload ||
+	    (horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
+		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
+		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
+		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
 	{
-		INT16 next_y;
-		UINT16 next_x;
-		attotime duration;
-
-		/* we are in a display region, get the location of the next blanking start */
-		if (is_display_enabled(crtc_ega))
+		/* update the screen if we have valid data */
+		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
+			(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
+			(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
+			(hsync_on_pos != hsync_off_pos))
 		{
-			/* normally, it's at end the current raster line */
-			next_y = crtc_ega->screen->vpos();
-			next_x = crtc_ega->max_visible_x + 1;
+			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
 
-			/* but if visible width = horiz_pix_total, then we need
-               to go to the beginning of VBLANK */
-			if (next_x == crtc_ega->horiz_pix_total)
-			{
-				next_y = crtc_ega->max_visible_y + 1;
-				next_x = 0;
+			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
-				/* abnormal case, no vertical blanking, either */
-				if (next_y == crtc_ega->vert_pix_total)
-					next_y = -1;
-			}
+			if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
+							  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+
+			if ( m_screen != NULL )
+				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+
+			m_has_valid_parameters = true;
 		}
-
-		/* we are in a blanking region, get the location of the next display start */
 		else
 		{
-			next_x = 0;
-			next_y = (crtc_ega->screen->vpos() + 1) % crtc_ega->vert_pix_total;
+			m_has_valid_parameters = false;
+			if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
+			                   horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
 
-			/* if we would now fall in the vertical blanking, we need
-               to go to the top of the screen */
-			if (next_y > crtc_ega->max_visible_y)
-				next_y = 0;
 		}
 
-		if (next_y != -1)
-			duration = crtc_ega->screen->time_until_pos(next_y, next_x);
-		else
-			duration = attotime::never;
-
-		crtc_ega->de_changed_timer->adjust(duration);
+		m_horiz_pix_total = horiz_pix_total;
+		m_vert_pix_total = vert_pix_total;
+		m_max_visible_x = max_visible_x;
+		m_max_visible_y = max_visible_y;
+		m_hsync_on_pos = hsync_on_pos;
+		m_hsync_off_pos = hsync_off_pos;
+		m_vsync_on_pos = vsync_on_pos;
+		m_vsync_off_pos = vsync_off_pos;
 	}
 }
 
 
-static void update_hsync_changed_timers(crtc_ega_t *crtc_ega)
+void crtc_ega_device::update_counters()
 {
-	if (crtc_ega->has_valid_parameters && (crtc_ega->hsync_on_timer != NULL))
+	m_character_counter = m_line_timer->elapsed().as_ticks( m_clock );
+
+	if ( m_hsync_off_timer->enabled() )
 	{
-		UINT16 next_y;
-
-		/* we are before the HSYNC position, we trigger on the current line */
-		if (crtc_ega->screen->hpos() < crtc_ega->hsync_on_pos)
-			next_y = crtc_ega->screen->vpos();
-
-		/* trigger on the next line */
-		else
-			next_y = (crtc_ega->screen->vpos() + 1) % crtc_ega->vert_pix_total;
-
-		/* if the next line is not in the visible region, go to the beginning of the screen */
-		if (next_y > crtc_ega->max_visible_y)
-			next_y = 0;
-
-		crtc_ega->hsync_on_timer->adjust(crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_on_pos) );
-		crtc_ega->hsync_off_timer->adjust(crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_off_pos));
+		m_hsync_width_counter = m_hsync_off_timer->elapsed().as_ticks( m_clock );
 	}
 }
 
 
-static void update_vsync_changed_timers(crtc_ega_t *crtc_ega)
+void crtc_ega_device::set_de(int state)
 {
-	if (crtc_ega->has_valid_parameters && (crtc_ega->vsync_on_timer != NULL))
+	if ( m_de != state )
 	{
-		crtc_ega->vsync_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vsync_on_pos,  0));
-		crtc_ega->vsync_off_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vsync_off_pos, 0));
+		m_de = state;
+
+		if ( !m_res_out_de_func.isnull() )
+			m_res_out_de_func( m_de );
 	}
 }
 
 
-static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
+void crtc_ega_device::set_hsync(int state)
 {
-	if (crtc_ega->has_valid_parameters && (crtc_ega->vblank_on_timer != NULL))
+	if ( m_hsync != state )
 	{
-		crtc_ega->vblank_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_off_pos));
-		crtc_ega->vblank_off_timer->adjust(crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_on_pos));
+		m_hsync = state;
+
+		if ( !m_res_out_hsync_func.isnull() )
+			m_res_out_hsync_func( m_hsync );
 	}
 }
 
 
-static TIMER_CALLBACK( de_changed_timer_cb )
+void crtc_ega_device::set_vsync(int state)
 {
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_de_changed(device, is_display_enabled(crtc_ega));
-
-	update_de_changed_timer(crtc_ega);
-}
-
-
-static TIMER_CALLBACK( vsync_on_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_vsync_changed(device, TRUE);
-}
-
-
-static TIMER_CALLBACK( vsync_off_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_vsync_changed(device, FALSE);
-
-	update_vsync_changed_timers(crtc_ega);
-}
-
-
-static TIMER_CALLBACK( hsync_on_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_hsync_changed(device, TRUE);
-}
-
-
-static TIMER_CALLBACK( hsync_off_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_hsync_changed(device, FALSE);
-
-	update_hsync_changed_timers(crtc_ega);
-}
-
-
-static TIMER_CALLBACK( vblank_on_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_vblank_changed(device, TRUE);
-
-	update_vblank_changed_timers(crtc_ega);
-}
-
-
-static TIMER_CALLBACK( vblank_off_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	crtc_ega->intf->on_vblank_changed(device, FALSE);
-
-	update_vblank_changed_timers(crtc_ega);
-}
-
-
-
-UINT16 crtc_ega_get_ma(device_t *device)
-{
-	UINT16 ret;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	if (crtc_ega->has_valid_parameters)
+	if ( m_vsync != state )
 	{
-		/* clamp Y/X to the visible region */
-		int y = crtc_ega->screen->vpos();
-		int x = crtc_ega->screen->hpos();
+		m_vsync = state;
 
-		/* since the MA counter stops in the blanking regions, if we are in a
-           VBLANK, both X and Y are at their max */
-		if ((y > crtc_ega->max_visible_y) || (x > crtc_ega->max_visible_x))
-			x = crtc_ega->max_visible_x;
+		if ( !m_res_out_vsync_func.isnull() )
+			m_res_out_vsync_func( m_vsync );
+	}
+}
 
-		if (y > crtc_ega->max_visible_y)
-			y = crtc_ega->max_visible_y;
 
-		ret = (crtc_ega->disp_start_addr +
-			  (y / (crtc_ega->max_ras_addr + 1)) * ( crtc_ega->horiz_disp + 1 ) +
-			  (x / crtc_ega->hpixels_per_column)) & 0x3fff;
+void crtc_ega_device::set_vblank(int state)
+{
+	if ( m_vblank != state )
+	{
+		m_vblank = state;
+
+		if ( !m_res_out_vblank_func.isnull() )
+			m_res_out_vblank_func( m_vblank );
+	}
+}
+
+
+void crtc_ega_device::set_cur(int state)
+{
+	if ( m_cur != state )
+	{
+		m_cur = state;
+
+//		if ( !m_res_out_cur_func.isnull() )
+//			m_res_out_cur_func( m_cur );
+	}
+}
+
+
+void crtc_ega_device::handle_line_timer()
+{
+	int new_vsync = m_vsync;
+
+	m_character_counter = 0;
+	m_cursor_x = -1;
+
+	/* Check if VSYNC is active */
+	if ( m_vsync_ff )
+	{
+		m_vsync_width_counter = ( m_vsync_width_counter + 1 ) & 0x0F;
+
+		/* Check if we've reached end of VSYNC */
+		if ( m_vsync_width_counter == m_vert_retr_end )
+		{
+			m_vsync_ff = 0;
+
+			new_vsync = FALSE;
+		}
+	}
+
+	if ( m_raster_counter == m_max_ras_addr )
+	{
+		m_raster_counter = 0;
+		m_line_address = ( m_line_address + m_horiz_disp + 1 ) & 0xffff;
 	}
 	else
-		ret = 0;
-
-	return ret;
-}
-
-
-UINT8 crtc_ega_get_ra(device_t *device)
-{
-	UINT8 ret;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	if (crtc_ega->has_valid_parameters)
 	{
-		/* get the current vertical raster position and clamp it to the visible region */
-		int y = crtc_ega->screen->vpos();
-
-		if (y > crtc_ega->max_visible_y)
-			y = crtc_ega->max_visible_y;
-
-		ret = y % (crtc_ega->max_ras_addr + 1);
+		m_raster_counter = ( m_raster_counter + 1 ) & 0x1F;
 	}
-	else
-		ret = 0;
 
-	return ret;
-}
+	m_line_counter = ( m_line_counter + 1 ) & 0x3ff;
 
-
-static TIMER_CALLBACK( light_pen_latch_timer_cb )
-{
-	device_t *device = (device_t *)ptr;
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	crtc_ega->light_pen_addr = crtc_ega_get_ma(device);
-	crtc_ega->light_pen_latched = TRUE;
-}
-
-
-void crtc_ega_assert_light_pen_input(device_t *device)
-{
-	int y, x;
-	int char_x;
-
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
-	if (crtc_ega->has_valid_parameters)
+	/* Check if we've reached the end of active display */
+	if ( m_line_counter == m_vert_disp_end )
 	{
-		/* get the current pixel coordinates */
-		y = crtc_ega->screen->vpos();
-		x = crtc_ega->screen->hpos();
+		m_line_enable_ff = false;
+	}
 
-		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
-		char_x = x / crtc_ega->hpixels_per_column;
-		x = (char_x + 1) * crtc_ega->hpixels_per_column;
+	/* Check if VSYNC should be enabled */
+	if ( m_line_counter == m_vert_retr_start )
+	{
+		m_vsync_width_counter = 0;
+		m_vsync_ff = 1;
 
-		/* adjust if we are passed the boundaries of the screen */
-		if (x == crtc_ega->horiz_pix_total)
+		new_vsync = TRUE;
+	}
+
+	/* Check if we have reached the end of the vertical area */
+	if ( m_line_counter == m_vert_total )
+	{
+		m_line_counter = 0;
+		m_line_address = m_disp_start_addr;
+		m_line_enable_ff = true;
+		set_vblank( FALSE );
+		/* also update the cursor state now */
+		update_cursor_state();
+
+		if (m_screen != NULL)
+			m_screen->reset_origin();
+	}
+
+	if ( m_line_enable_ff )
+	{
+		/* Schedule DE off signal change */
+		m_de_off_timer->adjust(attotime::from_ticks( m_horiz_disp + 1, m_clock ));
+
+		/* Is cursor visible on this line? */
+		if ( m_cursor_state &&
+			(m_raster_counter >= (m_cursor_start_ras & 0x1f)) &&
+			(m_raster_counter <= m_cursor_end_ras) &&
+			(m_cursor_addr >= m_line_address) &&
+			(m_cursor_addr < (m_line_address + m_horiz_disp + 1)) )
 		{
-			y = y + 1;
-			x = 0;
+			m_cursor_x = m_cursor_addr - m_line_address;
 
-			if (y == crtc_ega->vert_pix_total)
-				y = 0;
+			/* Schedule CURSOR ON signal */
+			m_cur_on_timer->adjust( attotime::from_ticks( m_cursor_x, m_clock ) );
 		}
+	}
 
-		/* set the timer that will latch the display address into the light pen registers */
-		crtc_ega->light_pen_latch_timer->adjust(crtc_ega->screen->time_until_pos(y, x));
+	/* Schedule HSYNC on signal */
+	m_hsync_on_timer->adjust( attotime::from_ticks( m_horiz_blank_start, m_clock ) );
+
+	/* Set VBlank signal */
+	if ( m_line_counter == m_vert_disp_end + 1 )
+	{
+		set_vblank( TRUE );
+	}
+
+	/* Schedule our next callback */
+	m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
+
+	/* Set VSYNC and DE signals */
+	set_vsync( new_vsync );
+	set_de( m_line_enable_ff ? TRUE : FALSE );
+}
+
+
+void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LINE:
+		handle_line_timer();
+		break;
+
+	case TIMER_DE_OFF:
+		set_de( FALSE );
+		break;
+
+	case TIMER_CUR_ON:
+		set_cur( TRUE );
+
+		/* Schedule CURSOR off signal */
+		m_cur_off_timer->adjust( attotime::from_ticks( 1, m_clock ) );
+		break;
+
+	case TIMER_CUR_OFF:
+		set_cur( FALSE );
+		break;
+
+	case TIMER_HSYNC_ON:
+		{
+			INT8 hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
+
+			if ( hsync_width <= 0 )
+			{
+				hsync_width += 0x20;
+			}
+
+			m_hsync_width_counter = 0;
+			set_hsync( TRUE );
+
+			/* Schedule HSYNC off signal */
+			m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
+		}
+		break;
+
+	case TIMER_HSYNC_OFF:
+		set_hsync( FALSE );
+		break;
+
+	case TIMER_LIGHT_PEN_LATCH:
+		m_light_pen_addr = get_ma();
+		m_light_pen_latched = true;
+		break;
 	}
 }
 
 
-void crtc_ega_set_clock(device_t *device, int clock)
+UINT16 crtc_ega_device::get_ma()
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
+	update_counters();
 
+	return m_line_address + m_character_counter;
+}
+
+
+UINT8 crtc_ega_device::get_ra()
+{
+	return m_raster_counter;
+}
+
+
+void crtc_ega_device::assert_light_pen_input()
+{
+	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
+	/* set the timer that will latch the display address into the light pen registers */
+	m_light_pen_latch_timer->adjust(attotime::from_ticks( 1, m_clock ));
+}
+
+
+void crtc_ega_device::set_clock(int clock)
+{
 	/* validate arguments */
 	assert(clock > 0);
 
-	if (clock != crtc_ega->clock)
+	if (clock != m_clock)
 	{
-		crtc_ega->clock = clock;
-		recompute_parameters(crtc_ega, FALSE);
+		m_clock = clock;
+		recompute_parameters(true);
 	}
 }
 
 
-void crtc_ega_set_hpixels_per_column(device_t *device, int hpixels_per_column)
+void crtc_ega_device::set_hpixels_per_column(int hpixels_per_column)
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
 	/* validate arguments */
 	assert(hpixels_per_column > 0);
 
-	if (hpixels_per_column != crtc_ega->hpixels_per_column)
+	if (hpixels_per_column != m_hpixels_per_column)
 	{
-		crtc_ega->hpixels_per_column = hpixels_per_column;
-		recompute_parameters(crtc_ega, FALSE);
+		m_hpixels_per_column = hpixels_per_column;
+		recompute_parameters(true);
 	}
 }
 
 
-static void update_cursor_state(crtc_ega_t *crtc_ega)
+void crtc_ega_device::update_cursor_state()
 {
 	/* save and increment cursor counter */
-	UINT8 last_cursor_blink_count = crtc_ega->cursor_blink_count;
-	crtc_ega->cursor_blink_count = crtc_ega->cursor_blink_count + 1;
+	UINT8 last_cursor_blink_count = m_cursor_blink_count;
+	m_cursor_blink_count = m_cursor_blink_count + 1;
 
 	/* switch on cursor blinking mode */
-	switch (crtc_ega->cursor_start_ras & 0x60)
+	switch (m_cursor_start_ras & 0x60)
 	{
 		/* always on */
-		case 0x00: crtc_ega->cursor_state = TRUE; break;
+		case 0x00: m_cursor_state = true; break;
 
 		/* always off */
-		case 0x20: crtc_ega->cursor_state = FALSE; break;
+		case 0x20: m_cursor_state = false; break;
 
 		/* fast blink */
 		case 0x40:
-			if ((last_cursor_blink_count & 0x10) != (crtc_ega->cursor_blink_count & 0x10))
+			if ((last_cursor_blink_count & 0x10) != (m_cursor_blink_count & 0x10))
 			{
-				crtc_ega->cursor_state = !crtc_ega->cursor_state;
+				m_cursor_state = !m_cursor_state;
 			}
 			break;
 
 		/* slow blink */
 		case 0x60:
-			if ((last_cursor_blink_count & 0x20) != (crtc_ega->cursor_blink_count & 0x20))
+			if ((last_cursor_blink_count & 0x20) != (m_cursor_blink_count & 0x20))
 			{
-				crtc_ega->cursor_state = !crtc_ega->cursor_state;
+				m_cursor_state = !m_cursor_state;
 			}
 			break;
 	}
 }
 
 
-void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
 	assert(bitmap.valid());
 
-	if (crtc_ega->has_valid_parameters)
+	if (m_has_valid_parameters)
 	{
 		UINT16 y;
 
 		void *param = NULL;
 
-		assert(crtc_ega->intf != NULL);
-		assert(crtc_ega->intf->update_row != NULL);
+		assert(m_update_row != NULL);
 
 		/* call the set up function if any */
-		if (crtc_ega->intf->begin_update != NULL)
-			param = crtc_ega->intf->begin_update(device, bitmap, cliprect);
+		if (m_begin_update != NULL)
+			param = m_begin_update(this, bitmap, cliprect);
 
 		if (cliprect.min_y == 0)
 		{
 			/* read the start address at the beginning of the frame */
-			crtc_ega->current_disp_addr = crtc_ega->disp_start_addr;
-
-			/* also update the cursor state now */
-			update_cursor_state(crtc_ega);
+			m_current_disp_addr = m_disp_start_addr;
 		}
 
 		/* for each row in the visible region */
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
-			UINT8 ra = y % (crtc_ega->max_ras_addr + 1);
+			UINT8 ra = y % (m_max_ras_addr + 1);
 
 			/* check if the cursor is visible and is on this scanline */
-			int cursor_visible = crtc_ega->cursor_state &&
-								(ra >= (crtc_ega->cursor_start_ras & 0x1f)) &&
-								( (ra <= (crtc_ega->cursor_end_ras & 0x1f)) || ((crtc_ega->cursor_end_ras & 0x1f) == 0x00 )) &&
-								(crtc_ega->cursor_addr >= crtc_ega->current_disp_addr) &&
-								(crtc_ega->cursor_addr < (crtc_ega->current_disp_addr + ( crtc_ega->horiz_disp + 1 )));
+			int cursor_visible = m_cursor_state &&
+								(ra >= (m_cursor_start_ras & 0x1f)) &&
+								( (ra <= (m_cursor_end_ras & 0x1f)) || ((m_cursor_end_ras & 0x1f) == 0x00 )) &&
+								(m_cursor_addr >= m_current_disp_addr) &&
+								(m_cursor_addr < (m_current_disp_addr + ( m_horiz_disp + 1 )));
 
 			/* compute the cursor X position, or -1 if not visible */
-			INT8 cursor_x = cursor_visible ? (crtc_ega->cursor_addr - crtc_ega->current_disp_addr) : -1;
+			INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			crtc_ega->intf->update_row(device, bitmap, cliprect, crtc_ega->current_disp_addr, ra, y, crtc_ega->horiz_disp + 1, cursor_x, param);
+			m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp + 1, cursor_x, param);
 
 			/* update MA if the last raster address */
-			if (ra == crtc_ega->max_ras_addr)
-				crtc_ega->current_disp_addr = (crtc_ega->current_disp_addr + crtc_ega->horiz_disp + 1) & 0xffff;
+			if (ra == m_max_ras_addr)
+				m_current_disp_addr = (m_current_disp_addr + m_horiz_disp + 1) & 0xffff;
 		}
 
 		/* call the tear down function if any */
-		if (crtc_ega->intf->end_update != NULL)
-			crtc_ega->intf->end_update(device, bitmap, cliprect, param);
+		if (m_end_update != NULL)
+			m_end_update(this, bitmap, cliprect, param);
 	}
 	else
 		logerror("Invalid crtc_ega screen parameters - display disabled!!!\n");
+
+	return 0;
 }
 
 
 /* device interface */
-static void common_start(device_t *device, int device_type)
+void crtc_ega_device::device_start()
 {
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
 	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-	assert(device->clock() > 0);
+	assert(m_clock > 0);
+	assert(m_hpixels_per_column > 0);
 
-	crtc_ega->intf = (const crtc_ega_interface*)device->static_config();
-	crtc_ega->device_type = device_type;
+	/* resolve callbacks */
+	m_res_out_de_func.resolve(m_out_de_func, *this);
+	m_res_out_hsync_func.resolve(m_out_hsync_func, *this);
+	m_res_out_vsync_func.resolve(m_out_vsync_func, *this);
+	m_res_out_vblank_func.resolve(m_out_vblank_func, *this);
 
-	if (crtc_ega->intf != NULL)
+	/* get the screen device */
+	if ( m_screen_tag != NULL )
 	{
-		assert(crtc_ega->intf->hpixels_per_column > 0);
-
-		/* copy the initial parameters */
-		crtc_ega->clock = device->clock();
-		crtc_ega->hpixels_per_column = crtc_ega->intf->hpixels_per_column;
-
-		/* get the screen device */
 		astring tempstring;
-		crtc_ega->screen = downcast<screen_device *>(device->machine().device(device->owner()->subtag(tempstring,crtc_ega->intf->screen_tag)));
-		assert(crtc_ega->screen != NULL);
-
-		/* create the timers */
-		if (crtc_ega->intf->on_de_changed != NULL)
-			crtc_ega->de_changed_timer = device->machine().scheduler().timer_alloc(FUNC(de_changed_timer_cb), (void *)device);
-
-		if (crtc_ega->intf->on_hsync_changed != NULL)
-		{
-			crtc_ega->hsync_on_timer = device->machine().scheduler().timer_alloc(FUNC(hsync_on_timer_cb), (void *)device);
-			crtc_ega->hsync_off_timer = device->machine().scheduler().timer_alloc(FUNC(hsync_off_timer_cb), (void *)device);
-		}
-
-		if (crtc_ega->intf->on_vsync_changed != NULL)
-		{
-			crtc_ega->vsync_on_timer = device->machine().scheduler().timer_alloc(FUNC(vsync_on_timer_cb), (void *)device);
-			crtc_ega->vsync_off_timer = device->machine().scheduler().timer_alloc(FUNC(vsync_off_timer_cb), (void *)device);
-		}
-
-		if (crtc_ega->intf->on_vblank_changed != NULL)
-		{
-			crtc_ega->vblank_on_timer = device->machine().scheduler().timer_alloc(FUNC(vblank_on_timer_cb), (void *)device);
-			crtc_ega->vblank_off_timer = device->machine().scheduler().timer_alloc(FUNC(vblank_off_timer_cb), (void *)device);
-		}
+		m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
+		assert(m_screen != NULL);
 	}
+	else
+		m_screen = NULL;
 
-	crtc_ega->light_pen_latch_timer = device->machine().scheduler().timer_alloc(FUNC(light_pen_latch_timer_cb), (void *)device);
+	/* create the timers */
+	m_line_timer = timer_alloc(TIMER_LINE);
+	m_de_off_timer = timer_alloc(TIMER_DE_OFF);
+	m_cur_on_timer = timer_alloc(TIMER_CUR_ON);
+	m_cur_off_timer = timer_alloc(TIMER_CUR_OFF);
+	m_hsync_on_timer = timer_alloc(TIMER_HSYNC_ON);
+	m_hsync_off_timer = timer_alloc(TIMER_HSYNC_OFF);
+	m_light_pen_latch_timer = timer_alloc(TIMER_LIGHT_PEN_LATCH);
+
+	/* Use some large startup values */
+	m_horiz_char_total = 0xff;
+	m_max_ras_addr = 0x1f;
+	m_vert_total = 0x3ff;
 
 	/* register for state saving */
-
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(crtc_ega_state_save_postload), crtc_ega));
-
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->clock);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->hpixels_per_column);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->register_address_latch);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_char_total);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_disp);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_blank_start);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->mode_control);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_start_ras);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_end_ras);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->disp_start_addr);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_addr);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->light_pen_addr);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->light_pen_latched);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_state);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_blink_count);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_blank_end);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->ena_vert_access);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->de_skew);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_retr_start);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_retr_end);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->horiz_retr_skew);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_total);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->preset_row_scan);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->byte_panning);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->max_ras_addr);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->scan_doubling);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_disable);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->cursor_skew);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_retr_start);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_retr_end);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->protect);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->bandwidth);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_disp_end);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->offset);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->underline_loc);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_blank_start);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->vert_blank_end);
-	state_save_register_item(device->machine(), device->tag(), NULL, 0, crtc_ega->line_compare);
+	save_item(NAME(m_hpixels_per_column));
+	save_item(NAME(m_register_address_latch));
+	save_item(NAME(m_horiz_char_total));
+	save_item(NAME(m_horiz_disp));
+	save_item(NAME(m_horiz_blank_start));
+	save_item(NAME(m_mode_control));
+	save_item(NAME(m_cursor_start_ras));
+	save_item(NAME(m_cursor_end_ras));
+	save_item(NAME(m_disp_start_addr));
+	save_item(NAME(m_cursor_addr));
+	save_item(NAME(m_light_pen_addr));
+	save_item(NAME(m_light_pen_latched));
+	save_item(NAME(m_cursor_state));
+	save_item(NAME(m_cursor_blink_count));
+	save_item(NAME(m_horiz_blank_end));
+	save_item(NAME(m_ena_vert_access));
+	save_item(NAME(m_de_skew));
+	save_item(NAME(m_horiz_retr_start));
+	save_item(NAME(m_horiz_retr_end));
+	save_item(NAME(m_horiz_retr_skew));
+	save_item(NAME(m_vert_total));
+	save_item(NAME(m_preset_row_scan));
+	save_item(NAME(m_byte_panning));
+	save_item(NAME(m_max_ras_addr));
+	save_item(NAME(m_scan_doubling));
+	save_item(NAME(m_cursor_disable));
+	save_item(NAME(m_cursor_skew));
+	save_item(NAME(m_vert_retr_start));
+	save_item(NAME(m_vert_retr_end));
+	save_item(NAME(m_protect));
+	save_item(NAME(m_bandwidth));
+	save_item(NAME(m_vert_disp_end));
+	save_item(NAME(m_offset));
+	save_item(NAME(m_underline_loc));
+	save_item(NAME(m_vert_blank_start));
+	save_item(NAME(m_vert_blank_end));
+	save_item(NAME(m_line_compare));
 }
 
 
-static DEVICE_START( crtc_ega )
+void crtc_ega_device::device_reset()
 {
-	common_start(device, TYPE_CRTC_EGA);
-}
-
-
-static DEVICE_RESET( crtc_ega )
-{
-	crtc_ega_t *crtc_ega = get_safe_token(device);
-
 	/* internal registers other than status remain unchanged, all outputs go low */
-	if (crtc_ega->intf != NULL)
+	if ( !m_res_out_de_func.isnull() )
+		m_res_out_de_func( FALSE );
+
+	if ( !m_res_out_hsync_func.isnull() )
+		m_res_out_hsync_func( FALSE );
+
+	if ( !m_res_out_vsync_func.isnull() )
+		m_res_out_vsync_func( FALSE );
+
+	if ( !m_res_out_vblank_func.isnull() )
+		m_res_out_vblank_func( FALSE );
+
+	if ( ! m_line_timer->enabled( ) )
 	{
-		if (crtc_ega->intf->on_de_changed != NULL)
-			crtc_ega->intf->on_de_changed(device, FALSE);
-
-		if (crtc_ega->intf->on_hsync_changed != NULL)
-			crtc_ega->intf->on_hsync_changed(device, FALSE);
-
-		if (crtc_ega->intf->on_vsync_changed != NULL)
-			crtc_ega->intf->on_vsync_changed(device, FALSE);
+		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 	}
 
-	crtc_ega->light_pen_latched = FALSE;
+	m_light_pen_latched = false;
+
+	m_cursor_addr = 0;
+	m_line_address = 0;
+	m_horiz_disp = 0;
+	m_cursor_x = 0;
 }
 
-
-DEVICE_GET_INFO( crtc_ega )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(crtc_ega_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(crtc_ega);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(crtc_ega);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "IBM EGA CRTC");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "EGA CRTC");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.00");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); break;
-	}
-}
-
-#if 0
-DEVICE_GET_INFO( crtc_vga )
-{
-	switch (state)
-	{
-		default:										DEVICE_GET_INFO_CALL( crtc_ega );			break;
-	}
-}
-#endif
-
-DEFINE_LEGACY_DEVICE(CRTC_EGA, crtc_ega);

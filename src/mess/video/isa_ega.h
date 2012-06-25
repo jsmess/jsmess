@@ -35,18 +35,25 @@ public:
 		DECLARE_WRITE8_MEMBER(pc_ega8_3c0_w);
 		DECLARE_READ8_MEMBER(pc_ega8_3d0_r);
 		DECLARE_WRITE8_MEMBER(pc_ega8_3d0_w);
+		DECLARE_WRITE_LINE_MEMBER(de_changed);
+		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+		DECLARE_WRITE_LINE_MEMBER(vblank_changed);
+
 protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
 
+		UINT8 alu_op( UINT8 data, UINT8 latch_data );
+
 public:
-		device_t *m_crtc_ega;
+		crtc_ega_device *m_crtc_ega;
 
 		void install_banks();
 		void change_mode();
-		void pc_ega8_3X0_w(UINT8 offset, UINT8 data);
-		UINT8 pc_ega8_3X0_r(UINT8 offset);
+		DECLARE_WRITE8_MEMBER(pc_ega8_3X0_w);
+		DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
 
 		crtc_ega_update_row_func	m_update_row;
 
@@ -85,6 +92,7 @@ public:
 		} m_graphics_controller;
 
 		UINT8	m_frame_cnt;
+		UINT8	m_hsync;
 		UINT8	m_vsync;
 		UINT8	m_vblank;
 		UINT8	m_display_enable;

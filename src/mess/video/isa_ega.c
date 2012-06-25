@@ -454,21 +454,18 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 */
 static SCREEN_UPDATE_IND16( pc_ega );
 static CRTC_EGA_UPDATE_ROW( ega_update_row );
-static CRTC_EGA_ON_DE_CHANGED( ega_de_changed );
-static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed );
-static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed );
 
-static const crtc_ega_interface crtc_ega_ega_intf =
+static CRTC_EGA_INTERFACE( crtc_ega_ega_intf )
 {
 	EGA_SCREEN_NAME,	/* screen number */
 	8,					/* numbers of pixels per video memory address */
 	NULL,				/* begin_update */
 	ega_update_row,		/* update_row */
 	NULL,				/* end_update */
-	ega_de_changed,		/* on_de_chaged */
-	NULL,				/* on_hsync_changed */
-	ega_vsync_changed,	/* on_vsync_changed */
-	ega_vblank_changed	/* on_vblank_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, de_changed),		/* on_de_chaged */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, hsync_changed),	/* on_hsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, vsync_changed),	/* on vsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, vblank_changed)	/* on_vblank_changed */
 };
 
 
@@ -510,23 +507,23 @@ ROM_END
 
 INPUT_PORTS_START( ega )
 	PORT_START( "config" )
-	PORT_CONFNAME( 0x0f, 0x0e, "dipswitches" )
-	PORT_CONFSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )
-	PORT_CONFSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )
-	PORT_CONFSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )
-	PORT_CONFSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )
-	PORT_CONFSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )
-	PORT_CONFSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )
-	PORT_CONFSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )
-	PORT_CONFSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )
-	PORT_CONFSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )
-	PORT_CONFSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )
-	PORT_CONFSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )
-	PORT_CONFSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )
-	PORT_CONFSETTING( 0x03, "1100 - RESERVED" )
-	PORT_CONFSETTING( 0x0b, "1101 - RESERVED" )
-	PORT_CONFSETTING( 0x07, "1110 - RESERVED" )
-	PORT_CONFSETTING( 0x0f, "1111 - RESERVED" )
+	PORT_CONFNAME( 0x0f, 0x09, "dipswitches" )
+	PORT_CONFSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )							/* DIAG: ?? 40 cols, RGBI */
+	PORT_CONFSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )							/* DIAG: ?? 80 cols, RGBI */
+	PORT_CONFSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )			/* DIAG: ?? 80 cols, RGBI */
+	PORT_CONFSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )							/* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_CONFSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )							/* DIAG: ??, Mono RGBI */
+	PORT_CONFSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )							/* DIAG: ??, Mono RGBI */
+	PORT_CONFSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )							/* DIAG: Color Display 40 cols, RGBI */
+	PORT_CONFSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )							/* DIAG: Color Display 80 cols, RGBI */
+	PORT_CONFSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )			/* DIAG: Color Display 80 cols, RGBI */
+	PORT_CONFSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )						/* DIAG: Color Display 40 cols, RrGgBb */
+	PORT_CONFSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )									/* DIAG: Monochrome display, Mono RGBI */
+	PORT_CONFSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )									/* DIAG: Monochrome display, Mono RGBI */
+	PORT_CONFSETTING( 0x03, "1100 - RESERVED" )													/* ??, RGBI */
+	PORT_CONFSETTING( 0x0b, "1101 - RESERVED" )													/* ??, RGBI */
+	PORT_CONFSETTING( 0x07, "1110 - RESERVED" )													/* ??, RGBI */
+	PORT_CONFSETTING( 0x0f, "1111 - RESERVED" )													/* ??, RGBI */
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -618,7 +615,7 @@ void isa8_ega_device::device_start()
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
 
-	m_crtc_ega = subdevice(EGA_CRTC_NAME);
+	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, 0, 0, "ega", "user2");
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
@@ -639,6 +636,7 @@ void isa8_ega_device::device_reset()
 	memset(&m_graphics_controller,0,sizeof(m_graphics_controller));
 
 	m_frame_cnt = 0;
+	m_hsync = 0;
 	m_vsync = 0;
 	m_vblank = 0;
 	m_display_enable = 0;
@@ -730,7 +728,7 @@ void isa8_ega_device::install_banks()
 static SCREEN_UPDATE_IND16( pc_ega )
 {
 	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(screen.owner());
-	crtc_ega_update( ega->m_crtc_ega, bitmap, cliprect);
+	ega->m_crtc_ega->screen_update( screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -745,28 +743,31 @@ static CRTC_EGA_UPDATE_ROW( ega_update_row )
 }
 
 
-static CRTC_EGA_ON_DE_CHANGED( ega_de_changed )
+WRITE_LINE_MEMBER( isa8_ega_device::de_changed )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	ega->m_display_enable = display_enabled ? 1 : 0;
+	m_display_enable = state ? 1 : 0;
 }
 
 
-static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed )
+WRITE_LINE_MEMBER( isa8_ega_device::hsync_changed )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	ega->m_vsync = vsync ? 8 : 0;
-	if ( vsync )
+	m_hsync = state ? 1 : 0;
+}
+
+
+WRITE_LINE_MEMBER( isa8_ega_device::vsync_changed )
+{
+	m_vsync = state ? 1 : 0;
+	if ( state )
 	{
-		ega->m_frame_cnt++;
+		m_frame_cnt++;
 	}
 }
 
 
-static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
+WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	ega->m_vblank = vblank ? 8 : 0;
+	m_vblank = state ? 8 : 0;
 }
 
 
@@ -803,7 +804,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 	{
 		// EGA mode
 
-//      UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
+		UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
 
 		for ( int i = 0; i < x_count; i++ )
 		{
@@ -817,7 +818,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 			{
 				UINT16 col = ( data0 & 0x01 ) | ( data1 & 0x02 ) | ( data2 & 0x04 ) | ( data3 & 0x08 );
 
-//              col &= mask;
+				col &= mask;
 
 				p[j] = ega->m_attribute.data[col];
 
@@ -942,8 +943,8 @@ void isa8_ega_device::change_mode()
 	{
 		clock >>= 1;
 	}
-	crtc_ega_set_clock( m_crtc_ega, clock / pixels );
-	crtc_ega_set_hpixels_per_column( m_crtc_ega, pixels );
+	m_crtc_ega->set_clock( clock / pixels );
+	m_crtc_ega->set_hpixels_per_column( pixels );
 
 if ( ! m_update_row )
 	logerror("unknown video mode\n");
@@ -954,7 +955,7 @@ READ8_MEMBER( isa8_ega_device::read )
 {
 	UINT8 data = 0xFF;
 
-	if ( !space.debugger_access() )
+	if ( !space.debugger_access() && ! ( m_sequencer.data[4] & 0x04 ) )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -967,6 +968,7 @@ READ8_MEMBER( isa8_ega_device::read )
 	{
 		// Read mode #1
 		popmessage("ega: Read mode 1 not supported yet!");
+		printf("EGA: Read mode 1 not supported yet!\n");
 	}
 	else
 	{
@@ -987,8 +989,31 @@ READ8_MEMBER( isa8_ega_device::read )
 }
 
 
+UINT8 isa8_ega_device::alu_op( UINT8 data, UINT8 latch_data )
+{
+	UINT8 mask = m_graphics_controller.data[8];
+
+	switch( m_graphics_controller.data[3] & 0x18 )
+	{
+	case 0x00:		// Unmodified
+		return ( data & mask ) | ( latch_data & ~mask );
+
+	case 0x08:		// AND
+		return ( data | ~mask ) & latch_data;
+
+	case 0x10:		// OR
+		return ( data & mask ) | latch_data;
+
+	case 0x18:		// XOR
+		return ( data & mask ) ^ latch_data;
+	}
+	return 0;
+}
+
+
 WRITE8_MEMBER( isa8_ega_device::write )
 {
+	UINT8 d[4];
 	UINT8 alu[4];
 	UINT8 target_mask = m_graphics_controller.data[8];
 
@@ -1000,37 +1025,32 @@ WRITE8_MEMBER( isa8_ega_device::write )
 		// Pass through barrel shifter
 		data = ( ( ( data << 8 ) | data ) >> ( m_graphics_controller.data[3] & 0x07 ) ) & 0xFF;
 
-		// Pass through ALUs
-		switch( m_graphics_controller.data[3] & 0x18 )
+		d[0] = d[1] = d[2] = d[3] = data;
+
+		/* Apply Set/Reset settings */
+		if ( m_graphics_controller.data[1] & 0x01 )
 		{
-		case 0x00:		// Unmodified
-			alu[0] = data;
-			alu[1] = data;
-			alu[2] = data;
-			alu[3] = data;
-			break;
-
-		case 0x08:		// AND
-			alu[0] = m_read_latch[0] & data;
-			alu[1] = m_read_latch[1] & data;
-			alu[2] = m_read_latch[2] & data;
-			alu[3] = m_read_latch[3] & data;
-			break;
-
-		case 0x10:		// OR
-			alu[0] = m_read_latch[0] | data;
-			alu[1] = m_read_latch[1] | data;
-			alu[2] = m_read_latch[2] | data;
-			alu[3] = m_read_latch[3] | data;
-			break;
-
-		case 0x18:		// XOR
-			alu[0] = m_read_latch[0] ^ data;
-			alu[1] = m_read_latch[1] ^ data;
-			alu[2] = m_read_latch[2] ^ data;
-			alu[3] = m_read_latch[3] ^ data;
-			break;
+			d[0] = ( m_graphics_controller.data[0] & 0x01 ) ? 0xff : 0x00;
 		}
+		if ( m_graphics_controller.data[1] & 0x02 )
+		{
+			d[1] = ( m_graphics_controller.data[0] & 0x02 ) ? 0xff : 0x00;
+		}
+		if ( m_graphics_controller.data[1] & 0x04 )
+		{
+			d[2] = ( m_graphics_controller.data[0] & 0x04 ) ? 0xff : 0x00;
+		}
+		if ( m_graphics_controller.data[1] & 0x08 )
+		{
+			d[3] = ( m_graphics_controller.data[0] & 0x08 ) ? 0xff : 0x00;
+		}
+
+		// Pass through ALUs
+		alu[0] = alu_op( d[0], m_read_latch[0] );
+		alu[1] = alu_op( d[1], m_read_latch[1] );
+		alu[2] = alu_op( d[2], m_read_latch[2] );
+		alu[3] = alu_op( d[3], m_read_latch[3] );
+
 		break;
 
 	case 1:		// Write mode 1
@@ -1042,10 +1062,15 @@ WRITE8_MEMBER( isa8_ega_device::write )
 		return;
 
 	case 2:		// Write mode 2
-		alu[0] = ( data & 0x01 ) ? 0xff : 0x00;
-		alu[1] = ( data & 0x02 ) ? 0xff : 0x00;
-		alu[2] = ( data & 0x04 ) ? 0xff : 0x00;
-		alu[3] = ( data & 0x08 ) ? 0xff : 0x00;
+		d[0] = ( data & 0x01 ) ? 0xff : 0x00;
+		d[1] = ( data & 0x02 ) ? 0xff : 0x00;
+		d[2] = ( data & 0x04 ) ? 0xff : 0x00;
+		d[3] = ( data & 0x08 ) ? 0xff : 0x00;
+
+		alu[0] = alu_op( d[0], m_read_latch[0] );
+		alu[1] = alu_op( d[1], m_read_latch[1] );
+		alu[2] = alu_op( d[2], m_read_latch[2] );
+		alu[3] = alu_op( d[3], m_read_latch[3] );
 		break;
 
 	case 3:		// Write mode 3
@@ -1132,14 +1157,9 @@ WRITE8_MEMBER( isa8_ega_device::write )
 }
 
 
-UINT8 isa8_ega_device::pc_ega8_3X0_r(UINT8 offset)
+READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 {
 	int data = 0xff;
-
-	if ( VERBOSE_EGA )
-	{
-		logerror("pc_ega_3X0_r: offset = %02x\n", offset );
-	}
 
 	switch ( offset )
 	{
@@ -1150,12 +1170,12 @@ UINT8 isa8_ega_device::pc_ega8_3X0_r(UINT8 offset)
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		data = crtc_ega_register_r( m_crtc_ega, offset );
+		data = m_crtc_ega->register_r( space, offset );
 		break;
 
 	/* Input Status Register 1 */
 	case 10:
-		data = m_vblank | m_display_enable;
+		data = m_vblank | ( m_hsync | m_vsync ); //  m_display_enable;
 
 		if ( m_display_enable )
 		{
@@ -1174,23 +1194,23 @@ UINT8 isa8_ega_device::pc_ega8_3X0_r(UINT8 offset)
 	return data;
 }
 
-void isa8_ega_device::pc_ega8_3X0_w(UINT8 offset, UINT8 data)
+WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 {
 	if ( VERBOSE_EGA )
 	{
-		logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
+//		logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
 	}
 
 	switch ( offset )
 	{
 	/* CRT Controller - address register */
 	case 0: case 2: case 4: case 6:
-		crtc_ega_address_w( m_crtc_ega, offset, data );
+		m_crtc_ega->address_w( space, offset, data );
 		break;
 
 	/* CRT Controller - data register */
 	case 1: case 3: case 5: case 7:
-		crtc_ega_register_w( m_crtc_ega, offset, data );
+		m_crtc_ega->register_w( space, offset, data );
 		break;
 
 	/* Set Light Pen Flip Flop */
@@ -1212,13 +1232,13 @@ void isa8_ega_device::pc_ega8_3X0_w(UINT8 offset, UINT8 data)
 
 READ8_MEMBER(isa8_ega_device::pc_ega8_3b0_r )
 {
-	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(offset);
+	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(space, offset);
 }
 
 
 READ8_MEMBER(isa8_ega_device::pc_ega8_3d0_r )
 {
-	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(offset) : 0xFF;
+	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(space, offset) : 0xFF;
 }
 
 
@@ -1226,7 +1246,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3b0_w )
 {
 	if ( ! ( m_misc_output & 0x01 ) )
 	{
-		pc_ega8_3X0_w(offset, data );
+		pc_ega8_3X0_w( space, offset, data );
 	}
 }
 
@@ -1235,7 +1255,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
 {
 	if ( m_misc_output & 0x01 )
 	{
-		pc_ega8_3X0_w(offset, data );
+		pc_ega8_3X0_w( space, offset, data );
 	}
 }
 
@@ -1246,7 +1266,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 
 	if ( VERBOSE_EGA )
 	{
-		logerror("pc_ega_3c0_r: offset = %02x\n", offset );
+//		logerror("pc_ega_3c0_r: offset = %02x\n", offset );
 	}
 
 	switch ( offset )
@@ -1305,7 +1325,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 
 	if ( VERBOSE_EGA )
 	{
-		logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
+//		logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
 	}
 
 	switch ( offset )
