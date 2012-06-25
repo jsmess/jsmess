@@ -91,6 +91,9 @@ void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_key
 
 
 
+READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r );
+READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r );
+WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
 DRIVER_INIT( ibm5150 );
 DRIVER_INIT( pccga );

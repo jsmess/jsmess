@@ -37,6 +37,7 @@
 #include "sound/speaker.h"
 
 #include "machine/8237dma.h"
+#include "machine/wd17xx.h"
 
 #include "machine/ram.h"
 
@@ -1105,6 +1106,36 @@ static void pc_set_keyb_int(running_machine &machine, int state)
 	pc_set_irq_line( machine, 1, state );
 }
 
+/*
+ * MC1502 uses a FD1793 clone instead of uPD765
+ */
+
+READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r )
+{
+	UINT8 data;
+
+	data = 0;
+
+	return data;
+}
+
+WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w )
+{
+	// master reset
+	wd17xx_mr_w(device, BIT(data, 0));
+
+	// SIDE ONE
+	wd17xx_set_side(device, BIT(data, 1));
+}
+
+READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r )
+{
+	UINT8 data;
+
+	data = wd17xx_drq_r(device);
+
+	return data;
+}
 
 /**********************************************************
  *

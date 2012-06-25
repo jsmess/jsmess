@@ -136,8 +136,9 @@ static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)		// keyboard poll
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)	// check
+	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)	// keyboard poll
+	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE_LEGACY("vg93", mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
+	AM_RANGE(0x0108, 0x0108) AM_DEVREAD_LEGACY("vg93", mc1502_wd17xx_drq_r)
 	AM_RANGE(0x010c, 0x010c) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0x010d, 0x010d) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x010e, 0x010e) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w)
@@ -1276,7 +1277,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )	/* TODO: verify */
 
-	MCFG_FD1797_ADD( "vg93", default_wd17xx_interface )
+	MCFG_FD1793_ADD( "vg93", default_wd17xx_interface_2_drives )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
 
 	/* internal ram */
