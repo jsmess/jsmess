@@ -98,7 +98,7 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 	DEVCB_NULL,
 	DEVCB_HANDLER(radio86_8255_porta_w2),
 	DEVCB_HANDLER(radio86_8255_portc_r2),
-	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
 
