@@ -5,20 +5,23 @@
     31/08/2008 Preliminary driver.
     15/06/2012 Various updates [Robbbert]
 
+    The emulator called HoLa! works fine, but it is closed source.
+    You can get HoLa! at: http://gaia.atilia.eu
+
     ToDO:
-    - Quickload loads the files ok, but the machine crashes.
-    - homelab2 - cassette
+    - HTP files should be a cassette format, not a quickload.
+    - homelab2 - cassette to fix.
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
     - homelab3/4 - Need a dump of the TM188 prom.
-                 Sound and cassette are disrupted by the frame sync
-                 pulse causing a 50Hz hum. There must be a way of
-                 switching it off.
-    - Brailab4 - same as homelab3.
-    - Z80PIO   - expansion only, doesn't do anything in the
+                 cassette to fix.
+                 up to 64k ram can be fitted. schematic only shows 16k.
+                 Z80PIO - expansion only, doesn't do anything in the
                  machine. /CE connects to A6, A/B = A0, C/D = A1.
-                 The bios never talks to it. Not fitted to homelab2.
-                 Official port numbers are 3C-3F.
+                 The bios never talks to it. Official port numbers
+                 are 3C-3F.
+    - Brailab4 - same as homelab3.
+
 
 TM188 is (it seems) equivalent to 27S19, TBP18S030N, 6331-1, 74S288, 82S123,
 MB7051 - fuse programmed prom.
@@ -64,19 +67,6 @@ public:
 private:
 };
 
-MACHINE_RESET( homelab3 )
-{
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->m_nmi = true;
-}
-
-MACHINE_RESET( brailab4 )
-{
-	homelab_state *state = machine.driver_data<homelab_state>();
-	state->m_nmi = true;
-	state->membank("bank1")->set_entry(0);
-}
-
 static INTERRUPT_GEN( homelab_frame )
 {
 	homelab_state *state = device->machine().driver_data<homelab_state>();
@@ -107,30 +97,6 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
-WRITE8_MEMBER( homelab_state::port7f_w )
-{
-	m_cass->output(-1.0);
-	speaker_level_w(m_speaker, 0 );
-}
-
-WRITE8_MEMBER( homelab_state::portff_w )
-{
-	m_cass->output(+1.0);
-	speaker_level_w(m_speaker, 1 );
-}
-
-WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
-{
-	m_cass->output(-1.0);
-	membank("bank1")->set_entry(0);
-}
-
-WRITE8_MEMBER( homelab_state::brailab4_portff_w )
-{
-	m_cass->output(+1.0);
-	membank("bank1")->set_entry(1);
-}
-
 READ8_MEMBER( homelab_state::cass2_r )
 {
 	return (m_cass->input() > 0.03) ? 0xff : 0;
@@ -148,9 +114,44 @@ WRITE8_MEMBER( homelab_state::cass_w )
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
+MACHINE_RESET( homelab3 )
+{
+	//homelab_state *state = machine.driver_data<homelab_state>();
+	//state->m_nmi = true;
+}
+
+MACHINE_RESET( brailab4 )
+{
+	homelab_state *state = machine.driver_data<homelab_state>();
+	//state->m_nmi = true;
+	state->membank("bank1")->set_entry(0);
+}
+
+WRITE8_MEMBER( homelab_state::port7f_w )
+{
+	//m_nmi = true;
+}
+
+WRITE8_MEMBER( homelab_state::portff_w )
+{
+	//m_nmi = false;
+}
+
+WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
+{
+	//m_nmi = true;
+	membank("bank1")->set_entry(0);
+}
+
+WRITE8_MEMBER( homelab_state::brailab4_portff_w )
+{
+	//m_nmi = false;
+	membank("bank1")->set_entry(1);
+}
+
 CUSTOM_INPUT_MEMBER( homelab_state::cass3_r )
 {
-	return (m_cass->input() > 0.03);
+	return 1;//(m_cass->input() > 0.03);
 }
 
 
@@ -158,7 +159,23 @@ READ8_MEMBER( homelab_state::exxx_r )
 {
 // keys E800-E813 but E810-E813 are not connected
 // cassin E883
-// sound routine reads E880 but discards the result
+// speaker/cass toggle E880, E802
+
+
+	if (offset == 0x83)
+		return (m_cass->input() > 0.03);
+	else
+	if (offset == 0x80)
+	{
+		speaker_level_w(m_speaker, 0 );
+		m_cass->output(-1.0);
+	}
+	else
+	if (offset == 0x02)
+	{
+		speaker_level_w(m_speaker, 1 );
+		m_cass->output(+1.0);
+	}
 
 	char kbdrow[8];
 	UINT8 data = 0xff;
@@ -189,7 +206,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
+	AM_RANGE( 0xe800, 0xefff ) AM_READ(exxx_r)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_REGION("maincpu",0xf800)
 ADDRESS_MAP_END
 
@@ -204,7 +221,7 @@ static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0xcfff ) AM_RAM
 	AM_RANGE( 0xd000, 0xdfff ) AM_ROM
-	AM_RANGE( 0xe000, 0xe01f ) AM_MIRROR(0x0fe0) AM_READ(exxx_r)
+	AM_RANGE( 0xe800, 0xefff ) AM_READ(exxx_r)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -811,7 +828,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_MEA8000_ADD("mea8000", brailab4_speech_intf)
-	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 8)
+	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 18)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( brailab4 )
@@ -886,6 +903,6 @@ ROM_END
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT       COMPANY                    FULLNAME   FLAGS */
 COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
+COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
 COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
