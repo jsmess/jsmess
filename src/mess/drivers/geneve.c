@@ -693,6 +693,11 @@ static TMS9995_CONFIG( geneve_processor_config )
 	NO_OVERFLOW_INT		// The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
+static TI_SOUND_CONFIG( sound_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(geneve, ext_ready)	// READY
+};
+
 static const mm58274c_interface geneve_mm58274c_interface =
 {
 	1,	/*  mode 24*/
@@ -778,10 +783,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
 
 	/* User interface devices */
 	MCFG_GENEVE_KEYBOARD_ADD( GKEYBOARD_TAG, geneve_keyb_conf )

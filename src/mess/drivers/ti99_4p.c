@@ -39,7 +39,6 @@
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
 #include "sound/dac.h"
-#include "sound/sn76496.h"
 
 #include "machine/tms9901.h"
 #include "machine/ti99/peribox.h"
@@ -64,6 +63,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
+
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 	DECLARE_READ8_MEMBER( interrupt_level );
@@ -120,7 +121,7 @@ public:
 	UINT16 *m_scratchpad;
 
 	// READY line
-	bool m_ready_line, m_ready_line1;
+	int		m_ready_line, m_ready_line_dmux;
 
 private:
 	DECLARE_READ16_MEMBER( datamux_read );
@@ -152,8 +153,11 @@ private:
 	UINT8	m_highbyte;
 	UINT8	m_latch;
 
-	/* Mapper registers */
+	// Mapper registers
 	UINT8 m_mapper[16];
+
+	int		m_ready_prev;		// for debugging purposes only
+
 };
 
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p)
@@ -431,7 +435,7 @@ void ti99_4p::clock_in(int clock)
 	if (clock==ASSERT_LINE && m_waitcount!=0)
 	{
 		m_waitcount--;
-		if (m_waitcount==0) console_ready(ASSERT_LINE);
+		if (m_waitcount==0) console_ready_dmux(ASSERT_LINE);
 	}
 }
 
@@ -452,7 +456,7 @@ READ16_MEMBER( ti99_4p::datamux_read )
 
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
-	console_ready(CLEAR_LINE);
+	console_ready_dmux(CLEAR_LINE);
 
 	return (hbyte<<8) | m_latch ;
 }
@@ -486,7 +490,7 @@ WRITE16_MEMBER( ti99_4p::datamux_write )
 
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
-	console_ready(CLEAR_LINE);
+	console_ready_dmux(CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -720,11 +724,35 @@ const tms9901_interface tms9901_wiring_sgcpu =
 */
 WRITE_LINE_MEMBER( ti99_4p::console_ready )
 {
-	if (VERBOSE>6) LOG("ti99_4p: READY level = %02x\n", state);
 	m_ready_line = state;
+	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
 
-	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+	if (VERBOSE>6)
+	{
+		if (m_ready_prev != combined) LOG("ti99_4p: READY level = %d\n", combined);
+	}
+	m_ready_prev = combined;
+	m_cpu->set_ready(combined);
 }
+
+/*
+    The exception of the above rule. Memory access over the datamux also operates
+    the READY line, and the datamux raises READY depending on the clock pulse.
+    So we must make sure this does not interfere.
+*/
+WRITE_LINE_MEMBER( ti99_4p::console_ready_dmux )
+{
+	m_ready_line_dmux = state;
+	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
+
+	if (VERBOSE>7)
+	{
+		if (m_ready_prev != combined) LOG("ti99_4p: READY dmux level = %d\n", state);
+	}
+	m_ready_prev = combined;
+	m_cpu->set_ready(combined);
+}
+
 
 WRITE_LINE_MEMBER( ti99_4p::extint )
 {
@@ -804,7 +832,7 @@ MACHINE_START( ti99_4p )
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
 
-	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
+	driver->m_ready_line = driver->m_ready_line_dmux = ASSERT_LINE;
 
 	UINT16 *rom = (UINT16*)(*machine.root_device().memregion("maincpu"));
 	driver->m_rom0  = rom + 0x2000;
@@ -820,6 +848,11 @@ void ti99_4p::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 {
 	m_tms9901->set_single_int(2, state);
 }
+
+static TI_SOUND_CONFIG( sound_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, console_ready)	// READY
+};
 
 /*
     Reset the machine.
@@ -863,16 +896,14 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
 	MCFG_PERIBOX_SG_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 MACHINE_CONFIG_END
 
 

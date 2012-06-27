@@ -40,7 +40,6 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#include "sound/sn76496.h"
 
 #include "sound/wave.h"
 #include "video/v9938.h"
@@ -362,6 +361,11 @@ static PERIBOX_CONFIG( peribox_conf )
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, notconnected),	// INTB
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready),	// READY
 	0x70000												// Address bus prefix (AMA/AMB/AMC)
+};
+
+static TI_SOUND_CONFIG( sound_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x, console_ready)	// READY
 };
 
 READ8_MEMBER( ti99_4x::cruread )
@@ -898,17 +902,15 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
@@ -944,17 +946,15 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
@@ -1023,17 +1023,15 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
@@ -1066,17 +1064,15 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
@@ -1124,17 +1120,15 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 	MCFG_PERIBOX_EV_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )

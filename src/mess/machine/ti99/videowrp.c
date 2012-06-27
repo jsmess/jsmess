@@ -177,26 +177,60 @@ void ti_video_device::device_reset(void)
 
 /**************************************************************************/
 
-// TODO: Should propagate READY to the system. However, READY is implemented
-// to be read instead of pushing the level.
-
-ti_sound_system_device::ti_sound_system_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, TISOUND, "TI sound chip wrapper", tag, owner, clock)
+/*
+    Sound subsystem.
+    TODO: Seriously consider to simplify this by connecting to the datamux
+    directly. We don't do anything reasonable here.
+*/
+static const sn76496_config sound_config =
 {
-}
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_sound_system_device, sound_ready),
+};
 
 WRITE8_MEMBER( ti_sound_system_device::write )
 {
-	sn76496_w(m_sound_chip, offset, data);
+	m_sound_chip->write(space, 0, data);
 }
 
 void ti_sound_system_device::device_start(void)
 {
-	m_sound_chip = machine().device(TISOUNDCHIP_TAG);
+	const ti_sound_config *conf = reinterpret_cast<const ti_sound_config *>(static_config());
+	m_console_ready.resolve(conf->ready, *this);
+	m_sound_chip = subdevice<sn76496_base_device>(TISOUNDCHIP_TAG);
+}
+
+WRITE_LINE_MEMBER( ti_sound_system_device::sound_ready )
+{
+	m_console_ready(state);
+}
+
+MACHINE_CONFIG_FRAGMENT( sn94624 )
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624N, 3579545/8)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SOUND_CONFIG(sound_config)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( sn76496 )
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496N, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SOUND_CONFIG(sound_config)
+MACHINE_CONFIG_END
+
+machine_config_constructor ti_sound_sn94624_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sn94624 );
+}
+
+machine_config_constructor ti_sound_sn76496_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sn76496 );
 }
 
 /**************************************************************************/
 
 const device_type TI99VIDEO = &device_creator<ti_std_video_device>;
 const device_type V9938VIDEO = &device_creator<ti_exp_video_device>;
-const device_type TISOUND = &device_creator<ti_sound_system_device>;
+const device_type TISOUND_94624 = &device_creator<ti_sound_sn94624_device>;
+const device_type TISOUND_76496 = &device_creator<ti_sound_sn76496_device>;

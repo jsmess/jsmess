@@ -15,6 +15,7 @@
 #include "video/tms9928a.h"
 #include "video/v9938.h"
 #include "ti99defs.h"
+#include "sound/sn76496.h"
 
 class ti_video_device : public bus8z_device
 {
@@ -59,25 +60,71 @@ protected:
 	v9938_device	*m_v9938;
 };
 
+extern const device_type TI99VIDEO;
+extern const device_type V9938VIDEO;
+
+/****************************************************************************/
 /*
-    Sound device wrapper (required until sn74296 is converted to a modern device);
-    let's hitchhike here - it is not required to create yet another file
-    that will be dropped later.
+    Sound device
 */
+
+extern const device_type TISOUND_94624;
+extern const device_type TISOUND_76496;
+
+typedef struct _ti_sound_config
+{
+	devcb_write_line				ready;
+} ti_sound_config;
+
+#define TI_SOUND_CONFIG(name) \
+	const ti_sound_config(name) =
+
 class ti_sound_system_device : public bus8z_device
 {
 public:
-	ti_sound_system_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *tag, const char *name, device_t *owner, UINT32 clock)
+	: bus8z_device(mconfig, type, name, tag, owner, clock) { };
+
 	// Cannot read from sound; just ignore silently
 	DECLARE_READ8Z_MEMBER(readz) { };
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE_LINE_MEMBER( sound_ready );	// connect to console READY
 
 protected:
 	void device_start(void);
+	virtual machine_config_constructor device_mconfig_additions() const =0;
 
 private:
-	device_t *m_sound_chip;
+	sn76496_base_device*		m_sound_chip;
+	devcb_resolved_write_line	m_console_ready;
 };
+
+/*
+    The version that sits in the TI-99/4A
+*/
+class ti_sound_sn94624_device : public ti_sound_system_device
+{
+public:
+	ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_sound_system_device(mconfig, TISOUND_94624, tag, "Onboard sound (SN94624)", owner, clock) { }
+
+protected:
+	machine_config_constructor device_mconfig_additions() const;
+};
+
+/*
+    The version that sits in the TI-99/8 and Geneve
+*/
+class ti_sound_sn76496_device : public ti_sound_system_device
+{
+public:
+	ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_sound_system_device(mconfig, TISOUND_76496, tag, "Onboard sound (SN76496)", owner, clock) { }
+
+protected:
+	machine_config_constructor device_mconfig_additions() const;
+};
+
 
 /****************************************************************************/
 
@@ -118,12 +165,13 @@ private:
 	MCFG_PALETTE_LENGTH(512)												\
 	MCFG_PALETTE_INIT(v9938)
 
-#define MCFG_TI_SOUND_ADD(_tag)			\
-	MCFG_DEVICE_ADD(_tag, TISOUND, 0)
+#define MCFG_TI_SOUND_94624_ADD(_tag, _conf)			\
+	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0)	\
+	MCFG_DEVICE_CONFIG( _conf )
 
-extern const device_type TI99VIDEO;
-extern const device_type V9938VIDEO;
-extern const device_type TISOUND;
+#define MCFG_TI_SOUND_76496_ADD(_tag, _conf)			\
+	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0)	\
+	MCFG_DEVICE_CONFIG( _conf )
 
 #endif /* __TIVIDEO__ */
 

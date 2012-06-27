@@ -797,6 +797,11 @@ static TMS9995_CONFIG( ti99_8_processor_config )
 	NO_OVERFLOW_INT
 };
 
+static TI_SOUND_CONFIG( sound_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)	// READY
+};
+
 /*
     Format:
     Name, mode, stop, mask, select, write, read8z function, write8 function
@@ -960,15 +965,13 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* Sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* Console GROMs */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
@@ -1007,15 +1010,13 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8 )
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* Sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
 
 	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* Console GROMs */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
