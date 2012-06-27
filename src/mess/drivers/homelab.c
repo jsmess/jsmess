@@ -21,6 +21,7 @@
                  The bios never talks to it. Official port numbers
                  are 3C-3F.
     - Brailab4 - same as homelab3.
+    - Braiplus - no work has been done. Needs to be developed from scratch.
 
 
 TM188 is (it seems) equivalent to 27S19, TBP18S030N, 6331-1, 74S288, 82S123,
@@ -851,7 +852,7 @@ ROM_START( homelab2 )
 	ROM_FILL(0x47, 1, 0x0E)
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD ("hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
+	ROM_LOAD( "hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
 	// found on net, looks like bad dump
 	//ROM_LOAD_OPTIONAL( "hl2_ch.rom", 0x0800, 0x1000, CRC(6a5c915a) SHA1(7e4e966358556c6aabae992f4c2b292b6aab59bd) )
 ROM_END
@@ -864,7 +865,7 @@ ROM_START( homelab3 )
 	ROM_LOAD( "hl3_4.rom", 0x3000, 0x1000, CRC(BF67EFF9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b))
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD ("hl3.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl3.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
 
 ROM_START( homelab4 )
@@ -875,7 +876,7 @@ ROM_START( homelab4 )
 	ROM_LOAD( "hl4_4.rom", 0x3000, 0x1000, CRC(F4B77CA2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5))
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
 
 ROM_START( brailab4 )
@@ -887,16 +888,24 @@ ROM_START( brailab4 )
 	ROM_LOAD( "brl5.rom", 0xd000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 
 	// these roms were found on the net, to be investigated
-	ROM_REGION( 0x9020, "user1", 0 )
-	// 256k Homelab 1000  Bios 1.2, 1988
-	ROM_LOAD_OPTIONAL( "brailabplus.bin", 0x0000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
-	// probably brl1 to 5 merged
-	ROM_LOAD_OPTIONAL( "brl.rom",         0x4000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b) )
+	ROM_REGION( 0x5020, "user1", 0 )
+	// brl1 to 5 merged, with small changes
+	// 00BF: 28 18 87 -> 30 30 0c
+	// 0138: 07 0a 06 0b -> 0c 06 07 0a (keyboard assignments)
+	ROM_LOAD_OPTIONAL( "brl.rom",         0x0000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b) )
 	// a small prom
-	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x9000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
+	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
+ROM_END
+
+ROM_START( braiplus )
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "brailabplus.bin", 0x0000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
+
+	ROM_REGION(0x0800, "chargen",0) // no idea what chargen it uses
+	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
 
 /* Driver */
@@ -906,3 +915,4 @@ COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,        "Jo
 COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
 COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
 COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
+COMP( 1988, braiplus,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab Plus", GAME_NOT_WORKING | GAME_IS_SKELETON )
