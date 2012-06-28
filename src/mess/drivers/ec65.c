@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;
 	UINT8 m_keyboard_input;
-	required_device<via6522_device> m_via_0;
+	optional_device<via6522_device> m_via_0;
 	required_shared_ptr<UINT8> m_p_videoram;
 };
 
