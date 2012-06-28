@@ -211,6 +211,8 @@
 #include "machine/ti99/peribox.h"
 #include "machine/ti99/videowrp.h"
 
+#include "machine/ti99/joyport.h"
+
 #define VERBOSE 1
 #define LOG logerror
 
@@ -248,6 +250,7 @@ public:
 	geneve_mapper_device*	m_mapper;
 	peribox_device*			m_peribox;
 	tms9995_device*			m_cpu;
+	joyport_device*			m_joyport;
 
 	WRITE_LINE_MEMBER( inta );
 	WRITE_LINE_MEMBER( intb );
@@ -320,20 +323,6 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
-	PORT_START("JOY")	/* col 1: "wired handset 1" (= joystick 1) */
-		PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)
-		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(1DOWN)", CODE_NONE, OSD_JOY_DOWN, 0*/) PORT_PLAYER(1)
-		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(1RIGHT)", CODE_NONE, OSD_JOY_RIGHT, 0*/) PORT_PLAYER(1)
-		PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(1LEFT)", CODE_NONE, OSD_JOY_LEFT, 0*/) PORT_PLAYER(1)
-		PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(1FIRE)", CODE_NONE, OSD_JOY_FIRE, 0*/) PORT_PLAYER(1)
-		PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNUSED)
-			/* col 2: "wired handset 2" (= joystick 2) */
-		PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(2UP)", CODE_NONE, OSD_JOY2_UP, 0*/) PORT_PLAYER(2)
-		PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(2DOWN)", CODE_NONE, OSD_JOY2_DOWN, 0*/) PORT_PLAYER(2)
-		PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(2RIGHT)", CODE_NONE, OSD_JOY2_RIGHT, 0*/) PORT_PLAYER(2)
-		PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(2LEFT)", CODE_NONE, OSD_JOY2_LEFT, 0*/) PORT_PLAYER(2)
-		PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
-		PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 /****************************************************************************
@@ -442,25 +431,21 @@ READ8_MEMBER( geneve::cruread )
 READ8_MEMBER( geneve::read_by_9901 )
 {
 	int answer = 0;
-	int joy = 0;
+
 	switch (offset & 0x03)
 	{
 	case TMS9901_CB_INT7:
-		// Read pins INT3*-INT7* of Geneve 9901.
 		//
+		// Read pins INT3*-INT7* of Geneve's 9901.
 		// bit 1: INTA status
 		// bit 2: INT2 status
 		// bit 3-7: joystick status
-
+		//
+		// |K|K|K|K|K|I2|I1|C|
 		// negative logic
 		if (m_inta==CLEAR_LINE) answer |= 0x02;
 		if (m_int2==CLEAR_LINE) answer |= 0x04;
-
-		joy = ioport("JOY")->read();
-		if (m_joystick_select==0) joy = joy & 0xff;
-		else joy = (joy>>8) & 0xff;
-		answer |= joy;
-
+		answer |= m_joyport->read_port()<<3;
 		break;
 
 	case TMS9901_INT8_INT15:
@@ -496,11 +481,7 @@ READ8_MEMBER( geneve::read_by_9901 )
 		if (m_keyint==CLEAR_LINE) answer |= 0x40;
 
 		// Joystick up (mirror of bit 7)
-		joy = ioport("JOY")->read();
-		if (m_joystick_select==0) joy = joy & 0xff;
-		else joy = (joy>>8) & 0xff;
-		if ((joy & 0x80)==0x00) answer |= 0x80;
-
+		if ((m_joyport->read_port() & 0x10)==0) answer |= 0x80;
 		break;
 	}
 	return answer;
@@ -523,11 +504,11 @@ WRITE_LINE_MEMBER( geneve::VDP_reset )
 }
 
 /*
-    Write joystick select line
+    Write joystick select line. 1 selects joystick 1 (pin 7), 0 selects joystick 2 (pin 2)
 */
 WRITE_LINE_MEMBER( geneve::joystick_select )
 {
-	m_joystick_select = (state==ASSERT_LINE)? 1:0;
+	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
 
 /*
@@ -544,7 +525,7 @@ WRITE_LINE_MEMBER( geneve::extbus_wait_states )
 */
 WRITE_LINE_MEMBER( geneve::video_wait_states )
 {
-	if (VERBOSE>1) LOG("geneve: vdp wait states set to %d\n", state);
+	if (VERBOSE>1) LOG("geneve: video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
 	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -722,6 +703,12 @@ static GENEVE_MAPPER_CONFIG( mapper_conf )
 	DEVCB_DRIVER_LINE_MEMBER(geneve, mapper_ready)	// READY
 };
 
+static JOYPORT_CONFIG( joyport_60 )
+{
+	DEVCB_NULL,
+	60
+};
+
 static DRIVER_INIT( geneve )
 {
 }
@@ -735,6 +722,7 @@ static MACHINE_START( geneve )
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
 	driver->m_mouse =  static_cast<geneve_mouse_device*>(machine.device(GMOUSE_TAG));
 	driver->m_cpu = static_cast<tms9995_device*>(machine.device("maincpu"));
+	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
 }
 
 /*
@@ -755,17 +743,19 @@ static MACHINE_RESET( geneve )
 	driver->m_ready_line = driver->m_ready_line1 = ASSERT_LINE;
 
 	driver->m_peribox->set_genmod(machine.root_device().ioport("MODE")->read()==GENMOD);
+
+	driver->m_joyport->write_port(0x01);	// select Joystick 1
 }
 
 static MACHINE_CONFIG_START( geneve_60hz, geneve )
-	/* basic machine hardware */
-	/* TMS9995 CPU @ 12.0 MHz */
+	// basic machine hardware
+	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
 
 	MCFG_MACHINE_START( geneve )
 	MCFG_MACHINE_RESET( geneve )
 
-	/* video hardware */
+	// video hardware
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.
 	// The reason is that that the number of screen lines is counted twice for the
 	// interlace mode, but in non-interlace modes only half of the lines are
@@ -774,20 +764,22 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve, set_tms9901_INT2_from_v9938)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
-	/* Main board components */
+	// Main board components
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
 	MCFG_GENEVE_MAPPER_ADD(GMAPPER_TAG, mapper_conf)
 	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
 
-	/* Peripheral expansion box (Geneve composition) */
+	// Peripheral expansion box (Geneve composition)
 	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, peribox_conf )
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
 
-	/* User interface devices */
+	// User interface devices
 	MCFG_GENEVE_KEYBOARD_ADD( GKEYBOARD_TAG, geneve_keyb_conf )
 	MCFG_GENEVE_MOUSE_ADD( GMOUSE_TAG )
+	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG, joyport_60 )
+
 MACHINE_CONFIG_END
 
 /*

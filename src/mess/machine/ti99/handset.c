@@ -18,6 +18,15 @@
 
     Originally written by R. Nabet
 
+    **************************************************
+
+    TI-99/4(A) Twin Joystick
+
+    This file also contains the implementation of the twin joystick;
+    actually, no big deal, as it contains no logic but only switches.
+
+    **************************************************
+
     Michael Zapf
     2010-10-24 Rewriten as device
 
@@ -40,14 +49,34 @@ static const char *const joynames[2][4] =
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
 ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock)
+: joyport_attached_device(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock)
 {
+	m_shortname = "handset";
 }
 
 #define POLL_TIMER 1
 #define DELAY_TIMER 2
 
 /*****************************************************************************/
+
+/*
+    Return the status of the handset via the joystick port.
+    B = bus
+    C = clock
+    I = int (neg logic)
+
+    answer = |0|I|C|1|B|B|B|B|
+*/
+UINT8 ti99_handset_device::read_dev()
+{
+	return (m_buf & 0xf) | 0x10 | (m_clock_high? 0x20:0) | ( m_buflen==3? 0x00:0x40);
+}
+
+void ti99_handset_device::write_dev(UINT8 data)
+{
+	if (VERBOSE>7) LOG("ti99_handset_device: Set ack %d\n", data);
+	set_acknowledge(data);
+}
 
 /*
     Handle data acknowledge sent by the ti-99/4 handset ISR (through tms9901
@@ -59,12 +88,12 @@ void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int
 {
 	if (id==DELAY_TIMER)
 	{
-		m_clock = !m_clock;
+		m_clock_high = !m_clock_high;
 		m_buf >>= 4;
 		m_buflen--;
 
 		// Clear the INT12 line
-		m_interrupt(CLEAR_LINE);
+		m_joyport->set_interrupt(CLEAR_LINE);
 
 		if (m_buflen == 1)
 		{
@@ -95,9 +124,11 @@ void ti99_handset_device::set_acknowledge(int data)
 	if ((m_buflen !=0) && (data != m_ack))
 	{
 		m_ack = data;
-		if (data == m_clock)
-			/* I don't know what the real delay is, but 30us apears to be enough */
-		m_delay_timer->adjust(attotime::from_usec(30));
+		if ((data!=0) == m_clock_high)
+		{
+			// I don't know what the real delay is, but 30us apears to be enough
+			m_delay_timer->adjust(attotime::from_usec(30));
+		}
 	}
 }
 
@@ -113,10 +144,11 @@ void ti99_handset_device::set_acknowledge(int data)
 void ti99_handset_device::post_message(int message)
 {
 	/* post message and assert interrupt */
-	m_clock = 1;
+	m_clock_high = true;
 	m_buf = ~message;
 	m_buflen = 3;
-	m_interrupt(ASSERT_LINE);
+	if (VERBOSE>5) LOG("ti99_handset_device: trigger interrupt\n");
+	m_joyport->set_interrupt(ASSERT_LINE);
 }
 
 /*
@@ -132,7 +164,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 	int i;
 
 	/* read current key state */
-	key_buf = (machine().root_device().ioport(keynames[num])->read() | (machine().root_device().ioport(keynames[num + 1])->read() << 16) ) >> (4*num);
+	key_buf = (ioport(keynames[num])->read() | (ioport(keynames[num + 1])->read() << 16) ) >> (4*num);
 
 	// If a key was previously pressed, this key was not shift, and this key is
 	// still down, then don't change the current key press.
@@ -159,7 +191,6 @@ bool ti99_handset_device::poll_keyboard(int num)
 			post_message((((unsigned)current_key) << 4) | (num << 1));
 			return true;
 		}
-
 	}
 
 	current_key = 0;	/* default value if no key is down */
@@ -288,22 +319,19 @@ void ti99_handset_device::do_task()
 
 void ti99_handset_device::device_start(void)
 {
-	const ti99_handset_intf *intf = reinterpret_cast<const ti99_handset_intf *>(static_config());
-
-	m_interrupt.resolve(intf->interrupt, *this);
 	m_delay_timer = timer_alloc(DELAY_TIMER);
 	m_poll_timer = timer_alloc(POLL_TIMER);
-	m_poll_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_poll_timer->adjust(attotime::from_hz(m_joyport->clock()), 0, attotime::from_hz(m_joyport->clock()));
 }
 
 void ti99_handset_device::device_reset(void)
 {
-	if (VERBOSE>5) LOG("ti99_handset_device reset\n");
+	if (VERBOSE>5) LOG("ti99_handset_device: Reset\n");
 	m_delay_timer->enable(true);
 	m_poll_timer->enable(true);
 	m_buf = 0;
 	m_buflen = 0;
-	m_clock = 0;
+	m_clock_high = false;
 	m_ack = 0;
 }
 
@@ -439,3 +467,70 @@ ioport_constructor ti99_handset_device::device_input_ports() const
 }
 
 const device_type HANDSET = &device_creator<ti99_handset_device>;
+
+/******************************************************************************
+    Twin Joystick
+******************************************************************************/
+
+/* col 6: "wired handset 1" (= joystick 1) */
+/* col 7: "wired handset 2" (= joystick 2) */
+
+INPUT_PORTS_START( joysticks )
+	PORT_START("JOY1")
+		PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(1DOWN)", CODE_NONE, OSD_JOY_DOWN, 0*/) PORT_PLAYER(1)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(1RIGHT)", CODE_NONE, OSD_JOY_RIGHT, 0*/) PORT_PLAYER(1)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(1LEFT)", CODE_NONE, OSD_JOY_LEFT, 0*/) PORT_PLAYER(1)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(1FIRE)", CODE_NONE, OSD_JOY_FIRE, 0*/) PORT_PLAYER(1)
+
+	PORT_START("JOY2")
+		PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(2UP)", CODE_NONE, OSD_JOY2_UP, 0*/) PORT_PLAYER(2)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(2DOWN)", CODE_NONE, OSD_JOY2_DOWN, 0*/) PORT_PLAYER(2)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(2RIGHT)", CODE_NONE, OSD_JOY2_RIGHT, 0*/) PORT_PLAYER(2)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(2LEFT)", CODE_NONE, OSD_JOY2_LEFT, 0*/) PORT_PLAYER(2)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: joyport_attached_device(mconfig, HANDSET, "TI-99/4(A) Twin Joystick", tag, owner, clock)
+{
+	m_shortname = "twinjoy";
+}
+
+void ti99_twin_joystick::device_start(void)
+{
+}
+
+/*
+    Return the status of the joysticks.
+
+    answer = |0|0|0|U|D|R|L|B|
+*/
+UINT8 ti99_twin_joystick::read_dev()
+{
+	UINT8 value;
+	if (m_joystick==1) value = ioport("JOY1")->read();
+	else
+	{
+		if (m_joystick==2) value = ioport("JOY2")->read();
+		else value = 0xff;
+	}
+	if (VERBOSE>6) LOG("ti99_twin_joystick: joy%d = %02x\n", m_joystick, value);
+	return value;
+}
+
+void ti99_twin_joystick::write_dev(UINT8 data)
+{
+	if (VERBOSE>7) LOG("ti99_twin_joystick: Select joystick %d\n", data);
+	m_joystick = data & 0x03;
+}
+
+ioport_constructor ti99_twin_joystick::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( joysticks );
+}
+
+const device_type TI99_JOYSTICK = &device_creator<ti99_twin_joystick>;
+

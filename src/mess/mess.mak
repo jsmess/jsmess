@@ -1714,6 +1714,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99/videowrp.o \
 	$(MESS_MACHINE)/ti99/grom.o	\
 	$(MESS_MACHINE)/ti99/gromport.o  \
+	$(MESS_MACHINE)/ti99/joyport.o  \
 	$(MESS_MACHINE)/ti99/mecmouse.o  \
 	$(MESS_MACHINE)/ti99/handset.o  \
 	$(MESS_MACHINE)/ti99/peribox.o  \

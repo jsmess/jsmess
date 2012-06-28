@@ -212,7 +212,7 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/ti99/mapper8.h"
 #include "machine/ti99/grom.h"
 #include "machine/ti99/gromport.h"
-#include "machine/ti99/mecmouse.h"
+#include "machine/ti99/joyport.h"
 
 #define VERBOSE 0
 #define LOG logerror
@@ -257,18 +257,19 @@ public:
 	tms9901_device		*m_tms9901;
 	gromport_device		*m_gromport;
 	peribox_device		*m_peribox;
-	mecmouse_device 	*m_mecmouse;
 	ti998_mapper_device	*m_mapper;
+	joyport_device* 	m_joyport;
+
+	int 	m_firstjoy;			// First joystick. 14 for TI-99/8
 
 	int		m_ready_line, m_ready_line1;
 
 private:
 	/* Keyboard support */
-	void			set_key(int number, int data);
-	int				m_keyboard_column;
-	int				m_alphalock_line;
+	void	set_keyboard_column(int number, int data);
+	int		m_keyboard_column;
+	int		m_alphalock_line;
 };
-
 
 /*
     Memory map. We have a configurable mapper, so we need to delegate the
@@ -295,132 +296,104 @@ ADDRESS_MAP_END
 
 /* ti99/8 : 54-key keyboard */
 static INPUT_PORTS_START(ti99_8)
-	PORT_START( "MECMOUSE" )
-	PORT_CONFNAME( 0x01, 0x00, "Mechatronics Mouse" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
-	/* 3 ports for mouse */
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* Mouse - buttons */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
 
 	/* 16 ports for keyboard and joystick */
-	PORT_START("KEY0")    /* col 0 */
+	PORT_START("COL0")    /* col 0 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALPHA LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY1")    /* col 1 */
+	PORT_START("COL1")    /* col 1 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 ! DEL") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY2")    /* col 2 */
+	PORT_START("COL2")    /* col 2 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @ INS") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S (LEFT)") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X (DOWN)") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY3")    /* col 3 */
+	PORT_START("COL3")    /* col 3 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E (UP)") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D (RIGHT)") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY4")    /* col 4 */
+	PORT_START("COL4")    /* col 4 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ CLEAR") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY5")    /* col 5 */
+	PORT_START("COL5")    /* col 5 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % BEGIN") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY6")    /* col 6 */
+	PORT_START("COL6")    /* col 6 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^ PROC'D") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY7")    /* col 7 */
+	PORT_START("COL7")    /* col 7 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 & AID") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY8")    /* col 8 */
+	PORT_START("COL8")    /* col 8 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 * REDO") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY9")    /* col 9 */
+	PORT_START("COL9")    /* col 9 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ( BACK") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY10")    /* col 10 */
+	PORT_START("COL10")    /* col 10 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY11")    /* col 11 */
+	PORT_START("COL11")    /* col 11 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY12")    /* col 12 */
+	PORT_START("COL12")    /* col 12 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY13")    /* col 13 */
+	PORT_START("COL13")    /* col 13 */
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("KEY14")    /* col 14: "wired handset 1" (= joystick 1) */
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(1DOWN)", CODE_NONE, OSD_JOY_DOWN, 0*/) PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(1RIGHT)", CODE_NONE, OSD_JOY_RIGHT, 0*/) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(1LEFT)", CODE_NONE, OSD_JOY_LEFT, 0*/) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(1FIRE)", CODE_NONE, OSD_JOY_FIRE, 0*/) PORT_PLAYER(1)
-
-	PORT_START("KEY15")    /* col 15: "wired handset 2" (= joystick 2) */
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(2UP)", CODE_NONE, OSD_JOY2_UP, 0*/) PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT/*, "(2DOWN)", CODE_NONE, OSD_JOY2_DOWN, 0*/) PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(2RIGHT)", CODE_NONE, OSD_JOY2_RIGHT, 0*/) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(2LEFT)", CODE_NONE, OSD_JOY2_LEFT, 0*/) PORT_PLAYER(2)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /*****************************************************************************
@@ -535,15 +508,15 @@ WRITE8_MEMBER( ti99_8::cruwrite )
     keyboard column selection.)
 ***************************************************************************/
 
-static const char *const keynames8[] = {
-	"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
-	"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
+static const char *const column[] = {
+	"COL0", "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7",
+	"COL8", "COL9", "COL10", "COL11", "COL12", "COL13"
 };
 
 READ8_MEMBER( ti99_8::read_by_9901 )
 {
 	int answer=0;
-
+	UINT8 joyst;
 	switch (offset & 0x03)
 	{
 	case TMS9901_CB_INT7:
@@ -554,14 +527,20 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 		// bits 3-4: unused?
 		// bit 5: ???
 		// bit 6-7: keyboard status bits 0 through 1
-		if (m_mecmouse != NULL && (m_keyboard_column == 15))
+
+		// |K|K|-|-|-|I2|I1|C|
+		if (m_keyboard_column >= m_firstjoy)
 		{
-			answer = m_mecmouse->get_values8(0);
+			// TI-99/8's wiring differs from the TI-99/4A
+			joyst = m_joyport->read_port();
+			answer = (joyst & 0x01) | ((joyst & 0x10)>>3);
 		}
 		else
 		{
-			answer = (ioport(keynames8[m_keyboard_column])->read() << 6) & 0xC0;
+			answer = ioport(column[m_keyboard_column])->read();
 		}
+		answer = (answer << 6) & 0xc0;
+
 		break;
 
 	case TMS9901_INT8_INT15:
@@ -569,16 +548,21 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 		//
 		// bit 0-2: keyboard status bits 2 to 4
 		// bit 3: tape input mirror
-		// (bit 4: IR remote handset interrupt)
+		// bit 4: unused
 		// bit 5-7: weird, not emulated
-		if (m_mecmouse != NULL && (m_keyboard_column == 15))
+
+		// |0|0|0|0|0|K|K|K|
+
+		if (m_keyboard_column >= m_firstjoy)
 		{
-			answer = m_mecmouse->get_values8(1);
+			joyst = m_joyport->read_port();
+			answer = joyst << 1;
 		}
 		else
 		{
-			answer = (ioport(keynames8[m_keyboard_column])->read() >> 2) & 0x07;
+			answer = ioport(column[m_keyboard_column])->read();
 		}
+		answer = (answer >> 2) & 0x07;
 		break;
 
 	case TMS9901_P0_P7:
@@ -601,33 +585,35 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 /*
     WRITE key column select (P2-P4), TI-99/8
 */
-void ti99_8::set_key(int number, int data)
+void ti99_8::set_keyboard_column(int number, int data)
 {
-	if (data!=0)	m_keyboard_column |=  1 << number;
-	else			m_keyboard_column &= ~(1 << number);
+	if (data != 0)		m_keyboard_column |= 1 << number;
+	else				m_keyboard_column &= ~(1 << number);
 
-	if (m_mecmouse != NULL)
-		m_mecmouse->select(m_keyboard_column, 14, 15);
+	if (m_keyboard_column >= m_firstjoy)
+	{
+		m_joyport->write_port(m_keyboard_column - m_firstjoy + 1);
+	}
 }
 
 WRITE_LINE_MEMBER( ti99_8::keyC0 )
 {
-	set_key(0, state);
+	set_keyboard_column(0, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8::keyC1 )
 {
-	set_key(1, state);
+	set_keyboard_column(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8::keyC2 )
 {
-	set_key(2, state);
+	set_keyboard_column(2, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8::keyC3 )
 {
-	set_key(3, state);
+	set_keyboard_column(3, state);
 }
 
 /*
@@ -908,6 +894,18 @@ static SPEECH8_CONFIG( speech_config )
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),	// READY
 };
 
+static JOYPORT_CONFIG( joyport8_60 )
+{
+	DEVCB_NULL,
+	60
+};
+
+static JOYPORT_CONFIG( joyport8_50 )
+{
+	DEVCB_NULL,
+	50
+};
+
 MACHINE_START( ti99_8 )
 {
 	ti99_8 *driver = machine.driver_data<ti99_8>();
@@ -916,18 +914,16 @@ MACHINE_START( ti99_8 )
 	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
 	driver->m_mapper = static_cast<ti998_mapper_device*>(machine.device(MAPPER_TAG));
+	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
+
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
+	driver->m_firstjoy = 14;
 }
 
 MACHINE_RESET( ti99_8 )
 {
 	ti99_8 *driver = machine.driver_data<ti99_8>();
-
-	if (machine.root_device().ioport("MECMOUSE")->read()==0x01)
-		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
-	else
-		driver->m_mecmouse = NULL;
 
 	driver->m_cpu->set_hold(CLEAR_LINE);
 
@@ -986,8 +982,8 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
 	/* Devices */
 	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
 
-	/* Optional user controller */
-	MCFG_MECMOUSE_ADD( MECMOUSE_TAG, 60 )
+	// Joystick port
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport8_60 )
 MACHINE_CONFIG_END
 
 
@@ -1031,8 +1027,8 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8 )
 	/* Devices */
 	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
 
-	/* Optional user controller */
-	MCFG_MECMOUSE_ADD( MECMOUSE_TAG, 50 )
+	// Joystick port
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport8_50 )
 MACHINE_CONFIG_END
 
 /*

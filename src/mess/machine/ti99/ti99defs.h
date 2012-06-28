@@ -30,6 +30,7 @@
 #define PERIBOX_TAG		"peb"
 #define MECMOUSE_TAG	"mecmouse"
 #define HANDSET_TAG		"handset"
+#define JOYPORT_TAG		"joyport"
 
 #define GROMFREQ 10700000.0/24
 
