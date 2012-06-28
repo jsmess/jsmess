@@ -424,14 +424,29 @@ static TIMER_CALLBACK( scv_vb_callback )
 
 INLINE void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
 {
+	if ( x < 4 )
+	{
+		return;
+	}
+
+	x -= 4;
+
 	if ( pat & 0x08 )
-		bitmap.pix16(y, x ) = col;
+	{
+		bitmap.pix16(y + 2, x ) = col;
+	}
 	if ( pat & 0x04 && x < 255 )
-		bitmap.pix16(y, x + 1 ) = col;
+	{
+		bitmap.pix16(y + 2, x + 1 ) = col;
+	}
 	if ( pat & 0x02 && x < 254 )
-		bitmap.pix16(y, x + 2 ) = col;
+	{
+		bitmap.pix16(y + 2, x + 2 ) = col;
+	}
 	if ( pat & 0x01 && x < 253 )
-		bitmap.pix16(y, x + 3 ) = col;
+	{
+		bitmap.pix16(y + 2, x + 3 ) = col;
+	}
 }
 
 
@@ -565,9 +580,13 @@ static SCREEN_UPDATE_IND16( scv )
 		int text_y = 0;
 
 		if ( y < clip_y )
+		{
 			text_y = ( state->m_videoram[0x1400] & 0x80 ) ? 0 : 1;
+		}
 		else
+		{
 			text_y = ( state->m_videoram[0x1400] & 0x80 ) ? 1 : 0;
+		}
 
 		for ( x = 0; x < 32; x++ )
 		{
@@ -575,9 +594,13 @@ static SCREEN_UPDATE_IND16( scv )
 			UINT8 d = state->m_videoram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
+			{
 				text_x = ( state->m_videoram[0x1400] & 0x40 ) ? 0 : 1;
+			}
 			else
+			{
 				text_x = ( state->m_videoram[0x1400] & 0x40 ) ? 1 : 0;
+			}
 
 			if ( text_x && text_y )
 			{
@@ -599,10 +622,12 @@ static SCREEN_UPDATE_IND16( scv )
 					draw_semi_graph( bitmap, x * 8    , y * 16 + 12, d & 0x02, gr_fg );
 					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg );
 					break;
+
 				case 0x03:		/* Block graphics mode */
 					draw_block_graph( bitmap, x * 8, y * 16    , d >> 4 );
 					draw_block_graph( bitmap, x * 8, y * 16 + 8, d & 0x0f );
 					break;
+
 				default:		/* Otherwise draw nothing? */
 					break;
 				}
@@ -631,10 +656,14 @@ static SCREEN_UPDATE_IND16( scv )
 			UINT8 bottom = 1;
 
 			if ( !col )
+			{
 				continue;
+			}
 
 			if ( !spr_y )
+			{
 				continue;
+			}
 
 			if ( half )
 			{
@@ -674,8 +703,8 @@ static SCREEN_UPDATE_IND16( scv )
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 || y_32 )
 				{
-					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 1, 1 };
-					static const UINT8 spr_2col_lut1[16] = { 0, 1, 8, 11, 2, 3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
+					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11,  8, 9, 6, 7,  4,  5, 2, 3,  1,  1 };
+					static const UINT8 spr_2col_lut1[16] = { 0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
 					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
 				}
@@ -685,14 +714,18 @@ static SCREEN_UPDATE_IND16( scv )
 				/* regular sprite handling */
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 )
-					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx + 8, col, 1, 1, top, bottom, clip );
+				{
+					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx | 8, col, 1, 1, top, bottom, clip );
+				}
 
 				if ( y_32 )
 				{
 					clip &= 0x07;
-					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx + 1, col, left, right, 1, 1, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx | 1, col, left, right, 1, 1, clip );
 					if ( x_32 )
-						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col, 1, 1, 1, 1, clip );
+					{
+						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx | 9, col, 1, 1, 1, 1, clip );
+					}
 				}
 			}
 		}
@@ -759,7 +792,7 @@ static MACHINE_CONFIG_START( scv, scv_state )
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 17, 209, 262, 0, 240 )	/* TODO: Verify */
+	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 24, 24+192, 262, 23, 23+222 )	/* TODO: Verify */
 	MCFG_SCREEN_UPDATE_STATIC( scv )
 
 	MCFG_GFXDECODE(scv)
@@ -796,7 +829,7 @@ static MACHINE_CONFIG_START( scv_pal, scv_state )
 
 	/* Video chip is EPOCH TV-1A */
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 17, 209, 342, 0, 256 )		/* TODO: Verify */
+	MCFG_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 24, 24+192, 342, 23, 23+222 )		/* TODO: Verify */
 	MCFG_SCREEN_UPDATE_STATIC( scv )
 
 	MCFG_GFXDECODE(scv)
