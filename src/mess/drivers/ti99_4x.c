@@ -85,6 +85,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( ready_connect );
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
 	// Some values to keep
 	tms9900_device*		m_cpu;
 	tms9901_device*		m_tms9901;
@@ -224,6 +226,9 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFNAME( 0x01, 0x01, "Alpha Lock blocks joystick up" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START( "LOADINT ")
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_4x, load_interrupt, 1)
 
 	PORT_START("COL0")	// col 0
 		PORT_BIT(0x88, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -601,6 +606,15 @@ void ti99_4x::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 WRITE_LINE_MEMBER( ti99_4x::set_tms9901_INT12)
 {
 	m_tms9901->set_single_int(12, state);
+}
+
+/*
+    One of the common hardware mods was to add a switch to trigger a LOAD
+    interrupt (NMI)
+*/
+INPUT_CHANGED_MEMBER( ti99_4x::load_interrupt )
+{
+	m_cpu->set_input_line(INPUT_LINE_NMI, (newval==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
 /***********************************************************
