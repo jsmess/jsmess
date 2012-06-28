@@ -11,12 +11,12 @@
 #include "png.h"
 
 // paper is A4 (297x210mm)
-#define PAPER_HEIGHT	(210*8)
-#define PAPER_WIDTH		(297*8)
+#define PAPER_WIDTH			(210*8)
+#define PAPER_HEIGHT		(297*8)
 
 // usable area is 187.5x262.5mm step is 0.125mm
-#define PAPER_MAX_X			2100
-#define PAPER_MAX_Y			1500
+#define PAPER_MAX_X			1500
+#define PAPER_MAX_Y			2100
 
 // dump the m_paper bitmap into a png
 #define DUMP_PAPER_INTO_PNG		0
@@ -83,7 +83,7 @@ void iq151_minigraf_device::device_stop()
 		static const rgb_t png_palette[] = { RGB_WHITE, RGB_BLACK };
 
 		// save the paper into a png
-		png_write_bitmap(file, NULL, m_paper, 2, png_palette);
+		png_write_bitmap(file, NULL, *m_paper, 2, png_palette);
 	}
 #endif
 }
@@ -145,8 +145,8 @@ inline int iq151_minigraf_device::get_direction(UINT8 old_val, UINT8 new_val)
 void iq151_minigraf_device::plotter_update(UINT8 control)
 {
 	// update pen and paper positions
-	m_posx += get_direction(m_control & 7, control & 7);
-	m_posy += get_direction((m_control>>3) & 7, (control>>3) & 7);
+	m_posy += get_direction(m_control & 7, control & 7);
+	m_posx += get_direction((m_control>>3) & 7, (control>>3) & 7);
 
 	// bit 7 is pen up/down
 	m_pen = BIT(control, 7);
@@ -159,7 +159,7 @@ void iq151_minigraf_device::plotter_update(UINT8 control)
 
 	// if pen is down draws a point
 	if (m_pen)
-		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 
 	m_control = control;
 }

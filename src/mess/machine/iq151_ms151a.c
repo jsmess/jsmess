@@ -11,12 +11,12 @@
 #include "png.h"
 
 // paper is A4 (210x297mm)
-#define PAPER_HEIGHT	(210*10)
-#define PAPER_WIDTH		(297*10)
+#define PAPER_WIDTH			(210*10)
+#define PAPER_HEIGHT		(297*10)
 
 // usable area is 175x250mm step is 0.1mm
-#define PAPER_MAX_X			(250*10)
-#define PAPER_MAX_Y			(175*10)
+#define PAPER_MAX_X			(175*10)
+#define PAPER_MAX_Y			(250*10)
 
 // dump the m_paper bitmap into a png
 #define DUMP_PAPER_INTO_PNG		0
@@ -82,7 +82,7 @@ void iq151_ms151a_device::device_stop()
 		static const rgb_t png_palette[] = { RGB_WHITE, RGB_BLACK };
 
 		// save the paper into a png
-		png_write_bitmap(file, NULL, m_paper, 2, png_palette);
+		png_write_bitmap(file, NULL, *m_paper, 2, png_palette);
 	}
 #endif
 }
@@ -146,10 +146,10 @@ void iq151_ms151a_device::plotter_update(UINT8 offset, UINT8 data)
 	// update pen and paper positions
 	switch (offset)
 	{
-		case 0:		m_posx++;				break;
-		case 1:		m_posx--;				break;
-		case 2:		m_posy++;				break;
-		case 3:		m_posy--;				break;
+		case 0:		m_posy++;				break;
+		case 1:		m_posy--;				break;
+		case 2:		m_posx++;				break;
+		case 3:		m_posx--;				break;
 		case 4:		m_pen = data & 0x01;	break;
 	}
 
@@ -161,5 +161,5 @@ void iq151_ms151a_device::plotter_update(UINT8 offset, UINT8 data)
 
 	// if pen is down draws a point
 	if (m_pen)
-		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 }
