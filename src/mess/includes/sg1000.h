@@ -1,12 +1,25 @@
 #ifndef __SG1000__
 #define __SG1000__
 
-#include "machine/ram.h"
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "imagedev/printer.h"
+#include "formats/basicdsk.h"
+#include "machine/ctronics.h"
+#include "machine/i8255.h"
+#include "machine/i8251.h"
+#include "machine/upd765.h"
+#include "video/tms9928a.h"
+#include "sound/sn76496.h"
+#include "crsshair.h"
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
-#define SN76489A_TAG	"sn76489a"
+#define SN76489AN_TAG	"sn76489an"
 #define UPD765_TAG		"upd765"
 #define UPD8251_TAG		"upd8251"
 #define UPD9255_TAG		"upd9255"
