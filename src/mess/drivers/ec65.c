@@ -14,6 +14,7 @@
 #include "machine/6522via.h"
 #include "machine/6551acia.h"
 #include "machine/6850acia.h"
+#include "machine/keyboard.h"
 
 #define PIA6821_TAG "pia6821"
 #define ACIA6850_TAG "acia6850"
@@ -26,15 +27,19 @@ class ec65_state : public driver_device
 {
 public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag),
+	m_via_0(*this, VIA6522_0_TAG),
+	m_p_videoram(*this, "videoram"){ }
 
 	DECLARE_READ8_MEMBER(ec65_via_read_a);
 	DECLARE_READ8_MEMBER(ec65_read_ca1 );
 	DECLARE_READ8_MEMBER(ec65_via_read_b);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;
+	UINT8 m_keyboard_input;
+	required_device<via6522_device> m_via_0;
 	required_shared_ptr<UINT8> m_p_videoram;
 };
 
@@ -50,14 +55,14 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r , register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -69,7 +74,7 @@ static const pia6821_interface ec65_pia_interface=
 	DEVCB_NULL,		/* CB1 input */
 	DEVCB_NULL,		/* CA2 input */
 	DEVCB_NULL,		/* CB2 input */
-	DEVCB_NULL, 	/* port A output */
+	DEVCB_NULL,		/* port A output */
 	DEVCB_NULL,		/* port B output */
 	DEVCB_NULL,		/* CA2 output */
 	DEVCB_NULL,		/* CB2 output */
@@ -91,19 +96,23 @@ static ACIA6850_INTERFACE( ec65_acia_intf )
 
 READ8_MEMBER( ec65_state::ec65_via_read_a)
 {
-	return 0;
+	return m_keyboard_input;
 }
+
 READ8_MEMBER( ec65_state::ec65_read_ca1 )
 {
 	return 0;
 }
+
 READ8_MEMBER( ec65_state::ec65_via_read_b)
 {
 	return 0xff;
 }
+
 WRITE8_MEMBER( ec65_state::ec65_via_write_a )
 {
 }
+
 WRITE8_MEMBER( ec65_state::ec65_via_write_b )
 {
 }
@@ -144,9 +153,23 @@ static const via6522_interface ec65_via_0_intf=
 
 /* Input ports */
 static INPUT_PORTS_START( ec65 )
-
 INPUT_PORTS_END
 
+WRITE8_MEMBER( ec65_state::kbd_put )
+{
+	if (data)
+	{
+		m_keyboard_input = data;
+		m_via_0->write_ca1(1);
+		m_via_0->write_ca1(0);
+	}
+}
+
+
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DRIVER_MEMBER(ec65_state, kbd_put)
+};
 
 static MACHINE_RESET(ec65)
 {
@@ -250,6 +273,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_VIA6522_ADD(VIA6522_0_TAG, XTAL_4MHz / 4, ec65_via_0_intf)
 	MCFG_VIA6522_ADD(VIA6522_1_TAG, XTAL_4MHz / 4, ec65_via_1_intf)
 	MCFG_ACIA6551_ADD(ACIA6551_TAG)     // have XTAL of 1.8432MHz connected
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ec65k, ec65_state )
