@@ -1004,7 +1004,7 @@ static const floppy_interface sf7000_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(sf7000),
-	NULL,
+	"floppy_3",
 	NULL
 };
 
@@ -1224,6 +1224,9 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
