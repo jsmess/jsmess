@@ -139,7 +139,6 @@ void ncr5380_device::device_reset()
 {
 	memset(m_5380_Registers, 0, sizeof(m_5380_Registers));
 	memset(m_5380_Data, 0, sizeof(m_5380_Data));
-	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	m_next_req_flag = 0;
 	m_cmd_ptr = 0;
