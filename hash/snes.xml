@@ -22178,7 +22178,7 @@ Alternate board (XL-1)
 			<feature name="dipswitch" value="DSW1" />
 			<feature name="battery" value="BATT1 CR2032" />
 			<feature name="cart_model" value="none" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="3145728">
 				<rom name="0.u1" size="524288" crc="470e9188" sha1="7272cd3225f67c454ddbd977050e09ef4a1314af" offset="0x000000" />
 				<rom name="1.u2" size="524288" crc="13001d97" sha1="67430feb3677e1ebb82f3dc105ca8b6c0058ad96" offset="0x080000" />
 				<rom name="2.u3" size="524288" crc="c22796d2" sha1="518b0966c8905fc0272d8fd5e4eefb3d4d19f8e9" offset="0x100000" />
@@ -24224,6 +24224,24 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="choplifter iii - rescue &amp; survive (usa) (beta) [b].sfc" size="524288" crc="3280c18f" sha1="8501570bfb32fe86f6cc7756eae23c49defe9974" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clayfgt2up" cloneof="clayfgt2" supported="no">
+		<!-- Incomplete dump, only 3 out of the 6 chips are available, the original prototype board is unknown -->
+		<description>Clay Fighter 2 - Judgment Clay (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="release" value="" />
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="clay 2 1995.u1" size="524288" crc="3998e4b9" sha1="a0b91861b4e67c290d6621f607560366d8ef7ec4"                 offset="0x000000" />
+				<rom name="2.u2"           size="524288" crc="19c4b39f" sha1="86df3dd37504dba24a84eac5bbf50ba26c84b194"                 offset="0x080000" />
+				<rom name="3.u3"           size="524288"                                                                status="nodump" offset="0x100000" />
+				<rom name="4.u4"           size="524288" crc="dc5e95b5" sha1="b695e6c1f25381d159cb2b3efa8b3a44bed85a86"                 offset="0x180000" />
+				<rom name="5.u4"           size="524288"                                                                status="nodump" offset="0x200000" />
+				<rom name="6.u6"           size="524288"                                                                status="nodump" offset="0x280000" />
 			</dataarea>
 		</part>
 	</software>
