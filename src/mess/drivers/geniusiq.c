@@ -73,7 +73,13 @@ ROM_START( geniusiq )
 	ROM_LOAD( "geniusiq.bin", 0x0000, 0x200000, CRC(9b06cbf1) SHA1(b9438494a9575f78117c0033761f899e3c14e292) )
 ROM_END
 
+ROM_START( geniusiq_de )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "german.rom", 0x0000, 0x200000, CRC(a98fc3ff) SHA1(de76a5898182bd0180bd2b3e34c4502f0918a3fa) )
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 1997, geniusiq,   0,       0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128", GAME_NO_SOUND_HW)
+COMP( 1997, geniusiq,      0,      		   0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NO_SOUND_HW)
+COMP( 1997, geniusiq_de,   geniusiq,       0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NO_SOUND_HW)
