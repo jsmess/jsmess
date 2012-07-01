@@ -1481,7 +1481,7 @@
   Special Discs                                 (most aren't dumped)                        |
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
       Delisoba Deluxe (Japan) [610-6803]                                                    | ########MISSING########
-      Christmas NiGHTS: into Dreams… (Japan) (Touki Genteiban) [610-6431]                   | (xmasnigh)
+      Christmas NiGHTS: into Dreams… (Japan) (Touki Genteiban) [610-6431]                   | (xmasnighj)
       Welcome to Eyeful Home: Oregon & Basic (Japan) [GS-9083]                              | ########MISSING########
       Heim Waltz (Japan) [GS-9121]                                                          | ########MISSING########
       Big Thanks Super Keirin: Dream With Keirin 50 Years (Japan) [610-6987]                | (bigthank)
@@ -1491,7 +1491,7 @@
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
       Alien Trilogy Taikenban (Japan) [ST-8113G]                                            |
       Azel Panzer Dragoon RPG OST (Japan) [MJCA-00009]                                      |
-      Azel Panzer Dragoon RPG Taikenban (Japan) [610-6749]                                  | (azelpanztaiken)
+      Azel Panzer Dragoon RPG Taikenban (Japan) [610-6749]                                  | (azelpanztai)
       Blue Breaker: Ken Yori mo Hohoemi wo Taikenban (Japan) [610-6719]                     |
       Body Special 264 ~Girls in Motion Puzzle vol.2~ Hibaihin (Japan) [ST-21003G]          |
       Bouken Katsugeki Monomono Taikenban (Japan) [610-6611]                                |
@@ -2471,12 +2471,10 @@ Croc (Spa) T-5029H-06
 Crusader - No Remorse (Ger) T-5014H-18
 Die Hard Trilogy (Fra) T-16103H-09
 Dragon Ball Z (Fra) T-13305H-09
-Galaxy Fight (Euro) T-1504H-50
 Jungla de Cristal - La Trilogia (Spa) T-16103H-06
 Olympic Soccer (Fra) T-7904H-09
 
 -->
-
 
 
   <!-- *********************************************************************************************************-->
@@ -2653,7 +2651,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="aquazone" supported="no">
 		<description>Aquazone - Desktop Life (Jpn)</description>
 		<year>1996</year>
-		<publisher>Open Book 9003</publisher>
+		<publisher>9003</publisher>
 		<info name="serial" value="T-24001G"/>
 		<info name="release" value="19960712"/>
 		<info name="alt_title" value="アクアゾーン"/>
@@ -2812,10 +2810,13 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Bakuretsu Hunter (Japan) (Disc 2) (Omake CD)... -->
-	<software name="bakhunto" supported="no">
-		<description>Bakuretsu Hunter (Jpn) (Omake CD)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="bakhunta" cloneof="bakhunt" supported="no">
+		<description>Bakuretsu Hunter (Jpn, Alt Omake CD)</description>
+		<year>1996</year>
+		<publisher>I'Max</publisher>
+		<info name="serial" value="T-22402G"/>
+		<info name="release" value="19960426"/>
+		<info name="alt_title" value="爆れつハンター"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -2892,7 +2893,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="btlmonstj" cloneof="btlmonst" supported="no">
 		<description>Battle Monsters (Jpn)</description>
 		<year>1995</year>
-		<publisher>Naxat</publisher>
+		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="T-18701G"/>
 		<info name="release" value="19950602"/>
 		<info name="alt_title" value="バトルモンスターズ"/>
@@ -2921,10 +2922,13 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Black Matrix (Japan) (Reprint)... -->
-	<software name="blckmtxr" supported="no">
-		<description>Black Matrix (Jpn) (Reprint)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="blckmtxa" cloneof="blckmtx" supported="no">
+		<description>Black/Matrix (Jpn) (Reprint)</description>
+		<year>1998</year>
+		<publisher>NEC Interchannel</publisher>
+		<info name="serial" value="T-20115G?"/>
+		<info name="release" value="19981106"/>
+		<info name="alt_title" value="ブラックマトリクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -3510,10 +3514,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Japan) (Sample)... -->
-	<software name="dsumsouldemo" cloneof="dsumsoul" supported="no">
-		<description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Jpn) (Sample)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dsumsould" cloneof="dsumsoul" supported="no">
+		<description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Jpn)</description>
+		<year>1997</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="610-6704"/>
+		<info name="alt_title" value="デビルサマナー　ソウル　ハッカーズ／ロンド〜輪舞曲〜　お試し用サンプル版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -4053,7 +4059,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="falcom1" supported="no">
 		<description>Falcom Classics (Jpn)</description>
 		<year>1997</year>
-		<publisher>Victor</publisher>
+		<publisher>JVC</publisher>
 		<info name="serial" value="T-31502G"/>
 		<info name="release" value="19971106"/>
 		<info name="alt_title" value="ファルコム　クラシックス"/>
@@ -4069,7 +4075,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="falcom2" supported="no">
 		<description>Falcom Classics II (Jpn)</description>
 		<year>1998</year>
-		<publisher>Victor</publisher>
+		<publisher>JVC</publisher>
 		<info name="serial" value="T-31505G"/>
 		<info name="release" value="19981029"/>
 		<info name="alt_title" value="ファルコム　クラシックスⅡ"/>
@@ -4325,7 +4331,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="gpaniss" supported="no">
 		<description>Gals Panic SS (Jpn)</description>
 		<year>1996</year>
-		<publisher>Mycom</publisher>
+		<publisher>MYCOM</publisher>
 		<info name="serial" value="T-29002G"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ギャルズパニック　ＳＳ"/>
@@ -5699,7 +5705,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mahjong Doukyuusei Special (Japan) (Disc 1) (Genteiban)... -->
 	<software name="mjdoukspgena" cloneof="mjdouksp" supported="no">
-		<description>Mahjong Doukyuusei Special (Genteiban) (Jpn, Alt)</description>
+		<description>Mahjong Doukyuusei Special (Jpn, Genteiban, Alt)</description>
 		<year>1996</year>
 		<publisher>Make Software</publisher>
 		<info name="serial" value="T-25302G"/>
@@ -9749,8 +9755,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Azel Panzer Dragoon RPG Taikenban (JAP) (DW0866)... -->
 	<software name="azelpanztai" cloneof="panzsaga" supported="no">
 		<description>Azel Panzer Dragoon RPG Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6749"/>
+		<info name="alt_title" value="アゼル　―パンツァードラグーンＲＰＧ―　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -9776,10 +9784,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Baroque Report CD Data File (JAP) (DW0867)... -->
-	<software name="baroquer" supported="no">
+	<software name="baroquerep" cloneof="baroque" supported="no">
 		<description>Baroque Report CD Data File (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>ESP</publisher>
+		<info name="serial" value="610-6848"/>
+		<info name="alt_title" value="バロックレポートＣＤデータファイル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -9871,8 +9881,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Burning Rangers Taikenban (JAP) (DW0868)... -->
 	<software name="burningrtai" cloneof="burningr" supported="no">
 		<description>Burning Rangers Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6856"/>
+		<info name="alt_title" value="バーニングレンジャー　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -9952,10 +9964,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Christmas Nights Into Dreams... (JAP) (DW0487)... -->
-	<software name="xmasnigh" supported="no">
-		<description>Christmas Nights Into Dreams... (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="xmasnighj" cloneof="xmasnigh" supported="no">
+		<description>Christmas NiGHTS Into Dreams... (Jpn, Touki Genteiban)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6431"/>
+		<info name="alt_title" value="クリスマスナイツ　冬季限定版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -9981,10 +9995,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Cross Tantei Monogatari Taikenban (JAP) (DW0869)... -->
+  <!-- is this 610-6876 or 610-6877? -->
 	<software name="crtanteitai" cloneof="crtantei" supported="no">
 		<description>Cross Tantei Monogatari Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>WorkJam</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -9997,7 +10012,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="cubeshou" supported="no">
 		<description>Cube Battler - Story of Shou (Jpn)</description>
 		<year>1997</year>
-		<publisher>Yanoman</publisher>
+		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21004G"/>
 		<info name="release" value="19970228"/>
 		<info name="alt_title" value="キューブバトラー　デバッガー翔編 ~ Cube Battler ~Debugger Shou-hen~ (Box)"/>
@@ -10130,8 +10145,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Daytona USA Hibaihin Mihonban (JAP) (DW0870)... -->
 	<software name="daytonajhib" cloneof="daytona" supported="no">
 		<description>Daytona USA Hibaihin Mihonban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SGS-9013"/>
+		<info name="alt_title" value="デイトナＵＳＡ　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10304,9 +10321,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Digital Pinball Last Gladiators Taikenban (JAP) (DW0871)... -->
 	<software name="digipinjtai" cloneof="digipin" supported="no">
-		<description>Digital Pinball Last Gladiators Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Digital Pinball - Last Gladiators Taikenban (Jpn)</description>
+		<year>1995</year>
+		<publisher>Kaze</publisher>
+		<info name="serial" value="ST-18901G / 610-5985"/>
+		<info name="alt_title" value="デジタルピンボール　ラストグラディエーターズ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10317,9 +10336,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Digital Pinball Necronomicon Taikenban (JAP) (DW0872)... -->
 	<software name="dpnecrotai" cloneof="dpnecro" supported="no">
-		<description>Digital Pinball Necronomicon Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Digital Pinball - Necronomicon Taikenban (Jpn)</description>
+		<year>1996</year>
+		<publisher>Kaze</publisher>
+		<info name="serial" value="ST-18901G / 610-5985"/>
+		<info name="alt_title" value="デジタルピンボール　ラストグラディエーターズ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10347,8 +10368,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying DJ Wars Taikenban (JAP) (DW0873)... -->
 	<software name="djwarstai" cloneof="djwars" supported="no">
 		<description>DJ Wars Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Spike</publisher>
+		<info name="serial" value="610-6762"/>
+		<info name="release" value=""/>
+		<info name="alt_title" value="ＤＪウォーズ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10391,9 +10415,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Doukonban ~ Metal Slug (JAP) (v1.002) (DW0073)... -->
 	<software name="mslugdouk" cloneof="mslug" supported="no">
-		<description>Metal Slug (Doukonban) (Jpn) (v1.002)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Metal Slug - Kakuchou Ram Doukon Okaidoku Set!! (Jpn)</description>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="T-3114G"/>
+		<info name="release" value="19970404"/>
+		<info name="alt_title" value="メタルスラッグ　（拡張ラム同梱「お買得セット」！！）"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10461,6 +10488,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>Dragon's Dream (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
 		<info name="alt_title" value="ドラゴンズドリーム"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -10608,9 +10637,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Eve the Lost One Taikenban (JAP) (DW0875)... -->
 	<software name="evelosttai" cloneof="evelost" supported="no">
-		<description>Eve the Lost One Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>EVE - The Lost One Taikenban (Jpn)</description>
+		<year>1998</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="610-6837"/>
+		<info name="alt_title" value="イヴ・ザ・ロストワン　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10639,7 +10670,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="fedarm" supported="no">
 		<description>FEDA Remake! The Emblem of Justice (Jpn)</description>
 		<year>1996</year>
-		<publisher>Yanoman</publisher>
+		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21001G"/>
 		<info name="release" value="19960524"/>
 		<info name="alt_title" value="フェーダ・リメイク！　エンブレム・オブ・ジャスティス"/>
@@ -10686,8 +10717,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Fighting Vipers Taikenban (JAP) (DW0877)... -->
 	<software name="fvipersjtai" cloneof="fvipers" supported="no">
 		<description>Fighting Vipers Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6376"/>
+		<info name="alt_title" value="ファイティングバイパーズ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10730,9 +10763,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Flash Sega Saturn ~Ochikadzuki-hen~ (JAP) (DW0878)... -->
 	<software name="flshssoh" supported="no">
-		<description>Flash Sega Saturn ~Ochikadzuki-hen~ (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-99"/>
+		<info name="alt_title" value="フラッシュ・セガサターン〜おちかづき編〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10766,9 +10801,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Full Cowl Mini Yonku Super Factory Taikenban (JAP) (DW0892)... -->
 	<software name="fullcowltai" cloneof="fullcowl" supported="no">
 		<description>Full Cowled Mini Yonku Super Factory Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="T-26408G"/>
+		<year>1997</year>
+		<publisher>Media Quest</publisher>
+		<info name="serial" value="610-6567"/>
+		<info name="alt_title" value="フルカウルミニ四駆　スーパーファクトリー　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10780,8 +10816,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Funky Head Boxers Hibaihin (JAP) (DW0893)... -->
 	<software name="fhboxhib" cloneof="fhbox" supported="no">
 		<description>Funky Head Boxers Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Yoshimoto Kogyo</publisher>
+		<info name="serial" value="ST-20003G / 610-6459"/>
+		<info name="alt_title" value="ファンキーヘッドボクサーズ　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10842,7 +10880,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="gpanissa" cloneof="gpaniss" supported="no">
 		<description>Gals Panic SS (Jpn, Alt)</description>
 		<year>1996</year>
-		<publisher>Mycom</publisher>
+		<publisher>MYCOM</publisher>
 		<info name="serial" value="T-29002G"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ギャルズパニック　ＳＳ"/>
@@ -10949,8 +10987,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Gekitotsu Koushien Taikenban ROM (JAP) (DW0894)... -->
 	<software name="gekitots" supported="no">
 		<description>Gekitotsu Koushien Taikenban ROM (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Magical Company</publisher>
+		<info name="serial" value="610-6677"/>
+		<info name="alt_title" value="激突甲子園　体験版　ＲＯＭ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10977,9 +11017,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Goiken Muyou ~Anarchy in the Nippon~ Taikenban (JAP) (DW0895)... -->
 	<software name="anarchytai" cloneof="anarchy" supported="no">
-		<description>Goiken Muyou ~Anarchy in the Nippon~ Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Goiken Muyou - Anarchy in the Nippon Taikenban (Jpn)</description>
+		<year>1997</year>
+		<publisher>KSS</publisher>
+		<info name="serial" value="610-6695"/>
+		<info name="alt_title" value="御意見無用　Ａｎａｒｃｈｙ　ｉｎ　ｔｈｅ　ＮＩＰＰＯＮ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -10990,9 +11032,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Gotha II Demonstration (JAP) (DW0896)... -->
 	<software name="gotha2d" cloneof="zendor" supported="no">
-		<description>Gotha II Demonstration (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Gotha II - Tenkuu no Kishi - Teitoku no Ketsudan II - Demonstration-you CD-ROM (Jpn)</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="ST-7608G - ST-7607G / 610-6201"/>
+		<info name="alt_title" value="ゴータⅡ～天空の騎士～　提督の決断Ⅱ　デモンストレーション用ＣＤ‐ＲＯＭ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11057,9 +11101,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Grandia ~Prelude~ (JAP) (DW0897)... -->
 	<software name="grandpre" supported="no">
-		<description>Grandia ~Prelude~ (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Grandia - Prelude (Jpn)</description>
+		<year>1997</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="610-6600"/>
+		<info name="alt_title" value="グランディア　～プレリュード～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11135,8 +11181,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Gungriffon Hibaihin Auto Demo (JAP) (DW0898)... -->
 	<software name="gungriffjd" cloneof="gungriff" supported="no">
 		<description>Gungriffon Hibaihin Auto Demo (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-4502G / 610-6188"/>
+		<info name="alt_title" value="ガングリフォン　非売品　オートデモ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11180,8 +11228,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Hang On GP '95 Hibaihin (JAP) (DW0899) (DW0899)... -->
 	<software name="hangongpjhib" cloneof="hangongp" supported="no">
 		<description>Hang On GP '95 Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SGS-9032"/>
+		<info name="alt_title" value="ハングオン　ＧＰ　’９５　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11192,9 +11242,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Heisei Tensai Bakabon Susume! Bakabons Hibaihin (JAP) (DW0900)... -->
 	<software name="bakabonshib" cloneof="bakabons" supported="no">
-		<description>Heisei Tensai Bakabon Susume! Bakabons Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Heisei Tensai Bakabon Susume! Bakabons Hibaihin Mihonban (Jpn)</description>
+		<year>1995</year>
+		<publisher>General Entertainmnet</publisher>
+		<info name="serial" value="ST-17001G / 610-5984"/>
+		<info name="alt_title" value="平成天才バカボン　すすめ！　バカボンズ　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11238,8 +11290,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying House of the Dead Taikenban (JAP) (DW0928)... -->
 	<software name="hotdtai" cloneof="hotd" supported="no">
 		<description>The House of the Dead Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6861"/>
+		<info name="alt_title" value="ザ・ハウス・オブ・ザ・デッド　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11265,10 +11319,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Hudson Soft New Soft Line Up (JAP) (DW0901)... -->
-	<software name="hudsonso" supported="no">
+	<software name="hudsonlu" supported="no">
 		<description>Hudson Soft New Soft Line Up (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="610-6540"/>
+		<info name="alt_title" value="ＨＵＤＳＯＮ　ＳＯＦＴ　ＮＥＷ　ＳＯＦＴ　ＬＩＮＥ　ＵＰ　ＦＯＲ　ＳＥＧＡ　ＳＡＴＵＲＮ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11390,9 +11446,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Kidou Senshi Gundam Gaiden I Taikenban(JAP) (DW0902)... -->
 	<software name="ksgdg1tai" cloneof="ksgdg1" supported="no">
-		<description>Kidou Senshi Gundam Gaiden I Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue Taikenban (Jpn)</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="ST-13306G / 610-6358"/>
+		<info name="alt_title" value="機動戦士ガンダム外伝Ⅰ　戦慄のブルー　体験版ディスク"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11403,7 +11461,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Kidou Senshi Gundam Gihren no Yabou (Shokai Genteiban) (JAP) (DW0625)... -->
 	<software name="ksgdgihrsg" cloneof="ksgdgihr" supported="no">
-		<description>Kidou Senshi Gundam - Gihren no Yabou (Shokai Genteiban) (Jpn)</description>
+		<description>Kidou Senshi Gundam - Gihren no Yabou (Jpn, Shokai Genteiban)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13327G"/>
@@ -11702,8 +11760,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Lunar Silver Star Story Hibaihin Auto Demo (JAP) (DW0903)... -->
 	<software name="lunarhib" cloneof="lunar" supported="no">
 		<description>Lunar - Silver Star Story Hibaihin Auto Demo (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Kadokawa Shoten</publisher>
+		<info name="serial" value="ST-27901G / 610-6419"/>
+		<info name="alt_title" value="ルナ　シルバースターストーリー　非売品　オートデモ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11745,10 +11805,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Machi Sample (JAP) (DW0904)... -->
-	<software name="machisam" supported="no">
+	<software name="machisam" cloneof="snovelm" supported="no">
 		<description>Machi Sample (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Chun Soft</publisher>
+		<info name="serial" value="610-6777"/>
+		<info name="alt_title" value="街　ＳＡＭＰＬＥ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11807,9 +11869,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Maria  Hibaihin (JAP) (DW0905)... -->
 	<software name="mariahib" cloneof="maria" supported="no">
-		<description>Maria Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Maria - Kimitachi ga Umareta Wake Hibaihin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Axela</publisher>
+		<info name="serial" value="610-6800"/>
+		<info name="alt_title" value="マリア〜君たちが生まれた理由〜　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11837,8 +11901,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Marvel Super Heroes Taikenban (JAP) (DW0906)... -->
 	<software name="mshjtai" cloneof="msh" supported="no">
 		<description>Marvel Super Heroes Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="610-6664"/>
+		<info name="alt_title" value="マーブル・スーパーヒーローズ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11899,9 +11965,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mogitate SegaSaturn Vol.2 1998.2 (JAP) (DW0907)... -->
 	<software name="mogv2" supported="no">
-		<description>Mogitate SegaSaturn Vol.2 1998.2 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mogitate SegaSaturn Vol. 2 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-02"/>
+		<info name="release" value="199802xx"/>
+		<info name="alt_title" value="モギタテセガサターン　Ｖｏｌ．２　１９９８．２"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11913,9 +11982,12 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Mogitate SegaSaturn Vol.3 1998.5 (JAP) (DW0908)... -->
   <!-- Identifying Mogitate SegaSaturn Vol.3 1998.5 Special Movie (JAP) (DW0908)... -->
 	<software name="mogv3" supported="no">
-		<description>Mogitate SegaSaturn Vol.3 1998.5 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mogitate SegaSaturn Vol. 3 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-03 / 610-6929"/>
+		<info name="release" value="199805xx"/>
+		<info name="alt_title" value="モギタテセガサターン　Ｖｏｌ．３　１９９８．５"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11931,9 +12003,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mogitate SegaSaturn Vol.4 1998.8 (JAP) (DW0909)... -->
 	<software name="mogv4" supported="no">
-		<description>Mogitate SegaSaturn Vol.4 1998.8 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mogitate SegaSaturn Vol. 4 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-04"/>
+		<info name="release" value="199808xx"/>
+		<info name="alt_title" value="モギタテセガサターン　Ｖｏｌ．４　１９９８．８"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11944,9 +12019,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mogitate SegaSaturn Vol.5 1998.11 (JAP) (DW0910)... -->
 	<software name="mogv5" supported="no">
-		<description>Mogitate SegaSaturn Vol.5 1998.11 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mogitate SegaSaturn Vol. 5 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-05"/>
+		<info name="release" value="199811xx"/>
+		<info name="alt_title" value="モギタテセガサターン　Ｖｏｌ．５　１９９８．１１"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11957,9 +12035,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mogitate SegaSaturn Vol.6 1999.2 (JAP) (DW0911)... -->
 	<software name="mogv6" supported="no">
-		<description>Mogitate SegaSaturn Vol.6 1999.2 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mogitate SegaSaturn Vol. 6 (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-06"/>
+		<info name="release" value="199902xx"/>
+		<info name="alt_title" value="モギタテセガサターン　Ｖｏｌ．６　１９９９．２"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12009,8 +12090,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Mr. Bones Taiken Sample-ban (JAP) (DW0913)... -->
 	<software name="mrbonestai" cloneof="mrbones" supported="no">
 		<description>Mr. Bones Taiken Sample-ban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6666"/>
+		<info name="alt_title" value="ミスター・ボーンズ　体験サンプル版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12086,8 +12169,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Nobunaga no Yabou Tenshouki Hibaihin (JAP) (DW0914)... -->
 	<software name="nobutenshib" cloneof="nobutens" supported="no">
 		<description>Nobunaga no Yabou Tenshouki Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="ST-7605G / 610-6108"/>
+		<info name="alt_title" value="信長の野望・天翔記　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12098,9 +12183,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Noel 3 Taikenban (JAP) (DW0915)... -->
 	<software name="noel3tai" cloneof="noel3" supported="no">
-		<description>Noel 3 Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Noël 3 Taikenban (Jpn)</description>
+		<year>1998</year>
+		<publisher>Pioneer LDC</publisher>
+		<info name="serial" value="610-7100"/>
+		<info name="alt_title" value="ノエル３　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12160,8 +12247,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Panzer Dragoon Demo-you Hibaihin (JAP) (DW0916)... -->
 	<software name="panzerjd" cloneof="panzer" supported="no">
 		<description>Panzer Dragoon Demo-you Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="PD-DEMO"/>
+		<info name="alt_title" value="パンツァードラグーン　デモ用　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12588,9 +12677,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sakura Taisen 2 Tokubetsu-ban (JAP) (DW0917)... -->
 	<software name="sakurat2tb" cloneof="sakurat2" supported="no">
-		<description>Sakura Taisen 2 Tokubetsu-ban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare Tokubetsu-ban (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6864"/>
+		<info name="alt_title" value="サクラ大戦２　〜君、死にたもうことなかれ〜　特別版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12665,9 +12756,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Saturn Super Vol.5 (JAP) (DW0947)... -->
 	<software name="satsup5" supported="no">
-		<description>Saturn Super Vol.5 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Saturn Super Vol. 5 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Captain Soft</publisher>
+		<info name="serial" value="610-6020-006"/>
+		<info name="alt_title" value="サターンスーパー　ＶＯＬ．５"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12678,9 +12771,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Saturn Super Vol.6 (JAP) (DW0948)... -->
 	<software name="satsup6" supported="no">
-		<description>Saturn Super Vol.6 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Saturn Super Vol. 6 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Captain Soft</publisher>
+		<info name="serial" value="610-6020-07"/>
+		<info name="alt_title" value="サターンスーパー　ＶＯＬ．６"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12691,9 +12786,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Saturn Super Vol.7 (JAP) (DW0949)... -->
 	<software name="satsup7" supported="no">
-		<description>Saturn Super Vol.7 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Saturn Super Vol. 7 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Captain Soft</publisher>
+		<info name="serial" value="610-6020-08"/>
+		<info name="alt_title" value="サターンスーパー　ＶＯＬ．７"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12737,8 +12834,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Sega Rally Championship Hibaihin (JAP) (DW0918)... -->
 	<software name="srallycjhib" cloneof="srallyc" supported="no">
 		<description>Sega Rally Championship Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SGS-9047"/>
+		<info name="alt_title" value="セガラリー・チャンピオンシップ　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12765,9 +12864,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Segakore Sega Bible Mogitate SegaSaturn 1997.11 (JAP) (DW0912)... -->
 	<software name="mogv1" supported="no">
-		<description>Segakore Sega Bible Mogitate SegaSaturn 1997.11 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Segakore Sega Bible Mogitate SegaSaturn Soukango (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6805-01"/>
+		<info name="release" value="199711xx"/>
+		<info name="alt_title" value="セガコレセガバイブルモギタテセガサターン。　創刊号　１９９７．１１"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -12880,9 +12982,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Shinpi No Sekai El-Hazard (Shokai Tokuten Genteiban) (JAP) (DW0605)... -->
 	<software name="elhazardb" cloneof="elhazard" supported="no">
-		<description>Shinpi no Sekai El-Hazard (Shokai Tokuten Genteiban) (Jpn, Alt)</description>
+		<description>Shinpi no Sekai El-Hazard (Jpn, Shokai Tokuten Genteiban, Alt)</description>
 		<year>1996</year>
-		<publisher>Pioneer</publisher>
+		<publisher>Pioneer LDC</publisher>
 		<info name="serial" value="T-22202G"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="神秘の世界エルハザード"/>
@@ -12998,9 +13100,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Shiroki Majo Taikenban (JAP) (DW0919)... -->
 	<software name="shirokimtai" cloneof="shirokim" supported="no">
-		<description>Shiroki Majo Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shiroki Majo - Mou Hitotsu no Eiyuu Densetsu Taikenban (Jpn)</description>
+		<year>1998</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="610-6860"/>
+		<info name="alt_title" value="白き魔女　～もうひとつの英雄伝説～　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13044,8 +13148,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Solo Crisis Taiken Sample-ban (JAP) (DW0921)... -->
 	<software name="solocristai" cloneof="solocris" supported="no">
 		<description>Solo Crisis Taiken Sample-ban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Quintet</publisher>
+		<info name="serial" value="610-6802"/>
+		<info name="alt_title" value="ソロ・クライシス　体験サンプル版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13159,8 +13265,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Steep Slope Sliders Hibaihin (JAP) (DW0922)... -->
 	<software name="sssjhib" cloneof="sss" supported="no">
 		<description>Steep Slope Sliders Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Pack-In Soft</publisher>
+		<info name="serial" value="610-6716"/>
+		<info name="alt_title" value="スティープ　スロープ　スライダーズ　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13236,8 +13344,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Street Fighter Zero 2 Taikenban (JAP) (DW0923)... -->
 	<software name="sfz2tai" cloneof="sfa2" supported="no">
 		<description>Street Fighter Zero 2 Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="ST-1212G / 610-6354"/>
+		<info name="alt_title" value="ストリートファイターＺＥＲＯ２　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13280,9 +13390,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Suiko Enbu ~Fuuun Saiki~ SAMPLE (JAP) (DW0889)... -->
 	<software name="suikoen2s" cloneof="suikoen2" supported="no">
-		<description>Suiko Enbu ~Fuuun Saiki~ SAMPLE (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Suiko Enbu - Fuuun Saiki Sample (Jpn)</description>
+		<year>1996</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="ST-1305G / 610-6182"/>
+		<info name="alt_title" value="水滸演舞　〜風雲再起〜　ＳＡＭＰＬＥ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13294,8 +13406,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Super Robot Taisen F Taikenban (JAP) (DW0924)... -->
 	<software name="srobotftai" cloneof="srobotf" supported="no">
 		<description>Super Robot Taisen F Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="610-6745"/>
+		<info name="alt_title" value="スーパーロボット大戦Ｆ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13338,9 +13452,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Syutokou Battle '97 Mihon Hin (JAP) (DW0920)... -->
 	<software name="sbatl97mh" cloneof="sbatl97" supported="no">
-		<description>Shutokou Battle '97 Mihon Hin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Drift King Shutokou Battle '97 - Tsuchiya Keiichi &amp; Bandou Masaaki Mihonhin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="610-6503"/>
+		<info name="release" value=""/>
+		<info name="alt_title" value="首都高バトル’９７　見本品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13352,8 +13469,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Tactics Formula Taikenban (JAP) (DW0925)... -->
 	<software name="tacticsftai" cloneof="tacticsf" supported="no">
 		<description>Tactics Formula Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Aki</publisher>
+		<info name="serial" value="610-6717"/>
+		<info name="alt_title" value="タクティクス　フォーミュラ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13396,9 +13515,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Tech Saturn Tsuushin Vol.1 (Spring 1995) (JAP) (DW0950)... -->
 	<software name="techv1" supported="no">
-		<description>TechSaturn Tsuushin Vol.1 (Spring 1995) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>TechSaturn Tsuushin 1995/Vol. 1 (Spring 1995) (Jpn)</description>
+		<year>1995</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-5913-01"/>
+		<info name="alt_title" value="ＴＥＣＨ　サターン通信　１９９５／Ｖｏｌ．１"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13409,9 +13530,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Tech Saturn Tsuushin Vol.3 (Winter 1995) (JAP) (DW0951)... -->
 	<software name="techv3" supported="no">
-		<description>TechSaturn Tsuushin Vol.3 (Winter 1995) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>TechSaturn Tsuushin 1996/Vol. 3 (Winter 1995) (Jpn)</description>
+		<year>1996</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-5913-03"/>
+		<info name="alt_title" value="ＴＥＣＨ　サターン通信　１９９６／Ｖｏｌ．３"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13422,9 +13545,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying TechSaturn 1996 Vol. 2 (JAP) (DW0952)... -->
 	<software name="tech96v2" supported="no">
-		<description>TechSaturn 1996 Vol. 2 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>TechSaturn 1996/Vol. 2 (Jpn)</description>
+		<year>1996</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-02"/>
+		<info name="release" value=""/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９６／Ｖｏｌ．２"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13436,8 +13562,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-01 (JAP) (DW0953)... -->
 	<software name="tech9701" supported="no">
 		<description>TechSaturn 1997-01 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-03"/>
+		<info name="release" value="199701xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．１"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13449,8 +13578,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-02 (JAP) (DW0954)... -->
 	<software name="tech9702" supported="no">
 		<description>TechSaturn 1997-02 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-04"/>
+		<info name="release" value="199702xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．２"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13462,8 +13594,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-03 (JAP) (DW0955)... -->
 	<software name="tech9703" supported="no">
 		<description>TechSaturn 1997-03 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-05"/>
+		<info name="release" value="199703xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．３"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13475,8 +13610,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-04 (JAP) (DW0956)... -->
 	<software name="tech9704" supported="no">
 		<description>TechSaturn 1997-04 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-06"/>
+		<info name="release" value="199704xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．４"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13488,8 +13626,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-05 (JAP) (DW0957)... -->
 	<software name="tech9705" supported="no">
 		<description>TechSaturn 1997-05 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-07"/>
+		<info name="release" value="199705xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．５"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13501,8 +13642,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-06 (JAP) (DW0958)... -->
 	<software name="tech9706" supported="no">
 		<description>TechSaturn 1997-06 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-08"/>
+		<info name="release" value="199706xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．６"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13514,8 +13658,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-07 (JAP) (DW0959)... -->
 	<software name="tech9707" supported="no">
 		<description>TechSaturn 1997-07 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-09"/>
+		<info name="release" value="199707xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．７"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13527,8 +13674,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-08 (JAP) (DW0960)... -->
 	<software name="tech9708" supported="no">
 		<description>TechSaturn 1997-08 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-10"/>
+		<info name="release" value="199708xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．８"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13540,8 +13690,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying TechSaturn 1997-10 (JAP) (DW0961)... -->
 	<software name="tech9710" supported="no">
 		<description>TechSaturn 1997-10 (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>ASCII</publisher>
+		<info name="serial" value="610-6360-12"/>
+		<info name="release" value="199710xx"/>
+		<info name="alt_title" value="ＴＥＣＨ　ＳＡＴＵＲＮ　１９９７．１０"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13569,8 +13722,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Tenant Wars Hibaihin (JAP) (DW0926)... -->
 	<software name="tenantwhib" cloneof="tenantw" supported="no">
 		<description>Tenant Wars Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>KID</publisher>
+		<info name="serial" value="610-6821"/>
+		<info name="alt_title" value="テナントウォーズ　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13581,9 +13736,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Tengai Makyou - The Apocalpyse IV Hibaihin (JAP) (DW0927)... -->
 	<software name="tengaimahib" cloneof="tengaima" supported="no">
-		<description>Tengai Makyou - The Apocalpyse IV Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tengai Makyou - Daishi no Mokushiroku - The Apocalypse IV Hibaihin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="610-6484"/>
+		<info name="release" value=""/>
+		<info name="alt_title" value="天外魔境　第四の黙示録　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13595,7 +13753,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)... -->
   <!-- Identifying Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)... -->
 	<software name="tengaimaa" cloneof="tengaima" supported="no">
-		<description>Tengai Makyou Dai - The Apocalypse IV (Jpn)</description>
+		<description>Tengai Makyou - Daishi no Mokushiroku - The Apocalypse IV (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14301G"/>
@@ -13745,8 +13903,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Tomb Raiders Taikenban (JAP) (DW0929)... -->
 	<software name="traidjtai" cloneof="traid" supported="no">
 		<description>Tomb Raiders Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Victor Interactive</publisher>
+		<info name="serial" value="ST-6010G / 610-6457"/>
+		<info name="alt_title" value="トゥームレイダース　体験版　非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13757,9 +13917,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Touge - King The Spirits 2 Mihonhin (JAP) (DW0930)... -->
 	<software name="touge2mih" cloneof="touge2" supported="no">
-		<description>Touge - King The Spirits 2 Mihonhin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Touge King The Spirits 2 Mihonhin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="610-6539"/>
+		<info name="alt_title" value="峠キング　ザ　スピリッツ　２　見本品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13834,9 +13996,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Vampire Hunter SAMPLE (JAP) (DW0931)... -->
 	<software name="vhuntsam" cloneof="nwarr" supported="no">
-		<description>Vampire Hunter SAMPLE (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Vampire Hunter - Darkstalkers' Revenge Sample (Jpn)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="ST-1202G / 610-6183"/>
+		<info name="alt_title" value="ヴァンパイア　ハンター　ＳＡＭＰＬＥ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13864,8 +14028,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Vatlva Taikenban (JAP) (DW0932)... -->
 	<software name="vatlvatai" cloneof="vatlva" supported="no">
 		<description>Vatlva Taikenban (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>JVC</publisher>
+		<info name="serial" value="ST-31501G"/>
+		<info name="alt_title" value="バトルバ　体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -13973,8 +14139,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Virtua Fighter 2 Hibaihin (JAP) (DW0933)... -->
 	<software name="vf2jhib" cloneof="vf2" supported="no">
 		<description>Virtua Fighter 2 Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SGS-9079"/>
+		<info name="alt_title" value="バーチャファイター２　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -14306,9 +14474,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Wing Arms Hibaihin (JAP) (DW0891)... -->
 	<software name="wingarmsjhib" cloneof="wingarms" supported="no">
-		<description>Wing Arms Hibaihin (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Wing Arms - Karei Naru Gekitsui Ou Hibaihin (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SGS-9038"/>
+		<info name="alt_title" value="ウイングアームズ　～華麗なる撃墜王～　非売品　見本盤"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -14618,6 +14788,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Advanced VG (Genteiban) (T-32506G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
   		<part name="cdrom" interface="sat_cdrom">
   			<diskarea name="cdrom">
   				<disk name="advanced vg (genteiban) (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
@@ -14675,10 +14848,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Albert Odyssey Gaiden Legend of Eldean (Genteiban) (T-1507G)... -->
 	<software name="albodysjg" cloneof="albodys" supported="no">
-		<description>Albert Odyssey Gaiden - Legend of Eldean (Genteiban) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Albert Odyssey Gaiden - Legend of Eldean (Jpn, Shokai Press Gentei)</description>
+		<year>1996</year>
+		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-1507G"/>
+		<info name="release" value="19960809"/>
+		<info name="alt_title" value="アルバートオデッセイ　外伝　～レジェンド　オブ　エルディーン～　（初回プレス限定）"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -15061,11 +15236,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Baroque Report CD Data File (610-6848)... -->
-	<software name="baroquera" cloneof="baroquer" supported="no">
+	<software name="baroquerepa" cloneof="baroque" supported="no">
 		<description>Baroque Report CD Data File (Jpn, Alt)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>ESP</publisher>
 		<info name="serial" value="610-6848"/>
+		<info name="alt_title" value="バロックレポートＣＤデータファイル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -15094,7 +15270,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="btlmonstja" cloneof="btlmonst" supported="no">
 		<description>Battle Monsters (Jpn, Alt)</description>
 		<year>1995</year>
-		<publisher>Naxat</publisher>
+		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="T-18701G"/>
 		<info name="release" value="19950602"/>
 		<info name="alt_title" value="バトルモンスターズ"/>
@@ -15140,9 +15316,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Big Thanks Super Keirin - Dream With Keirin 50 Years (610-6987)... -->
 	<software name="bigthank" supported="no">
-		<description>Big Thanks Super Keirin - Dream With Keirin 50 Years (610-6987)</description>
+		<description>Big Thanks Super Keirin - Dream With Keirin 50 Years</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Vap</publisher>
+		<info name="serial" value="610-6987"/>
+		<info name="alt_title" value="ＢＩＧ　ＴＨＡＮＫＳ　ＳＵＰＥＲ　ＫＥＩＲＩＮ　スーパーケイリン"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -15233,7 +15411,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Black Matrix (T-20115G)... -->
 	<software name="blckmtx" supported="no">
-		<description>Black Matrix (Jpn)</description>
+		<description>Black/Matrix (Jpn)</description>
 		<year>1998</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20115G"/>
@@ -15729,7 +15907,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="cubeshoua" cloneof="cubeshou" supported="no">
 		<description>Cube Battler - Story of Shou (Jpn, Alt)</description>
 		<year>1997</year>
-		<publisher>Yanoman</publisher>
+		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21004G"/>
 		<info name="release" value="19970228"/>
 		<info name="alt_title" value="キューブバトラー　デバッガー翔編 ~ Cube Battler ~Debugger Shou-hen~ (Box)"/>
@@ -16083,6 +16261,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Deep Fear Disc 1 (GS-9189)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
@@ -16093,6 +16274,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Deep Fear Disc 2 (GS-9189)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
@@ -16243,10 +16427,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Devil Summoner Soul Hackers - Ronde Otamashi You Sample Ban (610-6704)... -->
-	<software name="dsumsouldemoa" cloneof="dsumsoul" supported="no">
-		<description>Devil Summoner Soul Hackers - Ronde Otamashi You Sample Ban (610-6704)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dsumsoulda" cloneof="dsumsoul" supported="no">
+		<description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Jpn, Alt)</description>
+		<year>1997</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="610-6704"/>
+		<info name="alt_title" value="デビルサマナー　ソウル　ハッカーズ／ロンド〜輪舞曲〜　お試し用サンプル版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -16881,9 +17067,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Flash Sega Saturn - Ochikadzuki Hen (610-6166-99)... -->
 	<software name="flshssoha" cloneof="flshssoh" supported="no">
-		<description>Flash Sega Saturn - Ochikadzuki Hen (610-6166-99)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn, Alt)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-99"/>
+		<info name="alt_title" value="フラッシュ・セガサターン〜おちかづき編〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -16892,50 +17080,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Flash Sega Saturn Vol 10 (610-6166-10)... -->
-	<software name="flshss10" supported="no">
-		<description>Flash Sega Saturn Vol 10 (610-6166-10)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="flash sega saturn vol 10 (610-6166-10)" sha1="96b2d4359aac3d56ed35811d2fe54fb448c8598a" />
-			</diskarea>
-		</part>
-	</software>
-
-  <!-- Identifying Flash Sega Saturn Vol 28 (610-6166-28)... -->
-	<software name="flshss28" supported="no">
-		<description>Flash Sega Saturn Vol 28 (610-6166-28)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="flash sega saturn vol 28 (610-6166-28)" sha1="bbb3aebf76ba448225ffc6d35a9beb67071a9fc4" />
-			</diskarea>
-		</part>
-	</software>
-
-  <!-- Identifying Flash Sega Saturn Vol 31 (610-6166-31)... -->
-	<software name="flshss31" supported="no">
-		<description>Flash Sega Saturn Vol 31 (610-6166-31)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="flash sega saturn vol 31 (610-6166-31)" sha1="2acc90d7aa7af178c10eb2b93576e6ed1233cfe6" />
-			</diskarea>
-		</part>
-	</software>
-
   <!-- Identifying Flash Sega Saturn Vol 4 (610-6166-04)... -->
 	<software name="flshss4" supported="no">
-		<description>Flash Sega Saturn Vol 4 (610-6166-04)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Flash Sega Saturn Vol. 4 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-04"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．４"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -16946,9 +17097,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Flash Sega Saturn Vol 7 (610-6166-07)... -->
 	<software name="flshss7" supported="no">
-		<description>Flash Sega Saturn Vol 7 (610-6166-07)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Flash Sega Saturn Vol. 7 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-07"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．７"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -16959,13 +17112,60 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Flash Sega Saturn Vol 8 (610-6166-08)... -->
 	<software name="flshss8" supported="no">
-		<description>Flash Sega Saturn Vol 8 (610-6166-08)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Flash Sega Saturn Vol. 8 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-08"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．８"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="flash sega saturn vol 8 (610-6166-08)" sha1="3155a855c39f3d14f3655cece49f08542266c850" />
+			</diskarea>
+		</part>
+	</software>
+
+  <!-- Identifying Flash Sega Saturn Vol 10 (610-6166-10)... -->
+	<software name="flshss10" supported="no">
+		<description>Flash Sega Saturn Vol. 10 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-10"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．１０"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="flash sega saturn vol 10 (610-6166-10)" sha1="96b2d4359aac3d56ed35811d2fe54fb448c8598a" />
+			</diskarea>
+		</part>
+	</software>
+
+  <!-- Identifying Flash Sega Saturn Vol 28 (610-6166-28)... -->
+	<software name="flshss28" supported="no">
+		<description>Flash Sega Saturn Vol. 28 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-28"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．２８"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="flash sega saturn vol 28 (610-6166-28)" sha1="bbb3aebf76ba448225ffc6d35a9beb67071a9fc4" />
+			</diskarea>
+		</part>
+	</software>
+
+  <!-- Identifying Flash Sega Saturn Vol 31 (610-6166-31)... -->
+	<software name="flshss31" supported="no">
+		<description>Flash Sega Saturn Vol. 31 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6166-31"/>
+		<info name="alt_title" value="フラッシュ・セガサターン　Ｖｏｌ．３１"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="flash sega saturn vol 31 (610-6166-31)" sha1="2acc90d7aa7af178c10eb2b93576e6ed1233cfe6" />
 			</diskarea>
 		</part>
 	</software>
@@ -17174,6 +17374,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Game Basic For Sega Saturn PC CD-ROM (T-2111G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
@@ -17461,7 +17664,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="goiiipro" supported="no">
 		<description>Go III Professional Taikyoku Igo (Jpn)</description>
 		<year>1997</year>
-		<publisher>Mycom</publisher>
+		<publisher>MYCOM</publisher>
 		<info name="serial" value="T-29003G"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ＧＯⅢ　Ｐｒｏｆｅｓｓｉｏｎａｌ　対局囲碁"/>
@@ -17602,11 +17805,13 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Groove on Fight ~Gouketsuji Ichizoku 3~ (Doukonban) (T-14413G)... -->
-	<software name="groovefd" supported="no">
-		<description>Groove on Fight ~Gouketsuji Ichizoku 3~ (Doukonban) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="groovef" supported="no">
+		<description>Groove on Fight - Gouketsuji Ichizoku 3 - Kakuchou Ram Cartridge-tsuki! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14413G"/>
+		<info name="release" value="19970516"/>
+		<info name="alt_title" value="グルーヴ　オン　ファイト　豪血寺一族３　（拡張ラムカートリッジ付き！）"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -17838,7 +18043,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Houkago Ren-ai Club - Ren no Etude (Genteiban) Disc 1 (T-19714G)... -->
   <!-- Identifying Houkago Ren-ai Club - Ren no Etude (Genteiban) Disc 2 (T-19714G)... -->
 	<software name="houkagogen" cloneof="houkago" supported="no">
-		<description>Houkago Renai Club - Koi no Etude (Genteiban) (Jpn)</description>
+		<description>Houkago Renai Club - Koi no Etude (Jpn, Genteiban)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19714G"/>
@@ -18234,7 +18439,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Jungle Park - Saturn Shima (Genteiban) (T-18009G)... -->
 	<software name="junglprkgen" cloneof="junglprk" supported="no">
-		<description>Jungle Park - Saturn Shima (Genteiban) (Jpn)</description>
+		<description>Jungle Park - Saturn Shima (Jpn, Genteiban)</description>
 		<year>1998</year>
 		<publisher>BMG Japan</publisher>
 		<info name="serial" value="T-18009G"/>
@@ -18301,6 +18506,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (T-13307G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
@@ -18308,7 +18516,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Kiss Yori (Shokai Genteiban) (T-19723G)... -->
 	<software name="kissyosg" supported="no">
-		<description>Kiss Yori (Shokai Genteiban) (Jpn)</description>
+		<description>Kiss Yori (Jpn, Shokai Genteiban)</description>
 		<year>1999</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19723G"/>
@@ -18395,7 +18603,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Kuro no Danshou - The Literary Fragment (Genteiban) Disc 1 (T-21203G)... -->
   <!-- Identifying Kuro no Danshou - The Literary Fragment (Genteiban) PC-CDROM (T-21203G)... -->
 	<software name="literaryg" cloneof="literary" supported="no">
-		<description>Kuro no Danshou - The Literary Fragment (Genteiban) (Jpn)</description>
+		<description>Kuro no Danshou - The Literary Fragment (Jpn, Genteiban)</description>
 		<year>1997</year>
 		<publisher>OZ Club</publisher>
 		<info name="serial" value="T-21203G"/>
@@ -19022,7 +19230,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Pia Carrot e Youkoso - We've Been Waiting For You (Shokai Genteiban) (T-19708G)... -->
 	<software name="picarrotsg" cloneof="picarrot" supported="no">
-		<description>Pia Carrot he Youkoso!! - We've Been Waiting For You (Shokai Genteiban) (Jpn)</description>
+		<description>Pia Carrot he Youkoso!! - We've Been Waiting For You (Jpn, Shokai Genteiban)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19708G"/>
@@ -19562,9 +19770,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sakura Taisen 2 - Kimi Shini Tamou Kotonakare Tokubetsu Ban (610-6864)... -->
 	<software name="sakurat2tba" cloneof="sakurat2" supported="no">
-		<description>Sakura Taisen 2 - Kimi Shini Tamou Kotonakare Tokubetsu Ban (610-6864)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare Tokubetsu-ban (Jpn, Alt)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6864"/>
+		<info name="alt_title" value="サクラ大戦２　〜君、死にたもうことなかれ〜　特別版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -19608,7 +19818,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sankyo Jikki Simulation S (T-32102G)... -->
 	<software name="sjsims" supported="no">
-		<description>Sankyo Fever Jikki Simulation S (Genteiban) (Jpn)</description>
+		<description>Sankyo Fever Jikki Simulation S (Jpn, Genteiban)</description>
 		<year>1997</year>
 		<publisher>TEN</publisher>
 		<info name="serial" value="T-32102G"/>
@@ -19988,9 +20198,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Shinpi no Sekai El-Hazard (Shokai Tokuten Genteiban) (T-22202G)... -->
 	<software name="elhazard" supported="no">
-		<description>Shinpi no Sekai El-Hazard (Shokai Tokuten Genteiban) (Jpn)</description>
+		<description>Shinpi no Sekai El-Hazard (Jpn, Shokai Tokuten Genteiban)</description>
 		<year>1996</year>
-		<publisher>Pioneer</publisher>
+		<publisher>Pioneer LDC</publisher>
 		<info name="serial" value="T-22202G"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="神秘の世界エルハザード"/>
@@ -20059,9 +20269,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Side Pocket 3 SAMPLE (610-6678)... -->
 	<software name="sidepkt3sam" cloneof="sidepkt3" supported="no">
-		<description>Side Pocket 3 SAMPLE (610-6678)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Side Pocket 3 Sample (Jpn)</description>
+		<year>1997</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="610-6678"/>
+		<info name="alt_title" value="サイドポケット　３　サンプル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -20072,9 +20284,11 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Silhouette Mirage Taikenban (610-6679)... -->
 	<software name="silhouettai" cloneof="silhouet" supported="no">
-		<description>Silhouette Mirage Taikenban (610-6679)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Silhouette Mirage Taikan CD-ROM Sousa Setsumei (Jpn)</description>
+		<year>1997</year>
+		<publisher>ESP</publisher>
+		<info name="serial" value="610-6679"/>
+		<info name="alt_title" value="シルエットミラージュ　体感ＣＤ－ＲＯＭ操作説明"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -20312,6 +20526,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Strikers 1945 (T-14407G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
@@ -20415,7 +20632,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Syutokou Battle 97 (T-15019G)... -->
 	<software name="sbatl97a" cloneof="sbatl97" supported="no">
-		<description>Syutokou Battle 97 (Jpn)</description>
+		<description>Drift King Shutokou Battle '97 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15019G"/>
@@ -20607,6 +20824,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 1 (T-14301G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
@@ -20617,6 +20837,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 2 (T-14301G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
@@ -20771,6 +20994,9 @@ Olympic Soccer (Fra) T-7904H-09
   		<description>The King of Fighters '95 (T-3101G)</description>
   		<year>199?</year>
   		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
@@ -20793,10 +21019,13 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying The King of Fighters '97 (Doukonban) (T-3120G)... -->
-	<software name="kof97dou" cloneof="kof97" supported="no">
-		<description>The King of Fighters '97 (Doukonban) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="kof97douk" cloneof="kof97" supported="no">
+		<description>The King of Fighters '97 - Kakuchou Ram Cartridge-tsuki Okaidoku Set!! (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="T-3121G"/>
+		<info name="release" value="19980326"/>
+		<info name="alt_title" value="ザ・キング・オブ・ファイターズ’９７　（拡張ラムカートリッジ付き「お買得セット」！！）"/>
 		<info name="serial" value="T-3120G"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -22352,10 +22581,12 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Christmas Nights Into Dreams Touki Genteiban (610-6431)... -->
-	<software name="xmasnigha" cloneof="xmasnigh" supported="no">
-		<description>Christmas Nights Into Dreams Touki Genteiban (610-6431)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="xmasnighja" cloneof="xmasnigh" supported="no">
+		<description>Christmas NiGHTS Into Dreams... (Jpn, Touki Genteiban, Alt)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6431"/>
+		<info name="alt_title" value="クリスマスナイツ　冬季限定版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -22561,7 +22792,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="elhazarda" cloneof="elhazard" supported="no">
 		<description>Shinpi no Sekai El-Hazard (Limited Edition) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Pioneer</publisher>
+		<publisher>Pioneer LDC</publisher>
 		<info name="serial" value="T-22202G"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="神秘の世界エルハザード"/>
@@ -23467,6 +23698,9 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>Mobile Suit Gundam - Gihrens Greed (Jpn) (T-13330G)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value=""/>
+		<info name="release" value=""/>
+		<info name="alt_title" value=""/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mobile suit gundam gihrens greed (j) (t-13330g)" sha1="f73d0d35b758eb90cd60a6f2f36cf51c003a6f2c" />
@@ -23751,7 +23985,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Maajan Doukyuusei Special (Genteiban) Disc 1 (T-25302G)... -->
   <!-- Identifying Maajan Doukyuusei Special (Genteiban) Disc 2 (T-25302G)... -->
 	<software name="mjdoukspgen" cloneof="mjdouksp" supported="no">
-		<description>Mahjong Doukyuusei Special (Genteiban) (Jpn)</description>
+		<description>Mahjong Doukyuusei Special (Jpn, Genteiban)</description>
 		<year>1996</year>
 		<publisher>Make Software</publisher>
 		<info name="serial" value="T-25302G"/>
@@ -23789,7 +24023,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Maajan Gakuensai (Genteiban) Disc 1 (J) (T-25305G)... -->
   <!-- Identifying Maajan Gakuensai (Genteiban) Disc 2 (J) (T-25305G)... -->
 	<software name="mjgakugen" cloneof="mjgaku" supported="no">
-		<description>Mahjong Gakuensai (Genteiban) (Jpn)</description>
+		<description>Mahjong Gakuensai (Jpn, Genteiban)</description>
 		<year>1997</year>
 		<publisher>Make Software</publisher>
 		<info name="serial" value="T-25305G"/>
@@ -24637,7 +24871,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Noel 3 Special Edition Disc 2 (J) (T-22205G)... -->
   <!-- Identifying Noel 3 Special Edition Disc 3 (J) (T-22205G)... -->
 	<software name="noel3" supported="no">
-		<description>Noël 3 (Shokai Genteiban) (Jpn)</description>
+		<description>Noël 3 (Jpn, Shokai Genteiban)</description>
 		<year>1998</year>
 		<publisher>Pioneer LDC</publisher>
 		<info name="serial" value="T-22205G"/>
@@ -25148,7 +25382,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Ruriiro no Yuki (Shokai Genteiban) (J) (T-19722G)... -->
 	<software name="ruryukis" supported="no">
-		<description>Ruriiro no Yuki (Shokai Genteiban) (Jpn)</description>
+		<description>Ruriiro no Yuki (Jpn, Shokai Genteiban)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19722G"/>
@@ -25961,10 +26195,12 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Taikou Risshiden II (Koei Best Collection) (T-7667G)... -->
 	<software name="taikour2kb" cloneof="taikour2" supported="no">
-		<description>Taikou Risshiden II (Koei Best Collection) (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Taikou Risshiden II (Jpn, Koei Best Collection)</description>
+		<year>1998</year>
+		<publisher>Koei</publisher>
 		<info name="serial" value="T-7667G"/>
+		<info name="release" value="19980409"/>
+		<info name="alt_title" value="太閤立志伝Ⅱ　（光栄ベストコレクション）"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -26349,7 +26585,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="vcasinoj" cloneof="vcasino" supported="no">
 		<description>Virtual Casino (Jpn)</description>
 		<year>1996</year>
-		<publisher>Datt Japan</publisher>
+		<publisher>DATT Japan</publisher>
 		<info name="serial" value="T-27301G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="バーチャルカジノ"/>
@@ -26869,7 +27105,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Langrisser 3 (Genteiban) (T-2504G)... -->
 	<software name="lang3gen" cloneof="lang3" supported="no">
-		<description>Langrisser III (Shokai Genteiban) (Jpn)</description>
+		<description>Langrisser III (Jpn, Shokai Genteiban)</description>
 		<year>1996</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-2504G"/>
@@ -26917,7 +27153,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mobile Suit Gundam Side Story 2 (T-13309G)... -->
 	<software name="ksgdg2aogen" cloneof="ksgdg2ao" supported="no">
-		<description>Kidou Senshi Gundam Gaiden II - Ao wo Uketsugu Mono (Genteiban) (Jpn)</description>
+		<description>Kidou Senshi Gundam Gaiden II - Ao wo Uketsugu Mono (Jpn, Genteiban)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13309G"/>
@@ -26933,7 +27169,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Mobile Suit Gundam Side Story 3 (T-13312G)... -->
 	<software name="ksgdg3sm" supported="no">
-		<description>Kidou Senshi Gundam Gaiden III - Sabakareshi Mono (Genteiban) (Jpn)</description>
+		<description>Kidou Senshi Gundam Gaiden III - Sabakareshi Mono (Jpn, Genteiban)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13312G"/>
@@ -27238,9 +27474,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Roommate (T-19502G)... -->
 	<software name="rmate" supported="no">
 		<description>Roommate (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>DATAM Polystar</publisher>
 		<info name="serial" value="T-19502G"/>
+		<info name="release" value="19970214"/>
+		<info name="alt_title" value="ルームメイト　～井上涼子～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -27251,7 +27489,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Roommate - Ryoko in Summer Vacation (T-19504G)... -->
 	<software name="rmatesv" supported="no">
-		<description>Roommate - Ryoko in Summer Vacation (Shokai Genteiban) (Jpn)</description>
+		<description>Roommate - Ryoko in Summer Vacation (Jpn, Shokai Genteiban)</description>
 		<year>1997</year>
 		<publisher>DATAM Polystar</publisher>
 		<info name="serial" value="T-19504G"/>
@@ -28154,7 +28392,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="cubeanna" supported="no">
 		<description>Cube Battler - Story of Anna (Jpn)</description>
 		<year>1997</year>
-		<publisher>Yanoman</publisher>
+		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21006G"/>
 		<info name="release" value="19970523"/>
 		<info name="alt_title" value="キューブバトラー　アンナ未来編 ~ Cube Battler (Box)"/>
@@ -28416,7 +28654,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Father_Christmas... -->
 	<software name="fatherch" supported="no">
-		<description>Father Christmas</description>
+		<description>Father Christmas (Jpn)</description>
 		<year>1995</year>
 		<publisher>GAGA Communications</publisher>
 		<info name="serial" value="T-18504G"/>
@@ -28542,7 +28780,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="metamor5" supported="no">
 		<description>Himitsu Sentai Metamor V (Jpn)</description>
 		<year>1998</year>
-		<publisher>Mycom</publisher>
+		<publisher>MYCOM</publisher>
 		<info name="serial" value="T-29005G"/>
 		<info name="release" value="19980423"/>
 		<info name="alt_title" value="ひみつ戦隊メタモルⅤ"/>
@@ -31238,6 +31476,20 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+<!-- Identifying 0186-gxfg-eur... -->
+	<software name="galaxyfg" supported="no">
+		<description>Galaxy Fight (Euro)</description>
+		<year>1996</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-1504H-50"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="0186-gxfg-eur" sha1="28d159f8246f39d8d6b678c666c12c505bc91262" />
+			</diskarea>
+		</part>
+	</software>
+
   <!-- Identifying Gex (E)... -->
 	<software name="gex" supported="no">
 		<description>Gex (Euro)</description>
@@ -33242,7 +33494,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Swagman... -->
-	<software name="swagmanc" supported="no">
+	<software name="swagman" supported="no">
 		<description>SwagMan (Euro)</description>
 		<year>1995</year>
 		<publisher>Eidos</publisher>
@@ -33911,7 +34163,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="bootlegs" supported="no">
 		<description>Bootleg Sampler (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6165 / 000-SOE-00061"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -33922,9 +34175,10 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying CRIMEWAVE_demo... -->
 	<software name="crimewavd" cloneof="crimewav" supported="no">
-		<description>Crime Wave (Euro, Demo)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>CrimeWave Playable Demonstration Disk (Euro)</description>
+		<year>1997</year>
+		<publisher>Eidos</publisher>
+		<info name="serial" value="610-6455"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -33936,8 +34190,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Gremlin Demo Disc (E)... -->
 	<software name="gremlind" supported="no">
 		<description>Gremlin Demo Disc (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Gremlin</publisher>
+		<info name="serial" value="610-6675"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -33947,10 +34202,10 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Gremlin Demo Disk EUR [610-6384-01] - By Madroms... -->
-	<software name="gremlind01" cloneof="gremlind" supported="no">
+	<software name="gremlinda" cloneof="gremlind" supported="no">
 		<description>Gremlin Demo Disk (Euro, Alt)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Gremlin</publisher>
 		<info name="serial" value="610-6384-01"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -33963,8 +34218,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying IMPACT_RACING_demo... -->
 	<software name="impactrad" cloneof="impactra" supported="no">
 		<description>Impact Racing (Euro, Demo)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>JVC</publisher>
+		<info name="serial" value="610-9008-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -33976,8 +34232,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Panzer Dragoon Demo (E)... -->
 	<software name="panzerd" cloneof="panzer" supported="no">
 		<description>Panzer Dragoon Demo (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK81018-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -33987,10 +34244,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Pinball Graffiti Demo (E)... -->
-	<software name="pinballgedem" cloneof="pinballg" supported="no">
+	<software name="pinballgd" cloneof="pinballg" supported="no">
 		<description>Pinball Graffiti Demo (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>JVC</publisher>
+		<info name="serial" value="610-6493"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34000,11 +34258,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Saturn Power N.1 EUR [610-6576] - Core Demo Disc EUR [790-0002-50]... -->
-	<software name="saturnpo" supported="no">
-		<description>Saturn Power N.1 (Euro) [610-6576] - Core Demo Disc EUR</description>
+	<software name="satpowr1" supported="no">
+		<description>Saturn Power No. 1 (Euro) ~ Core Demo Disc (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="790-0002-50"/>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="610-6576, 790-0002-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34014,10 +34272,10 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Saturn Power N.3 - Block-Rocking Beats EUR [SP03-8-97] - By Madroms... -->
-	<software name="saturnpo01" cloneof="saturnpo" supported="no">
-		<description>Saturn Power N.3 - Block-Rocking Beats (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="satpowr3" supported="no">
+		<description>Saturn Power No. 3 - Block-Rocking Beats (Euro, Audio CD)</description>
+		<year>1997</year>
+		<publisher>Future Publishing</publisher>
 		<info name="serial" value="SP03-8-97"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -34027,11 +34285,26 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+  <!-- Identifying Wipeout 2097 Demo (E)... -->
+	<software name="satpowr5" supported="no">
+		<description>Saturn Power No. 5 - WipEout 2097 Demo (Euro)</description>
+		<year>1998</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="560-0003-50"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wipeout 2097 demo (e)" sha1="37e7e0c0141140f4e604e6609ffacdc4c1b088b0" />
+			</diskarea>
+		</part>
+	</software>
+
   <!-- Identifying Saturn Sampler (MMSJAN96)... -->
 	<software name="saturnsa" supported="no">
-		<description>Saturn Sampler (MMSJAN96)</description>
+		<description>Saturn Sampler (Euro, Audio CD)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MMSJAN96"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34040,25 +34313,12 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Sega Flash Vol 3 EUR v1.004 [610-6288C]... -->
-	<software name="sflv3a" cloneof="sflv3" supported="no">
-		<description>Sega Flash Vol 3 (Euro) (v1.004)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="610-6288C"/>
-		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sega flash vol 3 eur v1.004 [610-6288c]" sha1="49826844da6993edf679ebf5fac3e2fd109406a0" />
-			</diskarea>
-		</part>
-	</software>
-
   <!-- Identifying Sega Flash Vol. 1 (E)... -->
 	<software name="sflv1" supported="no">
 		<description>Sega Flash Vol. 1 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK610-6288A / 610-6288A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34071,7 +34331,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="sflv2" supported="no">
 		<description>Sega Flash Vol. 2 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288B"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34080,11 +34341,40 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+  <!-- Identifying Sega Flash Volume 3 (E)... -->
+	<software name="sflv3" supported="no">
+		<description>Sega Flash Vol. 3 (Euro)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288C"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sega flash volume 3 (e)" sha1="df785aed4f577a8c4be7b14e6de957c6f834afcf" />
+			</diskarea>
+		</part>
+	</software>
+
+  <!-- Identifying Sega Flash Vol 3 EUR v1.004 [610-6288C]... -->
+	<software name="sflv3a" cloneof="sflv3" supported="no">
+		<description>Sega Flash Vol. 3 (Euro, v1.004)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288C"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sega flash vol 3 eur v1.004 [610-6288c]" sha1="49826844da6993edf679ebf5fac3e2fd109406a0" />
+			</diskarea>
+		</part>
+	</software>
+
   <!-- Identifying Sega Flash Vol. 4 (E)... -->
 	<software name="sflv4" supported="no">
 		<description>Sega Flash Vol. 4 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288D"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34097,7 +34387,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="sflv5" supported="no">
 		<description>Sega Flash Vol. 5 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288E"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34110,7 +34401,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="sflv6" supported="no">
 		<description>Sega Flash Vol. 6 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288F"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34123,7 +34415,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="sflv7" supported="no">
 		<description>Sega Flash Vol. 7 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6288G"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34132,24 +34425,12 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Sega Flash Volume 3 (E)... -->
-	<software name="sflv3" supported="no">
-		<description>Sega Flash Vol. 3 (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sega flash volume 3 (e)" sha1="df785aed4f577a8c4be7b14e6de957c6f834afcf" />
-			</diskarea>
-		</part>
-	</software>
-
   <!-- Identifying Sega Preview Vol. 1 (E)... -->
-	<software name="segaprev" supported="no">
-		<description>Sega Preview Vol. 1 (Euro)</description>
+	<software name="previsat" supported="no">
+		<description>Preview Sega Saturn Vol. 1 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6377"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34159,10 +34440,10 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Swagman Demo EUR [610-6529] - By Madroms... -->
-	<software name="swagmand" supported="no">
-		<description>Swagman Demo (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="swagmand" cloneof="swagman" supported="no">
+		<description>SwagMan Demo (Euro)</description>
+		<year>1995</year>
+		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6529"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -34173,10 +34454,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Various - Club Saturn (single wav)_... -->
-	<software name="variousc" supported="no">
-		<description>Club Saturn (Audio CD)</description>
+	<software name="clubsat" supported="no">
+		<description>Club Saturn (Euro, Audio CD)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Breakdown Records</publisher>
+		<info name="serial" value="BDR CD17"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34188,8 +34470,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying VICTORYBOXING_demo... -->
 	<software name="vicboxind" cloneof="vicboxin" supported="no">
 		<description>Victory Boxing (Euro, Demo)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>JVC</publisher>
+		<info name="serial" value="ST-6005H"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34202,7 +34485,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="videocdm" supported="no">
 		<description>VideoCD Music Sampler Sega Saturn (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>PolyGram Video</publisher>
+		<info name="serial" value="MK80310-50 / 000-SOE-00074"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34213,9 +34497,10 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Virtua Fighter C.G. Portrait Collection v1.000 (1995)(Sega)(PAL)[!][inc. with Virtua Fighter Remix]... -->
 	<software name="virtuafi" supported="no">
-		<description>Virtua Fighter C.G. Portrait Collection v1.000 (Euro) (Virtua Fighter Remix Bonus CD)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Virtua Fighter C.G. Portrait Collection (Euro) (Virtua Fighter Remix Bonus CD)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6083"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34227,8 +34512,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Winter Heat Demo Disc (E)... -->
 	<software name="winterhtd" cloneof="winterht" supported="no">
 		<description>Winter Heat Demo Disc (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK81125-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34237,24 +34523,12 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Wipeout 2097 Demo (E)... -->
-	<software name="wipe2097d" cloneof="wipe2097" supported="no">
-		<description>Wipeout 2097 Demo (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="wipeout 2097 demo (e)" sha1="37e7e0c0141140f4e604e6609ffacdc4c1b088b0" />
-			</diskarea>
-		</part>
-	</software>
-
   <!-- Identifying Wrestle Mania - The Arcade Game Demo Disc (E)... -->
-	<software name="wrestlem" supported="no">
-		<description>Wrestle Mania - The Arcade Game Demo Disc (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="wwfagd" cloneof="wwfag" supported="no">
+		<description>WWF WrestleMania - The Arcade Game (Euro, Demo)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8112H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -34264,10 +34538,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying xmasnights... -->
-	<software name="xmasnighe" cloneof="xmasnigh" supported="no">
-		<description>Christmas Nights (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="xmasnigh" supported="no">
+		<description>Christmas NiGHTS Into Dreams... (Euro)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-6438-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -35533,7 +35808,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying galaxy fight... -->
-	<software name="galaxyfg" supported="no">
+	<software name="galaxyfgu" cloneof="galaxyfg" supported="no">
 		<description>Galaxy Fight (USA)</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
@@ -38040,9 +38315,9 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying dw-sat-0840-Deep_Fear_Prototype-usa-cd1... -->
   <!-- Identifying dw-sat-0840-Deep_Fear_Prototype-usa-cd2... -->
 	<software name="deepfeau" supported="no">
-		<description>Deep Fear (USA, prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Deep Fear (USA, Prototype)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38076,7 +38351,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="bootlegc" supported="no">
 		<description>Bootleg Sampler (USA)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81031"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38089,7 +38365,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="bootleg2" supported="no">
 		<description>Bootleg Sampler 2 (USA)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81068"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38099,10 +38376,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Bug_Playable_Preview-usa... -->
-	<software name="bugplaya" supported="no">
-		<description>Bug Playable Preview (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="bugud" cloneof="bug" supported="no">
+		<description>Bug! Playable Preview (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81030"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38112,10 +38390,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Christmas Nights - Into Dreams... (SAT) (U)... -->
-	<software name="xmasnigu" supported="no">
-		<description>Christmas Nights - Into Dreams... (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="xmasnighu" cloneof="xmasnigh" supported="no">
+		<description>Christmas NiGHTS Into Dreams... Sampler (USA)</description>
+		<year>1997?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81067"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38125,10 +38404,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Nights_Into_Dream_Sampler-usa... -->
-	<software name="nightsin" supported="no">
-		<description>Nights Into Dream Sampler (USA)</description>
+	<software name="nightsam" cloneof="nights" supported="no">
+		<description>NiGHTS Into Dream... Sampler (USA)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81063"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38139,9 +38419,10 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Panzer_Dragoon_Preview-usa... -->
 	<software name="panzerud" cloneof="panzer" supported="no">
-		<description>Panzer Dragoon Preview (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Panzer Dragoon Playable Preview (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81018"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38151,10 +38432,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Rayman_Playable_Game_Preview-usa... -->
-	<software name="raymanpl" supported="no">
+	<software name="raymanud" cloneof="rayman" supported="no">
 		<description>Rayman Playable Game Preview (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="serial" value="610-6164"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38167,7 +38449,8 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="segascre" supported="no">
 		<description>Sega Screams Volume 1 (USA)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81075"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38177,10 +38460,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Sega_Saturn_Choice_Cuts_v1_000-usa... -->
-	<software name="satccut" supported="no">
-		<description>Sega Saturn Choice Cuts (v1.000) (USA)</description>
+	<software name="satccuta" cloneof="satccut" supported="no">
+		<description>Sega Saturn Choice Cuts (USA, v1.000)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81600"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38190,10 +38474,11 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Sega_Saturn_Choice_Cuts_v2_000-usa... -->
-	<software name="satccut2" supported="no">
-		<description>Sega Saturn Choice Cuts (v2.000) (USA)</description>
+	<software name="satccut" supported="no">
+		<description>Sega Saturn Choice Cuts (USA, v2.000)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81600"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38203,10 +38488,10 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying That_Virtua_Feeling_AudioCD-usa... -->
-	<software name="thatvirt" supported="no">
-		<description>That Virtua Feeling (AudioCD) (USA)</description>
+	<software name="vfeel" supported="no">
+		<description>That Virtua Feeling - Sub Pop &amp; Sega Get Together (USA, Audio CD)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sub Pop Records</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38219,9 +38504,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying major damage 14-06-1996... -->
 	<software name="majordama" cloneof="majordam" supported="no">
-		<description>Major Damage (Prototype, 14-06-1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Major Damage (USA, Prototype 19960614)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38233,9 +38518,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying major damage 15-07-1996... -->
 	<software name="majordam" supported="no">
-		<description>Major Damage (Prototype, 15-07-1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Major Damage (USA, Prototype 19960715)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38246,7 +38531,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- (info dumped out by SRP - Saturn Region Patcher)
 
-     CD Label: CHILL
+    CD Label: CHILL
     Game Title: CHILL
     Manufacturer ID: SEGA TP T-079
     Serial Number: T-7616H-50
@@ -38267,9 +38552,10 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying chill... -->
 	<software name="chill" supported="no">
-		<description>Chill (Prototype, Europe)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Chill (Euro, Prototype 19980119)</description>
+		<year>1998</year>
+		<publisher>Eidos?</publisher>
+		<info name="serial" value="T-7616H-50?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38300,9 +38586,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying werewolf... -->
 	<software name="werewolf" supported="no">
-		<description>Werewolf (Prototype, Internal Date 1994/08/01 Creation Date 1994/11/11 Modification Date 1996/06/28)</description>
+		<description>Werewolf (Prototype, Internal Date 19940801 Creation Date 19941111 Modification Date 19960628)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="werewolf" sha1="c641e289b89e9a3e2f775468edcddf42f0092126" />
@@ -38312,9 +38598,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- just seems to be an alt read of the above? info is identical? -->
 	<software name="werewolfa" cloneof="werewolf" supported="no">
-		<description>Werewolf (Prototype, Internal Date 1994/08/01 Creation Date 1994/11/11 Modification Date 1996/06/28, alt)</description>
+		<description>Werewolf (Prototype, Internal Date 19940801 Creation Date 19941111 Modification Date 19960628, Alt)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38346,9 +38632,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying vc2alpha... -->
 	<software name="vcop2p" cloneof="vcop2" supported="no">
-		<description>Virtua Cop 2 (Prototype, 1995/10/20) </description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Virtua Cop 2 (Euro, Prototype 19951020) </description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38380,7 +38666,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="returnfi" supported="no">
 		<description>Return Fire (Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Williams</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="return_fire" sha1="50e45e977280ce5d889abc24946a9a5487022794" />
@@ -38408,9 +38694,9 @@ Olympic Soccer (Fra) T-7904H-09
   -->
   <!-- Identifying nightse3... -->
 	<software name="nightse3" cloneof="nights" supported="no">
-		<description>Nights (E3 Demo)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>NiGHTS - into Dreams... (E3 Demo)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38440,11 +38726,10 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Three_Dirty_Dwarves_CD-1-1_MK8103300_V0.003_04171996_[JUT]... -->
 	<software name="3dwarvesp" cloneof="3dwarves" supported="no">
-		<description>Three Dirty Dwarves (Prototype, MK8103300 V0.003 04171996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<description>Three Dirty Dwarves (Prototype 19960417)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U, NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="three_dirty_dwarves_cd-1-1_mk8103300_v0.003_04171996_[jut]" sha1="16ad09ea3b81734e9833a4f38694b246a4506063" />
@@ -38471,10 +38756,10 @@ Olympic Soccer (Fra) T-7904H-09
     Modification Time: 18:29:07:00
   -->
   <!-- Identifying ejim2beta... -->
-	<software name="ejim2p1" cloneof="ejim2" supported="no">
-		<description>Earthworm Jim 2 (Beta, 19951229, Modified 1996/01/05) </description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="ejim2p" cloneof="ejim2" supported="no">
+		<description>Earthworm Jim 2 (Prototype 19951229) </description>
+		<year>1996</year>
+		<publisher>Playmates Interactive</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ejim2beta" sha1="9b7c3a4cff02e8fea9a0a91af08b095869ee53d6" />
@@ -38484,9 +38769,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Crypt Killer (Prototype - Jan 8, 1997)... -->
 	<software name="cryptklrp" cloneof="cryptklr" supported="no">
-		<description>Crypt Killer (Prototype - Jan 8, 1997)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Crypt Killer (Prototype 19970108)</description>
+		<year>1997</year>
+		<publisher>Konami</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="crypt killer (prototype - jan 8, 1997)" sha1="8e0be3d0581b50a1464305cb50800e6120d70a8c" />
@@ -38496,9 +38781,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Duke Nukem (Prototype - Sep 18, 1997)... -->
 	<software name="dukenk3dp" cloneof="dukenk3d" supported="no">
-		<description>Duke Nukem (Prototype - Sep 18, 1997)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Duke Nukem 3D (Prototype 19970918)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="duke nukem (prototype - sep 18, 1997)" sha1="c25cfc3b778f485195e51a6aabb4ec4115a26662" />
@@ -38508,9 +38793,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Fighters Megamix (Prototype - Apr 08, 1997)... -->
 	<software name="fightmixp" cloneof="fightmix" supported="no">
-		<description>Fighters Megamix (Prototype - Apr 08, 1997)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Fighters Megamix (Prototype 19970408)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fighters megamix (prototype - apr 08, 1997)" sha1="8fa6814c1f296931b3ead102b49f3737669306e4" />
@@ -38520,9 +38805,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Fighting Vipers (Prototype - Sep 06, 1996)... -->
 	<software name="fvipersp" cloneof="fvipers" supported="no">
-		<description>Fighting Vipers (Prototype - Sep 06, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Fighting Vipers (Prototype 19960906)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fighting vipers (prototype - sep 06, 1996)" sha1="ed5e9009dfb570a855947a369ed0228fd9efe25b" />
@@ -38532,9 +38817,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Loaded (Prototype - Sep 3, 1996)... -->
 	<software name="loadedp" cloneof="loaded" supported="no">
-		<description>Loaded (Prototype - Sep 3, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Loaded (Prototype 19960903)</description>
+		<year>1996</year>
+		<publisher>Interplay</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="loaded (prototype - sep 3, 1996)" sha1="0de17389283d4582f4b445762d1b9e27ba04d9d6" />
@@ -38542,25 +38827,12 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Panzer Dragoon Saga (Prototype - Dec 22, 1997) (Disc 1)... -->
-	<software name="panzsaga221297" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Prototype - Dec 22, 1997) (Disc 1)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="panzer dragoon saga (prototype - dec 22, 1997) (disc 1)" sha1="36192872e9751643fbcc3b9ab4053231d72e3ee4" />
-			</diskarea>
-		</part>
-		<!-- only one disc of this version dumped? -->
-	</software>
-
   <!-- Identifying Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 3)... -->
   <!-- Identifying Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 4)... -->
-	<software name="panzsaga301297" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 3)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="panzsagap1" cloneof="panzsaga" supported="no">
+		<description>Panzer Dragoon Saga (Discs 3&amp;4, Prototype 19971230)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
 
 		<!-- no discs 1 + 2 dumped? -->
 		<part name="cdrom" interface="sat_cdrom">
@@ -38575,14 +38847,26 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+  <!-- Identifying Panzer Dragoon Saga (Prototype - Dec 22, 1997) (Disc 1)... -->
+	<software name="panzsagap2" cloneof="panzsaga" supported="no">
+		<description>Panzer Dragoon Saga (Disc 1, Prototype 19971222)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="panzer dragoon saga (prototype - dec 22, 1997) (disc 1)" sha1="36192872e9751643fbcc3b9ab4053231d72e3ee4" />
+			</diskarea>
+		</part>
+		<!-- only one disc of this version dumped? -->
+	</software>
 
   <!-- Identifying Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 1)... -->
   <!-- Identifying Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 2)... -->
   <!-- Identifying Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 3)... -->
-	<software name="panzsaga301197" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 1)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="panzsagap3" cloneof="panzsaga" supported="no">
+		<description>Panzer Dragoon Saga (Discs 1&amp;2&amp;3, Prototype 19971130)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="panzer dragoon saga (prototype - nov 30, 1997) (disc 1)" sha1="2216d711c522c8fd9035e1a0743604422cab0fac" />
@@ -38601,13 +38885,11 @@ Olympic Soccer (Fra) T-7904H-09
 		<!-- no disc 4 dumped? -->
 	</software>
 
-
-
   <!-- Identifying Panzer Dragoon Zwei (Prototype Preview - Feb 02, 1996)... -->
-	<software name="panzer2_020296" cloneof="panzer2" supported="no">
-		<description>Panzer Dragoon Zwei (Prototype Preview - Feb 02, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="panzer2p" cloneof="panzer2" supported="no">
+		<description>Panzer Dragoon II Zwei (Prototype Preview 19960202)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="panzer dragoon zwei (prototype preview - feb 02, 1996)" sha1="a81ecaa5f102b170c178b98103704b1a92dca6ab" />
@@ -38617,9 +38899,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Primal Rage (Prototype - Feb 12, 1996)... -->
 	<software name="primalp" cloneof="primal" supported="no">
-		<description>Primal Rage (Prototype - Feb 12, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Primal Rage (Prototype 19960212)</description>
+		<year>1996</year>
+		<publisher>Time Warner Interactive</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38630,9 +38912,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sega Rally Championship (Prototype - Oct 31, 1995)... -->
 	<software name="srallycp" cloneof="srallyc" supported="no">
-		<description>Sega Rally Championship (Prototype - Oct 31, 1995)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sega Rally Championship (Prototype 19951031)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sega rally championship (prototype - oct 31, 1995)" sha1="f7f386289e1e11e6fffd619696e1be7322de87f2" />
@@ -38644,7 +38926,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="segasatu" supported="no">
 		<description>Sega Saturn System-Disc (KD01)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sega saturn system-disc (kd01)" sha1="1f098bd478efc96b00c71c1dde147ee84b2619a6" />
@@ -38654,9 +38936,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Slam N' Jam 96 (Prototype - Feb 1, 1996)... -->
 	<software name="slamnjamp" cloneof="slamnjam" supported="no">
-		<description>Slam 'n Jam '96 (Prototype - Feb 1, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Prototype 19960201)</description>
+		<year>1996</year>
+		<publisher>Crystal Dynamics</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="slam n' jam 96 (prototype - feb 1, 1996)" sha1="07cd759aac1b09665bfdf9cd9b962da7df774ea5" />
@@ -38666,9 +38948,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sonic 3D (Tech Demo - Oct 08)... -->
 	<software name="sonic3dtd" cloneof="sonic3d" supported="no">
-		<description>Sonic 3D (Tech Demo - Oct 08)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sonic 3D (Tech Demo Oct 08)</description>
+		<year>1996?</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic 3d (tech demo - oct 08)" sha1="cdea20487cb5d7abda67020cfe40f508e2b0525e" />
@@ -38678,9 +38960,9 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Ultimate Mortal Kombat 3 (Prototype - Feb 07, 1996)... -->
 	<software name="umk3p" cloneof="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Prototype - Feb 07, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Ultimate Mortal Kombat 3 (Prototype 19960207)</description>
+		<year>1996</year>
+		<publisher>Midway</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultimate mortal kombat 3 (prototype - feb 07, 1996)" sha1="8bff13e762f41216a859156478fff4ca96fd2ca1" />
@@ -38688,13 +38970,11 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-
-
   <!-- Identifying Judgement Force (Prototype - Nov 26, 1996)... -->
-	<software name="judgemen" supported="no">
-		<description>Judgement Force (Prototype - Nov 26, 1996)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="judgefrc" supported="no">
+		<description>Judgement Force (Prototype 19961126)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="judgement force (prototype - nov 26, 1996)" sha1="63675697cec5616583f00db5cd53d6f0ecd6c0dd" />
