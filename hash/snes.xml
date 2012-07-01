@@ -24217,6 +24217,23 @@ Alternate board (XL-1)
 
 <!-- List of bad dumps -->
 
+	<software name="boogerup" cloneof="booger" supported="no">
+		<!-- Incomplete dump, only 1 out of the 6 chips are available, the original prototype board is unknown -->
+		<description>Boogerman - A Pick and Flick Adventure (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="boogerman ver13 1.u1" size="524288" crc="601cbe5f" sha1="fe250a8acf5fbd366e15039cbb11be8c59883324"                 offset="0x000000" />
+				<rom name="2.u2"                 size="524288"                                                                status="nodump" offset="0x080000" />
+				<rom name="3.u3"                 size="524288"                                                                status="nodump" offset="0x100000" />
+				<rom name="4.u4"                 size="524288"                                                                status="nodump" offset="0x180000" />
+				<rom name="5.u4"                 size="524288"                                                                status="nodump" offset="0x200000" />
+				<rom name="6.u6"                 size="524288"                                                                status="nodump" offset="0x280000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="choplft3up" cloneof="choplft3">
 		<description>Choplifter III - Rescue &amp; Survive (USA, Prototype)</description>
 		<year>1994</year>
@@ -24233,7 +24250,6 @@ Alternate board (XL-1)
 		<description>Clay Fighter 2 - Judgment Clay (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="clay 2 1995.u1" size="524288" crc="3998e4b9" sha1="a0b91861b4e67c290d6621f607560366d8ef7ec4"                 offset="0x000000" />
