@@ -20,11 +20,11 @@
 
     TODO:
 
-	- cleanup
-	- light pen
-	- 1:1 sync with CPU
-	- remove RDY hack
-	- VIC IIe
+    - cleanup
+    - light pen
+    - 1:1 sync with CPU
+    - remove RDY hack
+    - VIC IIe
 
 */
 
@@ -798,7 +798,7 @@ void mos6566_device::device_reset()
 			m_spr_draw_data[i][j] = 0;
 			m_spr_data[i][j] = 0;
 		}
-	}	
+	}
 }
 
 
@@ -1383,7 +1383,7 @@ void mos6566_device::execute_run()
 			m_cycle = 1;
 		}
 
-		m_raster_x += 8;		
+		m_raster_x += 8;
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -2016,7 +2016,7 @@ void mos6569_device::execute_run()
 			m_rdy_cycles = 0;
 		}
 
-		m_raster_x += 8;		
+		m_raster_x += 8;
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -2804,7 +2804,7 @@ WRITE8_MEMBER( mos6566_device::write )
 	default:
 		m_reg[offset] = data;
 		break;
-	}	
+	}
 }
 
 

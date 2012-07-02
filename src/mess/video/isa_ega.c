@@ -1198,7 +1198,7 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 {
 	if ( VERBOSE_EGA )
 	{
-//		logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
+//      logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
 	}
 
 	switch ( offset )
@@ -1266,7 +1266,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 
 	if ( VERBOSE_EGA )
 	{
-//		logerror("pc_ega_3c0_r: offset = %02x\n", offset );
+//      logerror("pc_ega_3c0_r: offset = %02x\n", offset );
 	}
 
 	switch ( offset )
@@ -1325,7 +1325,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 
 	if ( VERBOSE_EGA )
 	{
-//		logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
+//      logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
 	}
 
 	switch ( offset )

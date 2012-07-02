@@ -1256,10 +1256,10 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_PIT8253_ADD( "pit8253", mc1502_pit8253_config )
 
 	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
-  
+
 	MCFG_I8255_ADD( "ppi8255", mc1502_ppi8255_interface )		/* not complete */
 	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )	/* not complete */
-  
+
 	MCFG_I8251_ADD( "upd8251", default_i8251_interface )
 
 	/* video hardware */

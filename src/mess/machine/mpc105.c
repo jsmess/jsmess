@@ -74,7 +74,7 @@ void mpc105_device::device_config_complete()
 	{
     	memset(&m_cputag, 0, sizeof(m_cputag));
 		m_bank_base_default = 0;
-    	
+
 	}
 	m_shortname = "mpc105";
 }

@@ -14785,18 +14785,18 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Advanced VG (Genteiban) (T-32506G)... -->
   <!--<software name="advanced01" cloneof="advanced" supported="no">
-  		<description>Advanced VG (Genteiban) (T-32506G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Advanced VG (Genteiban) (T-32506G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
-  		<part name="cdrom" interface="sat_cdrom">
-  			<diskarea name="cdrom">
-  				<disk name="advanced vg (genteiban) (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
-  			</diskarea>
-  		</part>
-  	</software>-->
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced vg (genteiban) (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
+			</diskarea>
+		</part>
+	</software>-->
 
   <!-- Identifying Afterburner II (GS-9109)... -->
 	<software name="aburner2" supported="no">
@@ -16258,29 +16258,29 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Deep Fear Disc 1 (GS-9189)... -->
   <!--<software name="deepfear" supported="no">
-  		<description>Deep Fear Disc 1 (GS-9189)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Deep Fear Disc 1 (GS-9189)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
       = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Deep Fear Disc 2 (GS-9189)... -->
   <!--<software name="deepfear01" cloneof="deepfear" supported="no">
-  		<description>Deep Fear Disc 2 (GS-9189)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Deep Fear Disc 2 (GS-9189)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
       = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Deka Yonku - Tough The Truck (T-4313G)... -->
 	<software name="toughtrk" cloneof="hc4x4" supported="no">
@@ -17371,16 +17371,16 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Game Basic For Sega Saturn PC CD-ROM (T-2111G)... -->
   <!--<software name="gamebasi01" cloneof="gamebasi" supported="no">
-  		<description>Game Basic For Sega Saturn PC CD-ROM (T-2111G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Game Basic For Sega Saturn PC CD-ROM (T-2111G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
       = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Game de Seishun (T-19711G)... -->
 	<software name="gameseis" supported="no">
@@ -18503,16 +18503,16 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Kidou Senshi Gundam Gaiden I - Senritsu no Blue (T-13307G)... -->
   <!--<software name="kidousen" supported="no">
-  		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (T-13307G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (T-13307G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
       = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Kiss Yori (Shokai Genteiban) (T-19723G)... -->
 	<software name="kissyosg" supported="no">
@@ -20523,16 +20523,16 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Strikers 1945 (T-14407G)... -->
   <!--<software name="strikers" supported="no">
-  		<description>Strikers 1945 (T-14407G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Strikers 1945 (T-14407G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
       = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Suiko Enbu - Fuuun Saiki (T-1305G)... -->
 	<software name="suikoen2" supported="no">
@@ -20650,18 +20650,18 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Taiheiyou no Arashi 2 Disc 1 (J) (T-15024G)... -->
   <!-- Identifying Taiheiyou no Arashi 2 Disc 2 (J) (T-15024G)... -->
 	<software name="taiheiy2"  supported="no">
-  		<description>Taiheiyou no Arashi 2 - Shippuu no Moudou (Jpn)</description>
-  		<year>1997</year>
-  		<publisher>Imagineer</publisher>
+		<description>Taiheiyou no Arashi 2 - Shippuu no Moudou (Jpn)</description>
+		<year>1997</year>
+		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15018G, T-15024G (Shokai Genteiban, 2 disks)"/>
 		<info name="release" value="19970613"/>
 		<info name="alt_title" value="太平洋の嵐２　疾風の艨艟"/>
-  		<sharedfeat name="compatibility" value="NTSC-J"/>
-  		<part name="cdrom" interface="sat_cdrom">
-  			<diskarea name="cdrom">
-  				<disk name="taiheiyou no arashi 2 disc 1 (j) (t-15024g)" sha1="0292325dce9f03285a7c7c962fe77bb59e424e56" />
-  			</diskarea>
-  		</part>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="taiheiyou no arashi 2 disc 1 (j) (t-15024g)" sha1="0292325dce9f03285a7c7c962fe77bb59e424e56" />
+			</diskarea>
+		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="taiheiyou no arashi 2 disc 2 (j) (t-15024g)" sha1="34ede0ee26a200a2526760d18eb89c91bcc9a6f0" />
@@ -20821,29 +20821,29 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 1 (T-14301G)... -->
   <!--<software name="tengaima" supported="no">
-  		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 1 (T-14301G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 1 (T-14301G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 2 (T-14301G)... -->
   <!--<software name="tengaima01" cloneof="tengaima" supported="no">
-  		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 2 (T-14301G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 2 (T-14301G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
       = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying Tenka Seiha (T-15030G)... -->
 	<software name="tenkasei" supported="no">
@@ -20991,16 +20991,16 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying The King of Fighters '95 (T-3101G)... -->
   <!--<software name="thekingo01" cloneof="thekingo" supported="no">
-  		<description>The King of Fighters '95 (T-3101G)</description>
-  		<year>199?</year>
-  		<publisher>&lt;unknown&gt;</publisher>
+		<description>The King of Fighters '95 (T-3101G)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value=""/>
 		<info name="release" value=""/>
 		<info name="alt_title" value=""/>
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
       = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
-  	</software>-->
+	</software>-->
 
   <!-- Identifying The King of Fighters '96 (T-3108G)... -->
 	<software name="kof96c" cloneof="kof96" supported="no">
@@ -25898,7 +25898,7 @@ Olympic Soccer (Fra) T-7904H-09
 				<disk name="sound novel machi disc 1 (j) (t-34001g)" sha1="0174f2028cf41563218c85a2c04a6593062a4852" />
 			</diskarea>
 		</part>
- 		<part name="cdrom2" interface="sat_cdrom">
+		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sound novel machi disc 2 (j) (t-34001g)" sha1="17b5fbf2b76117740e14938ae58cf77790110086" />
 			</diskarea>
@@ -33060,7 +33060,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying 0707-Shellshock-fre... -->
- 	<software name="shellshkf" cloneof="shellshk" supported="no">
+	<software name="shellshkf" cloneof="shellshk" supported="no">
 		<description>Shellshock (Fra)</description>
 		<year>1996</year>
 		<publisher>Core</publisher>

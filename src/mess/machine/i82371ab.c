@@ -160,7 +160,7 @@ void i82371ab_device::pci_acpi_w(device_t *busdevice, int offset, UINT32 data, U
 	UINT32 cdata = 0;
 	int i;
 	COMBINE_DATA(&cdata);
-	
+
 	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
 
 	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
@@ -223,7 +223,7 @@ void i82371ab_device::device_start()
 	southbridge_device::device_start();
 	/* setup save states */
 	save_item(NAME(m_regs));
-	
+
 	device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
 }
 

@@ -7217,7 +7217,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanahour">
 		<description>Hanafuda Hourouki</description>
 		<year>1988</year>
@@ -7233,7 +7233,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanakoi">
 		<description>Hanafuda Koi Koi</description>
 		<year>19??</year>
@@ -7244,7 +7244,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanaten">
 		<description>Hanafuda Tengoku</description>
 		<year>1990</year>
@@ -7255,7 +7255,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanaiko">
 		<description>Hanaikoku Pro Uso-68k</description>
 		<year>1990</year>
@@ -7266,7 +7266,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanayori">
 		<description>Hana Yori Dango</description>
 		<year>1991</year>
@@ -7287,7 +7287,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="harenoch">
 		<description>Hare Nochi Oosawagi</description>
 		<year>1989</year>
@@ -7303,7 +7303,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hnaugust">
 		<description>Haruka Naru Augusta</description>
 		<year>1991</year>
@@ -7324,7 +7324,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- not bootable, perhaps expansion disks for Haruka Naru Augusta? -->
 	<software name="hn8lakes">
 		<description>Haruka Naru Eight Lakes</description>
@@ -7341,7 +7341,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hatenkou">
 		<description>Hatenkou</description>
 		<year>1998</year>
@@ -7357,7 +7357,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hrtsaph">
 		<description>Heart of Saphilamun</description>
 		<year>1991</year>
@@ -7383,7 +7383,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hvynova">
 		<description>Heavy Nova</description>
 		<year>1991</year>
@@ -7394,7 +7394,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hnkyo68k">
 		<description>Heiankyo Alien 68k</description>
 		<year>1988</year>
@@ -7405,7 +7405,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heiankyo">
 		<description>Heiankyo Alien</description>
 		<year>19??</year>
@@ -7416,7 +7416,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hellhoun">
 		<description>Hellhound</description>
 		<year>1994</year>
@@ -7427,7 +7427,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="helmet">
 		<description>Helmet</description>
 		<year>1991</year>
@@ -7438,7 +7438,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="herohero">
 		<description>Hero Hero Disk 1</description>
 		<year>19??</year>
@@ -7449,7 +7449,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heroher4">
 		<description>Hero Hero Disk 4 Indojin no Yabou</description>
 		<year>1990</year>
@@ -7460,7 +7460,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heroher6">
 		<description>Hero Hero Disk 6</description>
 		<year>1992</year>
@@ -7471,7 +7471,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heroher8">
 		<description>Hero Hero Disk 8</description>
 		<year>199?</year>
@@ -7482,7 +7482,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- screen doesn't clear after updating each frame -->
 	<software name="hetzer">
 		<description>Hetzer</description>
@@ -7494,7 +7494,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hextris">
 		<description>Hextris</description>
 		<year>199?</year>
@@ -7505,7 +7505,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heysay">
 		<description>Hey! Say! Education Committee (v0.12)</description>
 		<year>1993</year>
@@ -7516,7 +7516,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heysay010" cloneof="heysay">
 		<description>Hey! Say! Education Committee (v0.10)</description>
 		<year>1993</year>
@@ -7527,7 +7527,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="higesori">
 		<description>Higesori Pro Uso-68k</description>
 		<year>1990</year>
@@ -7538,7 +7538,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="highlow">
 		<description>High &amp; Low</description>
 		<year>199?</year>
@@ -7549,7 +7549,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="highpos">
 		<description>High Position</description>
 		<year>1989</year>
@@ -7560,7 +7560,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="himegas">
 		<description>Hi Mega Sister</description>
 		<year>1990</year>
@@ -7576,7 +7576,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="himihana">
 		<description>Himitsu no Hanazono</description>
 		<year>1992</year>
@@ -7597,7 +7597,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hiroshi">
 		<description>Hiroshi</description>
 		<year>19??</year>
@@ -7608,7 +7608,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hiroshi2">
 		<description>Hiroshi II</description>
 		<year>1998</year>
@@ -7619,7 +7619,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hishouza">
 		<description>Hishouzame Flying Shark</description>
 		<year>1991</year>
@@ -7630,7 +7630,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hishouzd">
 		<description>Hishouzame Flying Shark (Demo)</description>
 		<year>1991</year>
@@ -7641,7 +7641,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hyuusha">
 		<description>Hissatsu Yuusha Tsuitoshi</description>
 		<year>19??</year>
@@ -7652,7 +7652,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="helthled">
 		<description>History of Elthlead</description>
 		<year>19??</year>
@@ -7673,7 +7673,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hitomiza">
 		<description>Hitomi Zaka</description>
 		<year>19??</year>
@@ -7689,7 +7689,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="horiume">
 		<description>Hori Hori Ume Ume</description>
 		<year>199?</year>
@@ -7705,7 +7705,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="horror">
 		<description>Horror of Cridewell</description>
 		<year>1990</year>
@@ -7716,7 +7716,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshisu2">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
@@ -7772,7 +7772,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshisun">
 		<description>Hoshi no Suna Monogatari</description>
 		<year>1991</year>
@@ -7793,7 +7793,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hotelwar">
 		<description>Hotel Wars</description>
 		<year>19??</year>
@@ -7809,7 +7809,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hotjump">
 		<description>Hot Jump (v0.00)</description>
 		<year>199?</year>
@@ -7820,7 +7820,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="houmahnt">
 		<description>Houma Hunter Lime 1</description>
 		<year>1993</year>
@@ -7836,7 +7836,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="houmahn2">
 		<description>Houma Hunter Lime 2</description>
 		<year>1993</year>
@@ -7852,7 +7852,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="houmahn3">
 		<description>Houma Hunter Lime 3</description>
 		<year>1993</year>
@@ -7868,7 +7868,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="houmahn6">
 		<description>Houma Hunter Lime 6</description>
 		<year>1993</year>
@@ -7884,7 +7884,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="houmah11">
 		<description>Houma Hunter Lime 11</description>
 		<year>1994</year>
@@ -7905,7 +7905,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="htjewel">
 		<description>Houseki Tsukai Jewel Master</description>
 		<year>199?</year>
@@ -7916,7 +7916,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hvrcraft">
 		<description>Hover Craft 68k</description>
 		<year>1993</year>
@@ -7927,7 +7927,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="howmanyr">
 		<description>How Many Robot</description>
 		<year>1988</year>
@@ -7938,7 +7938,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hydlide3">
 		<description>Hydlide 3 The Space Memories Special Version</description>
 		<year>1990</year>
@@ -7954,7 +7954,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hydlide">
 		<description>Hydlide</description>
 		<year>1994</year>
@@ -7965,7 +7965,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hydlide2">
 		<description>Hydlide II Shine of Darkness</description>
 		<year>199?</year>

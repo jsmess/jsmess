@@ -22,20 +22,20 @@
     0x340000-0x3bffff   EPS/EPS-16 sample RAM
     0xc00000-0xc3ffff   OS ROM
     0xff0000-0xffffff   work RAM hi (may or may not be mirrored with work RAM low)
- 
+
     Interrupts:
     68681 uses custom vector 0x40 (address 0x100)
     5505 interrupts are on normal autovector IRQ 1
- 
+
     68681 GPIO lines (from VFX schematics):
     I0: CARTIN (if cartridge is present)
- 
+
     O0: "AN0"
     O1: "AN1"
     O2: "AN2" (disk side select on EPS/EPS-16)
     O6: To ESPHALT pin on ES5510
     O7: "SACK"
- 
+
 
 ***************************************************************************/
 
@@ -536,8 +536,8 @@ ROM_START( vfx )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_LOAD( "u14.bin",  0x000000, 0x080000, NO_DUMP ) // type 234000 on the schematic
-    ROM_LOAD( "u15.bin",  0x080000, 0x080000, NO_DUMP ) 
-    ROM_LOAD( "u16.bin",  0x100000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "u15.bin",  0x080000, 0x080000, NO_DUMP )
+    ROM_LOAD( "u16.bin",  0x100000, 0x080000, NO_DUMP )
 ROM_END
 
 ROM_START( vfxsd )
@@ -547,12 +547,12 @@ ROM_START( vfxsd )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_LOAD( "u54.bin",  0x000000, 0x010000, NO_DUMP )
-    ROM_LOAD( "u55.bin",  0x010000, 0x010000, NO_DUMP ) 
-    ROM_LOAD( "u56.bin",  0x020000, 0x010000, NO_DUMP ) 
-    ROM_LOAD( "u57.bin",  0x030000, 0x080000, NO_DUMP ) 
-    ROM_LOAD( "u58.bin",  0x038000, 0x080000, NO_DUMP ) 
-    ROM_LOAD( "u59.bin",  0x040000, 0x010000, NO_DUMP ) 
-    ROM_LOAD( "u60.bin",  0x050000, 0x080000, NO_DUMP ) 
+    ROM_LOAD( "u55.bin",  0x010000, 0x010000, NO_DUMP )
+    ROM_LOAD( "u56.bin",  0x020000, 0x010000, NO_DUMP )
+    ROM_LOAD( "u57.bin",  0x030000, 0x080000, NO_DUMP )
+    ROM_LOAD( "u58.bin",  0x038000, 0x080000, NO_DUMP )
+    ROM_LOAD( "u59.bin",  0x040000, 0x010000, NO_DUMP )
+    ROM_LOAD( "u60.bin",  0x050000, 0x080000, NO_DUMP )
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END

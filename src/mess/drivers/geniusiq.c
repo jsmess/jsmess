@@ -81,5 +81,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 1997, geniusiq,      0,      		   0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NO_SOUND_HW)
+COMP( 1997, geniusiq,      0,   		   0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NO_SOUND_HW)
 COMP( 1997, geniusiq_de,   geniusiq,       0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NO_SOUND_HW)

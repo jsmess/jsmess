@@ -38,7 +38,7 @@
 class device_vcs_control_port_interface;
 
 class vcs_control_port_device : public device_t,
-						     	public device_slot_interface
+						    	public device_slot_interface
 {
 public:
 	// construction/destruction

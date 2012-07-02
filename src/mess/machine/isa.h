@@ -236,7 +236,7 @@ public:
     static void static_set_isabus(device_t &device, device_t *isa_device);
 public:
 	isa8_device  *m_isa;
-	device_t 	 *m_isa_dev;
+	device_t	 *m_isa_dev;
 	device_isa8_card_interface *m_next;
 };
 

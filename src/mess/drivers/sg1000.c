@@ -53,7 +53,7 @@ Notes:
 
     TODO:
 
-	- slot interface for cartridges
+    - slot interface for cartridges
     - SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
     - connect PSG /READY signal to Z80 WAIT
     - accurate video timing

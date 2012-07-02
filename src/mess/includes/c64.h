@@ -100,7 +100,7 @@ public:
 	DECLARE_READ8_MEMBER( cia1_pa_r );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
 	DECLARE_WRITE8_MEMBER( cia1_pb_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( cia2_irq_w );
 	DECLARE_READ8_MEMBER( cia2_pa_r );
 	DECLARE_WRITE8_MEMBER( cia2_pa_w );

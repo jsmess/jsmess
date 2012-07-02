@@ -2,12 +2,12 @@
 
     TODO:
 
-	- tsuit215 test failures
+    - tsuit215 test failures
 
-		- CPUPORT (0=FF 1=FF 0=00 1=FF 1=FF 1=FF, AFTER 00 17, RIGHT 00 DF)
-		- IRQ (WRONG $DC0D)
-		- NMI (WRONG $DD0D)
-		- all CIA tests
+        - CPUPORT (0=FF 1=FF 0=00 1=FF 1=FF 1=FF, AFTER 00 17, RIGHT 00 DF)
+        - IRQ (WRONG $DC0D)
+        - NMI (WRONG $DD0D)
+        - all CIA tests
 
     - 64C PLA dump
     - clean up inputs

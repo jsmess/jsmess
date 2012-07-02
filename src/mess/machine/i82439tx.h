@@ -17,7 +17,7 @@
 struct i82439tx_interface
 {
 	const char *m_cputag;
-	const char *m_rom_region;	
+	const char *m_rom_region;
 };
 
 // ======================> i82439tx_device
@@ -38,16 +38,16 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete();
-	
+
 	void i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t end);
-	
+
 private:
 	address_space *m_space;
 	UINT8 *m_rom;
 
 	UINT32 m_regs[8];
 	UINT32 m_bios_ram[0x40000 / 4];
-	
+
 };
 
 // device type definition

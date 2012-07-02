@@ -291,8 +291,8 @@ void crtc_ega_device::set_cur(int state)
 	{
 		m_cur = state;
 
-//		if ( !m_res_out_cur_func.isnull() )
-//			m_res_out_cur_func( m_cur );
+//      if ( !m_res_out_cur_func.isnull() )
+//          m_res_out_cur_func( m_cur );
 	}
 }
 

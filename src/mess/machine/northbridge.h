@@ -14,7 +14,7 @@
 // ======================> northbridge_device
 
 class northbridge_device :
-  	  public device_t
+	  public device_t
 {
 public:
 		// construction/destruction

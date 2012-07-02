@@ -1253,7 +1253,7 @@ DRIVER_INIT( pcjr )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
-  
+
 DRIVER_INIT( mc1502 )
 {
 	mess_init_pc_common(machine, 0, NULL, pc_set_irq_line);

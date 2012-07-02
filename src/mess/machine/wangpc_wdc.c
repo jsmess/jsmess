@@ -197,7 +197,7 @@ void wangpc_wdc_device::device_reset()
 UINT16 wangpc_wdc_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 data = 0xffff;
-	
+
 	return data;
 }
 
@@ -317,19 +317,19 @@ bool wangpc_wdc_device::wangpcbus_have_dack(int line)
 READ8_MEMBER( wangpc_wdc_device::port_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	return 0x72; // TODO
 }
@@ -342,7 +342,7 @@ READ8_MEMBER( wangpc_wdc_device::port_r )
 WRITE8_MEMBER( wangpc_wdc_device::status_w )
 {
 	logerror("WDC status %02x\n", data);
-	
+
 	m_status = data;
 }
 

@@ -300,17 +300,17 @@ public:
 protected:
 	enum
 	{
-		TYPE_6566, 	// NTSC-M (SRAM)
-		TYPE_6567, 	// NTSC-M (NMOS)
-		TYPE_8562, 	// NTSC-M (HMOS)
-		TYPE_8564, 	// NTSC-M VIC-IIe (C128)
+		TYPE_6566,	// NTSC-M (SRAM)
+		TYPE_6567,	// NTSC-M (NMOS)
+		TYPE_8562,	// NTSC-M (HMOS)
+		TYPE_8564,	// NTSC-M VIC-IIe (C128)
 
-		TYPE_6569, 	// PAL-B 
-		TYPE_6572, 	// PAL-N
-		TYPE_6573, 	// PAL-M
-		TYPE_8565, 	// PAL-B (HMOS)
-		TYPE_8566, 	// PAL-B VIC-IIe (C128)
-		TYPE_8569 	// PAL-N VIC-IIe (C128)
+		TYPE_6569,	// PAL-B
+		TYPE_6572,	// PAL-N
+		TYPE_6573,	// PAL-M
+		TYPE_8565,	// PAL-B (HMOS)
+		TYPE_8566,	// PAL-B VIC-IIe (C128)
+		TYPE_8569	// PAL-N VIC-IIe (C128)
 	};
 
 	// device-level overrides
@@ -427,7 +427,7 @@ protected:
 	/* lightpen */
 	devcb_resolved_read8 m_in_lightpen_button_func;
 	devcb_resolved_read8 m_in_lightpen_x_func;
-	devcb_resolved_read8 m_in_lightpen_y_func;	
+	devcb_resolved_read8 m_in_lightpen_y_func;
 };
 
 

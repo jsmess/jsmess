@@ -58,7 +58,7 @@
 // ======================> southbridge_device
 
 class southbridge_device :
-  	  public device_t
+	  public device_t
 {
 public:
 		// construction/destruction

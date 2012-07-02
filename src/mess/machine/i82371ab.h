@@ -35,13 +35,13 @@ protected:
 
 	UINT32 pci_ide_r(device_t *busdevice, int offset, UINT32 mem_mask);
 	void pci_ide_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
-	
+
 	UINT32 pci_usb_r(device_t *busdevice, int offset, UINT32 mem_mask);
 	void pci_usb_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
 
 	UINT32 pci_acpi_r(device_t *busdevice, int offset, UINT32 mem_mask);
 	void pci_acpi_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);
-	
+
 private:
 	UINT8 m_regs[4][0x100];
 };

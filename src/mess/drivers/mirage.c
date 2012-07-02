@@ -31,9 +31,9 @@ LED patterns
      10
         76543210
 PORT A: 111xyzzz
- 
-PA4/PA5 are the "enable" for the two LEDs 
- 
+
+PA4/PA5 are the "enable" for the two LEDs
+
 7seg Display    Bits
 '0'  %11111100 $FC
 '1'  %01100000 $60
@@ -58,7 +58,7 @@ PA4/PA5 are the "enable" for the two LEDs
 'r'  %00001010 $0A
 'U' %01111100 $7C
 'c' %00011010 $1A
-'u' %01111000 $38 
+'u' %01111000 $38
 
 ***************************************************************************/
 

@@ -15,7 +15,7 @@ northbridge_device::northbridge_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, name, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_ram(*this, ":" RAM_TAG)
-{ 
+{
 }
 
 //-------------------------------------------------
