@@ -22,50 +22,50 @@ Custom :    X1-001A  X1-002A (SDIP64)   Sprites
 Ordered by Board        Year + Game                             Licensed To
 -------------------------------------------------------------------------------
 P0-029-A (M6100287A)    88 Thundercade / Twin Formation (1)     Taito
-?        (M6100326A)    88 Twin Eagle                           Taito
-P0-045-A (M6100429A)    89 DownTown                             Taito / RomStar
-?        (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
-?                       88 Caliber 50                           Taito / RomStar
-?                       89 Arbalester                           Taito / RomStar
+P0-034A  (M6100326A)    88 Twin Eagle                           Taito
+P0-044B                 88 Caliber 50                           Taito / RomStar
+P0-045A  (M6100429A)    89 DownTown                             Taito / RomStar
+P0-045A                 89 Arbalester                           Taito / RomStar
+P0-046A  (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
 P0-047A                 ?? Seta Roulette                        Seta / Visco
 P1-036-A + P0-045-A +
-P1-049-A                89 Meta Fox                             Taito / RomStar
+P1-049A                 89 Meta Fox                             Taito / RomStar
 P0-053-1                89 Castle of Dragon/Dragon Unit         Taito / RomStar / Athena
-P0-053-A                91 Strike Gunner S.T.G                  Athena / Tecmo
-P0-053-A                92 Quiz Kokology                        Tecmo
-P0-055-B                89 Wit's                                Athena
-P0-055-D                90 Thunder & Lightning                  Romstar / Visco
+P0-053A                 91 Strike Gunner S.T.G                  Athena / Tecmo
+P0-053A                 92 Quiz Kokology                        Tecmo
+P0-055B                 89 Wit's                                Athena
+P0-055D                 90 Thunder & Lightning                  Romstar / Visco
 Promat PCB              94 Wiggie Waggie(5)                     --
 Promat PCB              94 Super Bar(5)                         --
 P0-058-C                98 Internation Toote (6)                Coinmaster
-P0-063-A                91 Rezon                                Allumer
-P0-068-B (M6100723A)    92 Block Carnival                       Visco
+P0-063A                 91 Rezon                                Allumer
+P0-068B  (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
-P0-077-A (BP922)        92 Ultraman Club                        Banpresto
-P0-078-A                92 Blandia (7)                          Allumer
-P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
-P0-079-A                94 Eight Forces                         Tecmo
-P0-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
+P0-077A  (BP922)        92 Ultraman Club                        Banpresto
+P0-078A                 92 Blandia (7)                          Allumer
+P0-079A                 92 Zing Zing Zip                        Allumer / Tecmo
+P0-079A                 94 Eight Forces                         Tecmo
+P0-080A  (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 ?                       93 Athena no Hatena?                    Athena
-?                       93 J.J.Squawkers                        Athena / Able
+?        (93111A)       93 J.J.Squawkers                        Athena / Able
 ?        (93111A)       93 War Of Aero                          Yang Cheng
-P0-081-A (BP933KA)      93 Mobile Suit Gundam                   Banpresto
-P0-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
-P0-092-A                93 Daioh                                Athena
-P0-096-A (BP934KA)      93 Kamen Rider                          Banpresto
-P0-097-A                93 Oishii Puzzle ..                     Sunsoft + Atlus
+P0-081A  (BP933KA)      93 Mobile Suit Gundam                   Banpresto
+P0-083A  (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
+P0-092A                 93 Daioh                                Athena
+P0-096A  (BP934KA)      93 Kamen Rider                          Banpresto
+P0-097A                 93 Oishii Puzzle ..                     Sunsoft + Atlus
 bootleg                 9? Triple Fun (4)                       bootleg (Comad?)
-P0-100-A                93 Quiz Kokology 2                      Tecmo
+P0-100A                 93 Quiz Kokology 2                      Tecmo
 P0-101-1                94 Pro Mahjong Kiwame                   Athena
-P0-102-A                93 Mad Shark                            Allumer
-P0-107-A (prototype?)   94 Orbs (prototype?)                    American Sammy
-P0-107-A                93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
+P0-102A                 93 Mad Shark                            Allumer
+P0-107A  (prototype?)   94 Orbs (prototype?)                    American Sammy
+P0-107A                 93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
 P0-111A                 94 Magical Speed                        Allumer
-P0-114-A (SKB-001)      94 Krazy Bowl                           American Sammy
-P0-117-A (DH-01)        95 Extreme Downhill                     Sammy Japan
-P0-117-A?               95 Sokonuke Taisen Game                 Sammy Industries
-P0-120-A (BP954KA)      95 Gundhara                             Banpresto
-P0-122-A (SZR-001)      95 Zombie Raid                          American Sammy
+P0-114A  (SKB-001)      94 Krazy Bowl                           American Sammy
+P0-117A  (DH-01)        95 Extreme Downhill                     Sammy Japan
+P0-117A?                95 Sokonuke Taisen Game                 Sammy Industries
+P0-120A  (BP954KA)      95 Gundhara                             Banpresto
+P0-122A  (SZR-001)      95 Zombie Raid                          American Sammy
 ?                       96 Crazy Fight                          Subsino
 -------------------------------------------------------------------------------
 (1) YM2203 + YM3812 instead of X1-010
@@ -6030,40 +6030,34 @@ static INPUT_PORTS_START( umanclub )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("DSW") //2 DSWs
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 2-2*" )	//?
+	PORT_DIPNAME( 0x0004, 0x0004, "Unknown DSW2 - 3*" )		PORT_DIPLOCATION("SW2:3")	// tested...Manual states "Unused"
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Stage Select (Cheat)")
+	PORT_DIPNAME( 0x0008, 0x0008, "Stage Select (Cheat)")		PORT_DIPLOCATION("SW2:4")	// Manual states "Unused"
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 2-4" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 2-5" )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 2-6" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW2:6" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW2:7" ) /* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(   0x0080, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0200, "1" )
 	PORT_DIPSETTING(      0x0300, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal )  )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard )    )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
@@ -9778,30 +9772,30 @@ ROM_END
 
 ROM_START( blandia )
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "ux001001.003",  0x000000, 0x040000, CRC(2376a1f3) SHA1(705a3c5cc1137d14ffded6c949bf9aa650133eb7) )
-	ROM_LOAD16_BYTE( "ux001002.004",  0x000001, 0x040000, CRC(b915e172) SHA1(e43e50a664dc1286ece42a5ff8629b2da7fb49b4) )
-	ROM_LOAD16_WORD_SWAP( "ux001003.202",     0x100000, 0x100000, CRC(98052c63) SHA1(b523596de29038b3ec9f1b6e1f7374a6a8709d42) )
+	ROM_LOAD16_BYTE( "ux001001.u3", 0x000000, 0x040000, CRC(2376a1f3) SHA1(705a3c5cc1137d14ffded6c949bf9aa650133eb7) )
+	ROM_LOAD16_BYTE( "ux001002.u4", 0x000001, 0x040000, CRC(b915e172) SHA1(e43e50a664dc1286ece42a5ff8629b2da7fb49b4) )
+	ROM_LOAD16_WORD_SWAP( "ux001003.u202",    0x100000, 0x100000, CRC(98052c63) SHA1(b523596de29038b3ec9f1b6e1f7374a6a8709d42) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
-	ROM_LOAD( "ux001005.200",  0x300000, 0x100000, CRC(bea0c4a5) SHA1(a690c17fb7cbdab533c1dfad13abbad9359b9631) )
-	ROM_LOAD( "ux001007.201",  0x100000, 0x100000, CRC(4440fdd1) SHA1(7bfee90f81a2c867bd487abcf5905393ad400902) )
-	ROM_LOAD( "ux001006.063",  0x200000, 0x100000, CRC(abc01cf7) SHA1(c3f26e75eeb68073d2825be8df82cc6afcfbfb26) )
-	ROM_LOAD( "ux001008.064",  0x000000, 0x100000, CRC(413647b6) SHA1(594e010ca6f49ec82cc6d44fe23ac3427c4c3dbd) )
+	ROM_LOAD( "ux001005.u200", 0x300000, 0x100000, CRC(bea0c4a5) SHA1(a690c17fb7cbdab533c1dfad13abbad9359b9631) )
+	ROM_LOAD( "ux001007.u201", 0x100000, 0x100000, CRC(4440fdd1) SHA1(7bfee90f81a2c867bd487abcf5905393ad400902) )
+	ROM_LOAD( "ux001006.u63",  0x200000, 0x100000, CRC(abc01cf7) SHA1(c3f26e75eeb68073d2825be8df82cc6afcfbfb26) )
+	ROM_LOAD( "ux001008.u64",  0x000000, 0x100000, CRC(413647b6) SHA1(594e010ca6f49ec82cc6d44fe23ac3427c4c3dbd) )
 
 	ROM_REGION( 0x0c0000, "gfx2", 0 )	/* Layer 1 */
-	ROM_LOAD( "ux001009.065",  0x000000, 0x080000, CRC(bc6f6aea) SHA1(673efa0c70587b5650ccf0a3c4bc316f53d52ba6) )
-	ROM_LOAD( "ux001010.066",  0x040000, 0x080000, CRC(bd7f7614) SHA1(dc865ff0f327f460956915b2018aaac815e8fce5) )
+	ROM_LOAD( "ux001009.u65", 0x000000, 0x080000, CRC(bc6f6aea) SHA1(673efa0c70587b5650ccf0a3c4bc316f53d52ba6) )
+	ROM_LOAD( "ux001010.u66", 0x040000, 0x080000, CRC(bd7f7614) SHA1(dc865ff0f327f460956915b2018aaac815e8fce5) )
 
 	ROM_REGION( 0x0c0000, "gfx3", 0 )	/* Layer 2 */
-	ROM_LOAD( "ux001011.067",  0x000000, 0x080000, CRC(5efe0397) SHA1(a294a2dae9a10e93912543a8614a7f960a011f27) )
-	ROM_LOAD( "ux001012.068",  0x040000, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
+	ROM_LOAD( "ux001011.u67",  0x000000, 0x080000, CRC(5efe0397) SHA1(a294a2dae9a10e93912543a8614a7f960a011f27) )
+	ROM_LOAD( "ux001012.u068", 0x040000, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
 
 	/* The c0000-fffff region is bankswitched */
 	ROM_REGION( 0x240000, "x1snd", 0 )	/* Samples */
-	ROM_LOAD( "ux001013.069",  0x000000, 0x0c0000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
+	ROM_LOAD( "ux001013.u69", 0x000000, 0x0c0000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
 	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(              0x100000, 0x040000  )
-	ROM_LOAD( "ux001014.070",  0x140000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
+	ROM_CONTINUE(             0x100000, 0x040000  )
+	ROM_LOAD( "ux001014.u70", 0x140000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
 ROM_END
 
 ROM_START( blandiap )
@@ -10111,32 +10105,32 @@ ROM_START( wrofaero )
 	ROM_LOAD( "u70.bin",  0x080000, 0x080000, CRC(8d756fdf) SHA1(d66712a6aa19252f2c915ac66fc27df031fa9512) )
 ROM_END
 
-ROM_START( jjsquawk )
+ROM_START( jjsquawk ) /* PCB stickered  J.J. SQUAWKERS 9401- 1022 */
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "jj-rom1.040", 0x000000, 0x040000, CRC(7b9af960) SHA1(1718d54b0c12ae148de44f9ccccf90c0182f7b4f) )
-	ROM_CONTINUE   (                0x100000, 0x040000  )
-	ROM_LOAD16_BYTE( "jj-rom2.040", 0x000001, 0x040000, CRC(47dd71a3) SHA1(e219d984a1cac484ce1e570b7849562a88e0903e) )
-	ROM_CONTINUE   (                0x100001, 0x040000  )
+	ROM_LOAD16_BYTE( "fe2002001.u3", 0x000000, 0x040000, CRC(7b9af960) SHA1(1718d54b0c12ae148de44f9ccccf90c0182f7b4f) )
+	ROM_CONTINUE   (                 0x100000, 0x040000  )
+	ROM_LOAD16_BYTE( "fe2002002.u4", 0x000001, 0x040000, CRC(47dd71a3) SHA1(e219d984a1cac484ce1e570b7849562a88e0903e) )
+	ROM_CONTINUE   (                 0x100001, 0x040000  )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
-	ROM_LOAD( "jj-rom9",  0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) )
-	ROM_LOAD( "jj-rom10", 0x080000, 0x080000, CRC(ca2b42c4) SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) )
-	ROM_LOAD( "jj-rom7",  0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
-	ROM_LOAD( "jj-rom8",  0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
+	ROM_LOAD( "fe2001009", 0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) ) /* These roms located on a plug-in PCB */
+	ROM_LOAD( "fe2001010", 0x080000, 0x080000, CRC(ca2b42c4) SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) )
+	ROM_LOAD( "fe2001007", 0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
+	ROM_LOAD( "fe2001008", 0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 1 */
-	ROM_LOAD       ( "jj-rom11",    0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) )
-	ROM_LOAD       ( "jj-rom12",    0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) )
-	ROM_LOAD16_BYTE( "jj-rom3.040", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+	ROM_LOAD       ( "fe2001011", 0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD       ( "fe2001012", 0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD16_BYTE( "fe2001003", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
-	ROM_LOAD       ( "jj-rom14",    0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) )
-	ROM_LOAD       ( "jj-rom13",    0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) )
-	ROM_LOAD16_BYTE( "jj-rom4.040", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+	ROM_LOAD       ( "fe2001014", 0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD       ( "fe2001013", 0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD16_BYTE( "fe2001004", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
-	ROM_LOAD( "jj-rom5.040", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
-	ROM_LOAD( "jj-rom6.040", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
+	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
+	ROM_LOAD( "fe2001006.u70", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
 ROM_END
 
 ROM_START( jjsquawkb )
@@ -10162,7 +10156,7 @@ ROM_START( jjsquawkb )
 	ROM_COPY( "gfxtemp", 0x300000, 0x100000, 0x100000 )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
-	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
+	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
 ROM_END
 
 ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted to JJ Squawkers. No labels on any of the ROMs */
@@ -10173,19 +10167,19 @@ ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted 
 	ROM_CONTINUE   (                0x100001, 0x040000  )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
-	ROM_LOAD( "u64.3l",  0x000000, 0x100000, CRC(11d8713a) SHA1(8e3359f605913625191ac0a09222ec465b5fea71) ) /* jj-rom9 + jj-rom10 from jjsquawk */
-	ROM_LOAD( "u63.2l",  0x100000, 0x100000, CRC(7a385ef0) SHA1(d38e2242532074b58707783608a6ddce42c55a77) ) /* jj-rom7 + jj-rom8  from jjsquawk */
+	ROM_LOAD( "u64.3l",  0x000000, 0x100000, CRC(11d8713a) SHA1(8e3359f605913625191ac0a09222ec465b5fea71) ) /* fe2001009 + fe2001010 from jjsquawk */
+	ROM_LOAD( "u63.2l",  0x100000, 0x100000, CRC(7a385ef0) SHA1(d38e2242532074b58707783608a6ddce42c55a77) ) /* fe2001007 + fe2001008 from jjsquawk */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 1 */
-	ROM_LOAD       ( "u66.5l", 0x000000, 0x100000, CRC(bbaf40c5) SHA1(aecd48176adbe79e76c8febca1d9bb95ff0d6912) ) /* jj-rom11 + jj-rom12 from jjsquawk */
-	ROM_LOAD16_BYTE( "u65.4l", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* jj-rom3.040         from jjsquawk */
+	ROM_LOAD       ( "u66.5l", 0x000000, 0x100000, CRC(bbaf40c5) SHA1(aecd48176adbe79e76c8febca1d9bb95ff0d6912) ) /* fe2001011 + fe2001012 from jjsquawk */
+	ROM_LOAD16_BYTE( "u65.4l", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* fe2001003             from jjsquawk */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
-	ROM_LOAD       ( "u68.7l", 0x000000, 0x100000, CRC(ae9ae01f) SHA1(1a828d5b8848c5b5d8e5f279f1fde26b972a6332) ) /* jj-rom14 + jj-rom13 from jjsquawk */
-	ROM_LOAD16_BYTE( "u67.6l", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* jj-rom4.040         from jjsquawk */
+	ROM_LOAD       ( "u68.7l", 0x000000, 0x100000, CRC(ae9ae01f) SHA1(1a828d5b8848c5b5d8e5f279f1fde26b972a6332) ) /* fe2001014 + fe2001013 from jjsquawk */
+	ROM_LOAD16_BYTE( "u67.6l", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* fe2001004             from jjsquawk */
 
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
-	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
+	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
 ROM_END
 
 ROM_START( kamenrid )
