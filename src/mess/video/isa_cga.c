@@ -1022,7 +1022,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 		UINT8 attr = videoram[ offset +1 ];
 		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
-		UINT16 bg = attr >> 4;
+		UINT16 bg = (attr >> 4) & 0x07;
 
 		if ( i == cursor_x )
 		{
@@ -1067,7 +1067,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 		UINT8 attr = videoram[ offset +1 ];
 		UINT8 data = cga->m_chr_gen[ chr * 8 + ra ];
 		UINT16 fg = attr & 0x0F;
-		UINT16 bg = attr >> 4;
+		UINT16 bg = (attr >> 4) & 0x07;
 		UINT8 xi;
 
 		if ( i == cursor_x )
