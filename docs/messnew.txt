@@ -1,4 +1,83 @@
-﻿0.146u1
+﻿0.146u2
+
+MAMETesters Bugs Fixed
+----------------------
+- 04888: [Documentation] (msx.c) cpc400, cpc400s: The year of 
+  manufacture should be corrected to 1988. (Wilbert Pol)
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Homelab3 [Robbbert]
+- Homelab4 [Robbbert]
+
+Skeleton drivers:
+-----------------
+- Brailab Plus [Robbbert]
+
+
+System Driver Changes:
+----------------------
+-vic20/c64: Added a slot interface for the control ports. [Curt Coder]
+
+-ti99/tm990189: TM990/189 now using the new TMS9980A implementation;
+ small mods in TI-99 systems. [Michael Zapf]
+
+-Added a slot interface for the Atari 2600 controller ports, and a
+ digital joystick device to accompany it. [Curt Coder]
+
+-Ensoniq Mirage: Preliminary hookup of floppy format and WD1772 FDC
+ [R. Belmont]
+
+-Ensoniq: various documentation improvements for the 16-bit Ensoniqs
+ including correct CPU speed and other details.
+ [R. Belmont, Christian Brunschen]
+
+-odyssey2: Fixed noise channel.  [Justin Kerk, Kevtris]
+
+-Various improvements of mc1502 driver [shattered]
+
+-brailab4: screen and speech. [Robbbert]
+
+-floppy improvements of mc1502 driver [shattered]
+
+-fix for mikrosha cassette output [shattered]
+
+-ec65 - added ascii keyboard [Robbbert]
+
+-ti99: Joystick port now a dedicated slot device [Michael Zapf]
+
+-ti99/990189: Added LOAD interrupt switch [Michael Zapf]
+
+-mac: fix harddisks to work again [R. Belmont]
+
+-geniusiq: Added German ROM. [PulkoMandy]
+
+Software Lists:
+----------------
+-pico.xml: new US dumps added. [Team Europe]
+
+-bbc*_cass.xml: added software lists for tapes and hooked them up 
+ to BBC Model A, B and BBC Master drivers. [Pernod]
+
+-pv1000.xml: two new dumps added [anondumper]
+
+-sf7000.xml: Added floppy software list. [Curt Coder]
+
+-bbcm_cart.xml,electron_cart.xml: added cart list for BBC Master 
+ and Acorn Electron, not hooked up yet. [Pernod]
+
+Source Changes:
+----------------
+-Re-implementation of TMS9980A for cycle-precise processing; changed
+ tms9900.c to allow subclassing TMS9900 and TMS9980A from a common
+ parent. [Michael Zapf]
+
+ 
+0.146u1
 
 MAMETesters Bugs Fixed
 ----------------------
