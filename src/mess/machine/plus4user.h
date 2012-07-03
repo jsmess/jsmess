@@ -1,0 +1,142 @@
+/**********************************************************************
+
+    Commodore Plus/4 User Port emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+
+                    GND       1      A       GND
+                    +5V       2      B       P0
+                _BRESET       3      C       RxD
+                     P2       4      D       RTS
+                     P3       5      E       DTR
+                     P4       6      F       P7
+                     P5       7      H       DCD
+                     P0       8      J       P6
+                    ATN       9      K       P1
+                  +9VAC      10      L       DSR
+                  +9VAC      11      M       TxD
+                    GND      12      N       GND
+
+**********************************************************************/
+
+#pragma once
+
+#ifndef __PLUS4_USER_PORT__
+#define __PLUS4_USER_PORT__
+
+#include "emu.h"
+
+
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+#define PLUS4_USER_PORT_TAG		"user"
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define PLUS4_USER_PORT_INTERFACE(_name) \
+	const plus4_user_port_interface (_name) =
+
+
+#define MCFG_PLUS4_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, PLUS4_USER_PORT, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> plus4_user_port_interface
+
+struct plus4_user_port_interface
+{
+    devcb_write_line	m_out_reset_cb;
+};
+
+
+// ======================> plus4_user_port_device
+
+class device_plus4_user_port_interface;
+
+class plus4_user_port_device : public device_t,
+						       public plus4_user_port_interface,
+						       public device_slot_interface
+{
+public:
+	// construction/destruction
+	plus4_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~plus4_user_port_device();
+
+	// computer interface
+	DECLARE_READ8_MEMBER( p_r );
+	DECLARE_WRITE8_MEMBER( p_w );
+	DECLARE_READ_LINE_MEMBER( rxd_r );
+	DECLARE_READ_LINE_MEMBER( dcd_r );
+	DECLARE_READ_LINE_MEMBER( dsr_r );
+	DECLARE_WRITE_LINE_MEMBER( txd_w );
+	DECLARE_WRITE_LINE_MEMBER( dtr_w );
+	DECLARE_WRITE_LINE_MEMBER( rts_w );
+	DECLARE_WRITE_LINE_MEMBER( rxc_w );
+
+	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete();
+
+    devcb_resolved_write_line	m_out_reset_func;
+
+	device_plus4_user_port_interface *m_cart;
+};
+
+
+// ======================> device_plus4_user_port_interface
+
+// class representing interface-specific live plus4_expansion card
+class device_plus4_user_port_interface : public device_slot_card_interface
+{
+public:
+	// construction/destruction
+	device_plus4_user_port_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_plus4_user_port_interface();
+
+	virtual UINT8 plus4_p_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void plus4_p_w(address_space &space, offs_t offset, UINT8 data) { };
+
+	virtual int plus4_rxd_r() { return 1; };
+	virtual int plus4_dcd_r() { return 0; };
+	virtual int plus4_dsr_r() { return 0; };
+	virtual void plus4_txd_w(int level) { };
+	virtual void plus4_dtr_w(int level) { };
+	virtual void plus4_rts_w(int level) { };
+	virtual void plus4_rxc_w(int level) { };
+
+	// reset
+	virtual void plus4_reset_w(int level) { };
+
+protected:
+	plus4_user_port_device *m_slot;
+};
+
+
+// device type definition
+extern const device_type PLUS4_USER_PORT;
+
+
+
+#endif

@@ -1221,3 +1221,9 @@ SLOT_INTERFACE_START( c128_expansion_cards )
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("c128_comal80", C128_COMAL80)
 SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( plus4_expansion_cards )
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( plus4_user_port_cards )
+SLOT_INTERFACE_END

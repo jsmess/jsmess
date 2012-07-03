@@ -154,6 +154,8 @@ SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_user_port_cards );
 SLOT_INTERFACE_EXTERN( c128_expansion_cards );
+SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
+SLOT_INTERFACE_EXTERN( plus4_user_port_cards );
 
 
 

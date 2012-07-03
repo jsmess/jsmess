@@ -124,6 +124,8 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "sound/sid6581.h"
+#include "machine/plus4exp.h"
+#include "machine/plus4user.h"
 
 
 /*************************************
@@ -425,6 +427,20 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 	DEVCB_NULL
 };
 
+static PLUS4_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static PLUS4_USER_PORT_INTERFACE( user_intf )
+{
+	DEVCB_NULL
+};
+
 static SCREEN_UPDATE_IND16( c16 )
 {
 	c16_state *state = screen.machine().driver_data<c16_state>();
@@ -497,6 +513,9 @@ static MACHINE_CONFIG_START( c16, c16_state )
 
 	/* IEC serial bus */
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
+
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, NULL, NULL)
+	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, user_intf, plus4_user_port_cards, NULL, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
