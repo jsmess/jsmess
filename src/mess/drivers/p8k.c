@@ -13,6 +13,9 @@
         8bit IO Map, and hence I commented out the whole map)
       * properly implement Z80 daisy chain in 16 bit board
 
+      * p8000 hardware test causes MESS to crash at pc=087E
+         "z80dma_do_operation: unhandled search & transfer mode !"
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -27,24 +30,33 @@
 #include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "sound/beep.h"
+#include "machine/terminal.h"
 
 
 class p8k_state : public driver_device
 {
 public:
 	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_terminal(*this, TERMINAL_TAG),
+	m_p_ram(*this, "p_ram") { }
 
+	DECLARE_READ8_MEMBER(p8k_port24_r);
+	DECLARE_WRITE8_MEMBER(p8k_port24_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_term_data;
+	required_device<generic_terminal_device> m_terminal;
+	optional_shared_ptr<UINT8> m_p_ram;
 };
 
 
 
 static ADDRESS_MAP_START(p8k_memmap, AS_PROGRAM, 8, p8k_state)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("p_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x07) // MH7489
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80ctc_0", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_ba_cd_r, z80pio_ba_cd_w)
@@ -52,7 +64,8 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("i8272", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREAD_LEGACY("i8272", upd765_status_r)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE_LEGACY("z80ctc_1", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
@@ -63,6 +76,33 @@ static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
 	AM_RANGE(0x04000, 0x07fff) AM_RAM
 	AM_RANGE(0x08000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
+
+
+READ8_MEMBER( p8k_state::p8k_port24_r )
+{
+	if (offset == 3)
+		return 0xff;
+	if (offset == 2)
+		return m_term_data;
+
+	return 0;
+}
+
+WRITE8_MEMBER( p8k_state::p8k_port24_w )
+{
+	if (offset == 2)
+		m_terminal->write(space, 0, data);
+}
+
+WRITE8_MEMBER( p8k_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(p8k_state, kbd_put)
+};
 
 
 #if 0 // we need a real Z8001 CPU core for the 16 bit IO map
@@ -149,11 +189,20 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( p8k )
+	PORT_START("DSW")
+	PORT_BIT( 0x7f, 0x7f, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x00, "Hardware Test")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
 INPUT_PORTS_END
 
 
 static MACHINE_RESET( p8k )
 {
+	p8k_state *state = machine.driver_data<p8k_state>();
+	// copy the roms into ram
+	UINT8* ROM = state->memregion("maincpu")->base();
+	memcpy(state->m_p_ram, ROM, 0x2000);
 }
 
 static MACHINE_RESET( p8k_16 )
@@ -267,12 +316,12 @@ static Z80PIO_INTERFACE( p8k_pio_1_intf )
 static Z80PIO_INTERFACE( p8k_pio_2_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_INPUT_PORT("DSW"),	/* port a read */
+	DEVCB_NULL,	/* port a write */
+	DEVCB_NULL,	/* ready a */
+	DEVCB_NULL,	/* port b read */
+	DEVCB_NULL,	/* port b write */
+	DEVCB_NULL	/* ready b */
 };
 
 /* Z80 SIO 0 */
@@ -529,17 +578,18 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(p8k)
+	//MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_REFRESH_RATE(50)
+	//MCFG_SCREEN_SIZE(640,480)
+	//MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	//MCFG_SCREEN_UPDATE_STATIC(p8k)
 
-	MCFG_GFXDECODE(p8k)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	//MCFG_GFXDECODE(p8k)
+	//MCFG_PALETTE_LENGTH(2)
+	//MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(p8k)
+	//MCFG_VIDEO_START(p8k)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( p8k_16, p8k_state )
