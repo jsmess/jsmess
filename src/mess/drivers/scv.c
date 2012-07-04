@@ -706,7 +706,7 @@ static SCREEN_UPDATE_IND16( scv )
 					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11,  8, 9, 6, 7,  4,  5, 2, 3,  1,  1 };
 					static const UINT8 spr_2col_lut1[16] = { 0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
-					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx + 8 * x_32 + y_32, ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx ^ ( 8 * x_32 + y_32 ), ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
 				}
 			}
 			else
