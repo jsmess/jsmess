@@ -276,7 +276,7 @@ ROM_START( dmv )
 
 	 // i8741/8041 microcontroller inside the Keyboard
     ROM_REGION(0x400, "keyboard_mcu", ROMREGION_ERASEFF)
-    ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, NO_DUMP )
+    ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, CRC(14e376de) SHA1 (ed09048ef03c602dba17ad6fcfe125c082c9bb17))
 ROM_END
 
 /* Driver */
