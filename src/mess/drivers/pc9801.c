@@ -1728,7 +1728,10 @@ static INPUT_CHANGED( key_stroke )
 	}
 
 	if(oldval && !newval)
+	{
 		state->m_keyb_press = 0;
+		pic8259_ir1_w(field.machine().device("pic8259_master"), 0);
+	}
 }
 
 /* for key modifiers */
@@ -1742,7 +1745,10 @@ static INPUT_CHANGED( shift_stroke )
 		pic8259_ir1_w(field.machine().device("pic8259_master"), 1);
 	}
 	else
+	{
 		state->m_keyb_press = 0;
+		pic8259_ir1_w(field.machine().device("pic8259_master"), 0);
+	}
 }
 
 static INPUT_PORTS_START( pc9801 )
@@ -2488,6 +2494,8 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 		pic8259_ir2_w(device->machine().device("pic8259_master"), 1);
 		state->m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
+	else
+		pic8259_ir2_w(device->machine().device("pic8259_master"), 0);
 }
 
 
