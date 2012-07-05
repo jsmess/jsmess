@@ -147,8 +147,8 @@ static INPUT_PORTS_START( thom_game_port )
 /* joysticks, SX 90-018 specific */
      PAD ( 0x04, 1, "Action B", BUTTON2, BUTTON2, LALT )
      PAD ( 0x08, 2, "Action B", BUTTON2, BUTTON2, RALT )
-     PORT_BIT  ( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_BIT  ( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
+     PORT_BIT  ( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
+     PORT_BIT  ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* ? */
 
 /* mouse, SX 90-018 specific */
      PORT_START ( "mouse_x" )
@@ -2081,6 +2081,8 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 
      MCFG_CPU_MODIFY( "maincpu" )
      MCFG_CPU_PROGRAM_MAP ( mo6)
+
+     MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
 
      MCFG_DEVICE_REMOVE( "mc6846" )
 

@@ -389,6 +389,7 @@ void thom_set_video_mode ( running_machine &machine, unsigned mode )
 		LOG (( "thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 		thom_vmode = mode;
 		thom_gplinfo_changed( machine );
+		thom_vstate_dirty = 1;
 		thom_hires_better |= thom_mode_is_hires( mode );
 	}
 }
@@ -403,6 +404,7 @@ void thom_set_video_page ( running_machine &machine, unsigned page )
 		LOG (( "thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64  ));
 		thom_vpage = page;
 		thom_gplinfo_changed( machine );
+		thom_vstate_dirty = 1;
 	}
 }
 
@@ -806,10 +808,18 @@ static TIMER_CALLBACK( thom_scanline_start )
 			unsigned page = thom_vmodepage[x] & 0xff;
 			assert( mode < THOM_VMODE_NB );
 			assert( page < 4 );
-			do
-			{
-				xx++;
-			} while ( xx < 40 && thom_vmodepage[xx] == -1 );
+			if ( thom_vmodepage_changed )
+                        {
+                                do
+				{
+					xx++;
+				} 
+                                while ( xx < 40 && thom_vmodepage[xx] == -1 );
+                        }
+			else
+                        {
+				xx = 40;
+                        }
 			thom_scandraw_funcs[ mode ][ thom_hires ]
 				( machine,
 				  thom_vram + y * 40 + page * 0x4000,
@@ -1123,10 +1133,12 @@ VIDEO_START ( thom )
 	memset( thom_border_l, 0xff, sizeof( thom_border_l ) );
 	memset( thom_border_r, 0xff, sizeof( thom_border_r ) );
 	memset( thom_vbody, 0, sizeof( thom_vbody ) );
-	memset( thom_vmodepage, 0, sizeof( thom_vmodepage ) );
+	memset( thom_vmodepage, 0xffff, sizeof( thom_vmodepage ) );
 	memset( thom_vmem_dirty, 0, sizeof( thom_vmem_dirty ) );
 	thom_border_l[ 0 ] = 0;
 	thom_border_r[ 0 ] = 0;
+	thom_vmodepage[ 0 ] = 0;
+	thom_vmodepage_changed = 0;
 	thom_vmode = 0;
 	thom_vpage = 0;
 	thom_border_index = 0;
