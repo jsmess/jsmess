@@ -27,10 +27,22 @@
 <kevtris> that's about it
 <kevtris> the samples are stored in the game ROMs, and are easy to extract
 
-RO-3-9503 = 2k self decoding address mask rom without external address decoder & bus
-RO-3-9504 = 2k self decoding address mask rom with external address decoder & bus
-RO-3-9505 = 8k self decoding address mask rom without external address decoder & bus
-RO-3-9506 = 8k self decoding address mask rom with external address decoder & bus
+9502, 9503 and 9504 are the chips used in the intv1 (the sears one may use different chips)
+9505 is used in some carts
+9503 and 9506 are the chips used in the intv2
+
+Known roms so far:
+RO-3-9502-011 = 4KiB(2Kiw) self-decoding mask rom with decoder & bus, (DIP40 containing 1/2 of EXEC, maps at words 0000-0fff or 1000-1fff [unclear which, guess is 0000], i/o maps at ?), located at U5 on intv1
+RO-3-9503-003 = 2KiB(1Kiw) self-decoding mask rom with decoder & bus, (DIP40 containing GROM, maps at words 0x3000-0x37FF, i/o maps at ?), located at U21 in intv1, U5 in intv2
+RO-3-9504-021 = 4KiB(2Kiw) self-decoding mask rom without decoder or bus, (DIP28 containing 1/2 of EXEC, maps at words 0000-0fff or 1000-1fff [unclear which, guess is 1000]), located at U6 in intv1
+RO-3-9506-010 = 8KiB(4Kiw)+512B(256W) self-decoding mask rom with decoder & bus, (DIP40 containing EXEC2, maps at words 0000-1fff and 0400-04FF, i/o maps at ?) located at U6 in intv2
+
+rom types (suspected, not proven yet):
+RO-3-9502 = 4KiB (2Kiw) self decoding address mask rom with external address decoder & bus (DIP40)
+RO-3-9503 = 2KiB (1Kiw) self decoding address mask rom with external address decoder & bus (DIP40)
+RO-3-9504 = 4KiB (2Kiw) self decoding address mask rom without external address decoder or bus (DIP28)
+RO-3-9505 = 8KiB (4Kiw) self decoding address mask rom without external address decoder or bus (DIP28)
+RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address decoder & bus (DIP40)
 
  *
  ************************************************************************/
@@ -710,6 +722,7 @@ static ADDRESS_MAP_START(intv_mem, AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
 	AM_RANGE(0x9000, 0xBfff) AM_ROM AM_REGION("maincpu", 0x9000<<1)
+	AM_RANGE(0xC000, 0xCfff) AM_ROM AM_REGION("maincpu", 0xC000<<1)
 	AM_RANGE(0xD000, 0xDfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
 	AM_RANGE(0xE000, 0xFfff) AM_ROM AM_REGION("maincpu", 0xE000<<1)
 ADDRESS_MAP_END
@@ -727,6 +740,7 @@ static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
 	AM_RANGE(0x9000, 0xBfff) AM_ROM AM_REGION("maincpu", 0x9000<<1)
+	AM_RANGE(0xC000, 0xCfff) AM_ROM AM_REGION("maincpu", 0xC000<<1)
 	AM_RANGE(0xD000, 0xDfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
 	AM_RANGE(0xE000, 0xFfff) AM_ROM AM_REGION("maincpu", 0xE000<<1)
 ADDRESS_MAP_END
@@ -749,6 +763,7 @@ static ADDRESS_MAP_START( intvecs_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x7000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE( ecs_bank2_page_select );
 	//AM_RANGE(0x8800, 0x8fff) AM_RAM_BANK("bank5") // cart rom / game factory ram
 	AM_RANGE(0x9000, 0xBfff) AM_ROM AM_REGION("maincpu", 0x9000<<1)
+	AM_RANGE(0xC000, 0xCfff) AM_ROM AM_REGION("maincpu", 0xC000<<1)
 	AM_RANGE(0xD000, 0xDfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
 	AM_RANGE(0xE000, 0xEfff) AM_READ_BANK("bank3") AM_WRITE( ecs_bank3_page_select );
 	AM_RANGE(0xF000, 0xFfff) AM_READ_BANK("bank4") AM_WRITE( wsmlb_bank_page_select ); // World Series Major League Baseball Banking
@@ -885,10 +900,10 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_CARTSLOT_LOAD(intvkbd_cart)
 MACHINE_CONFIG_END
 
-ROM_START(intv) // the intv1 exec rom should properly be two roms, one ro-3-9503 and one ro-3-9504
+ROM_START(intv) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u5", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
+	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -907,20 +922,20 @@ ROM_START(intv2)
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
-ROM_START(intvsrs)
+ROM_START(intvsrs) // the intv1 sears exec rom should be two roms: RO-3-9502-???.U5 and RO-3-9504-???.U6 but the correct names are unknown as of yet
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "searsexc.bin", (0x1000<<1)+0, 0x2000, CRC(ea552a22) SHA1(834339de056d42a35571cae7fd5b04d1344001e9))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u5", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
+	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
-ROM_START(intvecs) // the intv1 exec rom should properly be two roms, one ro-3-9503 and one ro-3-9504
+ROM_START(intvecs) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u5", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
+	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -932,10 +947,10 @@ ROM_START(intvecs) // the intv1 exec rom should properly be two roms, one ro-3-9
 	ROM_CONTINUE( 0xE000<<1, 0x2000 )
 ROM_END
 
-ROM_START(intvkbd)
+ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", 0x1000<<1, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u5", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
+	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 	ROM_LOAD16_WORD( "024.u60",  0x7000<<1, 0x1000, CRC(4f7998ec) SHA1(ec006d0ae9002e9d56d83a71f5f2eddd6a456a40))
 	ROM_LOAD16_BYTE( "4d72.u62", 0x7800<<1, 0x0800, CRC(aa57c594) SHA1(741860d489d90f5882ca53daa3169b6abacdf130))
 	ROM_LOAD16_BYTE( "4d71.u63", (0x7800<<1)+1, 0x0800, CRC(069b2f0b) SHA1(070850bb32f8474107cc52c5183cfaa32d640f9a))
