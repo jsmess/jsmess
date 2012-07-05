@@ -1010,7 +1010,7 @@ static DRIVER_INIT( intvkbd )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 CONS( 1979, intv,       0,      0,      intv,       intv,       intv,       "Mattel", "Intellivision", 0 )
-CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv,       "Mattel", "Intellivision (Sears)", 0 )
+CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv,       "Sears", "Super Video Arcade", 0 )
 COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
 CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv,       "Mattel", "Intellivision II", 0 )
 COMP( 1983, intvecs,    intv,   0,      intvecs,    intvecs,    intv,       "Mattel", "Intellivision Entertainment Computer System", 0)
