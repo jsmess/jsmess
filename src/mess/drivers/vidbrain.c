@@ -16,6 +16,11 @@
 
     TODO:
 
+	- interlaced video?
+	- pinball background colors
+	- Y-zoom starting on odd scanline only 1 line high
+	- object height 0 glitch
+	- object column 0xff glitch
     - video interrupts
     - R-2R ladder DAC
     - reset on cartridge unload
@@ -28,6 +33,7 @@
 
 
 #include "includes/vidbrain.h"
+#include "vidbrain.lh"
 
 
 
@@ -543,12 +549,13 @@ void vidbrain_state::machine_reset()
 
 static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
     // basic machine hardware
-    MCFG_CPU_ADD(F3850_TAG, F8, XTAL_14_31818MHz/8)
+    MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
     MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
     MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
-	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, XTAL_14_31818MHz, uv_intf)
+	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
+	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -560,7 +567,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
+	MCFG_F3853_ADD(F3853_TAG, XTAL_4MHz/2, smi_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

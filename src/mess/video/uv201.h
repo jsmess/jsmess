@@ -70,7 +70,7 @@
 	MCFG_DEVICE_CONFIG(_config) \
     MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, uv201_device, screen_update) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, 455, 0, 190, 525, 0, 243) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262) \
     MCFG_PALETTE_LENGTH(32)
 
 

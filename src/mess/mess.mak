@@ -2153,6 +2153,7 @@ $(MESS_DRIVERS)/unixpc.o:	$(MESS_LAYOUT)/unixpc.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/vboy.o:		$(MESS_LAYOUT)/vboy.lh
 $(MESS_DRIVERS)/vcs80.o:	$(MESS_LAYOUT)/vcs80.lh
+$(MESS_DRIVERS)/vidbrain.o:	$(MESS_LAYOUT)/vidbrain.lh
 $(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
 $(MESS_DRIVERS)/votrtnt.o:	$(MESS_LAYOUT)/votrtnt.lh
 $(MESS_DRIVERS)/vt100.o:	$(MESS_LAYOUT)/vt100.lh

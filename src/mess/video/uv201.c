@@ -18,6 +18,15 @@
 #define LOG 		1
 
 
+// screen parameters
+#define SCREEN_WIDTH				232
+#define VBLANK_WIDTH				21
+#define HBLANK_WIDTH				39
+#define HSYNC_WIDTH					18
+#define HFP_WIDTH					16
+#define HBP_WIDTH					5
+
+
 // write-only registers
 #define REGISTER_COMMAND			0xf7
 #define REGISTER_BACKGROUND			0xf5
@@ -68,7 +77,7 @@
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
 
 #define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) bitmap.pix16((_scanline), _dot) = pixel;
+	if (IS_VISIBLE(_scanline)) bitmap.pix16((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = pixel;
 
 
 
@@ -239,7 +248,7 @@ void uv201_device::set_y_interrupt()
 	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
 
 	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
-	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
+	//m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
 }
 
 
@@ -449,13 +458,21 @@ READ_LINE_MEMBER( uv201_device::kbd_r )
 
 UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(get_black_pen(machine()), cliprect);
+
 	if (!(m_cmd & COMMAND_ENB))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
-	bitmap.fill(m_bg, cliprect);
+	for (int y = 0; y < 262; y++)
+	{
+		for (int x = 0; x < 193; x++)
+		{
+			int pixel = m_bg;
+			DRAW_PIXEL(y, x);
+		}
+	}
 
 	for (int i = 0; i < 16; i++)
 	{
