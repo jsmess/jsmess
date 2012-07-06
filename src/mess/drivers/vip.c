@@ -669,7 +669,7 @@ static const cassette_interface vip_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
+	"vip_cass",
 	NULL
 };
 
@@ -704,6 +704,9 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, vip_cassette_interface)
+
+    // software lists
+    MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
