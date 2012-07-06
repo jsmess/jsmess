@@ -625,7 +625,7 @@ I8255_INTERFACE( sc3000_ppi_intf )
 
 const cassette_interface sc3000_cassette_interface =
 {
-	cassette_default_formats,
+	sc3000_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,

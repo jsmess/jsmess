@@ -9,6 +9,7 @@
 #include "machine/ram.h"
 #include "imagedev/printer.h"
 #include "formats/basicdsk.h"
+#include "formats/sc3000_bit.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
