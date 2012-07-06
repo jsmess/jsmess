@@ -13,8 +13,6 @@
         8bit IO Map, and hence I commented out the whole map)
       * properly implement Z80 daisy chain in 16 bit board
 
-      * p8000 hardware test causes MESS to crash at pc=087E
-         "z80dma_do_operation: unhandled search & transfer mode !"
 
 ****************************************************************************/
 
@@ -38,26 +36,45 @@ class p8k_state : public driver_device
 public:
 	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG),
 	m_p_ram(*this, "p_ram") { }
 
+	DECLARE_READ8_MEMBER(p8k_port0_r);
+	DECLARE_WRITE8_MEMBER(p8k_port0_w);
 	DECLARE_READ8_MEMBER(p8k_port24_r);
 	DECLARE_WRITE8_MEMBER(p8k_port24_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<cpu_device> m_maincpu;
+	optional_device<generic_terminal_device> m_terminal;
 	optional_shared_ptr<UINT8> m_p_ram;
 };
 
 
 
 static ADDRESS_MAP_START(p8k_memmap, AS_PROGRAM, 8, p8k_state)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0x0FFF) AM_RAMBANK("bank0")
+	AM_RANGE(0x1000, 0x1FFF) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x2FFF) AM_RAMBANK("bank2")
+	AM_RANGE(0x3000, 0x3FFF) AM_RAMBANK("bank3")
+	AM_RANGE(0x4000, 0x4FFF) AM_RAMBANK("bank4")
+	AM_RANGE(0x5000, 0x5FFF) AM_RAMBANK("bank5")
+	AM_RANGE(0x6000, 0x6FFF) AM_RAMBANK("bank6")
+	AM_RANGE(0x7000, 0x7FFF) AM_RAMBANK("bank7")
+	AM_RANGE(0x8000, 0x8FFF) AM_RAMBANK("bank8")
+	AM_RANGE(0x9000, 0x9FFF) AM_RAMBANK("bank9")
+	AM_RANGE(0xA000, 0xAFFF) AM_RAMBANK("bank10")
+	AM_RANGE(0xB000, 0xBFFF) AM_RAMBANK("bank11")
+	AM_RANGE(0xC000, 0xCFFF) AM_RAMBANK("bank12")
+	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK("bank13")
+	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK("bank14")
+	AM_RANGE(0xF000, 0xFFFF) AM_RAMBANK("bank15")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x07) // MH7489
+	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80ctc_0", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
@@ -77,6 +94,37 @@ static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
 	AM_RANGE(0x08000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
+
+READ8_MEMBER( p8k_state::p8k_port0_r )
+{
+	return 0;
+}
+
+// data controls what kind of memory is chosen 0=do nothing; 1=rom; 2=sram; 4=dram
+// highest 4 bits of offset control which bank is being modified
+WRITE8_MEMBER( p8k_state::p8k_port0_w )
+{
+	UINT8 breg = cpu_get_reg(m_maincpu, Z80_B) >> 4;
+	if ((data==1) || (data==2) || (data==4))
+	{
+		char banknum[8];
+		sprintf(banknum,"bank%d", breg);
+
+		offset = 0;
+		if (data==2)
+			offset = 16;
+		else
+		if (data==4)
+			offset = 32;
+
+		offset += breg;
+
+		membank(banknum)->set_entry(offset);
+	}
+	else
+	if (data)
+		printf("Invalid data %X for bank %d\n",data,breg);
+}
 
 READ8_MEMBER( p8k_state::p8k_port24_r )
 {
@@ -200,13 +248,30 @@ INPUT_PORTS_END
 static MACHINE_RESET( p8k )
 {
 	p8k_state *state = machine.driver_data<p8k_state>();
-	// copy the roms into ram
-	UINT8* ROM = state->memregion("maincpu")->base();
-	memcpy(state->m_p_ram, ROM, 0x2000);
+	state->membank("bank0")->set_entry(0);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->set_entry(0);
+	state->membank("bank3")->set_entry(0);
+	state->membank("bank4")->set_entry(0);
+	state->membank("bank5")->set_entry(0);
+	state->membank("bank6")->set_entry(0);
+	state->membank("bank7")->set_entry(0);
+	state->membank("bank8")->set_entry(0);
+	state->membank("bank9")->set_entry(0);
+	state->membank("bank10")->set_entry(0);
+	state->membank("bank11")->set_entry(0);
+	state->membank("bank12")->set_entry(0);
+	state->membank("bank13")->set_entry(0);
+	state->membank("bank14")->set_entry(0);
+	state->membank("bank15")->set_entry(0);
 }
 
 static MACHINE_RESET( p8k_16 )
 {
+	//p8k_state *state = machine.driver_data<p8k_state>();
+	// copy the roms into ram
+	//UINT8* ROM = state->memregion("maincpu")->base();
+	//memcpy(state->m_p_ram, ROM, 0x2000);
 }
 
 static VIDEO_START( p8k )
@@ -524,6 +589,29 @@ static const z80_daisy_config p8k_16_daisy_chain[] =
 	{ NULL }
 };
 
+static DRIVER_INIT( p8k )
+{
+	p8k_state *state = machine.driver_data<p8k_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank3")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank4")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank5")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank6")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank7")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank8")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank9")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank10")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank11")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank12")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank13")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank14")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank15")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+}
+
+
 /* F4 Character Displayer */
 static const gfx_layout p8k_charlayout =
 {
@@ -555,8 +643,6 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_CPU_CONFIG(p8k_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_memmap)
 	MCFG_CPU_IO_MAP(p8k_iomap)
-
-//  MCFG_MACHINE_START( p8000_8 )
 	MCFG_MACHINE_RESET(p8k)
 
 	/* peripheral hardware */
@@ -578,17 +664,6 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	//MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_REFRESH_RATE(50)
-	//MCFG_SCREEN_SIZE(640,480)
-	//MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	//MCFG_SCREEN_UPDATE_STATIC(p8k)
-
-	//MCFG_GFXDECODE(p8k)
-	//MCFG_PALETTE_LENGTH(2)
-	//MCFG_PALETTE_INIT(black_and_white)
-
-	//MCFG_VIDEO_START(p8k)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
@@ -613,7 +688,6 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -622,21 +696,20 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(640,480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(p8k)
 	MCFG_SCREEN_UPDATE_STATIC(p8k)
-
 	MCFG_GFXDECODE(p8k)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(p8k)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( p8000 )
-	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD("mon8_1_3.1",	0x0000, 0x1000, CRC(ad1bb118) SHA1(2332963acd74d5d1a009d9bce8a2b108de01d2a5))
 	ROM_LOAD("mon8_2_3.1",	0x1000, 0x1000, CRC(daced7c2) SHA1(f1f778e72568961b448020fc543ed6e81bbe81b1))
 
+	// this is for the p8000's terminal, not the p8000 itself
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("p8t_zs",    0x0000, 0x0800, CRC(f9321251) SHA1(a6a796b58d50ec4a416f2accc34bd76bc83f18ea))
 	ROM_LOAD("p8tdzs.2",  0x0800, 0x0800, CRC(32736503) SHA1(6a1d7c55dddc64a7d601dfdbf917ce1afaefbb0a))
@@ -649,6 +722,7 @@ ROM_START( p8000_16 )
 	ROM_LOAD16_BYTE("mon16_2h_3.1_udos",   0x2000, 0x1000, CRC(cddf58d5) SHA1(588bad8df75b99580459c7a8e898a3396907e3a4))
 	ROM_LOAD16_BYTE("mon16_2l_3.1_udos",   0x2001, 0x1000, CRC(395ee7aa) SHA1(d72fadb1608cd0915cd5ce6440897303ac5a12a6))
 
+	// this is for the p8000's terminal, not the p8000 itself
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("p8t_zs",    0x0000, 0x0800, CRC(f9321251) SHA1(a6a796b58d50ec4a416f2accc34bd76bc83f18ea))
 	ROM_LOAD("p8tdzs.2",  0x0800, 0x0800, CRC(32736503) SHA1(6a1d7c55dddc64a7d601dfdbf917ce1afaefbb0a))
@@ -657,5 +731,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1989, p8000,      0,      0,       p8k,       p8k,     0,      "EAW electronic Treptow", "P8000 (8bit Board)",  GAME_NOT_WORKING)
+COMP( 1989, p8000,      0,      0,       p8k,       p8k,     p8k,    "EAW electronic Treptow", "P8000 (8bit Board)",  GAME_NOT_WORKING)
 COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k,     0,      "EAW electronic Treptow", "P8000 (16bit Board)",  GAME_NOT_WORKING)
