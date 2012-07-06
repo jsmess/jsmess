@@ -995,7 +995,7 @@ static const floppy_interface bullet_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"bullet_flop",
+	"floppy_5_25",
 	NULL
 };
 
@@ -1185,6 +1185,9 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -1214,6 +1217,9 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
     MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
 	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
