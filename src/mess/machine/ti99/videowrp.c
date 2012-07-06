@@ -163,12 +163,12 @@ void ti_exp_video_device::video_update_mouse(int delta_x, int delta_y, int butto
 
 void ti_video_device::device_start(void)
 {
-	m_tms9928a = static_cast<tms9928a_device*>(machine().device(TMS9928A_TAG));
+	m_tms9928a = static_cast<tms9928a_device*>(machine().device(VDP_TAG));
 }
 
 void ti_exp_video_device::device_start(void)
 {
-	m_v9938 = static_cast<v9938_device*>(machine().device(V9938_TAG));
+	m_v9938 = static_cast<v9938_device*>(machine().device(VDP_TAG));
 }
 
 void ti_video_device::device_reset(void)

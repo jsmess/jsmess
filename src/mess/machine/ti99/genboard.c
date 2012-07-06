@@ -1475,7 +1475,7 @@ INPUT_PORTS_END
 
 void geneve_mouse_device::device_start()
 {
-	m_v9938 = machine().device<v9938_device>(V9938_TAG);
+	m_v9938 = machine().device<v9938_device>(VDP_TAG);
 }
 
 void geneve_mouse_device::device_reset()

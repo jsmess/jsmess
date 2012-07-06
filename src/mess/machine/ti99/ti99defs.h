@@ -18,8 +18,6 @@
 #define DATAMUX_TAG 	"datamux_16_8"
 #define VIDEO_SYSTEM_TAG "video"
 #define V9938_SYSTEM_TAG "video9938"
-#define TMS9928A_TAG	"tms9928a"
-#define V9938_TAG		"v9938"
 #define SCREEN_TAG		"screen"
 #define TISOUNDCHIP_TAG "soundchip"
 #define TISOUND_TAG 	"tisound"
@@ -31,6 +29,7 @@
 #define MECMOUSE_TAG	"mecmouse"
 #define HANDSET_TAG		"handset"
 #define JOYPORT_TAG		"joyport"
+#define VDP_TAG			"vdp"
 
 #define GROMFREQ 10700000.0/24
 
@@ -79,12 +78,6 @@ public:
 /****************************************************************************
     Constants
 ****************************************************************************/
-
-enum
-{
-	TI994,
-	TI994A
-};
 
 enum
 {

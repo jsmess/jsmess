@@ -1057,7 +1057,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
 {
-	timer.machine().device<v9938_device>(V9938_TAG)->interrupt();
+	timer.machine().device<v9938_device>(VDP_TAG)->interrupt();
 }
 
 /*
@@ -1111,7 +1111,6 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 
 MACHINE_CONFIG_END
 
-
 /*****************************************************************************
     ROM loading
     Note that we use the same ROMset for 50Hz and 60Hz versions.
@@ -1121,12 +1120,12 @@ MACHINE_CONFIG_END
 #define rom_ti99_4ae rom_ti99_4a
 
 ROM_START(ti99_4)
-	/*CPU memory space*/
+	// CPU memory space
 	ROM_REGION16_BE(0x2000, "maincpu", 0)
 	ROM_LOAD16_BYTE("u610.bin", 0x0000, 0x1000, CRC(6fcf4b15) SHA1(d085213c64701d429ae535f9a4ac8a50427a8343)) /* CPU ROMs high */
 	ROM_LOAD16_BYTE("u611.bin", 0x0001, 0x1000, CRC(491c21d1) SHA1(7741ae9294c51a44a78033d1b77c01568a6bbfb9)) /* CPU ROMs low */
 
-	/*GROM memory space*/
+	// GROM memory space
 	ROM_REGION(0x10000, region_grom, 0)
 	ROM_LOAD("u500.bin", 0x0000, 0x1800, CRC(aa757e13) SHA1(4658d3d01c0131c283a30cebd12e76754d41a84a)) /* system GROM 0 */
 	ROM_LOAD("u501.bin", 0x2000, 0x1800, CRC(c863e460) SHA1(6d849a76011273a069a98ed0c3feaf13831c942f)) /* system GROM 1 */
@@ -1134,11 +1133,11 @@ ROM_START(ti99_4)
 ROM_END
 
 ROM_START(ti99_4a)
-	/*CPU memory space*/
+	// CPU memory space
 	ROM_REGION16_BE(0x2000, "maincpu", 0)
 	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
-	/*GROM memory space*/
+	// GROM memory space
 	ROM_REGION(0x10000, region_grom, 0)
 	ROM_LOAD("994agrom.bin", 0x0000, 0x6000, CRC(af5c2449) SHA1(0c5eaad0093ed89e9562a2c0ee6a370bdc9df439)) /* system GROMs */
 ROM_END

@@ -869,7 +869,7 @@ MACHINE_RESET( ti99_4p )
 
 TIMER_DEVICE_CALLBACK( sgcpu_hblank_interrupt )
 {
-	timer.machine().device<v9938_device>(V9938_TAG)->interrupt();
+	timer.machine().device<v9938_device>(VDP_TAG)->interrupt();
 }
 
 /*

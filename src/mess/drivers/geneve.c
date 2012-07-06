@@ -635,7 +635,7 @@ TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 	int scanline = param;
 	geneve *driver = timer.machine().driver_data<geneve>();
 
-	timer.machine().device<v9938_device>(V9938_TAG)->interrupt();
+	timer.machine().device<v9938_device>(VDP_TAG)->interrupt();
 
 	if (scanline == 0) // was 262
 	{
@@ -652,7 +652,8 @@ TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 WRITE8_MEMBER( geneve::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	if (VERBOSE>1) LOG("External operation %s not implemented on Geneve board\n", extop[offset]);
+	if (VERBOSE>1)
+		if (offset != IDLE_OP) LOG("geneve: External operation %s not implemented on Geneve board\n", extop[offset]);
 }
 
 /*
