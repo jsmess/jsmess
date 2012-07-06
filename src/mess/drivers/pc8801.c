@@ -1957,7 +1957,7 @@ void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
 	{
 		drvstate->m_int_state |= irq;
 
-		m_pic->r_w(~irq);
+		drvstate->m_pic->r_w(~irq);
 
 		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 	}
@@ -1992,7 +1992,7 @@ static I8214_INTERFACE( pic_intf )
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	UINT8 vector = (7 - m_pic->a_r());
+	UINT8 vector = (7 - state->m_pic->a_r());
 
 	state->m_int_state &= ~(1<<vector);
 	cputag_set_input_line(device->machine(),"maincpu",0,CLEAR_LINE);
@@ -2126,8 +2126,8 @@ static MACHINE_RESET( pc8801 )
 	#ifdef USE_PROPER_I8214
 	{
 		/* initialize I8214 */
-		m_pic->etlg_w(1);
-		m_pic->inte_w(1);
+		state->m_pic->etlg_w(1);
+		state->m_pic->inte_w(1);
 	}
 	#else
 	{
