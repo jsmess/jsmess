@@ -404,6 +404,9 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( compis2, compis_state )
@@ -445,6 +448,9 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
 MACHINE_CONFIG_END
 
 
