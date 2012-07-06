@@ -804,6 +804,9 @@ static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw12_floppy_interface)
 
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
