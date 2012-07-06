@@ -737,6 +737,9 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
