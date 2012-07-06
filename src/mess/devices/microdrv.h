@@ -47,7 +47,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return m_interface; }
+	virtual const char *image_interface() const { return "ql_cass"; }
 	virtual const char *file_extensions() const { return "mdv"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 

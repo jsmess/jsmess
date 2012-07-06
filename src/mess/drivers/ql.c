@@ -1043,6 +1043,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_CARTSLOT_INTERFACE("ql_cart")
 
 	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "ql_cass")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql")
 
 	// internal ram
