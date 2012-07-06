@@ -17,29 +17,31 @@
 *  /nmi is emulated correctly (i.e. its tied to +5v. that was easy!)
 *
 *  TODO:
-*  figure out the rest of the i/o map
+*  minor finishing touches to i/o map
 *  figure out why banked ram on 4.x causes glitches/sys errors; it works on 2.2
-*  actually hook up interrupts: they fire on keypresses and 6551/ACIA receives
+*  actually hook up interrupts: they should fire on keypresses and 6551/ACIA receives
 *  attach terminal to 6551/ACIA serial for recieving from ep804
-*  correctly hook up 10937 vfd controller: por is not hooked up
+*  correctly hook up 10937 vfd controller: por is not hooked up (relates to /MEMEN)
 *  hook up keypad via 74C923 and mode buttons via logic gate mess
 *  artwork
 *
 ******************************************************************************/
 
-// port 40 read reads eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
+// port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
-// port 40 write writes eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
+// port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
-// port 41 write controls eprom socket pins 10 to 3 (d0 to d8) and SIM pins 7, 20/11, 8/12, 6/27, 23, and 21 (d0 to d5)
+// port 41 write controls eprom socket pins 10 to 3 (d0 to d8 to eprom pins A0 to A7) and SIM pins 7, 20/11, 8/12, 27, 23, and 21 (d0 to d5, corresponding to SIM pins for A9, A10, A11, A12, A13, and A14+A15)
+// Note: the v2.0 hardware has bit d6 controlling one of the pins going to the expansion ram socket
+// The 2.0 hardware may also have separate SIM controls for A14 and A15, possibly using bit d7 to control sim A15 somehow
 
 // port 42 write controls eprom socket pins 25(d0), 2(d4), 27(d6)
 
 // port 43 read is status/mode
 #undef PORT43_R_VERBOSE
 // port 43 write is ram banking and ctl1-7; it also clears overload state
-#undef PORT43_W_VERBOSE
-// port 44 write is vfd serial, as well as power and z80 control and various enables; it also clears powerfail state
+#define PORT43_W_VERBOSE 1
+// port 44 write is vfd serial/reset, as well as power and z80 control and various enables; it also clears powerfail state
 #define PORT44_W_VERBOSE 1
 // port 45 write is speaker control
 #undef PORT45_W_VERBOSE
@@ -120,6 +122,7 @@ public:
 	UINT8 m_sim_mode;
 	UINT8 m_powerfail_state;
 	UINT8 m_chipinsert_state;
+	UINT8 m_op41;
 };
 
 /*
@@ -174,6 +177,7 @@ static DRIVER_INIT( digel804 )
 	state->m_powerfail_state = 1; // "O11"
 	state->m_chipinsert_state = 0; // PIN
 	state->m_ram_bank = 0;
+	state->m_op41 = 0;
 	state->membank( "bankedram" )->set_base( state->memregion("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
 }
@@ -216,10 +220,12 @@ WRITE8_MEMBER( digel804_state::op40 ) // eprom data bus write
 	logerror("Digel804: port 40, eprom databus had %02X written to it!\n", data);
 }
 
-WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write
+WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, d6 also controls memory map somehow
 {
 	// TODO: would be nice to have a 'fake eprom' here
-	logerror("Digel804: port 41, eprom address low had %02X written to it!\n", data);
+	logerror("Digel804: port 41, eprom address low/sim/memorybank had %02X written to it!\n", data);
+	fprintf(stderr,"op41 write of %02X, ram mapper bit is %d\n", data, (data&0x40)?1:0);
+	m_op41 = data;
 }
 
 WRITE8_MEMBER( digel804_state::op42 ) // eprom address hi and control write
@@ -276,16 +282,15 @@ WRITE8_MEMBER( digel804_state::op43 )
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
      * bits:76543210
-     *      |||||\\\- select ram bank for 4000-bfff area based on these bits
-     *      \\\\\---- unknown, always 0?
-
-     * writes to 0x43 ALSO control
+     *      |||||\\\- select ram bank for 4000-bfff area based on these bits (2.0 hardware)
+     *      \\\\\\\-- CTL lines
 
      * all writes to port 43 will reset the overload state unless the ammeter detects the overload is ongoing
      */
 	m_overload_state = 0; // writes to port 43 clear overload state
 #ifdef PORT43_W_VERBOSE
 	logerror("Digel804: port 0x43 ram bank had %02x written to it!\n", data);
+	logerror("          op41 bit 6 is %d\n", (m_op41 & 0x40)?1:0);
 #endif
 	m_ram_bank = data&7;
 	if ((data&0xF8)!=0)
@@ -299,13 +304,13 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	/* writes to 0x44 control the 10937 vfd chip, z80 power/busrq, eprom driving and some eprom power ctl lines
      * bits:76543210
      *      |||||||\- 10937 VFDC '/SCK' serial clock '/CDIS'
-     *      ||||||\-- controls /KEYEN
-     *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby), also controls '/MEMEN'
+     *      ||||||\-- controls '/KEYEN' (which enables the four mode buttons when active)
+     *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby), also controls '/MEMEN' which secondarily controls POR(power on/reset) for the VFDC chip
      *      ||||\---- controls the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low) '/BRQ'
      *      |||\----- when 1, enables the output drivers of op40 to the rom data pins
      *      ||\------ controls 'CTL8'
      *      |\------- controls 'CTL9'
-     *      \-------- 10937 VFDC 'DATA' serial data /DDIS
+     *      \-------- 10937 VFDC 'DATA' serial data '/DDIS'
 
      * all writes to port 44 will reset the powerfail state
      */
@@ -373,12 +378,8 @@ WRITE8_MEMBER( digel804_state::op46 )
 #ifdef PORT46_W_VERBOSE
 	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
 #endif
-	 fprintf(stderr,"LEDS: ");
-	 if (data&0x80) fprintf(stderr,"INPUT "); else fprintf(stderr,"----- ");
-	 if (data&0x40) fprintf(stderr,"BUSY "); else fprintf(stderr,"---- ");
-	 if (data&0x20) fprintf(stderr,"ERROR "); else fprintf(stderr,"----- ");
-	 fprintf(stderr,"  function selected: ");
-	 if (data&0x10) fprintf(stderr,"none\n"); else fprintf(stderr,"%01X\n", ~data&0xF);
+	 popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
+	 //fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 }
 
 WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
@@ -437,10 +438,10 @@ WRITE8_MEMBER( digel804_state::acia_control_w )
 static ADDRESS_MAP_START(z80_mem_804_1_4, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // 3f in mapper = rom J3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM L3 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM M3 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM N3 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM O3 (6164)
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
 	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
@@ -450,16 +451,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom J3
-	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom K3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM L3 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM M3 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM N3 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM O3 (6164)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom D41
+	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom D42
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
 	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM D47 (6116)
 	// d800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
 
@@ -523,7 +524,7 @@ static INPUT_PORTS_START( digel804 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
 
-	PORT_START("MODE") // TODO
+	PORT_START("MODE") // TODO, connects entirely separately from the keypad through some complicated latching logic
 	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -543,7 +544,7 @@ static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1: 3.686Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -564,7 +565,7 @@ MACHINE_CONFIG_END
 /* TODO: make this copy the digel804 machine config and modify the program map! */
 static MACHINE_CONFIG_START( ep804, digel804_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80, X1: 3.686Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -589,7 +590,7 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 /*
-For the mapper PROM:
+For the 82S23A/MMI6330-equivalent mapper PROM at D30:
 
 z80 a11 -> prom a0
 z80 a12 -> prom a1
@@ -597,25 +598,48 @@ z80 a13 -> prom a2
 z80 a14 -> prom a3
 z80 a15 -> prom a4
 
-prom d0 -> ram 6116 at p6
-prom d1 -> ram 6164 at o6
-prom d2 -> ram 6164 at n6
-prom d3 -> ram 6164 at m6
-prom d4 -> ram 6164 at l6
-prom d5 -> rom at k6
-prom d6 -> rom at j6
-prom d7 -> N/C? (unused?)
+prom d0 -> ram 6116 /CE (pin 18?) at d47
+prom d1 -> ram 6116/64 /CE (pin 20) at d46
+prom d2 -> ram 6116/64 /CE (pin 20) at d45
+prom d3 -> ram 6116/64 /CE (pin 20) at d44
+prom d4 -> ram 6116/64 /CE (pin 20) at d43
+prom d5 -> rom /CE at d42
+prom d6 -> rom /CE at d41
+prom d7 -> N/C (unused)
+
+
+On the v2.0 804-0197B mainboard, the added connector X9 (for the ram expansion daughterboard)
+near to the mapper prom at D30 has the pinout:
+ ___
+|1 10
+|2 9|
+|3 8|
+|4 7|
+|5_6|
+
+1 -> pin 15 of CD74HC374E at D23 & eprom socket pin A6 (i.e. op41 bit 6)
+2 -> N/C
+3 -> ram 6116/64 /CE (pin 20) of D45 & mapper prom D2 (pin 3)
+4 -> ram 6116/64 /CE (pin 20) of D43 & mapper prom D4 (pin 5)
+5 -> CE2 (pin 26) of all four ram chips (D43 D44 D45 D46)
+6 -> +5v
+7 -> ram 6116/64 /CE (pin 20) of D44 & mapper prom D3 (pin 4)
+8 -> ram 6116/64 /CE (pin 20) of D46 & mapper prom D1 (pin 2)
+9 -> N/C
+10 -> mapper prom /CE (pin 15)
+
+If the ram expansion is not installed (i.e. only 32k of base ram on the mainboard), there is a jumper present between pins 5 and 6
 */
 
 ROM_START(digel804) // address mapper 804-1-4
 	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("1-04__76f1.27128.j6", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
+	ROM_LOAD("1-04__76f1.27128.d41", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
-	ROM_LOAD("2-04__d6cc.2764a.k6", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75))
+	ROM_LOAD("2-04__d6cc.2764a.d42", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75))
 	ROM_CONTINUE(0xd800, 0x800)
 	ROM_REGION(0x20, "proms", 0)
-	ROM_LOAD("804-1-4.82s23a.j5", 0x0000, 0x0020, CRC(f961beb1) SHA1(f2ec89375e656eeabc30246d42741cf718fb0f91)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
+	ROM_LOAD("804-1-4.82s23a.d30", 0x0000, 0x0020, CRC(f961beb1) SHA1(f2ec89375e656eeabc30246d42741cf718fb0f91)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
 ROM_START(ep804) // address mapper 804-1-2
@@ -623,17 +647,17 @@ ROM_START(ep804) // address mapper 804-1-2
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
-	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.j6", 0x0000, 0x2000, CRC(2D4C334C) SHA1(1BE70ED5F4F315A8D2E38A17327A049E00FA174E), ROM_BIOS(1))
-	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.k6", 0x2000, 0x2000, CRC(9C14906B) SHA1(41996039E604011C7C0F757397F82B6479EE3F62), ROM_BIOS(1))
+	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2D4C334C) SHA1(1BE70ED5F4F315A8D2E38A17327A049E00FA174E), ROM_BIOS(1))
+	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9C14906B) SHA1(41996039E604011C7C0F757397F82B6479EE3F62), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "ep804_v1.4", "Wavetek/Digelec EP804 FWv1.4") // hardware 1.1
-	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.j6", 0x0000, 0x2000, CRC(FDC0D2E3) SHA1(DA1BC1E8C4CB2A2D8CD2273F3E1A9F318AE8CB87), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.k6", 0x2000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.k6", 0x3000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2)) // load this twice
+	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(FDC0D2E3) SHA1(DA1BC1E8C4CB2A2D8CD2273F3E1A9F318AE8CB87), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2)) // load this twice
 	ROM_SYSTEM_BIOS( 2, "ep804_v2.21", "Wavetek/Digelec EP804 FWv2.21") // hardware 1.5 NOTE: this may use the address mapper 804-1-3 which is not dumped!
-	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.j6", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(3))
-	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.k6", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(3))
+	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(3))
+	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(3))
 	ROM_REGION(0x20, "proms", 0)
-	ROM_LOAD("804-1-2.mmi_6330-in.j5", 0x0000, 0x0020, CRC(30DD4721) SHA1(E4B2F5756118BE4C8AB56C708DC4F42469C7E51B)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
+	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30DD4721) SHA1(E4B2F5756118BE4C8AB56C708DC4F42469C7E51B)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
 
