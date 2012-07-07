@@ -56,6 +56,7 @@ Notes:
 
     TODO:
 
+    - move expansion cards to slot interface
     - second VP580 keypad
 
     - VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
@@ -673,6 +674,29 @@ static const cassette_interface vip_cassette_interface =
 	NULL
 };
 
+static VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
+{
+    DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( vip_byteio_cards )
+SLOT_INTERFACE_END
+
+static VIP_EXPANSION_INTERFACE( expansion_intf )
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( vip_expansion_cards )
+    // VP550
+    // VP551
+    // VP590
+    // VP595
+    // VP585
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( vip, vip_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_52128MHz/2)
@@ -696,6 +720,9 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(vip)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+    MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, byteio_intf, vip_byteio_cards, NULL, NULL)
+    MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, expansion_intf, vip_expansion_cards, NULL, NULL)
 
 	MCFG_VP595_ADD()
 	MCFG_VP550_ADD(XTAL_3_52128MHz/2)

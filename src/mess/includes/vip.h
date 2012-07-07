@@ -16,6 +16,8 @@
 #include "video/cdp1862.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
+#include "machine/vip_byteio.h"
+#include "machine/vip_exp.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"u1"
@@ -68,6 +70,8 @@ public:
 		  m_vp595(*this, VP595_TAG),
 		  m_vp550(*this, VP550_TAG),
 		  m_vp551(*this, VP551_TAG),
+		  m_byteio(*this, VIP_BYTEIO_PORT_TAG),
+		  m_exp(*this, VIP_EXPANSION_SLOT_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
 
@@ -79,6 +83,8 @@ public:
 	required_device<vp595_device> m_vp595;
 	required_device<vp550_device> m_vp550;
 	required_device<vp550_device> m_vp551;
+	required_device<vip_byteio_port_device> m_byteio;
+	required_device<vip_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();

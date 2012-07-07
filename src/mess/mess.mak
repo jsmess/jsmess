@@ -1485,6 +1485,8 @@ $(MESSOBJ)/rca.a:				\
 	$(MESS_DRIVERS)/studio2.o	\
 	$(MESS_FORMATS)/studio2_st2.o	\
 	$(MESS_DRIVERS)/vip.o		\
+	$(MESS_MACHINE)/vip_byteio.o	\
+	$(MESS_MACHINE)/vip_exp.o	\
 	$(MESS_AUDIO)/vp550.o		\
 	$(MESS_AUDIO)/vp595.o		\
 

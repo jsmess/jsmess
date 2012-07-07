@@ -4,8 +4,13 @@
 <softwarelist name="vip" description="RCA VIP tape images">
 
 	<software name="fpbasic">
+		<!--
+		VP701 FLOATING POINT BASIC VER 2.2
+		1-PAGE BOOTSTRAP         'B'-BASIC
+		COPYRIGHT 1980            RCA CORP
+		-->
 		<description>Floating Point BASIC</description>
-		<year>197?</year>
+		<year>1980</year>
 		<publisher>RCA</publisher>
 
 		<part name="cass1" interface="vip_cass">
