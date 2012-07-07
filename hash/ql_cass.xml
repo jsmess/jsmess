@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ql" description="Sinclair QL Microdrive images">
+<softwarelist name="ql_cass" description="Sinclair QL Microdrive images">
 
 	<software name="abacus">
 		<description>Abacus</description>
