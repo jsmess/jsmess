@@ -3,59 +3,24 @@
 #ifndef __VIP__
 #define __VIP__
 
-
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "audio/vp550.h"
-#include "audio/vp595.h"
-#include "sound/cdp1863.h"
-#include "sound/discrete.h"
-#include "video/cdp1861.h"
-#include "video/cdp1862.h"
-#include "machine/rescap.h"
 #include "machine/ram.h"
 #include "machine/vip_byteio.h"
 #include "machine/vip_exp.h"
+#include "machine/vp550.h"
+#include "machine/vp590.h"
+#include "machine/vp595.h"
+#include "sound/discrete.h"
+#include "video/cdp1861.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"u1"
 #define CDP1861_TAG		"u2"
-#define CDP1862_TAG		"cdp1862"
 #define DISCRETE_TAG	"discrete"
 
-#define VP590_COLOR_RAM_SIZE	0x100
-
-enum
-{
-	VIDEO_CDP1861 = 0,
-	VIDEO_CDP1862
-};
-
-enum
-{
-	SOUND_SPEAKER = 0,
-	SOUND_VP595,
-	SOUND_VP550,
-	SOUND_VP551
-};
-
-enum
-{
-	KEYBOARD_KEYPAD = 0,
-	KEYBOARD_VP580,
-	KEYBOARD_DUAL_VP580,
-	KEYBOARD_VP601,
-	KEYBOARD_VP611
-};
-
-enum
-{
-	LED_POWER = 0,
-	LED_Q,
-	LED_TAPE
-};
 
 class vip_state : public driver_device
 {
@@ -64,25 +29,29 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vdc(*this, CDP1861_TAG),
-		  m_cgc(*this, CDP1862_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_beeper(*this, DISCRETE_TAG),
-		  m_vp595(*this, VP595_TAG),
-		  m_vp550(*this, VP550_TAG),
-		  m_vp551(*this, VP551_TAG),
 		  m_byteio(*this, VIP_BYTEIO_PORT_TAG),
 		  m_exp(*this, VIP_EXPANSION_SLOT_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_8000(1),
+		  m_vdc_int(CLEAR_LINE),
+		  m_vdc_dma_out(CLEAR_LINE),
+		  m_vdc_ef1(CLEAR_LINE),
+		  m_exp_int(CLEAR_LINE),
+		  m_exp_dma_out(CLEAR_LINE),
+		  m_exp_dma_in(CLEAR_LINE),
+		  m_byteio_ef3(CLEAR_LINE),
+		  m_byteio_ef4(CLEAR_LINE),
+		  m_exp_ef1(CLEAR_LINE),
+		  m_exp_ef3(CLEAR_LINE),
+		  m_exp_ef4(CLEAR_LINE)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
-	required_device<cdp1862_device> m_cgc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_beeper;
-	required_device<vp595_device> m_vp595;
-	required_device<vp550_device> m_vp550;
-	required_device<vp550_device> m_vp551;
 	required_device<vip_byteio_port_device> m_byteio;
 	required_device<vip_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
@@ -92,30 +61,55 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( dispoff_w );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_WRITE8_MEMBER( bkg_w );
-	DECLARE_WRITE8_MEMBER( colorram_w );
-	DECLARE_READ_LINE_MEMBER( rd_r );
-	DECLARE_READ_LINE_MEMBER( bd_r );
-	DECLARE_READ_LINE_MEMBER( gd_r );
+	void update_interrupts();
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+
 	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE8_MEMBER( dma_w );
+
+	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
+	DECLARE_WRITE_LINE_MEMBER( vdc_dma_out_w );
+	DECLARE_WRITE_LINE_MEMBER( vdc_ef1_w );
+
+	DECLARE_WRITE_LINE_MEMBER( byteio_inst_w );
+
+	DECLARE_WRITE_LINE_MEMBER( exp_int_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_out_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_in_w );
+
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
-	/* video state */
-	int m_a12;						/* latched address line 12 */
-	UINT8 *m_colorram;				/* CDP1862 color RAM */
-	UINT8 m_color;					/* color RAM data */
+	// memory state
+	int m_8000;
 
-	/* keyboard state */
-	int m_keylatch;					/* key latch */
+	// interrupt state
+	int m_vdc_int;
+	int m_vdc_dma_out;
+	int m_vdc_ef1;
+	int m_exp_int;
+	int m_exp_dma_out;
+	int m_exp_dma_in;
+	int m_byteio_ef3;
+	int m_byteio_ef4;
+	int m_exp_ef1;
+	int m_exp_ef3;
+	int m_exp_ef4;
+
+	// keyboard state
+	int m_keylatch;
+
+	// expansion state
+	UINT8 m_byteio_data;
 };
 
 #endif

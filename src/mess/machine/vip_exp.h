@@ -25,7 +25,7 @@
                       Q      16      T       BUS 5
                 _DMA-IN      17      U       BUS 6
                     RUN      18      V       BUS 7
-                  INDIS      19      W       _MRD
+                   MINH      19      W       _MRD
                   _CDEF      20      X       CS
                    +5 V      21      Y       +5 V
                     GND      22      Z       GND
@@ -92,19 +92,19 @@ public:
 	virtual ~vip_expansion_slot_device();
 
 	// computer interface
-	UINT8 program_r(address_space &space, offs_t offset, int cdef, int *indis);
-	void program_w(address_space &space, offs_t offset, UINT8 data, int cdef);
+	UINT8 program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
+	void program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
 	UINT8 io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, UINT8 data);
-	UINT8 dma_r(offs_t offset);
-	void dma_w(offs_t offset, UINT8 data);
+	UINT8 dma_r(address_space &space, offs_t offset);
+	void dma_w(address_space &space, offs_t offset, UINT8 data);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( sc0_w );
-	DECLARE_WRITE_LINE_MEMBER( sc1_w );
+	void sc_w(int data);
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE_LINE_MEMBER( run_w );
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( interrupt_w );
@@ -137,8 +137,8 @@ public:
 
 protected:
 	// runtime
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cdef, int *indis) { return 0; };
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef) { };
+	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) { return 0; };
+	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) { };
 
 	virtual UINT8 vip_io_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) { };
@@ -148,14 +148,15 @@ protected:
 
 	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 
-	virtual int vip_ef1_r() { return 1; }
-	virtual int vip_ef3_r() { return 1; }
-	virtual int vip_ef4_r() { return 1; }
+	virtual int vip_ef1_r() { return CLEAR_LINE; }
+	virtual int vip_ef3_r() { return CLEAR_LINE; }
+	virtual int vip_ef4_r() { return CLEAR_LINE; }
 
-	virtual void vip_sc0_w(int state) { };
-	virtual void vip_sc1_w(int state) { };
+	virtual void vip_sc_w(int data) { };
 
 	virtual void vip_q_w(int state) { };
+
+	virtual void vip_run_w(int state) { };
 
 	vip_expansion_slot_device *m_slot;
 };

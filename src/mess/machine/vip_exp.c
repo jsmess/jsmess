@@ -120,13 +120,13 @@ void vip_expansion_slot_device::device_start()
 //  program_r - program read
 //-------------------------------------------------
 
-UINT8 vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cdef, int *indis)
+UINT8 vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
 {
 	UINT8 data = 0;
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->vip_program_r(space, offset, cdef, indis);
+		data = m_cart->vip_program_r(space, offset, cs, cdef, minh);
 	}
 
 	return data;
@@ -137,11 +137,71 @@ UINT8 vip_expansion_slot_device::program_r(address_space &space, offs_t offset, 
 //  program_w - program write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, UINT8 data, int cdef)
+void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
 {
 	if (m_cart != NULL)
 	{
-		m_cart->vip_program_w(space, offset, data, cdef);
+		m_cart->vip_program_w(space, offset, data, cdef, minh);
+	}
+}
+
+
+//-------------------------------------------------
+//  io_r - io read
+//-------------------------------------------------
+
+UINT8 vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
+{
+	UINT8 data = 0;
+
+	if (m_cart != NULL)
+	{
+		data = m_cart->vip_io_r(space, offset);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  io_w - io write
+//-------------------------------------------------
+
+void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 data)
+{
+	if (m_cart != NULL)
+	{
+		m_cart->vip_io_w(space, offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  dma_r - dma read
+//-------------------------------------------------
+
+UINT8 vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
+{
+	UINT8 data = 0;
+
+	if (m_cart != NULL)
+	{
+		data = m_cart->vip_dma_r(space, offset);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  dma_w - dma write
+//-------------------------------------------------
+
+void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, UINT8 data)
+{
+	if (m_cart != NULL)
+	{
+		m_cart->vip_dma_w(space, offset, data);
 	}
 }
 
@@ -162,12 +222,12 @@ UINT32 vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_in
 	return value;
 }
 
-READ_LINE_MEMBER( vip_expansion_slot_device::ef1_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vip_ef1_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef3_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vip_ef3_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef4_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vip_ef4_r(); return state; }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::sc0_w ) { if (m_cart != NULL) m_cart->vip_sc0_w(state); }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::sc1_w ) { if (m_cart != NULL) m_cart->vip_sc1_w(state); }
+READ_LINE_MEMBER( vip_expansion_slot_device::ef1_r ) { int state = CLEAR_LINE; if (m_cart != NULL) state = m_cart->vip_ef1_r(); return state; }
+READ_LINE_MEMBER( vip_expansion_slot_device::ef3_r ) { int state = CLEAR_LINE; if (m_cart != NULL) state = m_cart->vip_ef3_r(); return state; }
+READ_LINE_MEMBER( vip_expansion_slot_device::ef4_r ) { int state = CLEAR_LINE; if (m_cart != NULL) state = m_cart->vip_ef4_r(); return state; }
+void vip_expansion_slot_device::sc_w(int data) { if (m_cart != NULL) m_cart->vip_sc_w(data); }
 WRITE_LINE_MEMBER( vip_expansion_slot_device::q_w ) { if (m_cart != NULL) m_cart->vip_q_w(state); }
+WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_cart != NULL) m_cart->vip_run_w(state); }
 
 WRITE_LINE_MEMBER( vip_expansion_slot_device::interrupt_w ) { m_out_interrupt_func(state); }
 WRITE_LINE_MEMBER( vip_expansion_slot_device::dma_out_w ) { m_out_dma_out_func(state); }

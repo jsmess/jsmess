@@ -90,8 +90,8 @@ public:
 	virtual ~vip_byteio_port_device();
 
 	// computer interface
-	DECLARE_READ8_MEMBER( in_r );
-	DECLARE_WRITE8_MEMBER( out_w );
+	UINT8 in_r();
+	void out_w(UINT8 data);
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
@@ -121,11 +121,11 @@ public:
 	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vip_byteio_port_interface();
 
-	virtual UINT8 vip_in_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void vip_out_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual UINT8 vip_in_r() { return 0xff; };
+	virtual void vip_out_w(UINT8 data) { };
 
-	virtual int vip_ef3_r() { return 1; }
-	virtual int vip_ef4_r() { return 1; }
+	virtual int vip_ef3_r() { return CLEAR_LINE; }
+	virtual int vip_ef4_r() { return CLEAR_LINE; }
 
 	virtual void vip_q_w(int state) { };
 
