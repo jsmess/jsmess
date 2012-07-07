@@ -2587,14 +2587,24 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<!-- This is the export version -->
 	<software name="basic3">
-		<description>BASIC Level 3 (Euro?)</description>
+		<description>BASIC Level III (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="basic3.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
+				<rom name="basic3.bin" size="32768" crc="a46e3c73" sha1="b1a8585a9afff962e8fd0e79b3305199da4e4562" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic3e" cloneof="basic3">
+		<description>BASIC Level III (Export)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic3e.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
