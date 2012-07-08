@@ -11,6 +11,7 @@
 #include "machine/vip_byteio.h"
 #include "machine/vip_exp.h"
 #include "machine/vp550.h"
+#include "machine/vp585.h"
 #include "machine/vp590.h"
 #include "machine/vp595.h"
 #include "sound/discrete.h"
@@ -51,7 +52,7 @@ public:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_beeper;
+	required_device<discrete_sound_device> m_beeper;
 	required_device<vip_byteio_port_device> m_byteio;
 	required_device<vip_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
@@ -88,6 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_in_w );
 
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
+	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
 
 	// memory state
 	int m_8000;

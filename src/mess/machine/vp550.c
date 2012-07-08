@@ -11,7 +11,6 @@
 
 	TODO:
 
-	- volume control
 	- VP551
 
 */
@@ -53,10 +52,10 @@ static MACHINE_CONFIG_FRAGMENT( vp550 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -218,6 +217,10 @@ WRITE8_MEMBER( vp550_device::octave_w )
 WRITE8_MEMBER( vp550_device::vlmna_w )
 {
 	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
+
+	float gain = (data & 0x0f) * 0.0666;
+
+	m_pfg_a->set_output_gain(0, gain);
 }
 
 
@@ -228,6 +231,10 @@ WRITE8_MEMBER( vp550_device::vlmna_w )
 WRITE8_MEMBER( vp550_device::vlmnb_w )
 {
 	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
+
+	float gain = (data & 0x0f) * 0.0666;
+
+	m_pfg_b->set_output_gain(0, gain);
 }
 
 
