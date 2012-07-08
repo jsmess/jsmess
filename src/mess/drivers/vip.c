@@ -317,6 +317,11 @@ READ8_MEMBER( vip_state::io_r )
         break;
     }
 
+    if (BIT(offset, 2))
+    {
+        m_8000 = 0;
+    }
+
     return data;
 }
 
@@ -343,10 +348,11 @@ WRITE8_MEMBER( vip_state::io_w )
     case 3:
         m_byteio->out_w(data);
         break;
+    }
 
-    case 4:
+    if (BIT(offset, 2))
+    {
         m_8000 = 0;
-        break;
     }
 }
 
@@ -703,7 +709,8 @@ void vip_state::machine_reset()
 
 static QUICKLOAD_LOAD( vip )
 {
-	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
+    vip_state *state = image.device().machine().driver_data<vip_state>();
+    UINT8 *ram = state->m_ram->pointer();
 	UINT8 *chip8_ptr = NULL;
 	int chip8_size = 0;
 	int size = image.length();
@@ -729,11 +736,11 @@ static QUICKLOAD_LOAD( vip )
 	if (chip8_size > 0)
 	{
 		/* copy CHIP-8 interpreter to RAM */
-		memcpy(ptr, chip8_ptr, chip8_size);
+		memcpy(ram, chip8_ptr, chip8_size);
 	}
 
 	/* load image to RAM */
-	image.fread(ptr + chip8_size, size);
+	image.fread(ram + chip8_size, size);
 
 	return IMAGE_INIT_PASS;
 }
