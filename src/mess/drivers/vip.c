@@ -56,6 +56,9 @@ Notes:
 
     TODO:
 
+    - cassette loading
+    - 20K RAM for Floating Point BASIC
+    - VP-111 has 1K RAM, no byte I/O, no expansion
     - VP-551 Super Sound Board (4 channel sound)
     - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
     - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
@@ -599,6 +602,8 @@ static const cassette_interface vip_cassette_interface =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( vip_byteio_cards )
+    // VP576
+    // VP620
 SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
@@ -622,6 +627,12 @@ static VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 static SLOT_INTERFACE_START( vip_expansion_cards )
     SLOT_INTERFACE("vp550", VP550)
     // VP551
+    // VP560
+    // VP565
+    // VP570
+    // VP575
+    // VP576
+    // VP700
     SLOT_INTERFACE("vp585", VP585)
     SLOT_INTERFACE("vp590", VP590)
     SLOT_INTERFACE("vp595", VP595)
