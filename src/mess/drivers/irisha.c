@@ -7,12 +7,6 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/i8251.h"
 #include "includes/irisha.h"
 
 /* Address maps */
@@ -183,6 +177,11 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */
