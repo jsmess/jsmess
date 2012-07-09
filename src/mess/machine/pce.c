@@ -1362,6 +1362,8 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 				/* bit 3 - ?? irq */
 				/* bit 2 - ?? irq */
 		pce_cd.scsi_ACK = data & 0x80;
+		/* Update register now otherwise it won't catch the irq enable/disable change */
+		pce_cd.regs[0x02] = data;
 		/* Don't set or reset any irq lines, but just verify the current state */
 		pce_cd_set_irq_line( machine(), 0, 0 );
 		break;
