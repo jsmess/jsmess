@@ -8,10 +8,37 @@
       * http://www.pofo.de/P8000/notes/books/
       * http://www.pofo.de/P8000/
 
+    P8000 memory layout
+      * divided into 3 banks of 64k
+      * bank A is for roms, only 0000-1FFF is populated
+      * bank B is for static ram, only 2000-2FFF exists
+      * bank C is for dynamic ram, all 64k is available.
+      * selection is done with OUT(c), code
+      * code = 0 for do nothing; 1 = bank A; 2 = bank B; 4 = bank C.
+      * Reg C = 0; Reg B = start address of memory that is being switched,
+        for example B = 20 indicates "bank2" in memory map, and also the
+        corresponding address in bank A/B/C.
+
+    P8000 monitor commands
+      * B : ?
+      * D : display and modify memory
+      * F : fill memory
+      * G : go to
+      * M : move (copy) memory
+      * N : dump registers
+      * O : boot from floppy
+      * P : ?
+      * Q : ?
+      * R : dump registers
+      * S : boot from floppy
+      * T : jump to ROM at CEF0
+      * X : jump to ROM at DB00
+      * return : boot from floppy disk
+
     TODO:
-      * add Z8001 core so that we can handle the 16bit IO Map (Z8000 uses a
-        8bit IO Map, and hence I commented out the whole map)
       * properly implement Z80 daisy chain in 16 bit board
+      * Find out how to enter hardware check on 16 bit board
+      * hook the sio back up when it becomes usable
 
 
 ****************************************************************************/
@@ -37,8 +64,7 @@ public:
 	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
-	m_p_ram(*this, "p_ram") { }
+	m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
@@ -47,13 +73,17 @@ public:
 	DECLARE_READ16_MEMBER(portff82_r);
 	DECLARE_WRITE16_MEMBER(portff82_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE8_MEMBER(kbd_put_16);
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
-	optional_device<generic_terminal_device> m_terminal;
-	optional_shared_ptr<UINT8> m_p_ram;
+	required_device<generic_terminal_device> m_terminal;
 };
 
+/***************************************************************************
 
+    P8000 8bit
+
+****************************************************************************/
 
 static ADDRESS_MAP_START(p8k_memmap, AS_PROGRAM, 8, p8k_state)
 	AM_RANGE(0x0000, 0x0FFF) AM_RAMBANK("bank0")
@@ -90,11 +120,6 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
 
 
 READ8_MEMBER( p8k_state::p8k_port0_r )
@@ -102,8 +127,7 @@ READ8_MEMBER( p8k_state::p8k_port0_r )
 	return 0;
 }
 
-// data controls what kind of memory is chosen 0=do nothing; 1=rom; 2=sram; 4=dram
-// highest 4 bits of offset control which bank is being modified
+// see memory explanation above
 WRITE8_MEMBER( p8k_state::p8k_port0_w )
 {
 	UINT8 breg = cpu_get_reg(m_maincpu, Z80_B) >> 4;
@@ -147,150 +171,23 @@ WRITE8_MEMBER( p8k_state::p8k_port24_w )
 WRITE8_MEMBER( p8k_state::kbd_put )
 {
 	m_term_data = data;
+	// This is a dreadful hack..
+	// simulate interrupt by saving current pc on
+	// the stack and jumping to interrupt handler.
+	UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
+	UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+	spreg--;
+	space.write_byte(spreg, pcreg >> 8);
+	spreg--;
+	space.write_byte(spreg, pcreg);
+	cpu_set_reg(m_maincpu, Z80_SP, spreg);
+	cpu_set_reg(m_maincpu, Z80_PC, 0x078A);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(p8k_state, kbd_put)
 };
-
-
-//#if 0 // we need a real Z8001 CPU core for the 16 bit IO map
-// TODO: could any of the following be implemented through a DEVREADWRITE8 + suitable mask?
-
-static READ16_DEVICE_HANDLER( p8k_16_sio_r )
-{
-	switch (offset & 0x06)
-	{
-	case 0x00:
-		return (UINT16)z80sio_d_r(device, 0);
-	case 0x02:
-		return (UINT16)z80sio_d_r(device, 1);
-	case 0x04:
-		return (UINT16)z80sio_c_r(device, 0);
-	case 0x06:
-		return (UINT16)z80sio_c_r(device, 1);
-	}
-
-	return 0;
-}
-
-static WRITE16_DEVICE_HANDLER( p8k_16_sio_w )
-{
-	data &= 0xff;
-
-	switch (offset & 0x06)
-	{
-	case 0x00:
-		z80sio_d_w(device, 0, (UINT8)data);
-		break;
-	case 0x02:
-		z80sio_d_w(device, 1, (UINT8)data);
-		break;
-	case 0x04:
-		z80sio_c_w(device, 0, (UINT8)data);
-		break;
-	case 0x06:
-		z80sio_c_w(device, 1, (UINT8)data);
-		break;
-	}
-}
-
-static READ16_DEVICE_HANDLER( p8k_16_pio_r )
-{
-	return 0; //(UINT16)z80pio_r(device, (offset & 0x06) >> 1);
-}
-
-static WRITE16_DEVICE_HANDLER( p8k_16_pio_w )
-{
-	//z80pio_w(device, (offset & 0x06) >> 1, (UINT8)(data & 0xff));
-}
-
-static READ16_DEVICE_HANDLER( p8k_16_ctc_r )
-{
-	return (UINT16)z80ctc_r(device, (offset & 0x06) >> 1);
-}
-
-static WRITE16_DEVICE_HANDLER( p8k_16_ctc_w )
-{
-	z80ctc_w(device, (offset & 0x06) >> 1, (UINT8)(data & 0xff));
-}
-
-READ16_MEMBER( p8k_state::portff82_r )
-{
-	if (offset == 3) // FF87
-		return 0xff;
-	return 0;
-}
-
-WRITE16_MEMBER( p8k_state::portff82_w )
-{
-	if (offset == 1) // FF83
-		m_terminal->write(space, 0, data);
-}
-
-
-static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
-//  AM_RANGE(0x0fef0, 0x0feff) // clock
-	//AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE_LEGACY("z80sio_0", p8k_16_sio_r, p8k_16_sio_w)
-	AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(portff82_r,portff82_w)
-	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE_LEGACY("z80sio_1", p8k_16_sio_r, p8k_16_sio_w)
-	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE_LEGACY("z80pio_0", p8k_16_pio_r, p8k_16_pio_w)
-	AM_RANGE(0x0ff98, 0x0ff9f) AM_DEVREADWRITE_LEGACY("z80pio_1", p8k_16_pio_r, p8k_16_pio_w)
-	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE_LEGACY("z80pio_2", p8k_16_pio_r, p8k_16_pio_w)
-	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE_LEGACY("z80ctc_0", p8k_16_ctc_r, p8k_16_ctc_w)
-	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE_LEGACY("z80ctc_1", p8k_16_ctc_r, p8k_16_ctc_w)
-//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
-//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
-//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
-//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
-//  AM_RANGE(0x0ffe0, 0x0ffe1) // RETI
-//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
-//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
-ADDRESS_MAP_END
-
-//#endif
-
-
-/* Input ports */
-static INPUT_PORTS_START( p8k )
-	PORT_START("DSW")
-	PORT_BIT( 0x7f, 0x7f, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, "Hardware Test")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x80, DEF_STR(On))
-INPUT_PORTS_END
-
-
-static MACHINE_RESET( p8k )
-{
-	p8k_state *state = machine.driver_data<p8k_state>();
-	state->membank("bank0")->set_entry(0);
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->set_entry(0);
-	state->membank("bank3")->set_entry(0);
-	state->membank("bank4")->set_entry(0);
-	state->membank("bank5")->set_entry(0);
-	state->membank("bank6")->set_entry(0);
-	state->membank("bank7")->set_entry(0);
-	state->membank("bank8")->set_entry(0);
-	state->membank("bank9")->set_entry(0);
-	state->membank("bank10")->set_entry(0);
-	state->membank("bank11")->set_entry(0);
-	state->membank("bank12")->set_entry(0);
-	state->membank("bank13")->set_entry(0);
-	state->membank("bank14")->set_entry(0);
-	state->membank("bank15")->set_entry(0);
-}
-
-static MACHINE_RESET( p8k_16 )
-{
-	//p8k_state *state = machine.driver_data<p8k_state>();
-	// copy the roms into ram
-	//UINT8* ROM = state->memregion("maincpu")->base();
-	//memcpy(state->m_p_ram, ROM, 0x2000);
-}
-
 
 
 /***************************************************************************
@@ -478,6 +375,187 @@ static const floppy_interface p8k_floppy_interface =
 	NULL
 };
 
+/* Input ports */
+static INPUT_PORTS_START( p8k )
+	PORT_START("DSW")
+	PORT_BIT( 0x7f, 0x7f, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x00, "Hardware Test")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x80, DEF_STR(On))
+INPUT_PORTS_END
+
+
+static MACHINE_RESET( p8k )
+{
+	p8k_state *state = machine.driver_data<p8k_state>();
+	state->membank("bank0")->set_entry(0);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->set_entry(0);
+	state->membank("bank3")->set_entry(0);
+	state->membank("bank4")->set_entry(0);
+	state->membank("bank5")->set_entry(0);
+	state->membank("bank6")->set_entry(0);
+	state->membank("bank7")->set_entry(0);
+	state->membank("bank8")->set_entry(0);
+	state->membank("bank9")->set_entry(0);
+	state->membank("bank10")->set_entry(0);
+	state->membank("bank11")->set_entry(0);
+	state->membank("bank12")->set_entry(0);
+	state->membank("bank13")->set_entry(0);
+	state->membank("bank14")->set_entry(0);
+	state->membank("bank15")->set_entry(0);
+}
+
+static DRIVER_INIT( p8k )
+{
+	p8k_state *state = machine.driver_data<p8k_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank3")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank4")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank5")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank6")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank7")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank8")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank9")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank10")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank11")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank12")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank13")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank14")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	state->membank("bank15")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+}
+
+
+/***************************************************************************
+
+    P8000 16bit
+
+****************************************************************************/
+
+WRITE8_MEMBER( p8k_state::kbd_put_16 )
+{
+	// keyboard int handler is at 0x0700
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf_16 )
+{
+	DEVCB_DRIVER_MEMBER(p8k_state, kbd_put_16)
+};
+
+
+
+
+static MACHINE_RESET( p8k_16 )
+{
+}
+
+// TODO: all of this needs upgrading to current standards
+
+static READ16_DEVICE_HANDLER( p8k_16_sio_r )
+{
+	switch (offset & 0x06)
+	{
+	case 0x00:
+		return (UINT16)z80sio_d_r(device, 0);
+	case 0x02:
+		return (UINT16)z80sio_d_r(device, 1);
+	case 0x04:
+		return (UINT16)z80sio_c_r(device, 0);
+	case 0x06:
+		return (UINT16)z80sio_c_r(device, 1);
+	}
+
+	return 0;
+}
+
+static WRITE16_DEVICE_HANDLER( p8k_16_sio_w )
+{
+	data &= 0xff;
+
+	switch (offset & 0x06)
+	{
+	case 0x00:
+		z80sio_d_w(device, 0, (UINT8)data);
+		break;
+	case 0x02:
+		z80sio_d_w(device, 1, (UINT8)data);
+		break;
+	case 0x04:
+		z80sio_c_w(device, 0, (UINT8)data);
+		break;
+	case 0x06:
+		z80sio_c_w(device, 1, (UINT8)data);
+		break;
+	}
+}
+
+static READ16_DEVICE_HANDLER( p8k_16_pio_r )
+{
+	return 0; //(UINT16)z80pio_r(device, (offset & 0x06) >> 1);
+}
+
+static WRITE16_DEVICE_HANDLER( p8k_16_pio_w )
+{
+	//z80pio_w(device, (offset & 0x06) >> 1, (UINT8)(data & 0xff));
+}
+
+static READ16_DEVICE_HANDLER( p8k_16_ctc_r )
+{
+	return (UINT16)z80ctc_r(device, (offset & 0x06) >> 1);
+}
+
+static WRITE16_DEVICE_HANDLER( p8k_16_ctc_w )
+{
+	z80ctc_w(device, (offset & 0x06) >> 1, (UINT8)(data & 0xff));
+}
+
+READ16_MEMBER( p8k_state::portff82_r )
+{
+	if (offset == 3) // FF87
+		return 0xff;
+	else
+	if (offset == 1) // FF83
+		return m_term_data;
+	return 0;
+}
+
+WRITE16_MEMBER( p8k_state::portff82_w )
+{
+	if (offset == 1) // FF83
+		m_terminal->write(space, 0, data);
+}
+
+static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
+	AM_RANGE(0x00000, 0x03fff) AM_ROM
+	AM_RANGE(0x04000, 0x07fff) AM_RAM
+	AM_RANGE(0x08000, 0xfffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
+//  AM_RANGE(0x0fef0, 0x0feff) // clock
+	//AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE_LEGACY("z80sio_0", p8k_16_sio_r, p8k_16_sio_w)
+	AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(portff82_r,portff82_w)
+	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE_LEGACY("z80sio_1", p8k_16_sio_r, p8k_16_sio_w)
+	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE_LEGACY("z80pio_0", p8k_16_pio_r, p8k_16_pio_w)
+	AM_RANGE(0x0ff98, 0x0ff9f) AM_DEVREADWRITE_LEGACY("z80pio_1", p8k_16_pio_r, p8k_16_pio_w)
+	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE_LEGACY("z80pio_2", p8k_16_pio_r, p8k_16_pio_w)
+	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE_LEGACY("z80ctc_0", p8k_16_ctc_r, p8k_16_ctc_w)
+	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE_LEGACY("z80ctc_1", p8k_16_ctc_r, p8k_16_ctc_w)
+//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
+//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
+//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
+//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
+//  AM_RANGE(0x0ffe0, 0x0ffe1) // RETI
+//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
+//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
+ADDRESS_MAP_END
+
+
 /***************************************************************************
 
     P8000 16bit Peripherals
@@ -598,27 +676,6 @@ static const z80_daisy_config p8k_16_daisy_chain[] =
 	{ NULL }
 };
 
-static DRIVER_INIT( p8k )
-{
-	p8k_state *state = machine.driver_data<p8k_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank3")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank4")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank5")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank6")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank7")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank8")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank9")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank10")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank11")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank12")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank13")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank14")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank15")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-}
 
 
 /* F4 Character Displayer */
@@ -678,7 +735,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
+	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )
 	MCFG_CPU_CONFIG(p8k_16_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
 	MCFG_CPU_IO_MAP(p8k_16_iomap)
@@ -699,7 +756,7 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf_16)
 MACHINE_CONFIG_END
 
 /* ROM definition */
