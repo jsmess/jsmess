@@ -288,10 +288,13 @@ MACHINE_RESET( mess_pce )
 	pce_cd.adpcm_write_buf = 0;
 
 	// TODO: add CD-DA stop command here
+	//pce_cd.cdda_status = PCE_CD_CDDA_OFF;
+	//cdda_stop_audio( machine.device( "cdda" ) );
 
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
 	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
+	pce_cd.msm_idle = 1;
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
        We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
