@@ -35,6 +35,8 @@
       * X : jump to ROM at DB00
       * return : boot from floppy disk
 
+    P8000_16 : All input must be in uppercase.
+
     TODO:
       * properly implement Z80 daisy chain in 16 bit board
       * Find out how to enter hardware check on 16 bit board
@@ -439,6 +441,11 @@ WRITE8_MEMBER( p8k_state::kbd_put_16 )
 {
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
+	// This is another dire hack..
+	UINT8 offs = space.read_byte(0x43a5);
+	UINT16 addr = 0x41b0 + (UINT16) offs;
+	space.write_byte(addr, data);
+	space.write_byte(0x43a0, 1);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf_16 )
