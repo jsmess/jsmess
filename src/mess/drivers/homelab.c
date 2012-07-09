@@ -117,36 +117,32 @@ WRITE8_MEMBER( homelab_state::cass_w )
 
 MACHINE_RESET( homelab3 )
 {
-	//homelab_state *state = machine.driver_data<homelab_state>();
-	//state->m_nmi = true;
+
 }
 
 MACHINE_RESET( brailab4 )
 {
 	homelab_state *state = machine.driver_data<homelab_state>();
-	//state->m_nmi = true;
 	state->membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER( homelab_state::port7f_w )
 {
-	//m_nmi = true;
+
 }
 
 WRITE8_MEMBER( homelab_state::portff_w )
 {
-	//m_nmi = false;
+
 }
 
 WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
 {
-	//m_nmi = true;
 	membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER( homelab_state::brailab4_portff_w )
 {
-	//m_nmi = false;
 	membank("bank1")->set_entry(1);
 }
 
