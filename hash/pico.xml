@@ -37,7 +37,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * パディントン のせかいりょこう  - Paddington no Sekai Ryokou (Sega - ???? - HPC-6029)
 * おんがくだいすきスヌーピー  - Ongaku Daisuki Snoopy (Sega - 1996xxxx - HPC-6030)
 * サンリオカーニバル たのしいカードづくり - Sanrio Carnival Tanoshii Card Dukuri (Sega - 19951130 - HPC-6031)
-* ＬＥＧＯ ＦＵＮ ＴＯ ＢＵＩＬＤ - LEGO Fun to Build (Sega - 199512xx - HPC-6032)
 * ゆかいな森のパケット - Yukai na Mori no Paketto (Sega - 199512xx - HPC-6034)
 * 怪盗セイント･テール セイントテールとワン･ツー･スリー! - Kaitou Saint Tail - Saint Tail to One, Two, Three! (Sega - ???? - HPC-6035)
 * バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
@@ -181,7 +180,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 学研のおべんきょうソフト かんじ - Gakken no Obenkyou Soft - Kanji (Gakken - ???? - T-169010)
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * 学研のおべんきょうソフト かけざん 九九 - Gakken no Obenkyou Soft - Kakezan Kuku (Gakken - ???? - T-169040)
-* 学研のおべんきょうソフト えいご ＡＢＣ - Gakken no Obenkyou Soft - Eigo ABC (Gakken - ???? - T-169060)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
 * 学研ピコで学習 １年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
@@ -237,7 +235,6 @@ Games for the MIXT BOOK PLAYER COPERA
 * コペラのタイムマシン - Copera no Time Machine (Yamaha - ???? - MMGS-3)
 * おっとカタチッチ - Otto Katachicchi (Yamaha - ???? - MMGS-4)
 * おうたのキャンバス - Outa no Kyanbasu (Yamaha - ???? - MMGS-5)
-* コペラのこのおとなあに - Copera no Kono Otonaani (Yamaha - 1994xxxx - MMGS-6)
 * マイクとあそぼう とびだせミルキーウェイ - Maiku to Asobou Tobidase Milky Way (Yamaha - 1994xxxx - MMGS-7)
 * おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
 * コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
@@ -383,6 +380,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="copekono">
+		<description>Copera no Kono Otonaani (Jpn)</description>
+		<year>1994</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-6"/>
+		<info name="alt_title" value="コペラのこのおとなあに"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="copera no kono otonaani (japan).bin" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="donaldts">
 		<description>Donald no Terebi Show (Jpn)</description>
 		<year>1995</year>
@@ -493,6 +503,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="gakken anpanman to chinou up! (japan).bin" size="2097152" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkeabc">
+		<description>Gakken no Obenkyou Soft - Eigo ABC (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169060"/>
+		<info name="alt_title" value="学研のおべんきょうソフト えいご ＡＢＣ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="gakken no obenkyou soft - eigo abc (japan).bin" size="1048576" crc="1259f360" sha1="82ffe0b0b6b0131f06e4f4cb6b535ee45559f0f4" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -703,6 +726,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="kuma no pooh-san christfer robin wo sagase (japan).bin" size="1048576" crc="40e2cdfc" sha1="14f757263f138cbe02e03c48748935224805edf1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legofun">
+		<description>Lego Fun to Build (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6032"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="ＬＥＧＯ ＦＵＮ ＴＯ ＢＵＩＬＤ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lego fun to build (japan).bin" size="1048576" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2565,17 +2602,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Kuma no Pooh-san - Tanoshii Tashizan - Hikizan (J).bin" size="????" crc="eda6b93c" sha1="5dc53a2b40bb3f11181862c819a9fd4d02e77d9c" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="legoblck">
-		<description>Lego Fun to Build - Block Asobi (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Lego Fun to Build - Block Asobi (J).bin" size="????" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
