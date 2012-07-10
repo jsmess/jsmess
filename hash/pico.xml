@@ -344,6 +344,18 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="berenstbs" cloneof="berenstb">
+		<description>Un Día en la Escuela con los Ositos Berenstain (Spa)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49036-06" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="un dia en la escuela con los ositos berenstain (spain).bin" size="1048576" crc="0ec21b68" sha1="06bb9053e3a9a6eb3e56475964ad4d745f92617f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="biroboka">
 		<description>Bi-Robo Kabutakku (Jpn)</description>
 		<year>1997</year>
@@ -455,6 +467,18 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ecco jr. et la chasse au tresor sous-marine! (france).bin" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrs" cloneof="eccojr">
+		<description>Ecco Jr. y la Gran Búsqueda del Tesoro en el Océano! (Spa)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-06" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. y la gran busqueda del tesoro en el oceano! (spain).bin" size="524288" crc="f11b9f3f" sha1="7b518e8c6b97cc68958084b65cbe3a74f34df914" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -590,6 +614,18 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="hucklowls" cloneof="hucklowl">
+		<description>Richard Scarry's - El Día Más Ajetreado de las Vidas de Felipe y Gusy (Spa)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49028-06" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="richard scarry's - el dia mas ajetreado de las vidas de felipe y gusy (spain).bin" size="1048576" crc="d529aacd" sha1="e65c808a51499c254ec24cbf9fb611a10e7505ff" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hkittymo">
 		<description>Hello Kitty no Machi he Odekake (Jpn)</description>
 		<year>1995</year>
@@ -678,6 +714,18 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="the lion king - adventures at pride rock (europe).bin" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" cloneof="lionking" supported="no">
+		<description>Las Aventuras del Rey León (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="49037-06"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="las aventuras del rey leon (spain).bin" size="1048576" crc="ca5534bc" sha1="f3eb0844b49329e2f522e595d887adee7171e88b"  offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1087,6 +1135,18 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tails et le faiseur de musique (france).bin" size="524288" crc="8cec50fa" sha1="3f1ec0e7e55c7b1c1e4577f516c24ab1068d77ef" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmms" cloneof="tailsmm">
+		<description>Tails y el Músico (Spa)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49023-06" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails y el musico (spain).bin" size="524288" crc="1281c3a4" sha1="832a77f8e6c59b8d0e3bbc606b6b93aa303857b6" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
