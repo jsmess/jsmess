@@ -67,6 +67,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 -->
 <softwarelist name="ibm5150" description="IBM PC/XT disk images">
 
+	<!-- Booter Games -->
 	<software name="3ktrivia">
 		<description>3-K Trivia</description>
 		<year>1984</year>
@@ -2312,5 +2313,100 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- Applications -->
 
+	<software name="croschex">
+		<description>Award Software's Cross-chex</description>
+		<year>198?</year>
+		<publisher>Award Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="389376">
+				<rom name="award software's cross-chex.dsk" size="389376" crc="2a6366b7" sha1="54249d55f0c1cfbecee5f034dc7080941579fd7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag202a">
+		<description>IBM System Diagnostics v 2.02 (Version A)</description>
+		<year>198?</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="67125">
+				<rom name="ibm system diagnostics v 2.02 (version a).td0" size="67125" crc="2825353e" sha1="593c807bab70d0c145034385d39ffd5ab2e544a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag202b">
+		<description>IBM System Diagnostics v 2.02 (Version B)</description>
+		<year>198?</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="67125">
+				<rom name="ibm system diagnostics v 2.02 (version b).td0" size="67125" crc="2607e65a" sha1="b50bc8746504ba2a08719814c63f2d7daece9795" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagn208">
+		<description>IBM System Diagnostics v 2.08</description>
+		<year>198?</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="115117">
+				<rom name="ibm system diagnostics v 2.08.td0" size="115117" crc="cc1c2688" sha1="be6b46c67523c6abbf56afa32a88d54ba9f2729c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagpc4i">
+		<description>NRC PC4I System Diagnostics Disk</description>
+		<year>198?</year>
+		<publisher>NCR</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47656">
+				<rom name="ncr pc4i system diagnostics disk.td0" size="47656" crc="a0e9d9fe" sha1="dd27bb2ab23d0148c5abb61b676287ce5adf47b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagncra">
+		<description>NCR System Diagnostics AT Class</description>
+		<year>198?</year>
+		<publisher>NCR</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="284775">
+				<rom name="ncr system diagnostics at class.td0" size="284775" crc="e73601ed" sha1="f253bb8ea508c98b88dd94c130e0dc87b9934b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- OS -->
+
+	<software name="ibmdos2">
+		<description>IBM Personal Computer DOS Version 2.0</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="ibmdos 2.img" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Dos based Games -->
+
+	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
+		<description>2400 A.D.</description>
+		<year>1987</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

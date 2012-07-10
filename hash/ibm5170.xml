@@ -579,28 +579,4 @@
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="2400ad">
-		<description>2400 A.D.</description>
-		<year>1987</year>
-		<publisher>Origin</publisher>
-		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ibmdos2">
-		<description>IBM Personal Computer DOS Version 2.0</description>
-		<year>1983</year>
-		<publisher>IBM</publisher>
-		<info name="version" value="2.0" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="ibmdos 2.img" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 </softwarelist>
