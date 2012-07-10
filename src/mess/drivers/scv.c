@@ -720,7 +720,7 @@ static SCREEN_UPDATE_IND16( scv )
 
 				if ( y_32 )
 				{
-					clip &= 0x07;
+					clip = ( clip & 0x08 ) ? ( clip & 0x07 ) : 0;
 					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx | 1, col, left, right, 1, 1, clip );
 					if ( x_32 )
 					{
