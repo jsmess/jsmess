@@ -551,7 +551,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 	}
 }
 
-static void draw_text_80(running_machine &machine, bitmap_ind16 &bitmap,int y_size)
+static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size, UINT8 width)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
@@ -568,6 +568,9 @@ static void draw_text_80(running_machine &machine, bitmap_ind16 &bitmap,int y_si
 	{
 		for(x=0;x<80;x++)
 		{
+			if(x & 1 && !width)
+				continue;
+
 			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x));
 
 			if(text_color_flag) // color mode
@@ -596,60 +599,7 @@ static void draw_text_80(running_machine &machine, bitmap_ind16 &bitmap,int y_si
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,0);
-		}
-	}
-}
-
-static void draw_text_40(running_machine &machine, bitmap_ind16 &bitmap, int y_size)
-{
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-	int x,y;
-	UINT8 attr;
-	UINT8 reverse;
-	UINT8 gfx_mode;
-	UINT8 secret;
-	UINT8 upper;
-	UINT8 lower;
-	UINT8 blink;
-	int pal;
-
-	for(y=0;y<y_size;y++)
-	{
-		for(x=0;x<80;x++)
-		{
-			if(x & 1)
-				continue;
-
-			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x));
-
-			if(text_color_flag)
-			{
-				pal = (attr & 8) ? ((attr & 0xe0) >> 5) : 7;  // Alpha behaves on this
-				gfx_mode = (attr & 0x10) >> 4;
-				reverse = 0;
-				secret = 0;
-				upper = 0;
-				lower = 0;
-				blink = 0;
-				pal|=8; //text pal bank
-			}
-			else
-			{
-				pal = (state->m_txt_color) ? 7 : 0;
-				gfx_mode = 0;
-				reverse = (attr & 4) >> 2;
-				secret = (attr & 1);
-				upper = (attr & 0x10) >> 4;
-				lower = (attr & 0x20) >> 5;
-				blink = (attr & 2) >> 1;
-				pal|=8; //text pal bank
-
-				if(attr & 0x80)
-					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
-			}
-
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,1);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,!width);
 		}
 	}
 }
@@ -680,10 +630,7 @@ static SCREEN_UPDATE_IND16( pc8801 )
 		if(y_size < 20) y_size = 20;
 		if(y_size > 25) y_size = 25;
 
-		if(state->m_txt_width)
-			draw_text_80(screen.machine(),bitmap,y_size);
-		else
-			draw_text_40(screen.machine(),bitmap,y_size);
+		draw_text(screen.machine(),bitmap,y_size,state->m_txt_width);
 	}
 
 	return 0;
