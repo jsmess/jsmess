@@ -149,19 +149,24 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "machine/i8214.h"
+#include "machine/i8251.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 //#include "includes/pc8801.h"
 
 //#define USE_PROPER_I8214
 
+#define MASTER_CLOCK XTAL_4MHz
+
 #define I8214_TAG		"i8214"
 #define UPD1990A_TAG	"upd1990a"
+#define I8251_TAG		"i8251"
 
 typedef struct
 {
@@ -175,11 +180,13 @@ public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_pic(*this, I8214_TAG),
-		  m_rtc(*this, UPD1990A_TAG)
+		  m_rtc(*this, UPD1990A_TAG),
+		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
+	required_device<cassette_image_device> m_cassette;
 	UINT8 m_i8255_0_pc;
 	UINT8 m_i8255_1_pc;
 	UINT8 m_fdc_irq_opcode;
@@ -292,6 +299,11 @@ public:
 	DECLARE_READ8_MEMBER(upd765_tc_r);
 	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
 	DECLARE_WRITE8_MEMBER(fdc_drive_mode_w);
+	DECLARE_READ_LINE_MEMBER(rxdata_callback);
+	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	DECLARE_READ_LINE_MEMBER(dsr_r);
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
+
 };
 
 /*
@@ -1277,6 +1289,8 @@ WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
 
 	m_txt_width = data & 1;
 	m_txt_color = data & 2;
+
+	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 
@@ -1400,7 +1414,8 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(pc8801_rtc_w)
-	AM_RANGE(0x21, 0x21) AM_READ(sio_status_r)                                /* RS-232C and cassette */
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w) /* RS-232C and CMT */
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
@@ -2181,7 +2196,49 @@ static const ym2203_interface pc88_ym2203_intf =
 	pc8801_sound_irq
 };
 
-#define MASTER_CLOCK XTAL_4MHz
+/* Cassette Configuration */
+READ_LINE_MEMBER( pc8801_state::rxdata_callback )
+{
+	return 0;
+	//return (m_cass->input() > -0.1) ? 1 : 0;
+}
+
+READ_LINE_MEMBER( pc8801_state::dsr_r )
+{
+	return 0; // bit 7 status
+}
+
+WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
+{
+	//m_cass->output( (state) ? 0.8 : -0.8);
+}
+
+WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
+{
+	// ...
+}
+
+static const i8251_interface uart_intf =
+{
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,rxdata_callback), //rxd_cb
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,txdata_callback), //txd_cb
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,dsr_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,rxrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const cassette_interface pc8801_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	/* main CPU */
@@ -2194,7 +2251,6 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CPU_ADD("fdccpu", Z80, MASTER_CLOCK)		/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_CPU_IO_MAP(pc8801fdc_io)
-
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 
@@ -2210,11 +2266,12 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8801_cassette_interface)
+
+	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
