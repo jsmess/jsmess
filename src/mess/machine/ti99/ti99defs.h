@@ -17,7 +17,6 @@
 #define TIBOARD_TAG 	"ti_board"
 #define DATAMUX_TAG 	"datamux_16_8"
 #define VIDEO_SYSTEM_TAG "video"
-#define V9938_SYSTEM_TAG "video9938"
 #define SCREEN_TAG		"screen"
 #define TISOUNDCHIP_TAG "soundchip"
 #define TISOUND_TAG 	"tisound"

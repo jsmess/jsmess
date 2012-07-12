@@ -771,7 +771,7 @@ WRITE8_MEMBER( ti99_4p::tms9901_interrupt )
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
 	// See below (interrupt_level)
-	m_cpu->set_input_line(0, data);
+	m_cpu->set_input_line(INPUT_LINE_99XX_INTREQ, data);
 }
 
 READ8_MEMBER( ti99_4p::interrupt_level )

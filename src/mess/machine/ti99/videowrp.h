@@ -19,6 +19,9 @@
 
 class ti_video_device : public bus8z_device
 {
+public:
+	virtual void	reset_vdp(int state) =0;
+
 protected:
 	address_space	*m_space;
 	tms9928a_device *m_tms9928a;
@@ -40,6 +43,8 @@ public:
 	ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
+
+	void	reset_vdp(int state) { m_tms9928a->reset_line(state); }
 };
 
 /*
@@ -54,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(read16);
 	DECLARE_WRITE16_MEMBER(write16);
+	void	reset_vdp(int state) { m_v9938->reset_line(state); }
 
 protected:
 	void			device_start(void);

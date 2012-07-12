@@ -232,6 +232,7 @@ public:
 	// Forwarding interrupts to the CPU or CRU
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_mapper );
+	DECLARE_WRITE_LINE_MEMBER( console_reset );
 
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
 	DECLARE_WRITE_LINE_MEMBER( extint );
@@ -259,6 +260,7 @@ public:
 	peribox_device		*m_peribox;
 	ti998_mapper_device	*m_mapper;
 	joyport_device* 	m_joyport;
+	ti_video_device*	m_video;
 
 	int 	m_firstjoy;			// First joystick. 14 for TI-99/8
 
@@ -465,7 +467,8 @@ GROM_LIBRARY_CONFIG(pascal2, pascal12_region)
 
 static GROMPORT_CONFIG(console_cartslot)
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_reset)
 };
 
 static PERIBOX_CONFIG( peribox_conf )
@@ -663,7 +666,7 @@ WRITE_LINE_MEMBER( ti99_8::cassette_output )
 
 WRITE8_MEMBER( ti99_8::tms9901_interrupt )
 {
-	m_cpu->set_input_line(1, data);
+	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
 }
 
 const tms9901_interface tms9901_wiring_ti99_8 =
@@ -718,6 +721,18 @@ WRITE_LINE_MEMBER( ti99_8::console_ready )
 	m_ready_line = state;
 
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*
+    The RESET line leading to a reset of the CPU.
+*/
+WRITE_LINE_MEMBER( ti99_8::console_reset )
+{
+	if (machine().phase() != MACHINE_PHASE_INIT)
+	{
+		m_cpu->set_input_line(INPUT_LINE_99XX_RESET, state);
+		m_video->reset_vdp(state);
+	}
 }
 
 /*
@@ -915,6 +930,7 @@ MACHINE_START( ti99_8 )
 	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
 	driver->m_mapper = static_cast<ti998_mapper_device*>(machine.device(MAPPER_TAG));
 	driver->m_joyport = static_cast<joyport_device*>(machine.device(JOYPORT_TAG));
+	driver->m_video = static_cast<ti_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
 
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
