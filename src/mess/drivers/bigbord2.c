@@ -4,8 +4,7 @@
 
         12/05/2009 Skeleton driver.
 
-        This is very much under construction. All that works is if you
-        press a key it will display the signon message.
+        This is very much under construction.
 
         Despite the name, this is not like the xerox or bigboard at all.
 
@@ -35,6 +34,11 @@ causing a complete freeze. Therefore CTCA has been isolated, and the
 2 interrupts are triggered by a hack. It isn't a very good hack,
 because the system crashes after a while. However it will allow
 testing and development to continue.
+
+What works:
+
+Turn it on, wait for cursor to appear in the top corner. Press Enter.
+Now you can enter commands. D, M, X are working.
 
 ****************************************************************************/
 
