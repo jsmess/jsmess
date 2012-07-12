@@ -6,8 +6,7 @@ or computer.
 
 Use MCFG_ASCII_KEYBOARD_ADD to attach as a generic ascii input device in
 cases where either the driver isn't developed enough yet; or for testing;
-or for the rare case of a computer with an inbuilt (not serial) ascii
-keyboard.
+or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 
 Example of usage in a driver.
 
@@ -146,6 +145,7 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 				switch(row_number(code))
 				{
 					case 0: key_code = 0x1B; break; // Escape
+					case 1: key_code = 0x08; break; // Backspace
 				}
 			}
 			retVal = key_code;
@@ -163,7 +163,7 @@ void generic_keyboard_device::device_timer(emu_timer &timer, device_timer_id id,
 {
 	UINT8 new_code;
 	new_code = keyboard_handler(m_last_code, &m_scan_line);
-	if(m_last_code != new_code)
+	if ((m_last_code != new_code) && (new_code))
 		send_key(new_code);
 	m_last_code = new_code;
 }
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( generic_keyboard )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL")PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL")PORT_CODE(KEYCODE_DEL)
 
 	PORT_START("TERM_LINE6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
@@ -326,6 +326,7 @@ static INPUT_PORTS_START( generic_keyboard )
 
 	PORT_START("TERM_LINE7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
 ioport_constructor generic_keyboard_device::device_input_ports() const
