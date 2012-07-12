@@ -25,6 +25,17 @@ d4 = 1793 ce
 d8 = port7
 dc = 6845 ce
 
+
+Difficulties encountered:
+
+CTCA controls a pair of vectored interrupts.
+One is triggered by a keypress, the other by a vsync pulse..
+Once a key is pressed, CTCA continually issues a keyboard interrupt,
+causing a complete freeze. Therefore CTCA has been isolated, and the
+2 interrupts are triggered by a hack. It isn't a very good hack,
+because the system crashes after a while. However it will allow
+testing and development to continue.
+
 ****************************************************************************/
 
 
@@ -37,16 +48,18 @@ dc = 6845 ce
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "machine/z80dma.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
 
 #define SCREEN_TAG		"screen"
 
-#define Z80_TAG			"u46"
+#define Z80_TAG			"u39"
 #define Z80SIO_TAG		"u16"
-#define Z80CTC_TAG		"u99"
-#define WD1771_TAG		"u109"
+#define Z80CTCA_TAG		"u37"
+#define Z80CTCB_TAG		"u21"
+#define Z80DMA_TAG		"u62"
 
 class bigbord2_state : public driver_device
 {
@@ -55,27 +68,20 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, Z80_TAG),
 	m_6845(*this, "crtc"),
-	m_ctc_84(*this, "ctc_84"),
-	m_ctc_88(*this, "ctc_88"),
-	m_fdc(*this, WD1771_TAG),
+	m_ctca(*this, Z80CTCA_TAG),
+	m_ctcb(*this, Z80CTCA_TAG),
+	m_fdc(*this, "fdc"),
 	// m_ram(*this, RAM_TAG),
 	m_floppy0(*this, FLOPPY_0),
 	m_floppy1(*this, FLOPPY_1),
-	m_videoram(*this, "videoram"){ }
+	m_videoram(*this, "videoram"),
+	m_workram(*this, "workram"),
+	m_attribram(*this, "attribram"){ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_6845;
-	required_device<z80ctc_device> m_ctc_84;
-	required_device<z80ctc_device> m_ctc_88;
-	required_device<device_t> m_fdc;
-	//required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
 
 	DECLARE_WRITE8_MEMBER( scroll_w );
 	//DECLARE_WRITE8_MEMBER( x120_system_w );
@@ -87,6 +93,7 @@ public:
 	DECLARE_READ8_MEMBER( kbpio_pb_r );
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	DECLARE_WRITE_LINE_MEMBER(frame);
 
 	void scan_keyboard();
 	//void bankswitch(int bank);
@@ -98,8 +105,7 @@ public:
 	UINT8 m_term_status;
 
 	/* video state */
-	required_shared_ptr<UINT8> m_videoram; /* video RAM */
-	UINT8 *m_char_rom;					/* character ROM */
+	UINT8 *m_p_chargen;					/* character ROM */
 	UINT8 m_scroll;						/* vertical scroll */
 	int m_ncset2;						/* national character set */
 	int m_vatt;							/* X120 video attribute */
@@ -111,9 +117,20 @@ public:
 	int m_fdc_drq;						/* data request */
 	int m_8n5;							/* 5.25" / 8" drive select */
 	int m_dsdd;							/* double sided disk detect */
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_6845;
+	required_device<z80ctc_device> m_ctca;
+	required_device<z80ctc_device> m_ctcb;
+	required_device<device_t> m_fdc;
+	//required_device<ram_device> m_ram;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
+	required_shared_ptr<UINT8> m_videoram; /* video RAM */
+	required_shared_ptr<UINT8> m_workram;
+	required_shared_ptr<UINT8> m_attribram;
 };
 
-/* Keyboard (external keyboard - so we use the 'terminal') */
+/* Keyboard (external keyboard - so we use the 'ascii keyboard') */
 
 READ8_MEMBER( bigbord2_state::bigbord2_c4_r )
 {
@@ -124,19 +141,40 @@ READ8_MEMBER( bigbord2_state::bigbord2_c4_r )
 
 READ8_MEMBER( bigbord2_state::bigbord2_d0_r )
 {
-	return m_term_data;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
 }
 
 WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 {
-	m_term_data = data;
-	m_term_status = 8;
+	if (data)
+	{
+		m_term_data = data;
+		m_term_status = 8;
+		z80ctc_trg0_w(m_ctca, 0);
+		z80ctc_trg0_w(m_ctca, 1);
+		if (space.read_byte(0xf13d) == 0x4d)
+		{
+			// simulate interrupt by saving current pc on
+			// the stack and jumping to interrupt handler.
+			UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
+			UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+			spreg--;
+			space.write_byte(spreg, pcreg >> 8);
+			spreg--;
+			space.write_byte(spreg, pcreg);
+			cpu_set_reg(m_maincpu, Z80_SP, spreg);
+			cpu_set_reg(m_maincpu, Z80_PC, 0xF120);
+		}
+	}
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(bigbord2_state, bigbord2_kbd_put)
 };
+
 
 static READ8_DEVICE_HANDLER( bigbord2_sio_r )
 {
@@ -167,33 +205,27 @@ static WRITE8_DEVICE_HANDLER( bigbord2_sio_w )
 }
 
 
+/* Z80 DMA */
+
+
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
+static Z80DMA_INTERFACE( dma_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT), // actually BUSRQ
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
+};
+
+
 /* Read/Write Handlers */
 
-#if 0
-void bigbord2_state::bankswitch(int bank)
-{
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
 
-	if (bank)
-	{
-		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine.root_device().memregion("monitor")->base());
-		program->unmap_readwrite(0x1000, 0x1fff);
-		program->install_ram(0x3000, 0x3fff, m_videoram);
-	}
-	else
-	{
-		/* RAM */
-		program->install_ram(0x0000, 0x3fff, ram);
-	}
-}
-#endif
-
-WRITE8_MEMBER( bigbord2_state::scroll_w )
-{
-	m_scroll = (offset >> 8) & 0x1f;
-}
 
 #ifdef UNUSED_CODE
 WRITE8_MEMBER( bigbord2_state::x120_system_w )
@@ -252,22 +284,24 @@ WRITE8_MEMBER( bigbii_state::sync_w )
 
 static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x5fff) AM_RAM
-	AM_RANGE(0x6800, 0xffff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("attribram")
+	AM_RANGE(0x8000, 0xfeff) AM_RAM
+	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, bigbord2_sio_r, bigbord2_sio_w)
-	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	//AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	//AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80ctc_r, z80ctc_w)
+	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTCA_TAG, z80ctc_r, z80ctc_w) //has issues
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTCB_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0xC4, 0xC7) AM_READ(bigbord2_c4_r)
 	AM_RANGE(0xD0, 0xD3) AM_READ(bigbord2_d0_r)
-	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE_LEGACY(WD1771_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0xDD, 0xDD) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
@@ -367,65 +401,100 @@ const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	//bigbord2_state *state = timer.machine().driver_data<bigbord2_state>();
+	bigbord2_state *state = timer.machine().driver_data<bigbord2_state>();
 
-	//z80ctc_trg0_w(state->m_ctc, 1);
-	//z80ctc_trg0_w(state->m_ctc, 0);
+	z80ctc_trg0_w(state->m_ctcb, 1);
+	z80ctc_trg1_w(state->m_ctcb, 1);
+	z80ctc_trg0_w(state->m_ctcb, 0);
+	z80ctc_trg1_w(state->m_ctcb, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+WRITE_LINE_MEMBER( bigbord2_state::frame )
 {
-//  z80ctc_trg1_w(device, state);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	static UINT8 framecnt;
+	framecnt++;
+
+	if ((space->read_byte(0xf13d) == 0x4d) & (framecnt > 3))
+	{
+		framecnt = 0;
+		// simulate interrupt by saving current pc on
+		// the stack and jumping to interrupt handler.
+		UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
+		UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+		spreg--;
+		space->write_byte(spreg, pcreg >> 8);
+		spreg--;
+		space->write_byte(spreg, pcreg);
+		cpu_set_reg(m_maincpu, Z80_SP, spreg);
+		cpu_set_reg(m_maincpu, Z80_PC, 0xF18E);
+	}
 }
+
+
+// other inputs of ctca:
+// trg0 = KBDSTB; trg1 = index pulse from fdc; trg2 = synca output from sio
+
+
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-//  z80ctc_trg3_w(device, state);
+	z80ctc_trg3_w(device, state);
 }
 
-static Z80CTC_INTERFACE( ctc_intf )
+static Z80CTC_INTERFACE( ctca_intf )
 {
 	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),		/* ZC/TO0 callback */
-	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_NULL,		/* ZC/TO0 callback - KBDCLK */
+	DEVCB_NULL,		/* ZC/TO1 callback - not connected */
+	DEVCB_NULL		/* ZC/TO2 callback - not connected */
+};
+
+static Z80CTC_INTERFACE( ctcb_intf )
+{
+	0,              			/* timer disables */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
+	DEVCB_NULL,		/* ZC/TO0 callback - SIO channel B clock */
+	DEVCB_NULL,		/* ZC/TO1 callback - SIO channel A clock */
+	DEVCB_DEVICE_LINE(Z80CTCB_TAG, ctc_z2_w) /* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config bigbord2_daisy_chain[] =
 {
+	{ Z80DMA_TAG },
+	{ Z80CTCA_TAG },
+	{ Z80CTCB_TAG },
 	{ Z80SIO_TAG },
-	{ "ctc_84" },
-	{ "ctc_88" },
 	{ NULL }
 };
 
-/* WD1771 Interface */
+/* WD1793 Interface */
 
 WRITE_LINE_MEMBER( bigbord2_state::intrq_w )
 {
-	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
+//	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
 
 	m_fdc_irq = state;
 
-	if (halt && state)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+//	if (halt && state)
+//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+//	else
+//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( bigbord2_state::drq_w )
 {
-	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
+//	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
 
 	m_fdc_drq = state;
 
-	if (halt && state)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+//	if (halt && state)
+//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+//	else
+//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =
@@ -442,7 +511,7 @@ static const wd17xx_interface fdc_intf =
 void bigbord2_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 
@@ -500,7 +569,7 @@ void bigbord2_state::machine_start()
 
 void bigbord2_state::machine_reset()
 {
-	//bankswitch(1);
+
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( bigbord2 )
@@ -569,25 +638,25 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)				// for each character
+	for (x = 0; x < x_count; x++)
 	{
 		inv=0;
-		if (x == cursor_x) inv^=0xff;
 		mem = (ma + x) & 0x7ff;
+		if (BIT(state->m_attribram[mem], 7)) inv^=0xff;
 		chr = state->m_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_char_rom[(chr<<4) | ra ] ^ inv;
+		gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = palette[BIT( gfx, 7 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 6 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 5 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 4 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 3 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 2 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 1 ) ? 1 : 0];
-		*p++ = palette[BIT( gfx, 0 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 7 )];
+		*p++ = palette[BIT( gfx, 6 )];
+		*p++ = palette[BIT( gfx, 5 )];
+		*p++ = palette[BIT( gfx, 4 )];
+		*p++ = palette[BIT( gfx, 3 )];
+		*p++ = palette[BIT( gfx, 2 )];
+		*p++ = palette[BIT( gfx, 1 )];
+		*p++ = palette[BIT( gfx, 0 )];
 	}
 }
 
@@ -600,7 +669,7 @@ static const mc6845_interface bigbord2_crtc = {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, frame), //DEVCB_DEVICE_LINE(Z80CTCA_TAG, z80ctc_trg3_w), // vsync
 	NULL
 };
 
@@ -628,10 +697,11 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(MAIN_CLOCK))
 
 	/* devices */
+	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)
 	MCFG_Z80SIO_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
-	MCFG_Z80CTC_ADD("ctc_84", MAIN_CLOCK, ctc_intf)
-	MCFG_Z80CTC_ADD("ctc_88", MAIN_CLOCK, ctc_intf)
-	MCFG_FD1793_ADD(WD1771_TAG, fdc_intf)
+	MCFG_Z80CTC_ADD(Z80CTCA_TAG, MAIN_CLOCK, ctca_intf)
+	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
+	MCFG_FD1793_ADD("fdc", fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
