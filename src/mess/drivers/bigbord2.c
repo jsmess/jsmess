@@ -49,7 +49,6 @@ Now you can enter commands. D, M, X are working.
 #include "cpu/z80/z80daisy.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80dma.h"
@@ -58,7 +57,6 @@ Now you can enter commands. D, M, X are working.
 #include "machine/keyboard.h"
 
 #define SCREEN_TAG		"screen"
-
 #define Z80_TAG			"u39"
 #define Z80SIO_TAG		"u16"
 #define Z80CTCA_TAG		"u37"
@@ -75,11 +73,11 @@ public:
 	m_ctca(*this, Z80CTCA_TAG),
 	m_ctcb(*this, Z80CTCA_TAG),
 	m_fdc(*this, "fdc"),
-	// m_ram(*this, RAM_TAG),
 	m_floppy0(*this, FLOPPY_0),
 	m_floppy1(*this, FLOPPY_1),
+	m_floppy2(*this, FLOPPY_2),
+	m_floppy3(*this, FLOPPY_3),
 	m_videoram(*this, "videoram"),
-	m_workram(*this, "workram"),
 	m_attribram(*this, "attribram"){ }
 
 	virtual void machine_start();
@@ -87,22 +85,16 @@ public:
 
 	virtual void video_start();
 
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	//DECLARE_WRITE8_MEMBER( x120_system_w );
-	DECLARE_READ8_MEMBER( bigbord2_c4_r );
-	DECLARE_READ8_MEMBER( bigbord2_d0_r );
-	DECLARE_READ8_MEMBER( kbpio_pa_r );
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
-	DECLARE_WRITE8_MEMBER( bigbord2_kbd_put );
-	DECLARE_READ8_MEMBER( kbpio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	DECLARE_WRITE8_MEMBER(portc8_w );
+	DECLARE_WRITE8_MEMBER(portcc_w );
+	DECLARE_READ8_MEMBER(portc4_r);
+	DECLARE_READ8_MEMBER(portd0_r);
+	DECLARE_WRITE8_MEMBER(bigbord2_kbd_put);
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(frame);
 
-	void scan_keyboard();
-	//void bankswitch(int bank);
 	void set_floppy_parameters(size_t length);
-	void common_kbpio_pa_w(UINT8 data);
 
 	/* keyboard state */
 	UINT8 m_term_data;
@@ -110,40 +102,46 @@ public:
 
 	/* video state */
 	UINT8 *m_p_chargen;					/* character ROM */
-	UINT8 m_scroll;						/* vertical scroll */
-	int m_ncset2;						/* national character set */
-	int m_vatt;							/* X120 video attribute */
-	int m_lowlite;						/* low light attribute */
-	int m_chrom;						/* character ROM index */
 
 	/* floppy state */
-	int m_fdc_irq;						/* interrupt request */
-	int m_fdc_drq;						/* data request */
-	int m_8n5;							/* 5.25" / 8" drive select */
-	int m_dsdd;							/* double sided disk detect */
+	bool m_fdc_irq;						/* interrupt request */
+	bool m_fdc_drq;						/* data request */
+	bool m_8n5;							/* 5.25" / 8" drive select */
+	bool m_dsdd;							/* double sided disk detect */
+	bool m_motor;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_6845;
 	required_device<z80ctc_device> m_ctca;
 	required_device<z80ctc_device> m_ctcb;
 	required_device<device_t> m_fdc;
-	//required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<device_t> m_floppy2;
+	required_device<device_t> m_floppy3;
 	required_shared_ptr<UINT8> m_videoram; /* video RAM */
-	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_attribram;
 };
 
-/* Keyboard (external keyboard - so we use the 'ascii keyboard') */
+/* Status port
+    0 = RXDA
+    1 = RXDB
+    2 = MOTOR
+    3 = KBDSTB
+    4 = DIPSW 1
+    5 = DIPSW 2
+    6 = DIPSW 3
+    7 = DIPSW 4 */
 
-READ8_MEMBER( bigbord2_state::bigbord2_c4_r )
+READ8_MEMBER( bigbord2_state::portc4_r )
 {
-	UINT8 ret = m_term_status | 0x17;
+	UINT8 ret = m_term_status | 3 | (m_motor<<2) | ioport("DSW")->read();
 	m_term_status = 0;
 	return ret;
 }
 
-READ8_MEMBER( bigbord2_state::bigbord2_d0_r )
+// KBD port - read ascii value of key pressed
+
+READ8_MEMBER( bigbord2_state::portd0_r )
 {
 	UINT8 ret = m_term_data;
 	m_term_data = 0;
@@ -180,34 +178,6 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 };
 
 
-static READ8_DEVICE_HANDLER( bigbord2_sio_r )
-{
-	if (!offset)
-		return z80sio_d_r(device, 0);
-	else
-	if (offset == 2)
-	return z80sio_d_r(device, 1);
-	else
-	if (offset == 1)
-		return z80sio_c_r(device, 0);
-	else
-	return z80sio_c_r(device, 1);
-}
-
-static WRITE8_DEVICE_HANDLER( bigbord2_sio_w )
-{
-	if (!offset)
-		z80sio_d_w(device, 0, data);
-	else
-	if (offset == 2)
-	z80sio_d_w(device, 1, data);
-	else
-	if (offset == 1)
-		z80sio_c_w(device, 0, data);
-	else
-		z80sio_c_w(device, 1, data);
-}
-
 
 /* Z80 DMA */
 
@@ -231,58 +201,77 @@ static Z80DMA_INTERFACE( dma_intf )
 
 
 
-#ifdef UNUSED_CODE
-WRITE8_MEMBER( bigbord2_state::x120_system_w )
+WRITE8_MEMBER( bigbord2_state::portc8_w )
 {
 	/*
 
         bit     signal      description
 
-        0       DSEL0       drive select bit 0 (01=A, 10=B, 00=C, 11=D)
-        1       DSEL1       drive select bit 1
-        2       SIDE        side select
-        3       VATT        video attribute (0=inverse, 1=blinking)
-        4       BELL        bell trigger
-        5       DENSITY     density (0=double, 1=single)
-        6       _MOTOR      disk motor (0=on, 1=off)
-        7       BANK        memory bank switch (0=RAM, 1=ROM/video)
+        0       D_S
+        1       SIDSEL      side select
+        2       SMC1
+        3       SMC2
+        4       DDEN        density
+        5       HLD         head load
+        6       MOTOR       disk motor
+        7       BELL        beeper pulse
 
     */
-}
-#endif
 
-#if 0
-WRITE8_MEMBER( bigbii_state::bell_w )
-{
-}
+	m_motor = BIT(data, 6);
+	floppy_mon_w(m_floppy0, ~m_motor);
+	floppy_mon_w(m_floppy1, ~m_motor);
+	floppy_mon_w(m_floppy2, ~m_motor);
+	floppy_mon_w(m_floppy3, ~m_motor);
 
-WRITE8_MEMBER( bigbii_state::slden_w )
-{
-	wd17xx_dden_w(m_fdc, offset ? CLEAR_LINE : ASSERT_LINE);
-}
+	/* side select */
+	wd17xx_set_side(m_fdc, BIT(data, 1));
 
-WRITE8_MEMBER( bigbii_state::chrom_w )
-{
-	m_chrom = offset;
+	/* density */
+	wd17xx_dden_w(m_fdc, BIT(data, 4));
 }
 
-WRITE8_MEMBER( bigbii_state::lowlite_w )
+WRITE8_MEMBER( bigbord2_state::portcc_w )
 {
-	m_lowlite = data;
+	/*
+
+        bit     signal      description
+
+        0,1,2   operates a 74LS151 for 8 individual inputs
+          0     W/RDYA
+          1     W/RDYB
+          2     DRQ         DRQ on fdc
+          3     JB7 pin 1
+          4     JB7 pin 2
+          5     JB7 pin 3
+          6     JB7 pin 4
+          7     JB7 pin 5
+        3       /TEST       test pin on FDC
+        4       DS3         drive 3 select
+        5       DS2         drive 2 select
+        6       DS1         drive 1 select
+        7       DS0         drive 0 select
+
+    */
+
+	/* drive select */
+	bool dvsel0 = BIT(data, 7);
+	bool dvsel1 = BIT(data, 6);
+	bool dvsel2 = BIT(data, 5);
+	bool dvsel3 = BIT(data, 4);
+
+	if (dvsel0) wd17xx_set_drive(m_fdc, 0);
+	if (dvsel1) wd17xx_set_drive(m_fdc, 1);
+	if (dvsel2) wd17xx_set_drive(m_fdc, 2);
+	if (dvsel3) wd17xx_set_drive(m_fdc, 3);
+
+	floppy_drive_set_ready_state(m_floppy0, dvsel0, 1);
+	floppy_drive_set_ready_state(m_floppy1, dvsel1, 1);
+	floppy_drive_set_ready_state(m_floppy2, dvsel2, 1);
+	floppy_drive_set_ready_state(m_floppy3, dvsel3, 1);
 }
 
-WRITE8_MEMBER( bigbii_state::sync_w )
-{
-	if (offset)
-	{
-		/* set external clocks for synchronous sio A */
-	}
-	else
-	{
-		/* set internal clocks for asynchronous sio A */
-	}
-}
-#endif
+
 
 /* Memory Maps */
 
@@ -292,19 +281,21 @@ static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	AM_RANGE(0x1000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("attribram")
-	AM_RANGE(0x8000, 0xfeff) AM_RAM
-	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, bigbord2_sio_r, bigbord2_sio_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTCA_TAG, z80ctc_r, z80ctc_w) //has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTCB_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0xC4, 0xC7) AM_READ(bigbord2_c4_r)
-	AM_RANGE(0xD0, 0xD3) AM_READ(bigbord2_d0_r)
+	AM_RANGE(0xC4, 0xC7) AM_READ(portc4_r)
+	AM_RANGE(0xC8, 0xCB) AM_WRITE(portc8_w)
+	AM_RANGE(0xCC, 0xCF) AM_WRITE(portcc_w)
+	AM_RANGE(0xD0, 0xD3) AM_READ(portd0_r)
 	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	//AM_RANGE(0xD8, 0xDB) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
 	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0xDD, 0xDD) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -313,74 +304,21 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( bigbord2 )
+	PORT_START("DSW")
+	PORT_BIT( 0xf, 0, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Switch 4") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "Switch 3") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "Switch 2") PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x80, 0x00, "Switch 1") PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
 INPUT_PORTS_END
-
-/* Z80 PIO */
-
-READ8_MEMBER( bigbord2_state::kbpio_pa_r )
-{
-	/*
-
-        bit     signal          description
-
-        0
-        1
-        2
-        3       PBRDY           keyboard data available
-        4       8/N5            8"/5.25" disk select (0=5.25", 1=8")
-        5       400/460         double sided disk detect (only on Etch 2 PCB) (0=SS, 1=DS)
-        6
-        7
-
-    */
-
-	return (m_dsdd << 5) | (m_8n5 << 4);// | (z80pio_brdy_r(m_kbpio) << 3);
-};
-
-void bigbord2_state::common_kbpio_pa_w(UINT8 data)
-{
-	/*
-
-        bit     signal          description
-
-        0       _DVSEL1         drive select 1
-        1       _DVSEL2         drive select 2
-        2       _DVSEL3         side select
-        3
-        4
-        5
-        6       NCSET2          display character set (inverted and connected to chargen A10)
-        7       BANK            bank switching (0=RAM, 1=ROM/videoram)
-
-    */
-
-	/* drive select */
-	int dvsel1 = BIT(data, 0);
-	int dvsel2 = BIT(data, 1);
-
-	if (dvsel1) wd17xx_set_drive(m_fdc, 0);
-	if (dvsel2) wd17xx_set_drive(m_fdc, 1);
-
-	floppy_mon_w(m_floppy0, !dvsel1);
-	floppy_mon_w(m_floppy1, !dvsel2);
-
-	floppy_drive_set_ready_state(m_floppy0, dvsel1, 1);
-	floppy_drive_set_ready_state(m_floppy1, dvsel2, 1);
-
-	/* side select */
-	wd17xx_set_side(m_fdc, BIT(data, 2));
-
-	/* display character set */
-	m_ncset2 = !BIT(data, 6);
-}
-
-WRITE8_MEMBER( bigbord2_state::kbpio_pa_w )
-{
-	common_kbpio_pa_w(data);
-
-	/* bank switching */
-	//bankswitch(BIT(data, 7));
-}
 
 
 /* Z80 SIO */
@@ -479,26 +417,12 @@ static const z80_daisy_config bigbord2_daisy_chain[] =
 
 WRITE_LINE_MEMBER( bigbord2_state::intrq_w )
 {
-//	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
-
 	m_fdc_irq = state;
-
-//	if (halt && state)
-//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-//	else
-//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( bigbord2_state::drq_w )
 {
-//	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
-
 	m_fdc_drq = state;
-
-//	if (halt && state)
-//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-//	else
-//		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =
@@ -506,7 +430,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, intrq_w),
 	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
 };
 
 
@@ -562,9 +486,6 @@ void bigbord2_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_scroll));
-	save_item(NAME(m_ncset2));
-	save_item(NAME(m_vatt));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_8n5));
@@ -616,6 +537,8 @@ static const floppy_interface bigbord2_floppy_interface =
 	NULL
 };
 
+/* Screen */
+
 /* F4 Character Displayer */
 static const gfx_layout bigbord2_charlayout =
 {
@@ -665,7 +588,7 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 }
 
 static const mc6845_interface bigbord2_crtc = {
-	"screen",			/* name of screen */
+	SCREEN_TAG,			/* name of screen */
 	8,			/* number of dots per character */
 	NULL,
 	bigbord2_update_row,		/* handler to display a scanline */
@@ -706,7 +629,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_Z80CTC_ADD(Z80CTCA_TAG, MAIN_CLOCK, ctca_intf)
 	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
 	MCFG_FD1793_ADD("fdc", fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
@@ -721,9 +644,9 @@ ROM_START( bigbord2 )
 
 	// internal to 8002 chip (undumped) we will use one from 'vta2000' for now
 	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )
-	ROM_LOAD( "bdp-15_14.rom", 0x0000, 0x2000, CRC(a1dc4f8e) SHA1(873fd211f44713b713d73163de2d8b5db83d2143) )
+	ROM_LOAD( "bdp-15_14.rom", 0x0000, 0x2000, BAD_DUMP CRC(a1dc4f8e) SHA1(873fd211f44713b713d73163de2d8b5db83d2143) )
 ROM_END
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1983, bigbord2,   bigboard,          0,      bigbord2,   bigbord2,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                      FULLNAME        FLAGS */
+COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2,   0,   "Digital Research Computers", "Big Board II", GAME_NOT_WORKING | GAME_NO_SOUND)
