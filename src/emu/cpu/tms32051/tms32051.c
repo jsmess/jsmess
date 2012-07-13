@@ -227,11 +227,41 @@ static CPU_INIT( tms )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
+	
+	cpustate->pcstack_ptr = 0;
 }
 
 static CPU_RESET( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
+
+	// reset registers
+	cpustate->st0.intm	= 1;
+	cpustate->st0.ov	= 0;
+	cpustate->st1.c		= 1;
+	cpustate->st1.cnf	= 0;
+	cpustate->st1.hm	= 1;
+	cpustate->st1.pm	= 0;
+	cpustate->st1.sxm	= 1;
+	cpustate->st1.xf	= 1;
+	cpustate->pmst.avis	= 0;
+	cpustate->pmst.braf	= 0;
+	cpustate->pmst.iptr	= 0;
+	cpustate->pmst.ndx	= 0;
+	cpustate->pmst.ovly	= 0;
+	cpustate->pmst.ram	= 0;
+	cpustate->pmst.mpmc	= 0; // TODO: this is set to logical pin state at reset
+	cpustate->pmst.trm	= 0;
+	cpustate->ifr		= 0;
+	cpustate->cbcr		= 0;
+	cpustate->rptc		= -1;
+
+	// simulate internal rom boot loader (can be removed when the dsp rom(s) is dumped)
+	cpustate->st0.intm	= 1;
+	cpustate->st1.cnf	= 1;
+	cpustate->pmst.ram	= 1;
+	cpustate->pmst.ovly	= 0;
+
 	int i;
 	UINT16 src, dst, length;
 
@@ -247,25 +277,6 @@ static CPU_RESET( tms )
 		UINT16 data = DM_READ16(cpustate, src++);
 		PM_WRITE16(cpustate, dst++, data);
 	}
-
-	cpustate->st0.intm	= 1;
-	cpustate->st0.ov	= 0;
-	cpustate->st1.c		= 1;
-	cpustate->st1.cnf	= 0;
-	cpustate->st1.hm	= 1;
-	cpustate->st1.pm	= 0;
-	cpustate->st1.sxm	= 1;
-	cpustate->st1.xf	= 1;
-	cpustate->pmst.avis	= 0;
-	cpustate->pmst.braf	= 0;
-	cpustate->pmst.iptr	= 0;
-	cpustate->pmst.ndx	= 0;
-	cpustate->pmst.ovly	= 0;
-	cpustate->pmst.ram	= 0;
-	cpustate->pmst.trm	= 0;
-	cpustate->ifr		= 0;
-	cpustate->cbcr		= 0;
-	cpustate->rptc		= -1;
 }
 
 static void check_interrupts(tms32051_state *cpustate)
@@ -536,16 +547,17 @@ static WRITE16_HANDLER( cpuregs_w )
  **************************************************************************/
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, legacy_cpu_device )
-	AM_RANGE(0x2000, 0x23ff) AM_RAM	AM_SHARE("saram")		// SARAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0
+	AM_RANGE(0x0000, 0x1fff) AM_ROM							// ROM			TODO: is off-chip if MP/_MC = 0
+	AM_RANGE(0x2000, 0x23ff) AM_RAM	AM_SHARE("saram")		// SARAM		TODO: is off-chip if RAM bit = 0
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0		TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( internal_data, AS_DATA, 16, legacy_cpu_device )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE_LEGACY(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM							// DARAM B2
-	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0
+	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0		TODO: is unconnected if CNF = 1
 	AM_RANGE(0x0300, 0x04ff) AM_RAM							// DARAM B1
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")		// SARAM		TODO: is off-chip if OVLY = 0
 ADDRESS_MAP_END
 
 /**************************************************************************

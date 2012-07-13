@@ -195,21 +195,21 @@ static INPUT_PORTS_START( dbz )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )	// I think this is right, but can't stomach the game long enough to check
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2")	// I think this is right, but can't stomach the game long enough to check
 	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN( 0x0400, 0x0400 )						// seems unused
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )	// Definitely correct
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )						// seems unused
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:4")	// Definitely correct
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x1000, 0x1000 )
-	PORT_SERVICE( 0x2000, 0x2000 )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )
+	PORT_SERVICE_DIPLOC(  0x2000, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x8000, 0x0000, "Mask ROM Test" )			//NOP'd
+	PORT_DIPNAME( 0x8000, 0x0000, "Mask ROM Test" )		PORT_DIPLOCATION("SW1:8")			//NOP'd
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
@@ -218,7 +218,7 @@ static INPUT_PORTS_START( dbz )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 
 	PORT_START("FAKE")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -255,17 +255,24 @@ static INPUT_PORTS_START( dbz )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dbza )
+	PORT_INCLUDE( dbz )
+
+	PORT_MODIFY("SYSTEM_DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )						// tests are always performed at start
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dbz2 )
 	PORT_INCLUDE( dbz )
 
 	PORT_MODIFY("SYSTEM_DSW1")
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Level_Select ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Level_Select ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -427,10 +434,41 @@ MACHINE_CONFIG_END
 ROM_START( dbz )
 	/* main program */
 	ROM_REGION( 0x400000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "222a11.9e", 0x000000, 0x80000, CRC(60c7d9b2) SHA1(718ef89e89b3943845e91bedfc5c1d26229f9fe5) )
-	ROM_LOAD16_BYTE( "222a12.9f", 0x000001, 0x80000, CRC(6ebc6853) SHA1(e9b2068246228968cc6b8554215563cacaa5ba9f) )
+	ROM_LOAD16_BYTE( "222b11.9e", 0x000000, 0x80000, CRC(4c6b75e9) SHA1(8b1d67f8c8b64bb38f824506eca4c6966215f233) )
+	ROM_LOAD16_BYTE( "222b12.9f", 0x000001, 0x80000, CRC(48637fce) SHA1(d3db0d56b70b9a4b20c645dda15327ec60e69d81) )
 
-	ROM_REGION( 0x400000, "user1", 0)
+	/* sound program */
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD("222a10.5e", 0x000000, 0x08000, CRC(1c93e30a) SHA1(8545a0ac5126b3c855e1901b186f57820699895d) )
+
+	/* tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	ROM_LOAD( "222a01.27c", 0x000000, 0x200000, CRC(9fce4ed4) SHA1(81e19375b351ee247f066434dd595149333d73c5) )
+	ROM_LOAD( "222a02.27e", 0x200000, 0x200000, CRC(651acaa5) SHA1(33942a90fb294b5da6a48e5bfb741b31babca188) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "222a04.3j", 0x000000, 0x200000, CRC(2533b95a) SHA1(35910836b6030130d742eae6c4bf1cdf1ff43fa4) )
+	ROM_LOAD64_WORD( "222a05.1j", 0x000002, 0x200000, CRC(731b7f93) SHA1(b676fff2ede5aa72c49fe12736cd60766462fe0b) )
+	ROM_LOAD64_WORD( "222a06.3l", 0x000004, 0x200000, CRC(97b767d3) SHA1(3d879c431586da2f88c632ab1a531b4a5ec96939) )
+	ROM_LOAD64_WORD( "222a07.1l", 0x000006, 0x200000, CRC(430bc873) SHA1(ea483195bb7f20ef3df7cfba153e5f6f8d53e5f9) )
+
+	/* K053536 PSAC-2 #1 */
+	ROM_REGION( 0x200000, "gfx3", 0)
+	ROM_LOAD( "222a08.25k", 0x000000, 0x200000, CRC(6410ee1b) SHA1(2296aafd3ba25f63a12130f7b58de53e88f14e92) )
+
+	/* K053536 PSAC-2 #2 */
+	ROM_REGION( 0x200000, "gfx4", 0)
+	ROM_LOAD( "222a09.25l", 0x000000, 0x200000, CRC(f7b3f070) SHA1(50ebd8cfcda292a3df5664de50f9212108d58923) )
+
+	/* sound data */
+	ROM_REGION( 0x40000, "oki", 0)
+	ROM_LOAD( "222a03.7c", 0x000000, 0x40000, CRC(1924467b) SHA1(57922090509bcc63b4783e8f2c5e95afd2090b87) )
+ROM_END
+
+ROM_START( dbza )
+	/* main program */
+	ROM_REGION( 0x400000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "222a11.9e", 0x000000, 0x80000, CRC(60c7d9b2) SHA1(718ef89e89b3943845e91bedfc5c1d26229f9fe5) )
 	ROM_LOAD16_BYTE( "222a12.9f", 0x000001, 0x80000, CRC(6ebc6853) SHA1(e9b2068246228968cc6b8554215563cacaa5ba9f) )
 
@@ -506,20 +544,93 @@ static DRIVER_INIT( dbz )
 
 	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
+	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
+	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
 	// nop out dbz1's mask rom test
 	// tile ROM test
-	ROM[0x790/2] = 0x4e71;
-	ROM[0x792/2] = 0x4e71;
-	// PSAC2 ROM test
-	ROM[0x982/2] = 0x4e71;
-	ROM[0x984/2] = 0x4e71;
-	ROM[0x986/2] = 0x4e71;
-	ROM[0x988/2] = 0x4e71;
-	ROM[0x98a/2] = 0x4e71;
-	ROM[0x98c/2] = 0x4e71;
-	ROM[0x98e/2] = 0x4e71;
-	ROM[0x990/2] = 0x4e71;
+	ROM[0x7b0/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1e0d, D3 */
+	ROM[0x7b2/2] = 0x4e71;    /* 0xe1f3 */
+	ROM[0x7b4/2] = 0x4e71;    /* 0x6600 - bne     $7d6 */
+	ROM[0x7b6/2] = 0x4e71;    /* 0x0020 */
+	ROM[0x7c0/2] = 0x4e71;    /* 0x0c45 - cmpi.w  #-$7aad, D5 */
+	ROM[0x7c2/2] = 0x4e71;    /* 0x8553 */
+	ROM[0x7c4/2] = 0x4e71;    /* 0x6600 - bne     $7d6 */
+	ROM[0x7c6/2] = 0x4e71;    /* 0x0010 */
+	// PSAC2 ROM test (A and B)
+	ROM[0x9a8/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$43c0, D3 */
+	ROM[0x9aa/2] = 0x4e71;    /* 0x43c0 */
+	ROM[0x9ac/2] = 0x4e71;    /* 0x6600 - bne     $a00 */
+	ROM[0x9ae/2] = 0x4e71;    /* 0x0052 */
+	ROM[0x9ea/2] = 0x4e71;    /* 0x0c44 - cmpi.w  #-$13de, D4 */
+	ROM[0x9ec/2] = 0x4e71;    /* 0xec22 */
+	ROM[0x9ee/2] = 0x4e71;    /* 0x6600 - bne     $a00 */
+	ROM[0x9f0/2] = 0x4e71;    /* 0x0010 */
+	// prog ROM test
+	ROM[0x80c/2] = 0x4e71;    /* 0xb650 - cmp.w   (A0), D3 */
+	ROM[0x80e/2] = 0x4e71;    /* 0x6600 - bne     $820 */
+	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0, dbz, dbz2, 0,    ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+static DRIVER_INIT( dbza )
+{
+	UINT16 *ROM;
+
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+
+	// nop out dbz1's mask rom test
+	// tile ROM test
+	ROM[0x78c/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1236, D3 */
+	ROM[0x78e/2] = 0x4e71;    /* 0x0010 */
+	ROM[0x790/2] = 0x4e71;    /* 0x6600 - bne     $7a2 */
+	ROM[0x792/2] = 0x4e71;    /* 0x0010 */
+	// PSAC2 ROM test
+	ROM[0x982/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$437e, D3 */
+	ROM[0x984/2] = 0x4e71;    /* 0x437e */
+	ROM[0x986/2] = 0x4e71;    /* 0x6600 - bne     $9a0 */
+	ROM[0x988/2] = 0x4e71;    /* 0x0018 */
+	ROM[0x98a/2] = 0x4e71;    /* 0x0c44 - cmpi.w  #$65e8, D4 */
+	ROM[0x98c/2] = 0x4e71;    /* 0x65e8 */
+	ROM[0x98e/2] = 0x4e71;    /* 0x6600 - bne     $9a0 */
+	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
+}
+
+static DRIVER_INIT( dbz2 )
+{
+	UINT16 *ROM;
+
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+
+	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
+	ROM[0xa48/2] = 0x007f;    /* 0x00ff */
+	// nop out dbz1's mask rom test
+	// tile ROM test
+	ROM[0xa88/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$e58, D3 */
+	ROM[0xa8a/2] = 0x4e71;    /* 0x0e58 */
+	ROM[0xa8c/2] = 0x4e71;    /* 0x6600 - bne     $aae */
+	ROM[0xa8e/2] = 0x4e71;    /* 0x0020 */
+	ROM[0xa98/2] = 0x4e71;    /* 0x0c45 - cmpi.w  #-$3d20, D5 */
+	ROM[0xa9a/2] = 0x4e71;    /* 0xc2e0 */
+	ROM[0xa9c/2] = 0x4e71;    /* 0x6600 - bne     $aae */
+	ROM[0xa9e/2] = 0x4e71;    /* 0x0010 */
+	// PSAC2 ROM test (0 to 3)
+	ROM[0xc66/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xc68/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xc6a/2] = 0x4e71;    /* 0x005e */
+	ROM[0xc7c/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xc7e/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xc80/2] = 0x4e71;    /* 0x0048 */
+	ROM[0xc9e/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xca0/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xca2/2] = 0x4e71;    /* 0x0026 */
+	ROM[0xcb4/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xcb6/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xcb8/2] = 0x4e71;    /* 0x0010 */
+	// prog ROM test
+	ROM[0xae4/2] = 0x4e71;    /* 0xb650 - cmp.w   (A0), D3 */
+	ROM[0xae6/2] = 0x4e71;    /* 0x6600 - bne     $af8 */
+	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
+}
+
+GAME( 1993, dbz,  0,   dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza, dbz, dbz, dbza, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0,   dbz, dbz2, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test

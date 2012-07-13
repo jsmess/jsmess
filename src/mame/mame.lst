@@ -674,6 +674,7 @@ kaitein			// [1980] Namco
 kaitei			// [1980] K.K. Tokki
 sos			// [1980] Namco
 tankbatt		// (c) 1980 Namco
+tankbattb		// bootleg
 warpwarp		// (c) 1981 Namco
 warpwarpr		// (c) 1981 [Namco] (Rock-ola license)
 warpwarpr2		// (c) 1981 [Namco] (Rock-ola license)
@@ -1001,7 +1002,9 @@ crszonec		// Crisis Zone - December 1999
 
 // Namco System 246
 sys246
+bldyr3b
 rrvac
+wanganmd
 dragchrn
 netchu02
 scptour
@@ -1020,13 +1023,16 @@ zgundmdx
 gundzaft
 soulclb3
 soulclb3a
+fateulc
 
 // Namco System 256
 sys256
 tekken51
+superdbz
 kinniku
 taiko9
 taiko10
+gdvsgd
 
 // Misc Namco games
 30test			// (c) 1997
@@ -2342,8 +2348,10 @@ commandw		// prototype
 dangcurv		// 1995.?? E09 (c) 1995 Taito Corporation
 				// 1995.07 (Japan)
 				// 1995.10 (US)
-landgear		// 1996.?? E17 (c) 1995 Taito Corporation Japan (World)
-				// 1996.03 (Japan)
+landgear		// 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 4.2 O
+landgeara		// 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 3.1 O
+landgearj		// 1996.?? E17 (c) 1996 Taito Corporation (Japan) - Ver 4.2 J
+landgearja		// 1996.03 E17 (c) 1996 Taito Corporation (Japan) - Ver 3.0 J
 sidebs			// 1996.07 E23 (c) 1996 Taito Corporation (Japan)
 dendego			// 1997.03 E35 (c) 1996 Taito Corporation (Japan)
 sidebs2j		// 1997.07 E38 (c) 1997 Taito Corporation (Japan)
@@ -3363,7 +3371,8 @@ sncwgltd		// Sonic Wings Limited (JAPAN)
 // Taito FX1a
 taitofx1
 sfchamp			// Super Football Champ (Ver 2.5O)
-sfchamp24o		// Super Football Champ (Ver 2.4O)
+sfchampo		// Super Football Champ (Ver 2.4O)
+sfchampu		// Super Football Champ (Ver 2.4A)
 sfchampj		// Super Football Champ (Ver 2.4J)
 psyforce		// Psychic Force (Ver 2.4O)
 psyforcej		// Psychic Force (Ver 2.4J)
@@ -3373,8 +3382,11 @@ mgcldtex		// Magical Date EX (JAPAN Ver 2.01J)
 
 // Taito FX1b
 raystorm		// Ray Storm (Ver 2.06A)
+raystormo		// Ray Storm (Ver 2.05O)
+raystormu		// Ray Storm (Ver 2.05A)
 raystormj		// Ray Storm (Ver 2.05J)
 ftimpact		// Fighters' Impact (Ver 2.02O)
+ftimpactu		// Fighters' Impact (Ver 2.02A)
 ftimpactj		// Fighters' Impact (Ver 2.02J)
 ftimpcta		// Fighters' Impact A (Ver 2.00J)
 gdarius			// G-Darius (Ver 2.01J)
@@ -4049,7 +4061,7 @@ wbmljo			// (c) 1987 Sega/Westone (S2)
 wbmljb			// (c) 1987 Sega/Westone (S2)
 wbmlb			// bootleg? (S2)
 wbmlbg			// bootleg (Galaxy Electronics)
-dakkochn		// 836-6483? (S2)
+dakkochn		// 836-6483 (S2)
 ufosensi		// 834-6659 (S2)
 ufosensib		// bootleg
 /*
@@ -4221,6 +4233,7 @@ wrestwar1		// (c) 1989 (FD1094, decrypted)
 
 // System 16C
 fantzn2x		// (c) 2008 Sega / M2
+fantzn2xp		// (c) 2008 Sega / M2
 
 // Philko Boards
 atomicp			// (c) 1990 Philko - korean clone board
@@ -4625,7 +4638,8 @@ scuda
 vs215			// 1997.06 Virtua Striker 2
 vs215o			// 1997.06 Virtua Striker 2
 lostwsga		// 1997.07 Lost World Jurassic Park
-scudp			// 1997.09 Scud Race Plus
+scudplus		// 1997.09 Scud Race Plus (rev A)
+scudplusa		// 1997.09 Scud Race Plus
 lemans24		// 1997.09 Le Mans 24
 vs29815			// 1998.05 Virtua Striker 2 ver.98
 
@@ -5118,7 +5132,7 @@ avalon20		// 2004.11 The Key Of Avalon 2 - Eutaxy Commandment - Satellite (Rev B
 				// 2004.?? F-Zero AX - Monster Ride Cycraft Edition
 tfupdate		// 2004.?? Triforce GDROM Boot Update (GDT-0011)
 				// 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen
-				// 2005.12 Mario Kart Arcade Grand Prix
+mkartagp		// 2005.12 Mario Kart Arcade Grand Prix
 				// 2005.?? Donkey Kong Jungle Fever
 vs42006			// 2006.05 Virtua Striker 4 ver.2006
 				// 2007.03 Mario Kart Arcade Grand Prix 2
@@ -5662,6 +5676,8 @@ timepltc		// GX393 (c) 1982 + Centuri license
 timeplta		// GX393 (c) 1982 + Atari license
 spaceplt		// bootleg
 psurge			// (c) 1988 unknown (NOT Konami)
+chkun			// Peni Soft (NOT Konami)
+bikkuric		// Peni Soft (NOT Konami)
 megazone		// GX319 (c) 1983
 megazonea		// GX319 (c) 1983
 megazoneb		// GX319 (c) 1983 + Kosuka
@@ -5991,6 +6007,7 @@ rungunu			// GX247 (c) 1993 (US)
 rungunua		// GX247 (c) 1993 (US)
 slmdunkj		// GX247 (c) 1993 (Japan)
 dbz			// (c) 1993 Banpresto
+dbza			// (c) 1993 Banpresto
 dbz2			// (c) 1994 Banpresto
 bishi			// GX575 (c) 1996 (Japan)
 sbishi			// GX675 (c) 1998 (Japan)
@@ -7385,6 +7402,7 @@ cultures		// (c) 1994 Face
 // Midway Atlantis games
 mwskins         // (c) 2000 Midway
 mwskinsa        // (c) 2000 Midway
+mwskinso        // (c) 2000 Midway
 
 // Williams/Midway TMS games
 narc			// (c) 1988 Williams
@@ -7473,8 +7491,10 @@ crusnusa		// (c) 1994 Midway
 crusnusa40		// (c) 1994 Midway
 crusnusa21		// (c) 1994 Midway
 crusnwld		// (c) 1996 Midway
+crusnwld24		// (c) 1996 Midway
 crusnwld23		// (c) 1996 Midway
 crusnwld20		// (c) 1996 Midway
+crusnwld19		// (c) 1996 Midway
 crusnwld17		// (c) 1996 Midway
 crusnwld13		// (c) 1996 Midway
 offroadc		// (c) 1997 Midway (v1.63)
@@ -8297,6 +8317,7 @@ madshark		// (c) 1993 Allumer
 msgundam		// (c) 1993 Banpresto
 msgundam1		// (c) 1993 Banpresto
 daioh			// (C) 1993 Athena
+daioha			// (C) 1993 Athena
 oisipuzl		// (c) 1993 SunSoft / Atlus
 triplfun		// bootleg
 utoukond		// (c) 1993 Banpresto + Tsuburaya Prod.
@@ -8330,6 +8351,7 @@ deerhunta		// (c) 2000 Sammy USA Corporation
 deerhuntb		// (c) 2000 Sammy USA Corporation
 deerhuntc		// (c) 2000 Sammy USA Corporation
 deerhuntd		// (c) 2000 Sammy USA Corporation
+deerhunte		// (c) 2000 Sammy USA Corporation
 turkhunt		// (c) 2001 Sammy USA Corporation
 wschamp			// (c) 2001 Sammy USA Corporation
 wschampa		// (c) 2001 Sammy USA Corporation
@@ -9116,10 +9138,11 @@ gigasm2b		// (c) 1986 bootleg
 oigas			// (c) 1986 bootleg
 pbillrd			// (c) 1987 Nihon System
 pbillrds		// (c) 1988 Nihon System (+ optional Sega)
-freekick		// (c) 1988 Nihon System (+ optional Sega)
-freekickb		// (c) 1987 bootleg
+freekick		// (c) 1988 Nihon System licensed to Merit (+ optional Sega) NS6201-A 1987.10
+freekicka		// (c) 1988 Nihon System (+ optional Sega) NS6201-A 1987.9
+freekickb1		// (c) 1987 bootleg
 freekickb2		// (c) 1987 bootleg
-countrun		// (c) 1988 Nihon System (+ optional Sega)
+countrun		// (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb		// (c) 1988 bootleg
 countrunb2		// (c) 1988 bootleg
 
@@ -19798,16 +19821,17 @@ suprstar		// (c) 1996 Amatic
 am_mg24			// (c) 2000 Amatic
 am_mg3			// (c) 2000 Amatic
 am_mg3a			// (c) 2000 Amatic
+am_mg35i  		// (c) Amatic
+am_mg34i  		// (c) Amatic
+am_mg33i  		// (c) Amatic
+am_mg31i  		// (c) Amatic
+
 
 neptunp2
 rgum
 
 // Extrema Systems International Ltd.
 poker72
-
-// Peni Soft, actually an hack on modified Time Pilot HW
-chkun
-bikkuric
 
 // Blitz System Inc.
 megadpkr		// (c) 1990 Blitz System Inc

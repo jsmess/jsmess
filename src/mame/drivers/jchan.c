@@ -550,7 +550,7 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_SHARE("vscroll.0")									//
 	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_SHARE("layers_0_regs")	// Layers 0 Regs
 
-	/* background prites */
+	/* background sprites */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(jchan_suprnova_sprite32_2_w) AM_SHARE("spriteram_2")
 	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_2_w) AM_SHARE("sprregs_2")
 
@@ -807,5 +807,5 @@ static DRIVER_INIT( jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, jchan2,    0,        jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL)
+GAME( 1995, jchan2,    0,        jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

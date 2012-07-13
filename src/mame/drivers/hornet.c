@@ -316,6 +316,7 @@
 #include "machine/k033906.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
+#include "machine/ds2401.h"
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
@@ -407,12 +408,11 @@ WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, param);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static SCREEN_UPDATE_RGB32( hornet )
@@ -827,7 +827,7 @@ static INPUT_PORTS_START( sscope )
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Screen Flip (H)" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x40, 0x00, "Screen Flip (H)" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Screen Flip (V)" ) PORT_DIPLOCATION("SW:3")
@@ -853,6 +853,12 @@ static INPUT_PORTS_START( sscope )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+
+	PORT_START("ANALOG1")		// Gun Yaw
+	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG2")		// Gun Pitch
+	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
 INPUT_PORTS_END
 
 static const sharc_config sharc_cfg =
@@ -897,7 +903,7 @@ static MACHINE_RESET( hornet )
 	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 
@@ -909,7 +915,14 @@ static MACHINE_RESET( hornet )
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
 {
-	return (double)0.0;
+	int value = 0;
+	switch (input)
+	{
+		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read(); break;
+		case 1:		value = device->machine().root_device().ioport("ANALOG2")->read(); break;
+	}
+
+	return (double)(value) / 2047.0;
 }
 
 static const adc12138_interface hornet_adc_interface = {
@@ -965,6 +978,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hornet_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_assert, 1000)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
@@ -1019,14 +1033,17 @@ static MACHINE_RESET( hornet_2board )
 
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
+	{
 		machine.root_device().membank("bank5")->set_base(usr5);
+		machine.root_device().membank("bank6")->set_base(usr5);
+	}
 }
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
@@ -1092,6 +1109,12 @@ static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
 	MCFG_3DFX_VOODOO_CPU("dsp2")
 	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sscope2, hornet_2board_v2)
+
+	MCFG_DS2401_ADD("lan_serial_id")
+	MCFG_EEPROM_93C46_ADD("lan_eeprom")
 MACHINE_CONFIG_END
 
 
@@ -1378,6 +1401,12 @@ ROM_START(sscope2)
 
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
+
+	ROM_REGION(0x8, "lan_serial_id", 0)		/* LAN Board DS2401 */
+	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, NO_DUMP )
+
+	ROM_REGION(0x80, "lan_eeprom", 0)		/* LAN Board AT93C46 */
+	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, NO_DUMP )
 ROM_END
 
 ROM_START(gradius4)
@@ -1503,4 +1532,4 @@ GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0,
 GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,          sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
