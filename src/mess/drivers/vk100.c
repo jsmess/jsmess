@@ -30,8 +30,8 @@ VK100 LOGICBOARD
 |                           HD46505SP              4116 4116 4116 4116 |
 |                                                                      |
 |                                                  4116 4116 4116 4116 |
-|                 INTEL           ROM1                                 |
-|          PR1    P8251A                           4116 4116 4116 4116 |
+|      PR5        INTEL           ROM1                                 |
+|         PR1 PR6 P8251A                           4116 4116 4116 4116 |
 |                     45.6192MHz  ROM2                                 |
 |                                                  4116 4116 4116 4116 |
 | 4116 4116 4116  INTEL           ROM3  PR3                            |
@@ -148,20 +148,28 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 /* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf page 5-10 (pdf pg 114),
-The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 67ff.
+The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 6fff.
 */
 ROM_START( vk100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-031e4-00.rom1", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
-	ROM_LOAD( "23-017e4-00.rom2", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
-	ROM_LOAD( "23-018e4-00.rom3", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
-	ROM_LOAD( "23-190e2-00.rom4", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
+	ROM_LOAD( "23-031e4-00.rom1.ic51", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
+	ROM_LOAD( "23-017e4-00.rom2.ic52", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
+	ROM_LOAD( "23-018e4-00.rom3.ic53", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
+	ROM_LOAD( "23-190e2-00.rom4.ic54", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
 
 	ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "6301.pr3", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. or possibly both. (256*4)
-	ROM_LOAD( "6309.pr1", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf)) // this is probably the "DIRECTION ROM", but might not be. (256*8)
-	ROM_LOAD( "6309.pr2", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8)
-	ROM_LOAD( "7643.pr4", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // this is definitely the "PATTERN ROM", (1k*4)
+	// this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. (256*4, 82s129)
+	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4))
+	// this is probably the "DIRECTION ROM", but might not be. (256*8, 82s135)
+	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))
+	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+	ROM_LOAD( "wb---0_090b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label is horribly unclear, could be 090b1 or 000b1
+	// this is definitely the "PATTERN ROM", (1k*4, 82s137)
+	ROM_LOAD( "wb8201_655a-.m1-7643-5.pr4.ic17", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label is unclear, may be type a4 (= 1024x4 assuming a3 = 512x4 and a2 = 256x4)
+	// the following == mb6309 (256x8, 82s135)
+	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0700, 0x0100, NO_DUMP)
+	// the following = mb6331 (32x8, 82s123)
+	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0800, 0x0100, NO_DUMP) 
 ROM_END
 
 /* Driver */
