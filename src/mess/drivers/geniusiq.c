@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	/* internal flash */
-	MCFG_AMD_29F040_ADD("flash")	// should be AM29f010
+	MCFG_AMD_29F010_ADD("flash")
 MACHINE_CONFIG_END
 
 /* ROM definition */
