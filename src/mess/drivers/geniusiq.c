@@ -13,8 +13,8 @@ System driver:
 Memory map:
     00000000 System ROM (2MB)
     00200000 RAM (256K)
+    00400000 Flash memory (128K)
     00600000 Some memory mapped hardware
-    ???????? Flash memory (128K)
     ???????? Cartridge port
 
 TODO:
@@ -147,5 +147,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 1997, geniusiq,      0,   		   0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NO_SOUND_HW)
-COMP( 1997, geniusiq_de,   geniusiq,       0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NO_SOUND_HW)
+COMP( 1997, geniusiq,      0,   		   0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, geniusiq_de,   geniusiq,       0,    geniusiq,   geniusiq,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
