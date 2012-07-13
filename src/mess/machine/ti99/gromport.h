@@ -256,6 +256,7 @@ class ti99_cartridge_pcb
 	friend class ti99_cartridge_device;
 public:
 	ti99_cartridge_pcb();
+	virtual ~ti99_cartridge_pcb() { };
 
 protected:
 	virtual DECLARE_READ8Z_MEMBER(readz);
@@ -283,6 +284,8 @@ private:
 
 class ti99_standard_cartridge : public ti99_cartridge_pcb
 {
+public:
+	~ti99_standard_cartridge() { };
 };
 
 /*********** Paged cartridge (like Extended Basic) ********************/
@@ -290,6 +293,7 @@ class ti99_standard_cartridge : public ti99_cartridge_pcb
 class ti99_paged_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_paged_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -302,6 +306,7 @@ private:
 class ti99_minimem_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_minimem_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 };
@@ -311,6 +316,7 @@ public:
 class ti99_super_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_super_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 	void	crureadz(offs_t offset, UINT8 *value);
@@ -325,6 +331,7 @@ private:
 class ti99_mbx_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_mbx_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 private:
@@ -336,6 +343,7 @@ private:
 class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_paged379i_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 private:
@@ -348,6 +356,7 @@ private:
 class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 {
 public:
+	~ti99_pagedcru_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 	void	crureadz(offs_t offset, UINT8 *value);
