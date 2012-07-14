@@ -177,9 +177,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
 * ふたりはプリキュア - Futari wa Pretty Cure (Bandai - 200406xx - T-133480)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
-* 学研のおべんきょうソフト かんじ - Gakken no Obenkyou Soft - Kanji (Gakken - ???? - T-169010)
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
-* 学研のおべんきょうソフト かけざん 九九 - Gakken no Obenkyou Soft - Kakezan Kuku (Gakken - ???? - T-169040)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
 * 学研ピコで学習 １年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
@@ -189,7 +187,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * そだててまなぶ どうぶつ王国! - Sodate te Manabu Doubutsu Oukoku (Yonezawa - 1996xxxx - T-193030)
-* ガブッチョつりがっこう やったね!ぼくはつりめいじん - Gabucho Tsuri Gakkou Yatta ne! Boku Hatsuri Meijn (Yonezawa - 1998xxxx - T-193050)
 * シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
 * がんばれ!ぼくらのコンパチヒーローズ - Ganbare! Bokura no Compati Heroes (Banpresto - 1996xxxx - T-206010)
 * ドラえもん タイムマシンで大冒険! - Doraemon Time Machine de Daibouken! (Shogakukan - 19951027 - T-226010)
@@ -212,7 +209,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 右脳開発シリーズ9 日本昔ばなし - Unou Kaihatsu Series 9 Nihon Mukashi Banashi (Imagineer - 19951205 - T-150040)
 * 右脳開発シリーズ7 Tails and the Music Maker - Unou Kaihatsu Series 7 Tails and the Music Maker (Imagineer - 19951205 - T-150050)
 * 右脳開発シリーズ2 ＥＣＣＯ Ｊｒ - Unou Kaihatsu Series 2 ECCO Jr (Imagineer - 19951031 - T-150060)
-* 右脳開発シリーズ1 Richard Scarry's ハックルとローリー - Unou Kaihatsu Series 1 Richard Scarry's Huckle to Lowly (Imagineer - 19951031 - T-150070)
 * 右脳開発シリーズ3 ハローキティのまちへおでかけ - Unou Kaihatsu Series 3 Hello Kitty no Machi he Odekake (Imagineer - 19951031 - T-150080)
 * 右脳開発シリーズ4 けろけろけろっぴのいろかたち - Unou Kaihatsu Series 4 Kerokero Keroppi no Irokatachi (Imagineer - 19951104 - T-150100)
 * 右脳開発シリーズ6 アヒルのペックルのかぞえてみよう - Unou Kaihatsu Series 6 Ahiru no Pekkle no Kazoete Miyou (Imagineer - 19951104 - T-150110)
@@ -493,6 +489,19 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="gabucho">
+		<description>Gabucho Tsuri Gakkou Yatta ne! Boku Hatsuri Meijn (Jpn)</description>
+		<year>1998</year>
+		<publisher>Yonezawa</publisher>
+		<info name="serial" value="T-193050"/>
+		<info name="alt_title" value="ガブッチョつりがっこう やったね!ぼくはつりめいじん"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="gabucho tsuri gakkou yatta ne! boku hatsuri meijn (japan).bin" size="1048576" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anpanchi">
 		<description>Gakken Anpanman to Chinou Up! (Jpn)</description>
 		<year>2002</year>
@@ -529,6 +538,32 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gakken no obenkyou soft - hiragana (japan).bin" size="1048576" crc="1eb0ba1c" sha1="8ab5239a99ce2c97cfe0c4ec786538c8a153a71d" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkekan">
+		<description>Gakken no Obenkyou Soft - Kanji (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169010"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かんじ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gakken no obenkyou soft - kanji (japan).bin" size="524288" crc="68aacb63" sha1="40ae0e0b6f644511e8864acd1d1965de8151c7a6" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkekak">
+		<description>Gakken no Obenkyou Soft - Kakezan Kuku (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169040"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かけざん 九九"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="gakken no obenkyou soft - kakezan kuku (japan).bin" size="1048576" crc="6470b56e" sha1="6f5af8dfcdcea5f79a451e611e23b3e88432ef81" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -597,6 +632,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gojira dokidoki kaijuu shima (japan).bin" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlj" cloneof="hucklowl">
+		<description>Richard Scarry's - Huckle to Lowly (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150070"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ1 Richard Scarry's ハックルとローリー"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="flop" size="1048576">
+				<rom name="unou kaihatsu series 1 - richard scarry's huckle to lowly (japan).bin" size="1048576" crc="1b46e52f" sha1="83f33c26ec829d85b3226f85b2e0da78f7f65ff2" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2580,17 +2629,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kabucf">
-		<description>Kabutcho Challenge Fishing - Kabutcho Tsuri Gakkou (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Kabutcho Challenge Fishing - Kabutcho Tsuri Gakkou (J).bin" size="????" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
