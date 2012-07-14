@@ -1286,7 +1286,7 @@ Compiled by K1W1
 	<software name="buckrog">
 		<description>Buck Rogers - Planet of Zoom</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="005-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -1674,7 +1674,7 @@ Compiled by K1W1
 	<software name="congo">
 		<description>Congo Bongo</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="006-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -4854,7 +4854,7 @@ Compiled by K1W1
 	<software name="spyhunt">
 		<description>Spy Hunter</description>
 		<year>1984</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="011-03" />
 		<info name="usage" value="2 joysticks required to play." />
 		<part name="cart" interface="a800_cart">
@@ -4906,7 +4906,7 @@ Compiled by K1W1
 	<software name="startrek">
 		<description>Star Trek - Strategic Operations Simulator</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="004-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -5087,7 +5087,7 @@ Compiled by K1W1
 	<software name="szaxxon">
 		<description>Super Zaxxon</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="012-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -5677,7 +5677,7 @@ Compiled by K1W1
 	<software name="upndown">
 		<description>Up 'n Down</description>
 		<year>1984</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="009-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -5825,7 +5825,7 @@ Compiled by K1W1
 	<software name="zaxxon">
 		<description>Zaxxon</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="008-03" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />

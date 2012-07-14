@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 
-<softwarelist name="intvecs" description="Intellivision ecs cartridges">
+<softwarelist name="intvecs" description="Intellivision ECS cartridges">
 
 	<software name="jetsons">
 		<description>The Jetsons - Ways With Words</description>

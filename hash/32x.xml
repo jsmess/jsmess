@@ -1655,7 +1655,7 @@
 		</part>
 	</software>
 
-	<software name="startr" supported="no">
+	<software name="stsfleet" supported="no">
 		<description>Star Trek - Starfleet Academy - Starship Bridge Simulator (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>

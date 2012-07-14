@@ -1860,7 +1860,7 @@
 	<software name="buckrog">
 		<description>Buck Rogers: Planet of Zoom</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="005-05" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -1982,7 +1982,7 @@
 	<software name="congo">
 		<description>Congo Bongo</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="006-05" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -3737,7 +3737,7 @@
 	<software name="startrek">
 		<description>Star Trek: Strategic Operations Simulator</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="004-05" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -3998,7 +3998,7 @@
 	<software name="upndown">
 		<description>Up'n Down</description>
 		<year>1984</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="009-05" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />

@@ -682,7 +682,7 @@
     <software name="buckrog">
 		<description>Buck Rogers: Planet of Zoom</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="005-04" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
@@ -979,7 +979,7 @@
     <software name="congo">
 		<description>Congo Bongo (NTSC)</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="T006-04" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
@@ -3037,7 +3037,7 @@
 	<software name="startrek">
 		<description>Star Trek: Strategic Operations Simulator</description>
 		<year>1983</year>
-		<publisher>SEGA</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="006-04" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
