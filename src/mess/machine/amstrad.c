@@ -1197,9 +1197,9 @@ static void amstrad_setLowerRom(running_machine &machine)
 	}
 	else  // CPC+/GX4000
 	{
-		address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+		//address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-		if ( state->m_asic.enabled && ( state->m_asic.rmr2 & 0x18 ) == 0x18 )
+/*		if ( state->m_asic.enabled && ( state->m_asic.rmr2 & 0x18 ) == 0x18 )
 		{
 			space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),state));
 			space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),state));
@@ -1213,7 +1213,7 @@ static void amstrad_setLowerRom(running_machine &machine)
 			space->install_write_bank(0x4000, 0x5fff, "bank11");
 			space->install_write_bank(0x6000, 0x7fff, "bank12");
 		}
-
+*/
 		if(state->m_AmstradCPC_RamBanks[0] != NULL)
 		{
 			state->membank("bank1")->set_base(state->m_AmstradCPC_RamBanks[0]);
@@ -1407,101 +1407,115 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine &machine)
 WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
 {
 //  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
-	m_asic.ram[offset] = data & 0x0f;
+	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
+		m_asic.ram[offset] = data & 0x0f;
+	else
+	{
+		UINT8* RAM = (UINT8*)membank("bank11")->base();
+		RAM[offset] = data;
+	}
 }
 
 
 WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 {
-	m_asic.ram[offset+0x2000] = data;
-	if(offset >= 0x0400 && offset < 0x440 && ( offset & 0x01 ) ) // ASIC palette
+	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
-		m_asic.ram[ offset + 0x2000 ] = data & 0x0f;
-	}
-	if(offset == 0x0800)  // Programmable raster interrupt
-	{
-//      logerror("ASIC: Wrote %02x to PRI\n",data);
-		m_asic.pri = data;
-	}
-	if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers
-	{
-		logerror("ASIC: Split screen at line %i, address &%04x\n",m_asic.ram[0x2801],m_asic.ram[0x2803] + (m_asic.ram[0x2802] << 8));
-	}
-	if(offset == 0x0804)  // Soft scroll register
-	{
-	}
-	if(offset == 0x0805)  // Interrupt vector register (for IM 2, used by Pang)
-	{
-		// high 5 bits go to interrupt vector
-		int vector;
+		m_asic.ram[offset+0x2000] = data;
+		if(offset >= 0x0400 && offset < 0x440 && ( offset & 0x01 ) ) // ASIC palette
+		{
+			m_asic.ram[ offset + 0x2000 ] = data & 0x0f;
+		}
+		if(offset == 0x0800)  // Programmable raster interrupt
+		{
+	//      logerror("ASIC: Wrote %02x to PRI\n",data);
+			m_asic.pri = data;
+		}
+		if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers
+		{
+			logerror("ASIC: Split screen at line %i, address &%04x\n",m_asic.ram[0x2801],m_asic.ram[0x2803] + (m_asic.ram[0x2802] << 8));
+		}
+		if(offset == 0x0804)  // Soft scroll register
+		{
+		}
+		if(offset == 0x0805)  // Interrupt vector register (for IM 2, used by Pang)
+		{
+			// high 5 bits go to interrupt vector
+			int vector;
 
-		if ( m_asic.enabled )
-		{
-			vector = (data & 0xf8) + (m_plus_irq_cause);
-			device_set_input_line_vector(m_maincpu, 0, vector);
-			logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
+			if ( m_asic.enabled )
+			{
+				vector = (data & 0xf8) + (m_plus_irq_cause);
+				device_set_input_line_vector(m_maincpu, 0, vector);
+				logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
+			}
+			m_asic.dma_clear = data & 0x01;
 		}
-		m_asic.dma_clear = data & 0x01;
+		// DMA channels
+		switch(offset)
+		{
+		case 0x0c00:
+		case 0x0c01:
+			m_asic.dma_addr[0] = (m_asic.ram[0x2c01] << 8) + m_asic.ram[0x2c00];
+			m_asic.dma_status &= ~0x01;
+			logerror("ASIC: DMA 0 address set to &%04x\n",m_asic.dma_addr[0]);
+			break;
+		case 0x0c04:
+		case 0x0c05:
+			m_asic.dma_addr[1] = (m_asic.ram[0x2c05] << 8) + m_asic.ram[0x2c04];
+			m_asic.dma_status &= ~0x02;
+			logerror("ASIC: DMA 1 address set to &%04x\n",m_asic.dma_addr[1]);
+			break;
+		case 0x0c08:
+		case 0x0c09:
+			m_asic.dma_addr[2] = (m_asic.ram[0x2c09] << 8) + m_asic.ram[0x2c08];
+			m_asic.dma_status &= ~0x04;
+			logerror("ASIC: DMA 2 address set to &%04x\n",m_asic.dma_addr[2]);
+			break;
+		case 0x0c02:
+			m_asic.dma_prescaler[0] = data + 1;
+			logerror("ASIC: DMA 0 pause prescaler set to %i\n",data);
+			break;
+		case 0x0c06:
+			m_asic.dma_prescaler[1] = data + 1;
+			logerror("ASIC: DMA 1 pause prescaler set to %i\n",data);
+			break;
+		case 0x0c0a:
+			m_asic.dma_prescaler[2] = data + 1;
+			logerror("ASIC: DMA 2 pause prescaler set to %i\n",data);
+			break;
+		case 0x0c0f:
+			m_asic.dma_status = data;
+			logerror("ASIC: DMA status write - %02x\n",data);
+			if(data & 0x40)
+			{
+				logerror("ASIC: DMA 0 IRQ acknowledge\n");
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				m_plus_irq_cause = 0x06;
+				m_asic.ram[0x2c0f] &= ~0x40;
+			}
+			if(data & 0x20)
+			{
+				logerror("ASIC: DMA 1 IRQ acknowledge\n");
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				m_plus_irq_cause = 0x06;
+				m_asic.ram[0x2c0f] &= ~0x20;
+			}
+			if(data & 0x10)
+			{
+				logerror("ASIC: DMA 2 IRQ acknowledge\n");
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				m_plus_irq_cause = 0x06;
+				m_asic.ram[0x2c0f] &= ~0x10;
+			}
+			m_asic.ram[0x2c0f] = (m_asic.ram[0x2c0f] & 0xf8) | (data & 0x07);
+			break;
+		}
 	}
-	// DMA channels
-	switch(offset)
+	else
 	{
-	case 0x0c00:
-	case 0x0c01:
-		m_asic.dma_addr[0] = (m_asic.ram[0x2c01] << 8) + m_asic.ram[0x2c00];
-		m_asic.dma_status &= ~0x01;
-		logerror("ASIC: DMA 0 address set to &%04x\n",m_asic.dma_addr[0]);
-		break;
-	case 0x0c04:
-	case 0x0c05:
-		m_asic.dma_addr[1] = (m_asic.ram[0x2c05] << 8) + m_asic.ram[0x2c04];
-		m_asic.dma_status &= ~0x02;
-		logerror("ASIC: DMA 1 address set to &%04x\n",m_asic.dma_addr[1]);
-		break;
-	case 0x0c08:
-	case 0x0c09:
-		m_asic.dma_addr[2] = (m_asic.ram[0x2c09] << 8) + m_asic.ram[0x2c08];
-		m_asic.dma_status &= ~0x04;
-		logerror("ASIC: DMA 2 address set to &%04x\n",m_asic.dma_addr[2]);
-		break;
-	case 0x0c02:
-		m_asic.dma_prescaler[0] = data + 1;
-		logerror("ASIC: DMA 0 pause prescaler set to %i\n",data);
-		break;
-	case 0x0c06:
-		m_asic.dma_prescaler[1] = data + 1;
-		logerror("ASIC: DMA 1 pause prescaler set to %i\n",data);
-		break;
-	case 0x0c0a:
-		m_asic.dma_prescaler[2] = data + 1;
-		logerror("ASIC: DMA 2 pause prescaler set to %i\n",data);
-		break;
-	case 0x0c0f:
-		m_asic.dma_status = data;
-		logerror("ASIC: DMA status write - %02x\n",data);
-		if(data & 0x40)
-		{
-			logerror("ASIC: DMA 0 IRQ acknowledge\n");
-			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
-			m_plus_irq_cause = 0x06;
-			m_asic.ram[0x2c0f] &= ~0x40;
-		}
-		if(data & 0x20)
-		{
-			logerror("ASIC: DMA 1 IRQ acknowledge\n");
-			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
-			m_plus_irq_cause = 0x06;
-			m_asic.ram[0x2c0f] &= ~0x20;
-		}
-		if(data & 0x10)
-		{
-			logerror("ASIC: DMA 2 IRQ acknowledge\n");
-			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
-			m_plus_irq_cause = 0x06;
-			m_asic.ram[0x2c0f] &= ~0x10;
-		}
-		m_asic.ram[0x2c0f] = (m_asic.ram[0x2c0f] & 0xf8) | (data & 0x07);
-		break;
+		UINT8* RAM = (UINT8*)membank("bank12")->base();
+		RAM[offset] = data;
 	}
 }
 
@@ -1509,54 +1523,68 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x4000);
-	return m_asic.ram[offset];
+	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
+		return m_asic.ram[offset];
+	else
+	{
+		UINT8* RAM = (UINT8*)membank("bank3")->base();
+		return RAM[offset];
+	}
 }
 
 
 READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x6000);
-	// Analogue ports
-	if(offset == 0x0808)
+	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
-		return (ioport("analog1")->read() & 0x3f);
+		// Analogue ports
+		if(offset == 0x0808)
+		{
+			return (ioport("analog1")->read() & 0x3f);
+		}
+		if(offset == 0x0809)
+		{
+			return (ioport("analog2")->read() & 0x3f);
+		}
+		if(offset == 0x080a)
+		{
+			return (ioport("analog3")->read() & 0x3f);
+		}
+		if(offset == 0x080b)
+		{
+			return (ioport("analog4")->read() & 0x3f);
+		}
+		if(offset == 0x080c || offset == 0x080e)
+		{
+			return 0x3f;
+		}
+		if(offset == 0x080d || offset == 0x080f)
+		{
+			return 0x00;
+		}
+	#if 0
+		if(offset == 0x0c0f)  // DMA status and control
+		{
+			int result = 0;
+			if(m_plus_irq_cause == 0x00)
+				result |= 0x40;
+			if(m_plus_irq_cause == 0x02)
+				result |= 0x20;
+			if(m_plus_irq_cause == 0x04)
+				result |= 0x10;
+			if(m_plus_irq_cause == 0x06)
+				result |= 0x80;
+			return result;
+		}
+	#endif
+		return m_asic.ram[offset+0x2000];
 	}
-	if(offset == 0x0809)
+	else
 	{
-		return (ioport("analog2")->read() & 0x3f);
+		UINT8* RAM = (UINT8*)membank("bank4")->base();
+		return RAM[offset];
 	}
-	if(offset == 0x080a)
-	{
-		return (ioport("analog3")->read() & 0x3f);
-	}
-	if(offset == 0x080b)
-	{
-		return (ioport("analog4")->read() & 0x3f);
-	}
-	if(offset == 0x080c || offset == 0x080e)
-	{
-		return 0x3f;
-	}
-	if(offset == 0x080d || offset == 0x080f)
-	{
-		return 0x00;
-	}
-#if 0
-	if(offset == 0x0c0f)  // DMA status and control
-	{
-		int result = 0;
-		if(m_plus_irq_cause == 0x00)
-			result |= 0x40;
-		if(m_plus_irq_cause == 0x02)
-			result |= 0x20;
-		if(m_plus_irq_cause == 0x04)
-			result |= 0x10;
-		if(m_plus_irq_cause == 0x06)
-			result |= 0x80;
-		return result;
-	}
-#endif
-	return m_asic.ram[offset+0x2000];
 }
 
 
@@ -2954,6 +2982,7 @@ MACHINE_START( plus )
 MACHINE_RESET( plus )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = state->memregion("maincpu")->base();
 
@@ -2986,6 +3015,11 @@ MACHINE_RESET( plus )
 	AmstradCPC_GA_SetRamConfiguration(machine);
 	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
+	space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),state));
+	space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),state));
+	space->install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),state));
+	space->install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),state));
+
 	//  multiface_init();
 	machine.scheduler().timer_set( attotime::zero, FUNC(cb_set_resolution));
 }
@@ -3000,6 +3034,7 @@ MACHINE_START( gx4000 )
 MACHINE_RESET( gx4000 )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = state->memregion("maincpu")->base();
 
@@ -3032,6 +3067,10 @@ MACHINE_RESET( gx4000 )
 	AmstradCPC_GA_SetRamConfiguration(machine);
 	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
+	space->install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),state));
+	space->install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),state));
+	space->install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),state));
+	space->install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),state));
 
 	machine.scheduler().timer_set( attotime::zero, FUNC(cb_set_resolution));
 }

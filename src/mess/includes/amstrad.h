@@ -108,14 +108,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ay;
-	required_device<device_t> m_fdc;
+	optional_device<device_t> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi;
-	required_device<centronics_device> m_centronics;
-	required_device<cassette_image_device> m_cassette;
+	optional_device<centronics_device> m_centronics;  // not on a GX4000
+	optional_device<cassette_image_device> m_cassette; // not on a GX4000, (or technically, the 6128+)
 	required_device<ram_device> m_ram;
-	required_device<cpc_expansion_slot_device> m_exp;
+	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000
 	optional_device<mc146818_device> m_rtc;  // Aleste 520EX only
 
 	int m_system_type;
