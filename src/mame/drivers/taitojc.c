@@ -1,8 +1,30 @@
-/*
+/*************************************************************************
 
-Taito JC System
+  Taito JC System
 
-Driver by Ville Linde, based on the preliminary driver by David Haywood
+  Driver by Ville Linde, based on the preliminary driver by David Haywood
+
+Taito custom chips on this hardware:
+- TC0640FIO      : I/O
+- TC0770CMU      : Math co-processor?
+- TC0780FPA x 2  : Polygon/Texture renderer?
+- TC0840GLU      : 2D graphics?
+- TC0870HVP      : Vertex processor?
+
+TODO:
+- dendego intro object RAM usage has various gfx bugs (check video file)
+- dendego title screen builds up and it shouldn't
+- dendego attract mode train doesn't ride, the doors light doesn't turn on.
+- landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
+- landgear has huge 3d problems on gameplay (CPU comms?)
+- dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
+- add idle skips if possible
+- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
+
+--------------------------------------------------------------------------
+
+PCB notes:
+
 
 Side By Side 2
 Taito, 1997
@@ -18,10 +40,10 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |54MHz                                   E23-32-1.51              43256           |
 |         424210 424210                                           43256           |
 |                      E23-29.39                                                  |
-|E23-25-1.3 TCO870HVP             E23-31.46                                       |
+|E23-25-1.3 TC0870HVP             E23-31.46                                       |
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
-|                              MC68040RC25            CXD1178Q    TCO640FIO       |
+|                              MC68040RC25            CXD1178Q    TC0640FIO       |
 |424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
@@ -30,18 +52,18 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                                             CY7B991       MB8421-90             |
 |4218160    43256                    CY7B991                                      |
 |                                                                                 |
-|           43256        TCO770CMU                          E23-35.110            |
+|           43256        TC0770CMU                          E23-35.110            |
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
-|E23-27.13  TCO780FPA                                                             |
+|E23-27.13  TC0780FPA                                                             |
 |           (QFP240)                                        ENSONIC               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160               D482445                                                    |
-|                                 TCO840GLU                 MC33274   TDA1543     |
+|                                 TC0840GLU                 MC33274   TDA1543     |
 |                      D482445    (QFP144)                                        |
 |4218160                                      16MHz         MB87078               |
-|           TCO780FPA  D482445           30.4761MHz                               |
+|           TC0780FPA  D482445           30.4761MHz                               |
 |           (QFP240)              ENSONIC                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
@@ -154,13 +176,13 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |54MHz                                                            43256           |
 |                                                                                 |
 |TC514260                                                                         |
-|         TCO870HVP  uPD424210                                    TCO640FIO       |
+|         TC0870HVP  uPD424210                                    TC0640FIO       |
 |TC514260 (QFP208)   uPD424210             E07-08.65              (QFP120)        |
 |E07-02.4                                                                         |
 |                                                                                 |
 |TMS320C51  43256                                                                 |
 |(QFP132)   43256              MC68040RC25          E07-10.116  93C46.91          |
-|labelled          TCO770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
+|labelled          TC0770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
 |"Taito E07-11"    (QFP208)                         E07-09.82      MB3771         |
 |                                                                                 |
 |                                                            MB8421-90            |
@@ -169,15 +191,15 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |TC528257   TC514260                                                              |
 |                              E07-07.49    CY7B991                               |
 |TC528257   TC514260           E07-03.50                     TC511664             |
-|                     TCO780FPA                                                   |
+|                     TC0780FPA                                                   |
 |TC528257   TC514260  (QFP240)           10MHz   MC68EC000   ENSONIC              |
 |                                 CY7B991                    ESPR6 ES5510         |
 |TC528257   TC514260                                                              |
 |                                                                                 |
-|TC528257   TC514260              TCO840GLU   TC51832       MC33274   TDA1543     |
+|TC528257   TC514260              TC0840GLU   TC51832       MC33274   TDA1543     |
 |                                 (QFP144)    TC51832                             |
 |TC528257   TC514260                             16MHz      MB87078               |
-|                     TCO780FPA          30.4761MHz                               |
+|                     TC0780FPA          30.4761MHz                               |
 |TC528257   TC514260  (QFP240)                                                    |
 |                                           ENSONIC                               |
 |TC528257             E07-05.22             OTISR2                                |
@@ -248,10 +270,10 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |54MHz                                   E23-32-1.51              43256           |
 |         424210 424210                                           43256           |
 |                      E23-29.39                                                  |
-|E23-25-1.3 TCO870HVP             E23-31.46                                       |
+|E23-25-1.3 TC0870HVP             E23-31.46                                       |
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
-|                              MC68040RC25            CXD1178Q    TCO640FIO       |
+|                              MC68040RC25            CXD1178Q    TC0640FIO       |
 |424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
@@ -260,18 +282,18 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                                             CY7B991       MB8421-90             |
 |4218160    43256                    CY7B991                                      |
 |                                                                                 |
-|           43256        TCO770CMU                          E23-35.110            |
+|           43256        TC0770CMU                          E23-35.110            |
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
-|E23-27.13  TCO780FPA                                                             |
+|E23-27.13  TC0780FPA                                                             |
 |           (QFP240)                                        ENSONIC               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160               D482445                                                    |
-|                                 TCO840GLU                 MC33274   TDA1543     |
+|                                 TC0840GLU                 MC33274   TDA1543     |
 |                      D482445    (QFP144)                                        |
 |4218160                                      16MHz         MB87078               |
-|           TCO780FPA  D482445           30.4761MHz                               |
+|           TC0780FPA  D482445           30.4761MHz                               |
 |           (QFP240)              ENSONIC                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
@@ -336,18 +358,6 @@ Notes:
       ROM  .65 is 27C512, linked to 68HC11 MCU
       *    Unpopulated socket.
 
-
-
-    TODO:
-        - dendego intro object RAM usage has various gfx bugs (check video file)
-        - dendego title screen builds up and it shouldn't
-        - dendego attract mode train doesn't ride, the doors light doesn't turn on.
-        - dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
-        - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
-        - landgear has huge 3d problems on gameplay (CPU comms?)
-        - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
-        - add idle skips if possible
-        - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
 #include "emu.h"
@@ -357,248 +367,26 @@ Notes:
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
+#include "machine/taitoio.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 
 #include "dendego.lh"
 
 
-#define POLYGON_FIFO_SIZE		100000
+/***************************************************************************
 
-READ32_MEMBER(taitojc_state::taitojc_palette_r)
-{
-	return m_palette_ram[offset];
-}
+  maincpu I/O
 
-WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
-{
-	int r, g, b;
-	UINT32 color;
+***************************************************************************/
 
-	COMBINE_DATA( m_palette_ram + offset );
-
-	color = m_palette_ram[offset];
-	r = (color >>  8) & 0xff;
-	g = (color >> 16) & 0xff;
-	b = (color >>  0) & 0xff;
-
-	palette_set_color(machine(),offset, MAKE_RGB(r, g, b));
-}
-
-READ32_MEMBER(taitojc_state::jc_control_r)
-{
-	UINT32 r = 0;
-
-	if(ACCESSING_BITS_0_15)
-		printf("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
-	switch(offset)
-	{
-		case 0x0:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ((ioport("COINS")->read() & 0x2) << 2) << 24;
-			}
-			return r;
-		}
-		case 0x1:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("COINS")->read() << 24;
-			}
-			return r;
-		}
-		case 0x2:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("START")->read() << 24;
-			}
-			return r;
-		}
-		case 0x3:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("UNUSED")->read() << 24;
-			}
-			return r;
-		}
-		case 0x4:
-		{
-			if (ACCESSING_BITS_16_31)
-			{
-				r |= m_outputs << 16;
-			}
-			return r;
-		}
-		case 0x7:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("BUTTONS")->read() << 24;
-			}
-			return r;
-		}
-
-		default:
-			break;
-	}
-
-	logerror("jc_control_r: %08X, %08X\n", offset, mem_mask);
-	return 0;
-}
-
-WRITE32_MEMBER(taitojc_state::jc_coin_counters_w)
-{
-	COMBINE_DATA(&m_outputs);
-
-	coin_lockout_w(machine(), 0, !(data & 0x01000000));
-	coin_lockout_w(machine(), 1, !(data & 0x02000000));
-	coin_counter_w(machine(), 0, data & 0x04000000);
-	coin_counter_w(machine(), 1, data & 0x08000000);
-}
-
-WRITE32_MEMBER(taitojc_state::jc_control_w)
-{
-	//mame_printf_debug("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-
-	switch(offset)
-	{
-		case 0x3:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				ioport("EEPROMOUT")->write(data >> 24, 0xff);
-			}
-			else
-				popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-			return;
-		}
-
-		default:
-			popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-			break;
-	}
-}
-
-
-
-static UINT8 mcu_comm_reg_r(address_space *space, int reg)
-{
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
-	UINT8 r = 0;
-
-	switch (reg)
-	{
-		case 0x03:
-		{
-			r = state->m_mcu_data_main;
-			break;
-		}
-		case 0x04:
-		{
-			r = state->m_mcu_comm_main | 0x14;
-			break;
-		}
-		default:
-		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
-			break;
-		}
-	}
-
-	return r;
-}
-
-static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
-{
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
-
-	switch (reg)
-	{
-		case 0x00:
-		{
-			state->m_mcu_data_hc11 = data;
-			state->m_mcu_comm_hc11 &= ~0x04;
-			state->m_mcu_comm_main &= ~0x20;
-			break;
-		}
-		case 0x04:
-		{
-			break;
-		}
-		default:
-		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
-			break;
-		}
-	}
-}
-
-READ32_MEMBER(taitojc_state::mcu_comm_r)
-{
-	UINT32 r = 0;
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 0) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 1) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 2) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 3) << 0;
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(taitojc_state::mcu_comm_w)
-{
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		mcu_comm_reg_w(&space, reg + 0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mcu_comm_reg_w(&space, reg + 1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mcu_comm_reg_w(&space, reg + 2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mcu_comm_reg_w(&space, reg + 3, (data >> 0) & 0xff);
-	}
-}
-
-READ8_MEMBER(taitojc_state::jc_pcbid_r)
-{
-	static const char pcb_id[0x40] =
-	{ "Needs proper PCB ID here!"};
-
-	return pcb_id[offset];
-}
+#define DEBUG_DSP				0
+#define DEBUG_BLOCK_MOVES		0
 
 READ32_MEMBER(taitojc_state::dsp_shared_r)
 {
 	return m_dsp_shared_ram[offset] << 16;
 }
-
-#define DEBUG_DSP				0
-#define DEBUG_BLOCK_MOVES		0
 
 #if DEBUG_DSP
 
@@ -729,7 +517,7 @@ static void debug_dsp_command(running_machine &machine)
 
 	printf("\n");
 }
-#endif
+#endif // DEBUG_DSP
 
 WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 {
@@ -782,6 +570,107 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 	}
 }
 
+
+
+static UINT8 mcu_comm_reg_r(address_space *space, int reg)
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+	UINT8 r = 0;
+
+	switch (reg)
+	{
+		case 0x03:
+		{
+			r = state->m_mcu_data_main;
+			break;
+		}
+		case 0x04:
+		{
+			r = state->m_mcu_comm_main | 0x14;
+			break;
+		}
+		default:
+		{
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
+			break;
+		}
+	}
+
+	return r;
+}
+
+static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	switch (reg)
+	{
+		case 0x00:
+		{
+			state->m_mcu_data_hc11 = data;
+			state->m_mcu_comm_hc11 &= ~0x04;
+			state->m_mcu_comm_main &= ~0x20;
+			break;
+		}
+		case 0x04:
+		{
+			break;
+		}
+		default:
+		{
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
+			break;
+		}
+	}
+}
+
+READ32_MEMBER(taitojc_state::mcu_comm_r)
+{
+	UINT32 r = 0;
+	int reg = offset * 4;
+
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 0) << 24;
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 1) << 16;
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 2) << 8;
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 3) << 0;
+	}
+
+	return r;
+}
+
+WRITE32_MEMBER(taitojc_state::mcu_comm_w)
+{
+	int reg = offset * 4;
+
+	if (ACCESSING_BITS_24_31)
+	{
+		mcu_comm_reg_w(&space, reg + 0, (data >> 24) & 0xff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		mcu_comm_reg_w(&space, reg + 1, (data >> 16) & 0xff);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		mcu_comm_reg_w(&space, reg + 2, (data >> 8) & 0xff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		mcu_comm_reg_w(&space, reg + 3, (data >> 0) & 0xff);
+	}
+}
+
 READ32_MEMBER(taitojc_state::snd_share_r)
 {
 	switch (offset & 3)
@@ -809,10 +698,34 @@ WRITE32_MEMBER(taitojc_state::snd_share_w)
 	}
 }
 
+
+READ8_MEMBER(taitojc_state::jc_pcbid_r)
+{
+	static const char pcb_id[0x40] =
+	{ "Needs proper PCB ID here!"};
+
+	return pcb_id[offset];
+}
+
+
+/*
+
+Some games (Dangerous Curves, Side by Side, Side by Side 2) were released as Twin cabinets,
+allowing 2 players to compete eachother.
+
+Not emulated yet...
+
+*/
+
 READ32_MEMBER(taitojc_state::jc_lan_r)
 {
 	return 0xffffffff;
 }
+
+WRITE32_MEMBER(taitojc_state::jc_lan_w)
+{
+}
+
 
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
@@ -824,13 +737,11 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r, 0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
-	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITENOP // watchdog?
-	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
-	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
+	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8_LEGACY("tc0640fio", tc0640fio_r, tc0640fio_w, 0xff000000)
+	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
-	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r)
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE(jc_lan_r, jc_lan_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
@@ -872,7 +783,13 @@ static ADDRESS_MAP_START( dendego_map, AS_PROGRAM, 32, taitojc_state )
 ADDRESS_MAP_END
 
 
-/*****************************************************************************/
+
+
+/***************************************************************************
+
+  MCU I/O
+
+***************************************************************************/
 
 READ8_MEMBER(taitojc_state::hc11_comm_r)
 {
@@ -883,7 +800,24 @@ WRITE8_MEMBER(taitojc_state::hc11_comm_w)
 {
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
+READ8_MEMBER(taitojc_state::hc11_data_r)
+{
+	m_mcu_comm_hc11 |= 0x04;
+	m_mcu_comm_main |= 0x20;
+	return m_mcu_data_hc11;
+}
+
+WRITE8_MEMBER(taitojc_state::hc11_data_w)
+{
+	m_mcu_data_main = data;
+}
+
+READ8_MEMBER(taitojc_state::hc11_output_r)
+{
+	return m_mcu_output;
+}
+
+WRITE8_MEMBER(taitojc_state::hc11_output_w)
 {
 /*
 	cabinet lamps, active high
@@ -906,18 +840,8 @@ WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
 */
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, data >> i & 1);
-}
 
-READ8_MEMBER(taitojc_state::hc11_data_r)
-{
-	m_mcu_comm_hc11 |= 0x04;
-	m_mcu_comm_main |= 0x20;
-	return m_mcu_data_hc11;
-}
-
-WRITE8_MEMBER(taitojc_state::hc11_data_w)
-{
-	m_mcu_data_main = data;
+	m_mcu_output = data;
 }
 
 READ8_MEMBER(taitojc_state::hc11_analog_r)
@@ -935,21 +859,86 @@ static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, taitojc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
-	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP
+	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP // ?
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
-	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_WRITE(hc11_lamps_w)
+	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_READWRITE(hc11_output_r, hc11_output_w)
 	AM_RANGE(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA) AM_READWRITE(hc11_data_r, hc11_data_w)
 	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ(hc11_analog_r)
 ADDRESS_MAP_END
 
-/*****************************************************************************/
+
+
+
+/***************************************************************************
+
+  DSP I/O
+
+***************************************************************************/
+
+/*
+    Math co-processor memory map
+
+    0x7000: Projection point Y
+    0x7001: Projection point X
+    0x7002: Projection point Z
+    0x7003: Frustum Min Z(?)
+    0x7004: Frustum Max Z(?)
+    0x7010: Line intersection, parameter length
+    0x7011: Line intersection, intersection point
+    0x7012: Line intersection, line length
+    0x7013: Viewport Width / 2
+    0x7014: Viewport Height / 2
+    0x7015: Viewport Z / 2 (?)
+    0x701b: Line intersection, parameter interpolation read
+    0x701d: Projected point Y read
+    0x701f: Projected point X read
+    0x7022: Unknown read
+    0x7030: Unknown write
+    0x703b: Unknown read/write
+*/
+
+WRITE16_MEMBER(taitojc_state::dsp_math_projection_w)
+{
+	m_projection_data[offset] = data;
+}
+
+WRITE16_MEMBER(taitojc_state::dsp_math_viewport_w)
+{
+	m_viewport_data[offset] = data;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_projection_y_r)
+{
+	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_projection_x_r)
+{
+	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
+}
+
+WRITE16_MEMBER(taitojc_state::dsp_math_intersection_w)
+{
+	m_intersection_data[offset] = data;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_intersection_r)
+{
+	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_unk_r)
+{
+	return 0x7fff;
+}
+
+
+/**************************************************************************/
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
-	UINT16 data = ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
-
-	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
-	return data;
+	//assert (m_dsp_rom_pos < 0x800000); // never happens
+	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_rom_w)
@@ -959,7 +948,7 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 		m_dsp_rom_pos &= 0xffff;
 		m_dsp_rom_pos |= data << 16;
 	}
-	else if (offset == 1)
+	else
 	{
 		m_dsp_rom_pos &= 0xffff0000;
 		m_dsp_rom_pos |= data;
@@ -1002,57 +991,8 @@ WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 
 WRITE16_MEMBER(taitojc_state::dsp_polygon_fifo_w)
 {
+	//assert (m_polygon_fifo_ptr < TAITOJC_POLYGON_FIFO_SIZE); // never happens
 	m_polygon_fifo[m_polygon_fifo_ptr++] = data;
-
-	if (m_polygon_fifo_ptr >= POLYGON_FIFO_SIZE)
-	{
-		fatalerror("dsp_polygon_fifo_w: fifo overflow!\n");
-	}
-}
-
-
-
-READ16_MEMBER(taitojc_state::dsp_unk_r)
-{
-	return 0x7fff;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_viewport_w)
-{
-	m_viewport_data[offset] = (INT16)(data);
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_projection_w)
-{
-	m_projection_data[offset] = (INT16)(data);
-
-	if (offset == 2)
-	{
-		if (m_projection_data[2] != 0)
-		{
-			m_projected_point_y = (m_projection_data[0] * m_viewport_data[0]) / (m_projection_data[2]);
-			m_projected_point_x = (m_projection_data[1] * m_viewport_data[1]) / (m_projection_data[2]);
-		}
-		else
-		{
-			m_projected_point_y = 0;
-			m_projected_point_x = 0;
-		}
-	}
-}
-
-READ16_MEMBER(taitojc_state::dsp_projection_r)
-{
-	if (offset == 0)
-	{
-		return m_projected_point_y;
-	}
-	else if (offset == 2)
-	{
-		return m_projected_point_x;
-	}
-
-	return 0;
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
@@ -1066,37 +1006,6 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	}
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_intersection_w)
-{
-	m_intersection_data[offset] = (INT32)(INT16)(data);
-}
-
-READ16_MEMBER(taitojc_state::dsp_intersection_r)
-{
-	return (INT16)((m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2]);
-}
-
-/*
-    Math co-processor memory map
-
-    0x7000: Projection point Y
-    0x7001: Projection point X
-    0x7002: Projection point Z
-    0x7003: Frustum Min Z(?)
-    0x7004: Frustum Max Z(?)
-    0x7010: Line intersection, parameter length
-    0x7011: Line intersection, intersection point
-    0x7012: Line intersection, line length
-    0x7013: Viewport Width / 2
-    0x7014: Viewport Height / 2
-    0x7015: Viewport Z / 2 (?)
-    0x701b: Line intersection, parameter interpolation read
-    0x701d: Projected point Y read
-    0x701f: Projected point X read
-    0x7022: Unknown read
-    0x7030: Unknown write
-*/
-
 READ16_MEMBER(taitojc_state::dsp_to_main_r)
 {
 	return m_dsp_shared_ram[0x7fe];
@@ -1109,6 +1018,7 @@ WRITE16_MEMBER(taitojc_state::dsp_to_main_w)
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 }
 
+
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1120,24 +1030,41 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x6b22, 0x6b22) AM_WRITE(dsp_texture_w)
 	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE(dsp_texaddr_r, dsp_texaddr_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_READWRITE(dsp_rom_r, dsp_rom_w)
-	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_projection_w)
-	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_intersection_w)
-	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_viewport_w)
-	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
-	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
-	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
+	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_math_projection_w)
+	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_math_intersection_w)
+	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_math_viewport_w)
+	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_math_intersection_r)
+	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
+	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
+	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r, dsp_to_main_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-/*****************************************************************************/
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( common )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1176,9 +1103,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dendego )
@@ -1261,6 +1188,12 @@ INPUT_PORTS_END
 
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
 static MACHINE_RESET( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -1278,9 +1211,7 @@ static MACHINE_RESET( taitojc )
 	state->m_dsp_rom_pos = 0;
 	state->m_dsp_tex_address = 0;
 	state->m_dsp_tex_offset = 0;
-
-	state->m_projected_point_x = 0;
-	state->m_projected_point_y = 0;
+	state->m_polygon_fifo_ptr = 0;
 
 	memset(state->m_viewport_data, 0, sizeof(state->m_viewport_data));
 	memset(state->m_projection_data, 0, sizeof(state->m_projection_data));
@@ -1295,13 +1226,18 @@ static INTERRUPT_GEN( taitojc_vblank )
 	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
 }
 
-static const hc11_config taitojc_config =
+static const tc0640fio_interface taitojc_io_intf =
 {
-	1,		//has extended I/O
-	1280,	//internal RAM size
-	0x00	//INIT defaults to 0x00
+	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COINS"),
+	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("UNUSED"), DEVCB_INPUT_PORT("BUTTONS")
 };
 
+static const hc11_config taitojc_hc11_config =
+{
+	1,		// has extended I/O
+	1280,	// internal RAM size
+	0x00	// INIT defaults to 0x00
+};
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	/* basic machine hardware */
@@ -1309,10 +1245,10 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
+	MCFG_CPU_ADD("sub", MC68HC11, 4000000) // MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
-	MCFG_CPU_CONFIG(taitojc_config)
+	MCFG_CPU_CONFIG(taitojc_hc11_config)
 
 	MCFG_CPU_ADD("dsp", TMS32051, 50000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
@@ -1321,7 +1257,10 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(taitojc)
+
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TC0640FIO_ADD("tc0640fio", taitojc_io_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1354,6 +1293,15 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 
+
+
+
+/***************************************************************************
+
+  Game Drivers
+
+***************************************************************************/
+
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
 	if(cpu_get_pc(&space.device())==0x404c)
@@ -1375,11 +1323,12 @@ WRITE16_MEMBER(taitojc_state::dsp_idle_skip_w)
 	COMBINE_DATA(&m_dsp_shared_ram[0x7f0]);
 }
 
+
 static DRIVER_INIT( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 
-	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
+	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, TAITOJC_POLYGON_FIFO_SIZE);
 
 	state->m_has_dsp_hack = 1;
 
@@ -1395,7 +1344,6 @@ static DRIVER_INIT( dendego2 )
 	machine.device("dsp")->memory().space(AS_DATA)->install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),state), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),state));
 }
 
-
 static DRIVER_INIT( dangcurv )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -1404,6 +1352,9 @@ static DRIVER_INIT( dangcurv )
 
 	state->m_has_dsp_hack = 0;
 }
+
+
+/**************************************************************************/
 
 ROM_START( sidebs )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
@@ -1808,7 +1759,7 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1862,7 +1813,7 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1916,7 +1867,7 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1970,7 +1921,7 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
