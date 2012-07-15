@@ -9,6 +9,7 @@
               attach hd46505sp CRTC
               emulate vector generator hardware
               attach keyboard
+              calculate or measure the correct beeper frequency
 ****************************************************************************/
 /*
 DEC VK100
@@ -46,33 +47,107 @@ Notes:
       ROM2 - TP-01 (C) DEC 1980 23-017E4-00 MOSTEK MK36444N 8116
       ROM3 - TP-01 (C) MICROSOFT 1979 23-018E4-00 MOSTEK MK36445N 8113
       ROM4 - TP-01 (C) DEC 1980 23-190E2-00 P8316E AMD 35517 8117DPP
+
+	LED meanings:
+	The LEDS on the vk100 (there are 7) are set up above the keyboard as:
+	Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
+	Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0 (of port 0x68)
+according to manual from http://www.bitsavers.org/pdf/dec/terminal/gigi/EK-VK100-IN-002_GIGI_Terminal_Installation_and_Owners_Manual_Apr81.pdf
+where X = on, 0 = off, ? = variable (- = off)
+	- X 0 0 0 0 0 (0x1F) = Microprocessor error
+	X - 0 X X X X (0x30) "
+
+	- X 0 0 0 0 X (0x1E) = ROM error
+	X - 0 0 ? ? ? (0x3x) "
+1E 3F = rom error, rom 1 (0000-0fff)
+1E 3E = rom error, rom 1 (1000-1fff)
+1E 3D = rom error, rom 2 (2000-2fff)
+1E 3C = rom error, rom 2 (3000-3fff)
+1E 3B = rom error, rom 3 (4000-4fff)
+1E 3A = rom error, rom 3 (5000-5fff)
+1E 39 = rom error, rom 4 (6000-6fff)
+
+	- X 0 0 0 X 0 (0x1D) = RAM error
+	X - 0 ? ? ? ? (0x3x) "
+
+	- X 0 0 0 X X (0x1C) = CRT Controller error
+	X - 0 X X X X (0x30) "
+
+	- X 0 0 X 0 0 (0x1B) = CRT Controller time-out
+	X - 0 X X X X (0x30) "
+
+	- X 0 0 X 0 X (0x1A) = Vector time-out error
+	X - 0 X X X X (0x30) "
+
 */
 
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "machine/i8251.h"
 
 class vk100_state : public driver_device
 {
 public:
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_crtc(*this, "hd46505sp"),
+		m_uart(*this, "i8251")
+		{ }
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<mc6845_device> m_crtc;
+	required_device<device_t> m_uart;
 
-
+	//UINT8 m_statusLED;
+	UINT8 m_key_scan;
+	DECLARE_WRITE8_MEMBER(led_beep_write);
 };
 
+WRITE8_MEMBER(vk100_state::led_beep_write)
+{
+	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_set_frequency( speaker, 318 ); //318 hz is a guess based on vt100
+	/* The LEDS on the vk100 (there are 7) are set up above the keyboard as:
+	 * Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
+	 * Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0
+	 * see header of file for information on error codes
+	 */
+	/* TODO: make this work.
+	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
+	output_set_value("local_led", BIT(data, 5));
+	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
+	output_set_value("noscroll_led", BIT(data, 3) ? 0 : 1);
+	output_set_value("hardcopy_led", BIT(data, 2) ? 0 : 1);
+	output_set_value("l1_led", BIT(data, 1) ? 0 : 1);
+	output_set_value("l2_led", BIT(data, 0) ? 0 : 1);
+	*/
+	m_key_scan = BIT(data, 6);
+	beep_set_state( speaker, BIT(data, 7));
+	//m_statusLED = data&0xFF;
+	logerror("LED state: %02X: %s %s %s %s %s %s\n", data&0xFF, (data&0x20)?"------- LOCAL ":"ON LINE ----- ", (data&0x10)?"--------- ":"NO SCROLL ", (data&0x8)?"----- ":"BASIC ", (data&0x4)?"--------- ":"HARD-COPY ", (data&0x2)?"-- ":"L1 ", (data&0x1)?"-- ":"L2 ");
+	//popmessage("LED write: %02X\n", data&0xFF);
+	popmessage("LED state: %02X: %s %s %s %s %s %s\n", data&0xFF, (data&0x20)?"------- LOCAL ":"ON LINE ----- ", (data&0x10)?"--------- ":"NO SCROLL ", (data&0x8)?"----- ":"BASIC ", (data&0x4)?"--------- ":"HARD-COPY ", (data&0x2)?"-- ":"L1 ", (data&0x1)?"-- ":"L2 ");
+	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", (data&0x80), (data&0x40), (data&0x20), data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
+}
 
 static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	//AM_RANGE( 0x7000, 0x700f) AM_DEVREADWRITE(vk100_keyboard) AM_MIRROR(0x0ff0)
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	// Comments are from page 118 (5-14) of http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
+	AM_RANGE(0x01, 0x01) AM_RAM // hack to pass crtc test
+	//AM_RANGE(0x00, 0x00) AM_WRITE(crtc_addr_w)
+	//AM_RANGE(0x01, 0x01) AM_READWRITE(crtc_data_r, crtc_data_w)
+	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 	//AM_RANGE (0x40, 0x40) AM_WRITE(X_low)  //LD X LO \_ 12 bits
 	//AM_RANGE (0x41, 0x41) AM_WRITE(X_high) //LD X HI /
 	//AM_RANGE (0x42, 0x42) AM_WRITE(Y_low)  //LD Y LO \_ 12 bits
@@ -89,16 +164,16 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	//AM_RANGE (0x65, 0x65) AM_WRITE(dot)    //EX DOT
 	//AM_RANGE (0x66, 0x66) AM_WRITE(vec)    //EX VEC
 	//AM_RANGE (0x67, 0x67) AM_WRITE(er)     //EX ER
-	//AM_RANGE (0x68, 0x68) AM_WRITE(unknown_68) // lots of writes go here; interrupt related?
-	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD
-	//AM_RANGE (0x70, 0x70) AM_WRITE(comd)   //LD COMD
-	//AM_RANGE (0x71, 0x71) AM_WRITE(com)    //LD COM
+	AM_RANGE (0x68, 0x68) AM_WRITE(led_beep_write) //keyboard LEDs and beeper
+	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks)
+	//AM_RANGE (0x70, 0x70) AM_WRITE(comd)   //LD COMD (one of the i8251 regs)
+	//AM_RANGE (0x71, 0x71) AM_WRITE(com)    //LD COM (the other i8251 reg)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
 	//AM_RANGE (0x40, 0x40) AM_READ(systat_a) // SYSTAT A (dipswitches?)
 	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B (dipswitches?)
-	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O
+	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O , low 2 bits control the i8251 dest: 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback 
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
@@ -144,6 +219,10 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_SCREEN_UPDATE_STATIC(vk100)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
+	
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -163,7 +242,7 @@ ROM_START( vk100 )
 	// this is probably the "DIRECTION ROM", but might not be. (256*8, 82s135)
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))
 	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
-	ROM_LOAD( "wb---0_090b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label is horribly unclear, could be 090b1 or 000b1
+	ROM_LOAD( "wb---0_090b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label is horribly unclear, could be 090b1 or 000b1 or 060b1
 	// this is definitely the "PATTERN ROM", (1k*4, 82s137)
 	ROM_LOAD( "wb8201_655a-.m1-7643-5.pr4.ic17", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label is unclear, may be type a4 (= 1024x4 assuming a3 = 512x4 and a2 = 256x4)
 	// the following == mb6309 (256x8, 82s135)
