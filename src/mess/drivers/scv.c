@@ -411,10 +411,10 @@ static TIMER_CALLBACK( scv_vb_callback )
 	switch( vpos )
 	{
 	case 240:
-		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, ASSERT_LINE);
 		break;
 	case 0:
-		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, CLEAR_LINE);
 		break;
 	}
 
