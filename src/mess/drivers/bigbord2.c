@@ -35,10 +35,29 @@ causing a complete freeze. Therefore CTCA has been isolated, and the
 because the system crashes after a while. However it will allow
 testing and development to continue.
 
+The FDC has a INTRQ pin, the diagram says it goes to page 6, but
+it just vanishes instead.
+
 What works:
 
 Turn it on, wait for cursor to appear in the top corner. Press Enter.
 Now you can enter commands. D, M, X are working.
+
+Memory banking:
+
+0000-7FFF are controlled by bit 0 of port C8, and select ROM&video, or RAM
+8000-FFFF control if RAM is onboard, or on S100 bus (do not know what controls this)
+We do not emulate the S100, so therefore banks 1&2 are the same as 3&4.
+The switching from port C8 is emulated.
+
+ToDo:
+- Finish floppy disk support (i have no boot disk)
+- Finish the DMA switch in portcc_w.
+- Fix the above problems with the CTC.
+- Finish connecting up the SIO, when it becomes usable.
+- Connect up the SASI, Centronics and other interfaces on ports D8-DB.
+- Connect up the programming port C0-C3.
+- Connect up the numerous board jumpers.
 
 ****************************************************************************/
 
@@ -55,6 +74,7 @@ Now you can enter commands. D, M, X are working.
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
+#include "sound/beep.h"
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"u39"
@@ -78,8 +98,8 @@ public:
 	m_floppy1(*this, FLOPPY_1),
 	m_floppy2(*this, FLOPPY_2),
 	m_floppy3(*this, FLOPPY_3),
-	m_videoram(*this, "videoram"),
-	m_attribram(*this, "attribram"){ }
+	m_beeper(*this, BEEPER_TAG)
+	{ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -103,6 +123,8 @@ public:
 
 	/* video state */
 	UINT8 *m_p_chargen;					/* character ROM */
+	UINT8 *m_p_videoram;					/* Video RAM */
+	UINT8 *m_p_attribram;					/* Attribute RAM */
 
 	/* floppy state */
 	bool m_fdc_irq;						/* interrupt request */
@@ -121,8 +143,7 @@ public:
 	required_device<device_t> m_floppy1;
 	required_device<device_t> m_floppy2;
 	required_device<device_t> m_floppy3;
-	required_shared_ptr<UINT8> m_videoram; /* video RAM */
-	required_shared_ptr<UINT8> m_attribram;
+	required_device<device_t> m_beeper;
 };
 
 /* Status port
@@ -203,7 +224,6 @@ static Z80DMA_INTERFACE( dma_intf )
 /* Read/Write Handlers */
 
 
-
 WRITE8_MEMBER( bigbord2_state::portc8_w )
 {
 	/*
@@ -214,10 +234,10 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 
         bit     signal      description
 
-        0       D_S
+        0       D_S         memory bank
         1       SIDSEL      side select
-        2       SMC1
-        3       SMC2
+        2       SMC1        u6 data separator pin 5
+        3       SMC2        u6 data separator pin 6
         4       DDEN        density
         5       HLD         head load
         6       MOTOR       disk motor
@@ -227,16 +247,42 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 
 	m_c8[data&7] = BIT(data, 3);
 
-	floppy_mon_w(m_floppy0, ~m_c8[6]);
-	floppy_mon_w(m_floppy1, ~m_c8[6]);
-	floppy_mon_w(m_floppy2, ~m_c8[6]);
-	floppy_mon_w(m_floppy3, ~m_c8[6]);
+	switch (data&7)
+	{
+		case 0:
+			// memory bank
+			membank("bankr")->set_entry(m_c8[0]);
+			membank("bankv")->set_entry(m_c8[0]);
+			membank("banka")->set_entry(m_c8[0]);
+			break;
+		case 1:
+			// side select
+			wd17xx_set_side(m_fdc, m_c8[1]);
+			break;
 
-	/* side select */
-	wd17xx_set_side(m_fdc, m_c8[1]);
-
-	/* density */
-	wd17xx_dden_w(m_fdc, m_c8[4]);
+		case 2:
+		case 3:
+			// these connect to "U6 (FDC9216B)" which drives the fdc "rawread" and "rclk" pins
+			break;
+		case 4:
+			// density
+			wd17xx_dden_w(m_fdc, m_c8[4]);
+			break;
+		case 5:
+			// connects to HLD pin on floppy drive
+			break;
+		case 6:
+			// motor on
+			floppy_mon_w(m_floppy0, ~m_c8[6]);
+			floppy_mon_w(m_floppy1, ~m_c8[6]);
+			floppy_mon_w(m_floppy2, ~m_c8[6]);
+			floppy_mon_w(m_floppy3, ~m_c8[6]);
+			break;
+		case 7:
+			// beeper
+			beep_set_state(m_beeper, m_c8[7]);
+			break;
+	}
 }
 
 WRITE8_MEMBER( bigbord2_state::portcc_w )
@@ -246,8 +292,8 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
         bit     signal      description
 
         0,1,2   operates a 74LS151 for 8 individual inputs to DMA RDY
-          0     W/RDYA
-          1     W/RDYB
+          0     W/RDYA      channel A of SIO
+          1     W/RDYB      channel B of SIO
           2     DRQ         DRQ on fdc
           3     JB7 pin 1
           4     JB7 pin 2
@@ -291,10 +337,10 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 
 static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bankr")
 	AM_RANGE(0x1000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("attribram")
+	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bankv")
+	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("banka")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -304,6 +350,7 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTCA_TAG, z80ctc_r, z80ctc_w) //has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTCB_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	//AM_RANGE(0xC0, 0xC3)   eprom programming port
 	AM_RANGE(0xC4, 0xC7) AM_READ(portc4_r)
 	AM_RANGE(0xC8, 0xCB) AM_WRITE(portc8_w)
 	AM_RANGE(0xCC, 0xCF) AM_WRITE(portcc_w)
@@ -454,6 +501,8 @@ void bigbord2_state::video_start()
 {
 	/* find memory regions */
 	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion(Z80_TAG)->base()+0x6000;
+	m_p_attribram = memregion(Z80_TAG)->base()+0x7000;
 }
 
 
@@ -511,6 +560,20 @@ void bigbord2_state::machine_reset()
 	UINT8 i;
 	for (i = 0; i < 8; i++)
 		m_c8[i] = 0;
+	beep_set_state(m_beeper, 0);
+	beep_set_frequency(m_beeper, 950); // actual frequency is unknown
+	membank("bankr")->set_entry(0);
+	membank("bankv")->set_entry(0);
+	membank("banka")->set_entry(0);
+}
+
+static DRIVER_INIT( bigbord2 )
+{
+	bigbord2_state *state = machine.driver_data<bigbord2_state>();
+	UINT8 *RAM = state->memregion(Z80_TAG)->base();
+	state->membank("bankr")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	state->membank("bankv")->configure_entries(0, 2, &RAM[0x6000], 0x10000);
+	state->membank("banka")->configure_entries(0, 2, &RAM[0x7000], 0x10000);
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( bigbord2 )
@@ -553,6 +616,7 @@ static const floppy_interface bigbord2_floppy_interface =
 	NULL
 };
 
+
 /* Screen */
 
 /* F4 Character Displayer */
@@ -585,8 +649,8 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 	{
 		inv=0;
 		mem = (ma + x) & 0x7ff;
-		if (BIT(state->m_attribram[mem], 7)) inv^=0xff;
-		chr = state->m_videoram[mem];
+		if (BIT(state->m_p_attribram[mem], 7)) inv^=0xff;
+		chr = state->m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
@@ -648,6 +712,11 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -655,7 +724,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( bigbord2 )
-	ROM_REGION( 0x1000, Z80_TAG, 0 )
+	ROM_REGION( 0x18000, Z80_TAG, 0 )
 	ROM_LOAD( "bigbrdii.bin", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645) )
 
 	// internal to 8002 chip (undumped) we will use one from 'vta2000' for now
@@ -664,5 +733,5 @@ ROM_START( bigbord2 )
 ROM_END
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                      FULLNAME        FLAGS */
-COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2,   0,   "Digital Research Computers", "Big Board II", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY                      FULLNAME        FLAGS */
+COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2,   bigbord2, "Digital Research Computers", "Big Board II", GAME_NOT_WORKING )
