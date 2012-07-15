@@ -299,7 +299,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 			//6Khz(ish) DIGI playback
 
 			//end capture
-			if (state->packet[state->index-2] == 0xFE &&
+			if (state->index >= 2 && state->packet[state->index-2] == 0xFE &&
 				state->packet[state->index-1] == 0x00){
                 //TODO play capture!
 				state->index = 0;
