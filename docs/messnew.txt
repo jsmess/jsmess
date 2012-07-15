@@ -1,4 +1,120 @@
-﻿0.146u2
+﻿0.146u3
+
+MAMETesters Bugs Fixed
+----------------------
+- 04926: [Speed] (pce.c) tg16, pce: Slowdown when playing CD based games (Angelo Salese)
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+-dmv: Added keyboard mcu rom content [rfka01]
+
+-intellivision: update comments and fix rom locations on intv1
+ hardware. Note the intv1 exec.bin still needs to be split to the two
+ separate roms that the real hardware used. [Lord Nightmare]
+
+-intellivision: enabled the c000-cfff area for cart rom access; while
+ no commercial carts used this afaik, at least one homebrew cart does
+ and won't work without it. (actually this was in the previous commit
+ by accident) Corrected the manufacturer/name of the Sears Super Video
+ Arcade. [Lord Nightmare]
+
+-thomson: Performance improvements and bug-fixes: more efficient bank
+ switching, fixed video update (Mach 3, Sparce Racer, HCL), fixed game
+ PIA port B, fixed side-effect in debugger, fixed MO6 cassette.
+ [Fabrice Bellet]
+
+-vidbrain: Improved video timings and correct CPU clock.
+ [Kurt Woloch, Sean Riddle, Curt Coder]
+
+-ep804/digel804: a lot of documentation updates, fixed location of roms
+ to match schematics; documented the ram expansion pinout.
+ [Lord Nightmare, balrog]
+
+-sc3000: Added support for the SC-3000 Survivors *.bit cassette file
+ format. [Curt Coder, SC-3000 Survivor]
+
+-vip: Added byte I/O and expansion slot interfaces. [Curt Coder]
+
+-sc3000: Moved the fake BIOS to cartridge software list. SC-3000 does
+ not have an internal BIOS, instead a BASIC or other cartridge needs to
+ be plugged in manually. E.g. "mess sc3000 basic3" [Curt Coder]
+
+-vip: Connected the byte I/O and expansion ports. Refactored the
+ VP550, VP590, and VP595 to implement the expansion slot interface.
+ [Curt Coder]
+
+-vip: Added beeper on/off switch, and VP585 board. [Curt Coder]
+
+-ti99: gromport redesigned, now offering three slot options "single"
+ (default) / "multi" / "gkracker" determining the set of cartridge
+ slots (cart or cart1/2/3/4). Cartridge insertion may be set to trigger
+ RESET or not. TI consoles now have a dedicated RESET line, connected
+ to the RESET input of the CPU and VDP. [Michael Zapf]
+
+-DEC VK100/GIGI documentation update; document two missing proms,
+ correct (I hope) IC locations (until we can get schematics) using the
+ DEC system of counting from the top right corner downward and shifting
+ one column to the left at the end, and documented the (sometimes
+ barely/illegible) markings on the proms.
+ [Lord Nightmare, Andy Valencia, Guru]
+
+Software Lists:
+----------------
+-ibm5150.xml: Added cassette software list. [Curt Coder]
+
+-snes.xml: Added a dump of a prototype of the cancelled title, Spectrum
+ HoloByte’s Falcon [Le GROS Pixel]
+
+-ql.xml: Added software list for Microdrive cassettes. [Curt Coder]
+
+-tandy6k.xml: Added software list for floppies. [Curt Coder]
+
+-tandy2k.xml: Added software list for floppies. [Curt Coder]
+
+-bw12.xml: Added software list for floppies. [Curt Coder]
+
+-wmbullet.xml: Added software list for floppies. [Curt Coder]
+
+-vip.xml: Added software list for cassettes. [Curt Coder]
+
+-compis.xml: Added software list for cassettes. [Curt Coder]
+
+-pico.xml: new spanish and japanese dumps [TeamEurope]
+
+-ibm5150.xml: added a few diagnostic disks and moved here a couple of
+ disks from ibm5170.xml, since they belong here
+ [Kaylee, shattered, rfka01]
+
+-ibm5170.xml: Added a few more disk images (and reorganized the list)
+ [Kaylee]
+
+Source Changes:
+----------------
+-Refactored the Commodore disk drives to use BIOS definitions.
+ [Curt Coder]
+
+-tms9928/v9938: Using an own address space for the attached video
+ memory [Michael Zapf]
+
+-tms99xx: Introduced symbolic constants for interrupt lines. Added a
+ special RESET line which is handled by the CPU, not by the emulator
+ core. tms9928a/v9938: Introduced dedicated RESET line. [Michael Zapf]
+
+
+0.146u2
 
 MAMETesters Bugs Fixed
 ----------------------
