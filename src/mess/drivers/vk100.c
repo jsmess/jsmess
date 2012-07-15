@@ -94,14 +94,14 @@ public:
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_crtc(*this, "hd46505sp"),
-		m_uart(*this, "i8251")
+		m_screen(*this, "screen")//,
+		//m_crtc(*this, "hd46505sp"),
+		//m_uart(*this, "i8251")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_uart;
+	//required_device<mc6845_device> m_crtc;
+	//required_device<device_t> m_uart;
 
 	//UINT8 m_statusLED;
 	UINT8 m_key_scan;
