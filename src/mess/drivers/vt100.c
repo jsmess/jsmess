@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/beep.h"
 #include "video/vtvideo.h"
 #include "vt100.lh"
 
@@ -27,7 +27,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "vt100_video"),
-	m_speaker(*this, SPEAKER_TAG)
+	m_speaker(*this, BEEPER_TAG)
 	,
 		m_p_ram(*this, "p_ram"){ }
 
@@ -131,6 +131,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
+	beep_set_frequency( m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz 
 	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
 	output_set_value("local_led", BIT(data, 5));
 	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
@@ -139,7 +140,7 @@ WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 	output_set_value("l3_led", BIT(data, 1) ? 0 : 1);
 	output_set_value("l4_led", BIT(data, 0) ? 0 : 1);
 	m_key_scan = BIT(data, 6);
-	speaker_level_w(m_speaker, BIT(data, 7));
+	beep_set_state( m_speaker, BIT(data, 7));
 }
 
 READ8_MEMBER( vt100_state::vt100_keyboard_r )
@@ -426,7 +427,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(800))
