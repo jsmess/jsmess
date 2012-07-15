@@ -813,7 +813,7 @@ static TIMER_CALLBACK( thom_scanline_start )
                                 do
 				{
 					xx++;
-				} 
+				}
                                 while ( xx < 40 && thom_vmodepage[xx] == -1 );
                         }
 			else

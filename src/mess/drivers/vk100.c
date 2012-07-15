@@ -48,17 +48,17 @@ Notes:
       ROM3 - TP-01 (C) MICROSOFT 1979 23-018E4-00 MOSTEK MK36445N 8113
       ROM4 - TP-01 (C) DEC 1980 23-190E2-00 P8316E AMD 35517 8117DPP
 
-	LED meanings:
-	The LEDS on the vk100 (there are 7) are set up above the keyboard as:
-	Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
-	Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0 (of port 0x68)
+    LED meanings:
+    The LEDS on the vk100 (there are 7) are set up above the keyboard as:
+    Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
+    Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0 (of port 0x68)
 according to manual from http://www.bitsavers.org/pdf/dec/terminal/gigi/EK-VK100-IN-002_GIGI_Terminal_Installation_and_Owners_Manual_Apr81.pdf
 where X = on, 0 = off, ? = variable (- = off)
-	- X 0 0 0 0 0 (0x1F) = Microprocessor error
-	X - 0 X X X X (0x30) "
+    - X 0 0 0 0 0 (0x1F) = Microprocessor error
+    X - 0 X X X X (0x30) "
 
-	- X 0 0 0 0 X (0x1E) = ROM error
-	X - 0 0 ? ? ? (0x3x) "
+    - X 0 0 0 0 X (0x1E) = ROM error
+    X - 0 0 ? ? ? (0x3x) "
 1E 3F = rom error, rom 1 (0000-0fff)
 1E 3E = rom error, rom 1 (1000-1fff)
 1E 3D = rom error, rom 2 (2000-2fff)
@@ -67,17 +67,17 @@ where X = on, 0 = off, ? = variable (- = off)
 1E 3A = rom error, rom 3 (5000-5fff)
 1E 39 = rom error, rom 4 (6000-6fff)
 
-	- X 0 0 0 X 0 (0x1D) = RAM error
-	X - 0 ? ? ? ? (0x3x) "
+    - X 0 0 0 X 0 (0x1D) = RAM error
+    X - 0 ? ? ? ? (0x3x) "
 
-	- X 0 0 0 X X (0x1C) = CRT Controller error
-	X - 0 X X X X (0x30) "
+    - X 0 0 0 X X (0x1C) = CRT Controller error
+    X - 0 X X X X (0x30) "
 
-	- X 0 0 X 0 0 (0x1B) = CRT Controller time-out
-	X - 0 X X X X (0x30) "
+    - X 0 0 X 0 0 (0x1B) = CRT Controller time-out
+    X - 0 X X X X (0x30) "
 
-	- X 0 0 X 0 X (0x1A) = Vector time-out error
-	X - 0 X X X X (0x30) "
+    - X 0 0 X 0 X (0x1A) = Vector time-out error
+    X - 0 X X X X (0x30) "
 
 */
 
@@ -113,19 +113,19 @@ WRITE8_MEMBER(vk100_state::led_beep_write)
 	device_t *speaker = machine().device(BEEPER_TAG);
 	beep_set_frequency( speaker, 318 ); //318 hz is a guess based on vt100
 	/* The LEDS on the vk100 (there are 7) are set up above the keyboard as:
-	 * Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
-	 * Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0
-	 * see header of file for information on error codes
-	 */
+     * Label: ON LINE   LOCAL     NO SCROLL BASIC     HARD-COPY L1        L2
+     * Bit:   !d5       d5        !d4       !d3       !d2       !d1       !d0
+     * see header of file for information on error codes
+     */
 	/* TODO: make this work.
-	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
-	output_set_value("local_led", BIT(data, 5));
-	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	output_set_value("noscroll_led", BIT(data, 3) ? 0 : 1);
-	output_set_value("hardcopy_led", BIT(data, 2) ? 0 : 1);
-	output_set_value("l1_led", BIT(data, 1) ? 0 : 1);
-	output_set_value("l2_led", BIT(data, 0) ? 0 : 1);
-	*/
+    output_set_value("online_led",BIT(data, 5) ? 0 : 1);
+    output_set_value("local_led", BIT(data, 5));
+    output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
+    output_set_value("noscroll_led", BIT(data, 3) ? 0 : 1);
+    output_set_value("hardcopy_led", BIT(data, 2) ? 0 : 1);
+    output_set_value("l1_led", BIT(data, 1) ? 0 : 1);
+    output_set_value("l2_led", BIT(data, 0) ? 0 : 1);
+    */
 	m_key_scan = BIT(data, 6);
 	beep_set_state( speaker, BIT(data, 7));
 	//m_statusLED = data&0xFF;
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
 	//AM_RANGE (0x40, 0x40) AM_READ(systat_a) // SYSTAT A (dipswitches?)
 	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B (dipswitches?)
-	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O , low 2 bits control the i8251 dest: 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback 
+	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O , low 2 bits control the i8251 dest: 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_SCREEN_UPDATE_STATIC(vk100)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
@@ -248,7 +248,7 @@ ROM_START( vk100 )
 	// the following == mb6309 (256x8, 82s135)
 	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0700, 0x0100, NO_DUMP)
 	// the following = mb6331 (32x8, 82s123)
-	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0800, 0x0100, NO_DUMP) 
+	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0800, 0x0100, NO_DUMP)
 ROM_END
 
 /* Driver */

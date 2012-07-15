@@ -288,7 +288,7 @@ WRITE8_MEMBER( vip_state::write )
     int cs = BIT(offset, 15) || m_8000;
     int cdef = !((offset >= 0xc00) && (offset < 0x1000));
     int minh = 0;
-    
+
     m_exp->program_w(space, offset, data, cdef, &minh);
 
     if (!cs && !minh)

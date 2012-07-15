@@ -7,28 +7,28 @@
 
 **********************************************************************
 
-							A 	IN 0
-							B 	IN 1
-							C 	IN 2
-							D 	IN 3
-							E 	IN 4
-							F 	IN 5
-							H 	IN 6
-							J 	IN 7
-							K 	INST
-							L 	_EF4
-							M 	OUT 0
-							N 	OUT 1
-							P 	OUT 2
-							R 	OUT 3
-							S 	OUT 4
-							T 	OUT 5
-							U 	OUT 6
-							V 	OUT 7
-							W 	Q
-							X 	_EF3
-							Y 	+5 V
-							Z 	GND
+                            A   IN 0
+                            B   IN 1
+                            C   IN 2
+                            D   IN 3
+                            E   IN 4
+                            F   IN 5
+                            H   IN 6
+                            J   IN 7
+                            K   INST
+                            L   _EF4
+                            M   OUT 0
+                            N   OUT 1
+                            P   OUT 2
+                            R   OUT 3
+                            S   OUT 4
+                            T   OUT 5
+                            U   OUT 6
+                            V   OUT 7
+                            W   Q
+                            X   _EF3
+                            Y   +5 V
+                            Z   GND
 
 **********************************************************************/
 

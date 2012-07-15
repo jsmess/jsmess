@@ -16,11 +16,11 @@
 
     TODO:
 
-	- interlaced video?
-	- pinball background colors
-	- Y-zoom starting on odd scanline only 1 line high
-	- object height 0 glitch
-	- object column 0xff glitch
+    - interlaced video?
+    - pinball background colors
+    - Y-zoom starting on odd scanline only 1 line high
+    - object height 0 glitch
+    - object column 0xff glitch
     - video interrupts
     - R-2R ladder DAC
     - reset on cartridge unload

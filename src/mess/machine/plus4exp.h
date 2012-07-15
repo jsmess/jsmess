@@ -88,9 +88,9 @@ struct plus4_expansion_slot_interface
 class device_plus4_expansion_card_interface;
 
 class plus4_expansion_slot_device : public device_t,
-								  	public plus4_expansion_slot_interface,
-								  	public device_slot_interface,
-								  	public device_image_interface
+									public plus4_expansion_slot_interface,
+									public device_slot_interface,
+									public device_image_interface
 {
 public:
 	// construction/destruction
@@ -172,7 +172,7 @@ public:
 
 protected:
 	plus4_expansion_slot_device *m_slot;
-	
+
 	UINT8 *m_c1l;
 	UINT8 *m_c1h;
 	UINT8 *m_c2l;

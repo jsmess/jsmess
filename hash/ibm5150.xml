@@ -2313,7 +2313,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Applications -->
 
 	<software name="croschex">
@@ -2395,7 +2395,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Dos based Games -->
 
 	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
