@@ -72,6 +72,7 @@ public:
 	m_6845(*this, "crtc"),
 	m_ctca(*this, Z80CTCA_TAG),
 	m_ctcb(*this, Z80CTCA_TAG),
+	m_dma(*this, Z80DMA_TAG),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, FLOPPY_0),
 	m_floppy1(*this, FLOPPY_1),
@@ -108,11 +109,13 @@ public:
 	bool m_fdc_drq;						/* data request */
 	bool m_8n5;							/* 5.25" / 8" drive select */
 	bool m_dsdd;							/* double sided disk detect */
-	bool m_motor;
+	bool m_c8[8];
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_6845;
 	required_device<z80ctc_device> m_ctca;
 	required_device<z80ctc_device> m_ctcb;
+	required_device<z80dma_device> m_dma;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
@@ -134,7 +137,7 @@ public:
 
 READ8_MEMBER( bigbord2_state::portc4_r )
 {
-	UINT8 ret = m_term_status | 3 | (m_motor<<2) | ioport("DSW")->read();
+	UINT8 ret = m_term_status | 3 | (m_c8[6]<<2) | ioport("DSW")->read();
 	m_term_status = 0;
 	return ret;
 }
@@ -205,6 +208,10 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 {
 	/*
 
+        This port uses a 74LS259, which allows individual bits
+        to be switched on and off, while the other bits are
+        unaffected.
+
         bit     signal      description
 
         0       D_S
@@ -218,17 +225,18 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 
     */
 
-	m_motor = BIT(data, 6);
-	floppy_mon_w(m_floppy0, ~m_motor);
-	floppy_mon_w(m_floppy1, ~m_motor);
-	floppy_mon_w(m_floppy2, ~m_motor);
-	floppy_mon_w(m_floppy3, ~m_motor);
+	m_c8[data&7] = BIT(data, 3);
+
+	floppy_mon_w(m_floppy0, ~m_c8[6]);
+	floppy_mon_w(m_floppy1, ~m_c8[6]);
+	floppy_mon_w(m_floppy2, ~m_c8[6]);
+	floppy_mon_w(m_floppy3, ~m_c8[6]);
 
 	/* side select */
-	wd17xx_set_side(m_fdc, BIT(data, 1));
+	wd17xx_set_side(m_fdc, m_c8[1]);
 
 	/* density */
-	wd17xx_dden_w(m_fdc, BIT(data, 4));
+	wd17xx_dden_w(m_fdc, m_c8[4]);
 }
 
 WRITE8_MEMBER( bigbord2_state::portcc_w )
@@ -237,7 +245,7 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 
         bit     signal      description
 
-        0,1,2   operates a 74LS151 for 8 individual inputs
+        0,1,2   operates a 74LS151 for 8 individual inputs to DMA RDY
           0     W/RDYA
           1     W/RDYB
           2     DRQ         DRQ on fdc
@@ -269,6 +277,12 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 	floppy_drive_set_ready_state(m_floppy1, dvsel1, 1);
 	floppy_drive_set_ready_state(m_floppy2, dvsel2, 1);
 	floppy_drive_set_ready_state(m_floppy3, dvsel3, 1);
+
+	bool dma_rdy = 0;
+	if ((data & 7) == 2)
+		dma_rdy = m_fdc_drq;
+
+	z80dma_rdy_w(m_dma, dma_rdy);
 }
 
 
@@ -494,7 +508,9 @@ void bigbord2_state::machine_start()
 
 void bigbord2_state::machine_reset()
 {
-
+	UINT8 i;
+	for (i = 0; i < 8; i++)
+		m_c8[i] = 0;
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( bigbord2 )
