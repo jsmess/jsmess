@@ -180,7 +180,7 @@ static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 c
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
-	int i,b,bit=0,j;
+	int i,b,bit=0,prevbit,invert=0,j;
 	int double_width = (display_type==2) ? 1 : 0;
 	vt_video_t *vt = get_safe_token(device);
 
@@ -202,30 +202,33 @@ static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 c
 
 		line = vt->gfx[(code & 0x7f)*16 + j];
 		if (vt->basic_attribute==1) {
-			if ((code & 0x80)==0x80) {
-				line = line ^ 0xff;
-			}
+			if ((code & 0x80)==0x80)
+				invert = 1;
+			else
+				invert = 0;
 		}
 
 		for (b = 0; b < 8; b++)
 		{
-			bit = ((line << b) & 0x80) ? 1 : 0;
+			prevbit = bit;
+			bit = (((line << b) & 0x80) ? 1 : 0);
 			if (double_width) {
-				bitmap.pix16(y*10+i, x*20+b*2)   =  bit;
-				bitmap.pix16(y*10+i, x*20+b*2+1) =  bit;
+				bitmap.pix16(y*10+i, x*20+b*2)   =  (bit|prevbit)^invert;
+				bitmap.pix16(y*10+i, x*20+b*2+1) =  bit^invert;
 			} else {
-				bitmap.pix16(y*10+i, x*10+b) =  bit;
+				bitmap.pix16(y*10+i, x*10+b) =  (bit|prevbit)^invert;
 			}
 		}
+		prevbit = bit;
 		// char interleave is filled with last bit
 		if (double_width) {
-			bitmap.pix16(y*10+i, x*20+16) =  bit;
-			bitmap.pix16(y*10+i, x*20+17) =  bit;
-			bitmap.pix16(y*10+i, x*20+18) =  bit;
-			bitmap.pix16(y*10+i, x*20+19) =  bit;
+			bitmap.pix16(y*10+i, x*20+16) =  (bit|prevbit)^invert;
+			bitmap.pix16(y*10+i, x*20+17) =  bit^invert;
+			bitmap.pix16(y*10+i, x*20+18) =  bit^invert;
+			bitmap.pix16(y*10+i, x*20+19) =  bit^invert;
 		} else {
-			bitmap.pix16(y*10+i, x*10+8) =  bit;
-			bitmap.pix16(y*10+i, x*10+9) =  bit;
+			bitmap.pix16(y*10+i, x*10+8) =  (bit|prevbit)^invert;
+			bitmap.pix16(y*10+i, x*10+9) =  bit^invert;
 		}
 	}
 }
