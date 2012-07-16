@@ -205,12 +205,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ<10th> - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu ~10th Anniversary Edition~ (Kodansha - 200305xx - T-255080)
 * くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
-* 右脳開発シリーズ8 ドラッキーのおえかきハウス - Unou Kaihatsu Series 8 Dolucky no Oekaki House (Imagineer - 19951205 - T-150030)
-* 右脳開発シリーズ9 日本昔ばなし - Unou Kaihatsu Series 9 Nihon Mukashi Banashi (Imagineer - 19951205 - T-150040)
-* 右脳開発シリーズ7 Tails and the Music Maker - Unou Kaihatsu Series 7 Tails and the Music Maker (Imagineer - 19951205 - T-150050)
-* 右脳開発シリーズ2 ＥＣＣＯ Ｊｒ - Unou Kaihatsu Series 2 ECCO Jr (Imagineer - 19951031 - T-150060)
-* 右脳開発シリーズ3 ハローキティのまちへおでかけ - Unou Kaihatsu Series 3 Hello Kitty no Machi he Odekake (Imagineer - 19951031 - T-150080)
-* 右脳開発シリーズ4 けろけろけろっぴのいろかたち - Unou Kaihatsu Series 4 Kerokero Keroppi no Irokatachi (Imagineer - 19951104 - T-150100)
 * 右脳開発シリーズ6 アヒルのペックルのかぞえてみよう - Unou Kaihatsu Series 6 Ahiru no Pekkle no Kazoete Miyou (Imagineer - 19951104 - T-150110)
 * 右脳開発シリーズ11 平成教育委員会Jr. - Unou Kaihatsu Series 11 Heisei Kyouikuiinkai Jr. (Imagineer - 19960102 - T-150130)
 * 右脳開発シリーズ5 ハローキティのすてきなたからもの - Unou Kaihatsu Series 5 Hello Kitty no Suteki na Takaramono (Imagineer - 19951104 - T-150???)
@@ -389,6 +383,21 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+<!-- This same file had also been released as Prototype, but it just means it was a final build... -->
+	<software name="dolucky">
+		<description>Dolucky no Oekaki House (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150030"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ8 ドラッキーのおえかきハウス"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="unou kaihatsu series 8 - dolucky no oekaki house (japan).bin" size="524288" crc="4ce7b75d" sha1="aa906392c97cb12792a8cd026fdcb12d61490cf8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="donaldts">
 		<description>Donald no Terebi Show (Jpn)</description>
 		<year>1995</year>
@@ -485,6 +494,20 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ecco jr. y la gran busqueda del tesoro en el oceano! (spain).bin" size="524288" crc="f11b9f3f" sha1="7b518e8c6b97cc68958084b65cbe3a74f34df914" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrj" cloneof="eccojr">
+		<description>Ecco Jr. and the Great Ocean Treasure Hunt! (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150060"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ2 ＥＣＣＯ Ｊｒ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="unou kaihatsu series 2 - ecco jr (japan).bin" size="524288" crc="8130f126" sha1="fa9b1f7602dca7d3ac3d579421b41da4ceb943a7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -753,6 +776,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="keroiro">
+		<description>Kero Kero Keroppi no Irokatachi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150100"/>
+		<info name="release" value="19951104"/>
+		<info name="alt_title" value="右脳開発シリーズ4 けろけろけろっぴのいろかたち"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="unou kaihatsu series 4 - kerokero keroppi no irokatachi (japan).bin" size="1048576" crc="37dae2f5" sha1="874e8d0466e0585fa7db3b70df871875ddf29cb2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kitereda">
 		<description>Kiteretsu Daihyakka - Edo ni Itte Kiteretsu Saisamaniau Nari (Jpn)</description>
 		<year>1994</year>
@@ -899,6 +936,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mickey - fait un voyage eclair dans le passe (france).bin" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This same file had also been released as Prototype, but it just means it was a final build... -->
+	<software name="mukabana">
+		<description>Nihon Mukashi Banashi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150040"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ9 日本昔ばなし"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="unou kaihatsu series 9 - nihon mukashi banashi (japan).bin" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1237,6 +1289,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="tailsmmj" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150050"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ7 Tails and the Music Maker"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="unou kaihatsu series 7 - tails and the music maker (japan).bin" size="524288" crc="0a9665e7" sha1="6b5f6e8775188e93a4ff572163c8d3452fe8fe13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tanoyouc">
 		<description>4 5 6 Tanoshii Youchien (Jpn)</description>
 		<year>1994</year>
@@ -1520,17 +1586,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a2].bin" size="524288" crc="39d4c64b" sha1="52e115feb9d303993ca46aa36aa94a427f0ee141" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dolucky">
-		<description>Dolucky no Oekaki House (Jpn, Prototype)</description>
-		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="dolucky no oekaki house (1995)(-)(jp)(beta).bin" size="524288" crc="4ce7b75d" sha1="aa906392c97cb12792a8cd026fdcb12d61490cf8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2126,17 +2181,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524238">
 				<rom name="musical zoo rev 19941220 (1995)(sega)(beta).bin" size="524238" crc="f3f402a1" sha1="7be6d664097d8608a3ebb0513d83e6c55692b5f8" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nipponmb">
-		<description>Nihon no Mukashi Banashi (Jpn, Prototype)</description>
-		<year>1995</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="nippon no mukasi banasi (1994)(-)(jp)(beta).bin" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
