@@ -13,7 +13,7 @@
     - Implement APSS tape commands;
     - Sort out / redump the BIOS gfx roms;
     - X1Turbo: Implement SIO.
-    - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
+	- Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
     - Implement SASI HDD interface;
     - clean-ups!
     - There are various unclear video things, these are:
