@@ -422,7 +422,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 }
 
 
-INLINE void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
+INLINE void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col, UINT8 screen_sprite_start_line )
 {
 	if ( x < 4 )
 	{
@@ -431,26 +431,29 @@ INLINE void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat,
 
 	x -= 4;
 
-	if ( pat & 0x08 )
+	if ( y + 2 >= screen_sprite_start_line )
 	{
-		bitmap.pix16(y + 2, x ) = col;
-	}
-	if ( pat & 0x04 && x < 255 )
-	{
-		bitmap.pix16(y + 2, x + 1 ) = col;
-	}
-	if ( pat & 0x02 && x < 254 )
-	{
-		bitmap.pix16(y + 2, x + 2 ) = col;
-	}
-	if ( pat & 0x01 && x < 253 )
-	{
-		bitmap.pix16(y + 2, x + 3 ) = col;
+		if ( pat & 0x08 )
+		{
+			bitmap.pix16(y + 2, x ) = col;
+		}
+		if ( pat & 0x04 && x < 255 )
+		{
+			bitmap.pix16(y + 2, x + 1 ) = col;
+		}
+		if ( pat & 0x02 && x < 254 )
+		{
+			bitmap.pix16(y + 2, x + 2 ) = col;
+		}
+		if ( pat & 0x01 && x < 253 )
+		{
+			bitmap.pix16(y + 2, x + 3 ) = col;
+		}
 	}
 }
 
 
-INLINE void draw_sprite( scv_state *state, bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
+INLINE void draw_sprite( scv_state *state, bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y, UINT8 screen_sprite_start_line )
 {
 	int j;
 
@@ -466,24 +469,24 @@ INLINE void draw_sprite( scv_state *state, bitmap_ind16 &bitmap, UINT8 x, UINT8 
 		{
 			if ( left )
 			{
-				plot_sprite_part( bitmap, x     , y, pat0 >> 4, col );
-				plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col );
+				plot_sprite_part( bitmap, x     , y, pat0 >> 4, col, screen_sprite_start_line );
+				plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col, screen_sprite_start_line );
 			}
 			if ( right )
 			{
-				plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col );
-				plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col );
+				plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col, screen_sprite_start_line );
+				plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col, screen_sprite_start_line );
 			}
 
 			if ( left )
 			{
-				plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col );
-				plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col );
+				plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col, screen_sprite_start_line );
+				plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col, screen_sprite_start_line );
 			}
 			if ( right )
 			{
-				plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col );
-				plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col );
+				plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col, screen_sprite_start_line );
+				plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col, screen_sprite_start_line );
 			}
 		}
 
@@ -638,6 +641,7 @@ static SCREEN_UPDATE_IND16( scv )
 	/* Draw sprites if enabled */
 	if ( state->m_videoram[0x1400] & 0x10 )
 	{
+		UINT8 screen_start_sprite_line = ( ( ( state->m_videoram[0x1400] & 0xf7 ) == 0x17 ) && ( ( state->m_videoram[0x1402] & 0xef ) == 0x4f ) ) ? 21 + 32 : 0 ;
 		int i;
 
 		for ( i = 0; i < 128; i++ )
@@ -700,31 +704,31 @@ static SCREEN_UPDATE_IND16( scv )
 			if ( ( state->m_videoram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
-				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
+				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip, screen_start_sprite_line );
 				if ( x_32 || y_32 )
 				{
 					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11,  8, 9, 6, 7,  4,  5, 2, 3,  1,  1 };
 					static const UINT8 spr_2col_lut1[16] = { 0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
-					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx ^ ( 8 * x_32 + y_32 ), ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y, tile_idx ^ ( 8 * x_32 + y_32 ), ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip, screen_start_sprite_line );
 				}
 			}
 			else
 			{
 				/* regular sprite handling */
-				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
+				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip, screen_start_sprite_line );
 				if ( x_32 )
 				{
-					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx | 8, col, 1, 1, top, bottom, clip );
+					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx | 8, col, 1, 1, top, bottom, clip, screen_start_sprite_line );
 				}
 
 				if ( y_32 )
 				{
 					clip = ( clip & 0x08 ) ? ( clip & 0x07 ) : 0;
-					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx | 1, col, left, right, 1, 1, clip );
+					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx | 1, col, left, right, 1, 1, clip, screen_start_sprite_line );
 					if ( x_32 )
 					{
-						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx | 9, col, 1, 1, 1, 1, clip );
+						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx | 9, col, 1, 1, 1, 1, clip, screen_start_sprite_line );
 					}
 				}
 			}
