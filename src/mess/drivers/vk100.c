@@ -368,17 +368,17 @@ ROM_START( vk100 )
 
 	ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
 	// this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. (256*4, 82s129)
-	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4))
+	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	// this is probably the "DIRECTION ROM", but might not be. (256*8, 82s135)
-	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))
+	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
-	ROM_LOAD( "wb---0_090b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label is horribly unclear, could be 090b1 or 000b1 or 060b1
+	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 	// this is definitely the "PATTERN ROM", (1k*4, 82s137)
-	ROM_LOAD( "wb8201_655a-.m1-7643-5.pr4.ic17", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label is unclear, may be type a4 (= 1024x4 assuming a3 = 512x4 and a2 = 256x4)
+	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 	// the following == mb6309 (256x8, 82s135)
-	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0700, 0x0100, NO_DUMP)
+	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0700, 0x0100, NO_DUMP)  // label verified from andy's board
 	// the following = mb6331 (32x8, 82s123)
-	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0800, 0x0100, NO_DUMP)
+	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0800, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
 /* Driver */
