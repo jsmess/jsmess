@@ -38,18 +38,26 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_mouse_gfx(*this, "mouse_gfx")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_shared_ptr<UINT16>	m_vram;
+	required_shared_ptr<UINT16>	m_mouse_gfx;
 	virtual void machine_reset();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(flash_r);
 	DECLARE_WRITE8_MEMBER(flash_w);
+	DECLARE_READ16_MEMBER(mouse_r);
+	DECLARE_WRITE16_MEMBER(mouse_pos_w);
 
+	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
+
+	UINT16		m_mouse_posx;
+	UINT16		m_mouse_posy;
 };
 
 
@@ -60,8 +68,28 @@ UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			UINT16 data = m_vram[(y*256 + x)>>1];
 
-			bitmap.pix16(y, x) = (data>>8) & 0xff;
-			bitmap.pix16(y, x + 1) = data & 0xff;
+			for(int b=0; b<4; b++)
+			{
+				bitmap.pix16(y, x*2 + b) = (data>>12) & 0x0f;
+				data <<= 4;
+			}
+		}
+
+	// mouse cursor
+	for (int y=0; y<16; y++)
+		for (int x=0; x<6; x+=2)
+		{
+			UINT16 data = m_mouse_gfx[(y*6 + x)>>1];
+
+			for(int b=0; b<4; b++)
+			{
+				UINT8 pen = (data>>12) & 0x0f;
+
+				// I assume color 0 is transparent
+				if(pen != 0 && screen.visible_area().contains(m_mouse_posx + x*2 + b, m_mouse_posy + y))
+					bitmap.pix16(m_mouse_posy + y, m_mouse_posx + x*2 + b) = pen;
+				data <<= 4;
+			}
 		}
 
 	return 0;
@@ -77,18 +105,36 @@ WRITE8_MEMBER(geniusiq_state::flash_w)
 	m_flash->write(offset, data);
 }
 
+WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
+{
+	switch (offset)
+	{
+		case 0:		m_mouse_posx = data;	break;
+		case 1:		m_mouse_posy = data;	break;
+	}
+}
+
+READ16_MEMBER( geniusiq_state::mouse_r )
+{
+	return 0;
+}
+
+
 static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
 	AM_RANGE(0x200000, 0x23FFFF) AM_RAM
 	AM_RANGE(0x300000, 0x30FFFF) AM_RAM		AM_SHARE("vram")
-	AM_RANGE(0x310000, 0x312FFF) AM_RAM
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE8(flash_r, flash_w, 0x00ff)
-	//AM_RANGE(0x600300, 0x600301)                      // read during IRQ 4 (mouse ??)
+	AM_RANGE(0x310000, 0x31FFFF) AM_RAM
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE8(flash_r, flash_w, 0x00ff)
+	AM_RANGE(0x600300, 0x600301) AM_READ(mouse_r)
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5 (keyboard ??)
+	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
 	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)			// unknown, read at start and expect that bit 2 changes several times before continue
+	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)		// loop at start if bit 1 is set
+	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
+	AM_RANGE(0x601100, 0x6011ff) AM_RAM		AM_SHARE("mouse_gfx")	// mouse cursor gfx (12x16)
 	// 0x600000 : some memory mapped hardware
-	// Somewhere : internal flash
 	// Somewhere : cartridge port
 ADDRESS_MAP_END
 
@@ -119,15 +165,16 @@ static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER( geniusiq_state, screen_update )
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(16)
 
 	/* internal flash */
 	MCFG_AMD_29F010_ADD("flash")
