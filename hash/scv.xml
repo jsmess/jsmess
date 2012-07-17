@@ -173,19 +173,20 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
     <!-- unknown whether the rom differs between Japan and Euro versions and which this is if so -->
-	<software name="kungfurd" supported="no">
+	<software name="kungfurd">
 		<description>Nekketsu Kung Fu Road / Kung Fu Road</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-            <dataarea name="rom" size="40960">
+            <dataarea name="rom" size="65536">
                 <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
-                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0x8000" />
+				<rom size="24576" offset="0x8000" loadflag="reload" />
+                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000" />
             </dataarea>
 		</part>
 	</software>
 
-	<software name="lupin3" supported="no">
+	<software name="lupin3">
 		<description>Lupin III</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
