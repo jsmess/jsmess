@@ -618,9 +618,9 @@ ROM_START(exl100)
 
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)			/* cartridge area */
 
-	/* TMS5220 ROM space, no idea if this is correct for exl100 */
+	/* is this correct for exl100? */
 	ROM_REGION(0x8000, "tms5220c", 0)
-	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
+	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 
 
@@ -637,9 +637,8 @@ ROM_START(exeltel)
 	ROM_SYSTEM_BIOS( 1, "spanish", "Spanish" )
 	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(2)) /* Spanish system rom */
 
-	/* TMS5220 ROM space,; no idea if this is correct for exeltel */
 	ROM_REGION(0x8000, "tms5220c", 0)
-	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
+	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 
 
