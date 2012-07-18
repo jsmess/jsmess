@@ -20426,7 +20426,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Spot Goes to Hollywood (T-7014G)... -->
-	<software name="spotj" cloneof="spot" supported="no">
+	<software name="spotgoj" cloneof="spotgo" supported="no">
 		<description>Spot Goes to Hollywood (Jpn)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
@@ -33326,7 +33326,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Spot Goes to Hollywood (E)... -->
-	<software name="spot" supported="no">
+	<software name="spotgo" supported="no">
 		<description>Spot Goes to Hollywood (Euro)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
@@ -37602,7 +37602,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying dw-spot... -->
-	<software name="spotu" cloneof="spot" supported="no">
+	<software name="spotgou" cloneof="spotgo" supported="no">
 		<description>Spot Goes to Hollywood (USA)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>

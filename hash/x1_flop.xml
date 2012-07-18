@@ -811,7 +811,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="gamblerj">
+	<software name="gambler">
 		<description>Gambler Jikochuushinha</description>
 		<year>1987</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
