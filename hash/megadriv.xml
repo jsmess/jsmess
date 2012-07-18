@@ -703,7 +703,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- Only Europe is confirmed -->
-	<software name="psampras">
+	<software name="sampras">
 		<description>Pete Sampras Tennis (Euro, USA, J-Cart)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -1491,8 +1491,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="3in1fl">
-		<description>3 in 1 Flashback - World Champ. Soccer - Tecmo World Cup 92 (Pirate)</description>
+	<software name="3in1fwt">
+		<description>3 in 1 Flashback - World Championship Soccer - Tecmo World Cup 92 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -1502,7 +1502,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="3in1ro">
+	<software name="3in1rmb">
 		<description>3 in 1 Road Rash - Ms. Pac-Man - Block Out (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4126,7 +4126,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bubbab" cloneof="bubba">
+	<software name="bubbap" cloneof="bubba">
 		<description>Bubba'n'Stix (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
@@ -4149,7 +4149,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bubble">
+	<software name="bubblesq">
 		<description>Bubble and Squeak (Euro)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -4160,7 +4160,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bubbleu" cloneof="bubble">
+	<software name="bubblesqu" cloneof="bubblesq">
 		<description>Bubble and Squeak (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -4804,7 +4804,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="chucks">
+	<software name="excelart">
 		<description>Chuck's Excellent Art Tool Animator (USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5085,7 +5085,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp02" cloneof="collnc">
+	<software name="collncp02" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940618)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5099,7 +5099,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp01" cloneof="collnc">
+	<software name="collncp01" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5113,7 +5113,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp15" cloneof="collnc">
+	<software name="collncp15" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940503)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5127,7 +5127,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp14" cloneof="collnc">
+	<software name="collncp14" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940506)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5141,7 +5141,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp13" cloneof="collnc">
+	<software name="collncp13" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940511-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5155,7 +5155,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp12" cloneof="collnc">
+	<software name="collncp12" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940517-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5169,7 +5169,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp11" cloneof="collnc">
+	<software name="collncp11" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940520)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5183,7 +5183,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp10" cloneof="collnc">
+	<software name="collncp10" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940525)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5197,7 +5197,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="collnp09" cloneof="collnc">
+	<software name="collncp09" cloneof="collnc">
 		<description>College Football's National Championship (Prototype, 19940531)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7397,7 +7397,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="elvient">
+	<software name="elviento">
 		<description>El Viento (USA)</description>
 		<year>1991</year>
 		<publisher>Renovation</publisher>
@@ -7408,7 +7408,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="elvientj" cloneof="elvient">
+	<software name="elvientoj" cloneof="elviento">
 		<description>El Viento (Jpn)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
@@ -7489,7 +7489,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="empirest">
+	<software name="empsteel">
 		<description>Empire of Steel (Euro)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -7500,7 +7500,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="steelemp" cloneof="empirest">
+	<software name="steelemp" cloneof="empsteel">
 		<description>Steel Empire (USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -7511,7 +7511,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="koteteik" cloneof="empirest">
+	<software name="koteteik" cloneof="empsteel">
 		<description>Koutetsu Teikoku (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
@@ -7760,7 +7760,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="eternalcb" cloneof="eternalc">
+	<software name="eternalcp" cloneof="eternalc">
 		<description>Eternal Champions (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8461,7 +8461,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fightm">
+	<software name="fightmas">
 		<description>Fighting Masters (USA)</description>
 		<year>1992</year>
 		<publisher>Treco</publisher>
@@ -8472,7 +8472,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fightmj" cloneof="fightm">
+	<software name="fightmasj" cloneof="fightmas">
 		<description>Fighting Masters (Jpn, Kor)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
@@ -8872,7 +8872,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gamblerj">
+	<software name="gambler">
 		<description>Gambler Jikochuushinha - Katayama Masayuki no Mahjong Doujou (Jpn)</description>
 		<year>1990</year>
 		<publisher>Game Arts</publisher>
@@ -11284,7 +11284,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="larussa">
+	<software name="laruss95">
 		<description>La Russa Baseball 95 (USA, Oceania)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -12731,7 +12731,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="metalf">
+	<software name="metalfng">
 		<description>Metal Fangs (Jpn)</description>
 		<year>1993</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -12936,8 +12936,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="midwaygh">
-		<description>Midway Presents Arcade's Greatest Hits (Euro)</description>
+	<software name="arcadegh">
+		<description>Arcade's Greatest Hits (Euro)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13181,7 +13181,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="minnesot">
+	<software name="mfpool">
 		<description>Minnesota Fats - Pool Legend (USA)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
@@ -13220,7 +13220,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mk5mor">
+	<software name="mk5">
 		<description>MK 5 - Mortal Combat - SubZero</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -13231,7 +13231,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mk5mor1" cloneof="mk5mor">
+	<software name="mk5a" cloneof="mk5">
 		<description>MK 5 - Mortal Combat - SubZero (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -15235,7 +15235,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="normys">
+	<software name="normy">
 		<description>Normy's Beach Babe-O-Rama (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -15628,7 +15628,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pacman">
+	<software name="pacman2">
 		<description>Pac-Man 2 - The New Adventures (USA)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
@@ -15893,7 +15893,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="psampras1" cloneof="psampras">
+	<software name="sampras1" cloneof="sampras">
 		<description>Pete Sampras Tennis (Euro, USA, J-Cart, Alt)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -15904,7 +15904,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="psampras2" cloneof="psampras">
+	<software name="sampras2" cloneof="sampras">
 		<description>Pete Sampras Tennis (Euro, USA, J-Cart, Alt 2)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -16499,6 +16499,41 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="pokemon">
+		<description>Pocket Monsters</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="POKEMON" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monsters (unl).bin" size="2097152" crc="f68f6367" sha1="d10de935e099c520384c986b1f00fd5e72d64e03" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemona" cloneof="pokemon">
+		<description>Pocket Monsters (Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monsters (unl) (alt).bin" size="2097152" crc="fb176667" sha1="3d667aea1b6fa980dddcc10e65845a6831491792" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemon2">
+		<description>Pocket Monsters 2</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="POKEMON2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monsters 2 (unl).bin" size="2097152" crc="30f7031f" sha1="dae100dfaee1b5b7816731cb2f43bcda3da273b7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokecd">
 		<description>Pokemon Crazy Drummer</description>
 		<year>199?</year>
@@ -16585,7 +16620,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="powrball">
+	<software name="powerbal">
 		<description>Powerball (USA)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
@@ -16596,7 +16631,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wrstball" cloneof="powrball">
+	<software name="wrstball" cloneof="powerbal">
 		<description>Wrestleball (Jpn)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
@@ -17877,7 +17912,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="robotb">
+	<software name="robotbat">
 		<description>Robot Battler (Jpn, SegaNet)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -17888,7 +17923,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="robotw">
+	<software name="robowrek">
 		<description>Robot Wreckage (USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18102,7 +18137,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="rugbyw">
+	<software name="rugbywc">
 		<description>Rugby World Cup 1995 (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -18178,7 +18213,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sampra96">
-		<description>Sampras Tennis 96 (Euro, J-Cart)</description>
+		<description>Pete Sampras Tennis '96 (Euro, J-Cart)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18241,7 +18276,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="sanguo5">
 		<description>San Guo Zhi V (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>SKOB</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="000000" loadflag="load16_word_swap" />
@@ -18347,7 +18382,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="seconds">
-		<description>Second Samurai (Euro)</description>
+		<description>The Second Samurai (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18357,7 +18392,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="segasp">
+	<software name="segasprt">
 		<description>Sega Sports 1 (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -20263,7 +20298,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="starcr">
+	<software name="starcrus">
 		<description>Star Cruiser (Jpn)</description>
 		<year>1990</year>
 		<publisher>NCS</publisher>
@@ -21400,7 +21435,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tommylb" cloneof="suprleag">
+	<software name="lasorda" cloneof="suprleag">
 		<description>Tommy Lasorda Baseball (USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -22019,7 +22054,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tcop">
+	<software name="tecnocop">
 		<description>Technocop (USA)</description>
 		<year>1990</year>
 		<publisher>Razorsoft</publisher>
@@ -22336,7 +22371,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="telsta">
+	<software name="telstad">
 		<description>Tel-Tel Stadium (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
@@ -22353,7 +22388,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="telebr">
+	<software name="telebrad">
 		<description>Telebradesco Residencia (Bra)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22724,7 +22759,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="toejam1" cloneof="toejam">
+	<software name="toejama" cloneof="toejam">
 		<description>Toe Jam &amp; Earl (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -22738,7 +22773,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tje2">
+	<software name="toejam2">
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -22749,7 +22784,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tje2g" cloneof="tje2">
+	<software name="toejam2g" cloneof="toejam2">
 		<description>Toe Jam &amp; Earl in Panic auf Funkotron (Ger)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -22760,7 +22795,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tje2j" cloneof="tje2">
+	<software name="toejam2j" cloneof="toejam2">
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -22771,7 +22806,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tje2u" cloneof="tje2">
+	<software name="toejam2u" cloneof="toejam2">
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -22832,7 +22867,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tonylrb">
+	<software name="larussa">
 		<description>Tony La Russa Baseball (USA, Oceania)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -22953,7 +22988,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="trampoli">
+	<software name="trampter">
 		<description>Trampoline Terror! (USA)</description>
 		<year>1990</year>
 		<publisher>Dreamworks</publisher>
@@ -23112,7 +23147,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="turboout">
+	<software name="toutrun">
 		<description>Turbo OutRun (Euro, Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -24148,7 +24183,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="williams">
+	<software name="arcadeghu" cloneof="arcadegh">
 		<description>Williams Arcade's Greatest Hits (USA)</description>
 		<year>1996</year>
 		<publisher>Williams</publisher>
@@ -24206,7 +24241,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintc">
+	<software name="wintchal">
 		<description>Winter Challenge (Euro, USA, Rev. 1)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
@@ -24217,7 +24252,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintc1" cloneof="wintc">
+	<software name="wintchal1" cloneof="wintchal">
 		<description>Winter Challenge (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
@@ -24228,7 +24263,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintcp" cloneof="wintc">
+	<software name="wintchalp" cloneof="wintchal">
 		<description>Winter Challenge (Prototype)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
@@ -24239,7 +24274,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintol">
+	<software name="wintolym">
 		<description>Winter Olympics (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -24250,7 +24285,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintolj" cloneof="wintol">
+	<software name="wintolymj" cloneof="wintolym">
 		<description>Winter Olympics (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24264,7 +24299,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintolu" cloneof="wintol">
+	<software name="wintolymu" cloneof="wintolym">
 		<description>Winter Olympic Games (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -25859,7 +25894,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xpert">
+	<software name="xperts">
 		<description>X-perts (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -25870,7 +25905,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xpertp" cloneof="xpert">
+	<software name="xpertsp" cloneof="xperts">
 		<description>X-perts (Prototype)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -25881,7 +25916,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xdrxda">
+	<software name="xdr">
 		<description>XDR - X Dazedly Ray (Jpn)</description>
 		<year>1990</year>
 		<publisher>Unipac</publisher>
@@ -26233,7 +26268,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="megaan">
+	<software name="meganser">
 		<description>Mega Anser (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26353,7 +26388,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="earthdef">
-		<description>Earth Defense (USA)</description>
+		<description>The Earth Defense (USA)</description>
 		<year>1995</year>
 		<publisher>Realtec</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26426,7 +26461,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="kof99">
-		<description>The King of Fighters 99</description>
+		<description>The King of Fighters '99</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26439,7 +26474,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Different PCB type needed? -->
 	<software name="kof99a" cloneof="kof99" supported="partial">
-		<description>The King of Fighters '99</description>
+		<description>The King of Fighters '99 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26462,7 +26497,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="lionkin2">
-		<description>Shi Zi Wang II - The Lion King II</description>
+		<description>Shi Zi Wang II - Lion King II</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26594,7 +26629,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="suprbubl">
-		<description>Super Bubble Bobble (Chi)</description>
+		<description>Super Bubble Bobble MD (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26762,7 +26797,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="lionkin2a" cloneof="lionkin2">
-		<description>Shi Zi Wang II - The Lion King II (Pirate)</description>
+		<description>Shi Zi Wang II - Lion King II (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27097,7 +27132,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="domino">
-		<description>Domino</description>
+		<description>Domino (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="Домино"/>
