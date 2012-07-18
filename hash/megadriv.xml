@@ -27495,7 +27495,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfsu" cloneof="turboout">
+	<software name="nfsu" cloneof="toutrun">
 		<description>Need for Speed Undercover (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
