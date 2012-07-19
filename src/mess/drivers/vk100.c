@@ -488,8 +488,19 @@ ROM_START( vk100 )
      * it contains a table of 4 output bits based on input of: (from figure 5-18):
      * 4 input bits bank-selected from RAM (a0, a1, a2, a3)
      * 2 select bits to choose one of the 4 bits, sourced from the X reg LSBs (a4, a5)
-     * 3 pattern function bits from WOPS,
-     * and one enable bit from the pattern register shifter
+     * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
+     * and one bit from the pattern register shifter a9
+i.e. addr bits 9876543210
+               ||||||\\\\- input from ram A
+               ||||\\----- bit select (from x reg lsb)
+               |||\------- negate N
+               |\\-------- function
+               \---------- pattern bit P
+          functions are:
+          Overlay: M=A|(P^N)
+          Replace: M=P^N
+          Complement: M=A^(P^N)
+          Erase: M=N
      */
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 	
