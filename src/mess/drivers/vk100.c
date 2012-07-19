@@ -110,13 +110,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		//m_crtc(*this, "hd46505sp"),
+		m_crtc(*this, "crtc"),
 		m_speaker(*this, BEEPER_TAG)//,
 		//m_uart(*this, "i8251")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	//required_device<mc6845_device> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_speaker;
 	//required_device<device_t> m_uart;
 
@@ -231,9 +231,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_RAM // hack to pass crtc test until crtc is attached
-	//AM_RANGE(0x00, 0x00) AM_WRITE(crtc_addr_w)
-	//AM_RANGE(0x01, 0x01) AM_READWRITE(crtc_data_r, crtc_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 	AM_RANGE (0x40, 0x41) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
 	AM_RANGE (0x42, 0x43) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
@@ -424,20 +423,32 @@ static PALETTE_INIT( vk100 )
 		palette_set_color_rgb( machine, i, (i&4)?0xFF:0x00, (i&2)?0xFF:0x00, (i&1)?0xFF:0x00);
 }
 
-static VIDEO_START( vk100 )
-{
-}
-
-static SCREEN_UPDATE_IND16( vk100 )
-{
-	return 0;
-}
 
 static INTERRUPT_GEN( vk100_vertical_interrupt )
 {
 	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
 	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 }
+
+static MC6845_UPDATE_ROW( vk100_update_row )
+{
+//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x\n", y, ma, ra, x_count);
+}
+
+
+static const mc6845_interface mc6845_intf =
+{
+	"screen",
+	12,
+	NULL,
+	vk100_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* basic machine hardware */
@@ -450,15 +461,9 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 )
-	//MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
-	//MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/16, mc6845_mda_intf)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(vk100)
-	MCFG_SCREEN_UPDATE_STATIC(vk100)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/12, mc6845_intf)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(vk100)
 
