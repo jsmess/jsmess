@@ -44,10 +44,10 @@
 		<description>Applesoft Lite</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load at 6000.7FFFR, press emulated F12 (cursor appears), enter at 6000R" />
+		<info name="usage" value="Load at 6000.7EFFR, enter at 6000R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="9457756">
-				<rom name="applesoft lite.wav" size="9457756" crc="b37799c4" sha1="edb1a6c801a0c0a58004eec42116ad7a22730df7" offset="0" />
+			<dataarea name="cass" size="9679664">
+				<rom name="applesoft lite.wav" size="9679664" crc="098614ca" sha1="1b99eea4ef1bd0155615fb49f5d1f6a6f17d9ae4" offset="0" />
 			</dataarea>
 		</part>
 	</software>

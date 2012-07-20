@@ -198,6 +198,7 @@
 		<year>1977</year>
 		<publisher>Fairchild</publisher>
 		<info name="series" value="Videocart 12" />
+		<info name="usage" value="Hit CTRL and A to start." />
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="baseball.bin" size="2048" crc="01129bcd" sha1="9b0c9bd3e52da22ca7f2aab6fbb5f3c24f89ef75" offset="0" />
