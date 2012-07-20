@@ -94,7 +94,8 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
     X - 0 X X X X (0x30) "
 
 */
-
+#undef VG_VERBOSE
+#undef LED_VERBOSE
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -122,22 +123,33 @@ public:
 
 	UINT16 m_vgX;
 	UINT16 m_vgY;
-	UINT8 m_vgErr;
-	UINT8 m_vgPat;
+	UINT8 m_vgERR;
+	UINT8 m_vgSOPS;
+	UINT8 m_vgPAT;
+	UINT8 m_vgPMUL;
+	UINT8 m_vgDU;
+	UINT8 m_vgDVM;
+	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
+	UINT8 m_GO;
 	
 	DECLARE_WRITE8_MEMBER(vgLD_X);
 	DECLARE_WRITE8_MEMBER(vgLD_Y);
-	DECLARE_WRITE8_MEMBER(vgErr);
-	
-	DECLARE_WRITE8_MEMBER(vgPat);
-	
+	DECLARE_WRITE8_MEMBER(vgERR);
+	DECLARE_WRITE8_MEMBER(vgSOPS);
+	DECLARE_WRITE8_MEMBER(vgPAT);
+	DECLARE_WRITE8_MEMBER(vgPMUL);
+	DECLARE_WRITE8_MEMBER(vgDU);
+	DECLARE_WRITE8_MEMBER(vgDVM);
+	DECLARE_WRITE8_MEMBER(vgDIR);
 	DECLARE_WRITE8_MEMBER(vgWOPS);
-	
+	DECLARE_WRITE8_MEMBER(vgEX_MOV);
+	DECLARE_WRITE8_MEMBER(vgEX_DOT);
 	DECLARE_WRITE8_MEMBER(vgEX_VEC);
-	
+	DECLARE_WRITE8_MEMBER(vgEX_ER);
 	DECLARE_WRITE8_MEMBER(KBDW);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
+	//DECLARE_READ8_MEMBER(SYSTAT_A);
 };
 
 /*
@@ -151,7 +163,9 @@ WRITE8_MEMBER(vk100_state::vgLD_X)
 {
 	m_vgX &= 0xFF << ((1-offset)*8);
 	m_vgX |= ((UINT16)data) << (offset*8);
-	logerror("VG: X Reg 0x%02X loaded with %04X, new X value is %04X\n", 0x40+offset, ((UINT16)data) << (offset*8), m_vgX);
+#ifdef VG_VERBOSE
+	logerror("VG: 0x%02X: X Reg loaded with %04X, new X value is %04X\n", 0x40+offset, ((UINT16)data) << (offset*8), m_vgX);
+#endif
 }
 
 /* ports 0x42 and 0x43: load low and high bytes of vector gen Y register */
@@ -159,21 +173,80 @@ WRITE8_MEMBER(vk100_state::vgLD_Y)
 {
 	m_vgY &= 0xFF << ((1-offset)*8);
 	m_vgY |= ((UINT16)data) << (offset*8);
-	logerror("VG: Y Reg 0x%02X loaded with %04X, new Y value is %04X\n", 0x42+offset, ((UINT16)data) << (offset*8), m_vgY);
+#ifdef VG_VERBOSE
+	logerror("VG: 0x%02X: Y Reg loaded with %04X, new Y value is %04X\n", 0x42+offset, ((UINT16)data) << (offset*8), m_vgY);
+#endif
 }
 
 /* port 0x44: "ERR" load bresenham line algorithm 'error' count */
-WRITE8_MEMBER(vk100_state::vgErr)
+WRITE8_MEMBER(vk100_state::vgERR)
 {
-	m_vgErr = data;
-	logerror("VG: Err Reg 0x44 loaded with %02X\n", m_vgErr);
+	m_vgERR = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x44: ERR Reg loaded with %02X\n", m_vgERR);
+#endif
 }
 
-/* port 0x46: "Pat" load vg Pattern register */
-WRITE8_MEMBER(vk100_state::vgPat)
+/* port 0x45: "SOPS" screen options 
+ * Blink --Background color--  Serial Port Select?  Reverse
+ * Enable Green  Red    Blue   ?      ?      ?      BG/FG
+ * d7     d6     d5     d4     d3     d2     d1     d0
+ */
+WRITE8_MEMBER(vk100_state::vgSOPS)
 {
-	m_vgPat = data;
-	logerror("VG: Pattern Reg 0x46 loaded with %02X\n", m_vgPat);
+	m_vgSOPS = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x45: SOPS Reg loaded with %02X: Blink: %d, Background GRB: %d%d%d, Serial select: %x, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>1)&7, m_vgSOPS&1);
+#endif
+}
+
+/* port 0x46: "PAT" load vg Pattern register */
+WRITE8_MEMBER(vk100_state::vgPAT)
+{
+	m_vgPAT = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x46: PAT Reg loaded with %02X\n", m_vgPAT);
+#endif
+}
+
+/* port 0x47: "PMUL" load vg Pattern Multiply Register 
+   The pattern multiply register loads a counter which counts reads from
+   the pattern register and increments on each one. if it overflows from
+   1111 to 0000 the pattern register is shifted right one bit and the
+   counter is reloaded from PMUL */
+WRITE8_MEMBER(vk100_state::vgPMUL)
+{
+	m_vgPMUL = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x47: PMUL Reg loaded with %02X\n", m_vgPMUL);
+#endif
+}
+
+/* port 0x60: "DU" load vg vector major register */
+WRITE8_MEMBER(vk100_state::vgDU)
+{
+	m_vgDU = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x60: DU Reg loaded with %02X\n", m_vgDU);
+#endif
+}
+
+/* port 0x61: "DVM" load vg vector minor register */
+WRITE8_MEMBER(vk100_state::vgDVM)
+{
+	m_vgDVM = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x61: DVM Reg loaded with %02X\n", m_vgDVM);
+#endif
+}
+
+/* port 0x62: "DIR" load vg Direction register */
+WRITE8_MEMBER(vk100_state::vgDIR)
+{
+	m_vgDIR = data;
+#ifdef VG_VERBOSE
+	logerror("VG: 0x62: DIR Reg loaded with %02X\n", m_vgDIR);
+#endif
 }
 
 /* port 0x63: "WOPS" vector 'pixel' write options
@@ -184,17 +257,55 @@ WRITE8_MEMBER(vk100_state::vgPat)
  */
 WRITE8_MEMBER(vk100_state::vgWOPS)
 {
-	static const char *const functions[] = { "Overlay", "Replace", "Complement", "Erase" };
 	m_vgWOPS = data;
-	logerror("VG: WOPS loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (m_vgWOPS>>7)&1, (m_vgWOPS>>6)&1, (m_vgWOPS>>5)&1, (m_vgWOPS>>4)&1, (m_vgWOPS>>3)&1, functions[(m_vgWOPS>>1)&3], m_vgWOPS&1);
+#ifdef VG_VERBOSE
+	static const char *const functions[] = { "Overlay", "Replace", "Complement", "Erase" };
+	logerror("VG: 0x64: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (m_vgWOPS>>7)&1, (m_vgWOPS>>6)&1, (m_vgWOPS>>5)&1, (m_vgWOPS>>4)&1, (m_vgWOPS>>3)&1, functions[(m_vgWOPS>>1)&3], m_vgWOPS&1);
+#endif
 }
 
-/* port 0x66: "EX VEC" execute a vector (start the state machine) */
+/* port 0x64: "EX MOV" execute a move (start the state machine) */
+WRITE8_MEMBER(vk100_state::vgEX_MOV)
+{
+#ifdef VG_VERBOSE
+	logerror("VG Execute Move 0x64 written: stub!\n");
+#endif
+	// TODO: short term: do some calculations here and print the expected starting ram address etc
+	// TODO: long term: fire a timer and actually move the ram with correct timing
+	m_GO = 1;
+}
+
+/* port 0x65: "EX DOT" execute a dot (start the state machine) */
+WRITE8_MEMBER(vk100_state::vgEX_DOT)
+{
+#ifdef VG_VERBOSE
+	logerror("VG: 0x65: Execute Dot written: stub!\n");
+#endif
+	// TODO: short term: do some calculations here and print the expected starting ram address etc
+	// TODO: long term: fire a timer and actually draw the dot to ram with correct timing
+	m_GO = 1;
+}
+
+/* port 0x66: "EX VEC" execute a pattern (8 fixed direction) vector (start the state machine) */
 WRITE8_MEMBER(vk100_state::vgEX_VEC)
 {
-	logerror("VG Execute Vector 0x66 written: stub!\n");
+#ifdef VG_VERBOSE
+	logerror("VG: 0x66: Execute Vector written: stub!\n");
+#endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the vector to ram with correct timing
+	m_GO = 1;
+}
+
+/* port 0x67: "EX ER" execute an arbitrary bresenham vector (start the state machine) */
+WRITE8_MEMBER(vk100_state::vgEX_ER)
+{
+#ifdef VG_VERBOSE
+	logerror("VG: 0x67: Execute Arbitrary 'error' vector written: stub!\n");
+#endif
+	// TODO: short term: do some calculations here and print the expected starting ram address etc
+	// TODO: long term: fire a timer and actually use the state machine to draw the vector to ram with correct timing
+	m_GO = 1;
 }
 
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
@@ -209,8 +320,21 @@ WRITE8_MEMBER(vk100_state::KBDW)
 	output_set_value("l2_led", BIT(data, 0) ? 1 : 0);
 	if (BIT(data, 6)) logerror("kb keyclick bit 6 set: not emulated yet (multivibrator)!\n");
 	beep_set_state( m_speaker, BIT(data, 7));
+#ifdef LED_VERBOSE
 	logerror("LED state: %02X: %s %s %s %s %s %s\n", data&0xFF, (data&0x20)?"------- LOCAL ":"ON LINE ----- ", (data&0x10)?"--------- ":"NO SCROLL ", (data&0x8)?"----- ":"BASIC ", (data&0x4)?"--------- ":"HARD-COPY ", (data&0x2)?"-- ":"L1 ", (data&0x1)?"-- ":"L2 ");
+#endif
 }
+
+/* port 0x40: "SYSTAT A"; various status bits, poorly documented in the tech manual
+ * /GO    ?      ?      ?      BIT3   BIT2   BIT1   BIT0
+ * d7     d6     d5     d4     d3     d2     d1     d0 
+ * bit3, 2, 1, 0 are the last 4 bits read by the vector generator from VRAM
+ * this appears to be the only way the vram can be READ by the cpu
+*/
+/*READ8_MEMBER(vk100_state::SYSTAT_A)
+{
+	return ((1-m_GO)<<7)|0x7F;
+}*/
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 {
@@ -231,31 +355,32 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	//ADDRESS_MAP_GLOBAL_MASK(0x7f) // guess
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 	AM_RANGE (0x40, 0x41) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
 	AM_RANGE (0x42, 0x43) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
-	AM_RANGE (0x44, 0x44) AM_WRITE(vgErr)    //LD ERR ('error' in bresenham algorithm)
-	//AM_RANGE (0x45, 0x45) AM_WRITE(sops)   //LD SOPS (screen options)
-	AM_RANGE (0x46, 0x46) AM_WRITE(vgPat)    //LD PAT (pattern register)
-	//AM_RANGE (0x47, 0x47) AM_READWRITE(pmul)   //LD PMUL (pattern multiplier) (should this be write only?)
-	//AM_RANGE (0x60, 0x60) AM_WRITE(du)     //LD DU
-	//AM_RANGE (0x61, 0x61) AM_WRITE(dvm)    //LD DVM
-	//AM_RANGE (0x62, 0x62) AM_WRITE(dir)    //LD DIR (direction)
+	AM_RANGE (0x44, 0x44) AM_WRITE(vgERR)    //LD ERR ('error' in bresenham algorithm)
+	AM_RANGE (0x45, 0x45) AM_WRITE(vgSOPS)   //LD SOPS (screen options)
+	AM_RANGE (0x46, 0x46) AM_WRITE(vgPAT)    //LD PAT (pattern register)
+	AM_RANGE (0x47, 0x47) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
+	AM_RANGE (0x60, 0x60) AM_WRITE(vgDU)     //LD DU
+	AM_RANGE (0x61, 0x61) AM_WRITE(vgDVM)    //LD DVM
+	AM_RANGE (0x62, 0x62) AM_WRITE(vgDIR)    //LD DIR (direction)
 	AM_RANGE (0x63, 0x63) AM_WRITE(vgWOPS)   //LD WOPS (write options)
-	//AM_RANGE (0x64, 0x64) AM_WRITE(mov)    //EX MOV
-	//AM_RANGE (0x65, 0x65) AM_WRITE(dot)    //EX DOT
+	AM_RANGE (0x64, 0x64) AM_WRITE(vgEX_MOV)    //EX MOV
+	AM_RANGE (0x65, 0x65) AM_WRITE(vgEX_DOT)    //EX DOT
 	AM_RANGE (0x66, 0x66) AM_WRITE(vgEX_VEC)    //EX VEC
-	//AM_RANGE (0x67, 0x67) AM_WRITE(er)     //EX ER
-	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW
-	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks)
+	AM_RANGE (0x67, 0x67) AM_WRITE(vgEX_ER)     //EX ER
+	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
+	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
 	//AM_RANGE (0x70, 0x70) AM_WRITE(comd)   //LD COMD (one of the i8251 regs)
 	//AM_RANGE (0x71, 0x71) AM_WRITE(com)    //LD COM (the other i8251 reg)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	//AM_RANGE (0x40, 0x40) AM_READ(systat_a) // SYSTAT A (dipswitches?)
+	//AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (dipswitches and state machine done)
 	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B (dipswitches?)
 	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O , low 2 bits control the i8251 dest: 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback
 	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
@@ -401,7 +526,7 @@ INPUT_PORTS_END
 static MACHINE_RESET( vk100 )
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
-	beep_set_frequency( state->m_speaker, 116 ); //116 hz (page 172 of TM)
+	beep_set_frequency( state->m_speaker, 116 ); //116 hz (page 172 of TM), but duty cycle is wrong here!
 	output_set_value("online_led",1);
 	output_set_value("local_led", 0);
 	output_set_value("noscroll_led",1);
@@ -411,9 +536,15 @@ static MACHINE_RESET( vk100 )
 	output_set_value("l2_led", 1);
 	state->m_vgX = 0;
 	state->m_vgY = 0;
-	state->m_vgErr = 0;
-	state->m_vgPat = 0;
+	state->m_vgERR = 0;
+	state->m_vgSOPS = 0;
+	state->m_vgPAT = 0;
+	state->m_vgPMUL = 0;
+	state->m_vgDU = 0;
+	state->m_vgDVM = 0;
+	state->m_vgDIR = 0;
 	state->m_vgWOPS = 0;
+	state->m_GO = 0;
 }
 
 static PALETTE_INIT( vk100 )
@@ -426,13 +557,15 @@ static PALETTE_INIT( vk100 )
 
 static INTERRUPT_GEN( vk100_vertical_interrupt )
 {
+	vk100_state *state = device->machine().driver_data<vk100_state>();
 	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
 	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	state->m_GO = 0; // hack for now until the state machine works
 }
 
 static MC6845_UPDATE_ROW( vk100_update_row )
 {
-//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x\n", y, ma, ra, x_count);
+	//fprintf(stderr,"y=%d, ma=%04x, ra=%02x, x_count=%02x\n", y, ma, ra, x_count);
 }
 
 
@@ -494,7 +627,7 @@ ROM_START( vk100 )
      * 4 input bits bank-selected from RAM (a0, a1, a2, a3)
      * 2 select bits to choose one of the 4 bits, sourced from the X reg LSBs (a4, a5)
      * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
-     * and one bit from the pattern register shifter a9
+     * and one bit from the lsb of the pattern register shifter (a9)
 i.e. addr bits 9876543210
                ||||||\\\\- input from ram A
                ||||\\----- bit select (from x reg lsb)
@@ -515,10 +648,11 @@ i.e. addr bits 9876543210
 	// this is probably the "DIRECTION ROM", but might not be. (256*8, 82s135)
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
-	// the following == mb6309 (256x8, 82s135)
+	// the following == mb6309 (256x8, 82s135) // possibly direction rom
 	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0300, 0x0100, NO_DUMP)  // label verified from andy's board
-	// the following = mb6331 (32x8, 82s123)
+	// the following = mb6331 (32x8, 82s123) // possibly sync rom
 	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0400, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
