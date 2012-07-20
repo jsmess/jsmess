@@ -5,12 +5,10 @@
         12/05/2009 Skeleton driver.
         28/07/2009 added Guru-readme(TM)
 
-        Todo: attach hd46505sp CRTC
+        Todo:
               hook up vram
               - vram space is now present but not hooked to anything
               emulate vector generator hardware
-              - stubbing registers:
-                done: X, Y, Err, Pattern, WOPS
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -96,6 +94,7 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 */
 #undef VG_VERBOSE
 #undef LED_VERBOSE
+#undef KBD_VERBOSE
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -112,14 +111,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_crtc(*this, "crtc"),
-		m_speaker(*this, BEEPER_TAG)//,
-		//m_uart(*this, "i8251")
+		m_speaker(*this, BEEPER_TAG),
+		m_uart(*this, "i8251")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_speaker;
-	//required_device<device_t> m_uart;
+	required_device<device_t> m_uart;
 
 	UINT16 m_vgX;
 	UINT16 m_vgY;
@@ -131,6 +130,7 @@ public:
 	UINT8 m_vgDVM;
 	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
+	UINT8 m_BAUD;
 	UINT8 m_GO;
 	
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -148,8 +148,10 @@ public:
 	DECLARE_WRITE8_MEMBER(vgEX_VEC);
 	DECLARE_WRITE8_MEMBER(vgEX_ER);
 	DECLARE_WRITE8_MEMBER(KBDW);
+	DECLARE_WRITE8_MEMBER(BAUD);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	//DECLARE_READ8_MEMBER(SYSTAT_A);
+	DECLARE_READ8_MEMBER(SYSTAT_B);
 };
 
 /*
@@ -191,6 +193,7 @@ WRITE8_MEMBER(vk100_state::vgERR)
  * Blink --Background color--  Serial Port Select?  Reverse
  * Enable Green  Red    Blue   ?      ?      ?      BG/FG
  * d7     d6     d5     d4     d3     d2     d1     d0
+ * apparently, 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback on whichever 2 bits do port select
  */
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
@@ -325,16 +328,34 @@ WRITE8_MEMBER(vk100_state::KBDW)
 #endif
 }
 
+/* port 0x6C: "BAUD" sets the dividers for the rx and tx clocks on the 8251 */
+WRITE8_MEMBER(vk100_state::BAUD)
+{
+	m_BAUD = data;
+	logerror("IO: 0x6C: write of %02X, TODO: set the i8251 clocks as appropriate here!\n", m_BAUD);
+}
+
 /* port 0x40: "SYSTAT A"; various status bits, poorly documented in the tech manual
- * /GO    ?      ?      ?      BIT3   BIT2   BIT1   BIT0
+ * /GO    BIT3   BIT2   BIT1   BIT0   ?      ?      ?
  * d7     d6     d5     d4     d3     d2     d1     d0 
  * bit3, 2, 1, 0 are the last 4 bits read by the vector generator from VRAM
  * this appears to be the only way the vram can be READ by the cpu
+ 
+ 31D reads and checks d7 in a loop
+ 205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 0101?)
+ 299 reads, rotates result right 3 times and ANDs the result with 0x0F
+ 2A4 reads, rotates result left 1 time and ANDS the result with 0xF0
 */
 /*READ8_MEMBER(vk100_state::SYSTAT_A)
 {
 	return ((1-m_GO)<<7)|0x7F;
 }*/
+
+/* port 0x48: "SYSTAT B"; NOT documented in the tech manual */
+READ8_MEMBER(vk100_state::SYSTAT_B)
+{
+	return ioport("SWITCHES")->read();
+}
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 {
@@ -342,7 +363,9 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 	char kbdcol[8];
 	sprintf(kbdcol,"COL%X", (offset&0xF));
 	code = ioport(kbdcol)->read() | ioport("CAPSSHIFT")->read();
+#ifdef KBD_VERBOSE
 	logerror("Keyboard column %X read, returning %02X\n", offset&0xF, code);
+#endif
 	return code;
 }
 
@@ -362,11 +385,11 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	AM_RANGE (0x40, 0x41) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
 	AM_RANGE (0x42, 0x43) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
 	AM_RANGE (0x44, 0x44) AM_WRITE(vgERR)    //LD ERR ('error' in bresenham algorithm)
-	AM_RANGE (0x45, 0x45) AM_WRITE(vgSOPS)   //LD SOPS (screen options)
+	AM_RANGE (0x45, 0x45) AM_WRITE(vgSOPS)   //LD SOPS (screen options (plus uart dest))
 	AM_RANGE (0x46, 0x46) AM_WRITE(vgPAT)    //LD PAT (pattern register)
 	AM_RANGE (0x47, 0x47) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
-	AM_RANGE (0x60, 0x60) AM_WRITE(vgDU)     //LD DU
-	AM_RANGE (0x61, 0x61) AM_WRITE(vgDVM)    //LD DVM
+	AM_RANGE (0x60, 0x60) AM_WRITE(vgDU)     //LD DU (major)
+	AM_RANGE (0x61, 0x61) AM_WRITE(vgDVM)    //LD DVM (minor)
 	AM_RANGE (0x62, 0x62) AM_WRITE(vgDIR)    //LD DIR (direction)
 	AM_RANGE (0x63, 0x63) AM_WRITE(vgWOPS)   //LD WOPS (write options)
 	AM_RANGE (0x64, 0x64) AM_WRITE(vgEX_MOV)    //EX MOV
@@ -374,16 +397,16 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	AM_RANGE (0x66, 0x66) AM_WRITE(vgEX_VEC)    //EX VEC
 	AM_RANGE (0x67, 0x67) AM_WRITE(vgEX_ER)     //EX ER
 	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
-	//AM_RANGE (0x6C, 0x6C) AM_WRITE(baud)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	//AM_RANGE (0x70, 0x70) AM_WRITE(comd)   //LD COMD (one of the i8251 regs)
-	//AM_RANGE (0x71, 0x71) AM_WRITE(com)    //LD COM (the other i8251 reg)
+	AM_RANGE (0x6C, 0x6C) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
+	AM_RANGE(0x71, 0x71) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg) 
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	//AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (dipswitches and state machine done)
-	//AM_RANGE (0x48, 0x48) AM_READ(systat_b) // SYSTAT B (dipswitches?)
-	//AM_RANGE (0x50, 0x50) AM_READ(uart_0)   // UART O , low 2 bits control the i8251 dest: 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback
-	//AM_RANGE (0x51, 0x51) AM_READ(uart_1)   // UAR
+	//AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
+	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (dipswitches?)
+	AM_RANGE(0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
+	AM_RANGE(0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
 	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED
@@ -393,6 +416,32 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vk100 )
+	// the dipswitches are common ground: when open (upward) the lines are pulled to 5v, otherwise they read as 0
+	PORT_START("SWITCHES")
+		PORT_DIPNAME( 0x01, 0x00, "Power Frequency" )			PORT_DIPLOCATION("SW:1")
+		PORT_DIPSETTING( 0x00, "60Hz" )
+		PORT_DIPSETTING( 0x01, "50Hz" )
+		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )			PORT_DIPLOCATION("SW:2")
+		PORT_DIPSETTING( 0x00, "20ma port" )
+		PORT_DIPSETTING( 0x02, "EIA port" )
+		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )			PORT_DIPLOCATION("SW:3")
+		PORT_DIPSETTING( 0x00, "US" )
+		PORT_DIPSETTING( 0x04, "UK" )
+		PORT_DIPNAME( 0x18, 0x00, "Default Parity" )			PORT_DIPLOCATION("SW:4,5")
+		PORT_DIPSETTING( 0x00, "Off" )
+		PORT_DIPSETTING( 0x10, "Even" )
+		PORT_DIPSETTING( 0x08, "Odd" )
+		PORT_DIPSETTING( 0x18, "Do Not Use This Setting" )
+		PORT_DIPNAME( 0xe0, 0xe0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:6,7,8")
+		PORT_DIPSETTING( 0x00, "110" )
+		PORT_DIPSETTING( 0x80, "300" )
+		PORT_DIPSETTING( 0x40, "600" )
+		PORT_DIPSETTING( 0xc0, "1200" )
+		PORT_DIPSETTING( 0x20, "2400" )
+		PORT_DIPSETTING( 0xa0, "4800" )
+		PORT_DIPSETTING( 0x60, "9600" )
+		PORT_DIPSETTING( 0xe0, "19200" )
+
 	PORT_START("CAPSSHIFT") // CAPS LOCK and SHIFT appear as the high 2 bits on all rows
 		PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK)
@@ -544,6 +593,7 @@ static MACHINE_RESET( vk100 )
 	state->m_vgDVM = 0;
 	state->m_vgDIR = 0;
 	state->m_vgWOPS = 0;
+	state->m_BAUD = 0;
 	state->m_GO = 0;
 }
 
@@ -583,6 +633,19 @@ static const mc6845_interface mc6845_intf =
 	NULL
 };
 
+static const i8251_interface i8251_intf =
+{
+	DEVCB_NULL, // in_rxd_cb
+	DEVCB_NULL, // out_txd_cb
+	DEVCB_NULL, // in_dsr_cb
+	DEVCB_NULL, // out_dtr_cb
+	DEVCB_NULL, // out_rts_cb
+	DEVCB_NULL, // out_rxrdy_cb  TODO: this goes to an interrupt!
+	DEVCB_NULL, // out_txrdy_cb  TODO: this goes to an interrupt!
+	DEVCB_NULL, // out_txempty_cb
+	DEVCB_NULL // out_syndet_cb
+};
+
 static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
@@ -600,6 +663,8 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(vk100)
 
+	/* i8251 uart */
+	MCFG_I8251_ADD("i8251", i8251_intf)
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
@@ -659,4 +724,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK 100", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
