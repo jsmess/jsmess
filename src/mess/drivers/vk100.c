@@ -6,9 +6,9 @@
         28/07/2009 added Guru-readme(TM)
 
         Todo:
-              hook up vram
-              - vram space is now present but not hooked to anything
-              emulate vector generator hardware
+              emulate vector generator hardware enough to write stuff to vram
+              * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
+              hook up baud generator to i8251 rx and tx clocks
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -120,6 +120,7 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_uart;
 
+	UINT8* m_vram;
 	UINT16 m_vgX;
 	UINT16 m_vgY;
 	UINT8 m_vgERR;
@@ -190,17 +191,17 @@ WRITE8_MEMBER(vk100_state::vgERR)
 }
 
 /* port 0x45: "SOPS" screen options 
- * Blink --Background color--  Serial Port Select?  Reverse
+ * Blink --Background color--  ?     Serial Select?  Reverse
  * Enable Green  Red    Blue   ?      ?      ?      BG/FG
  * d7     d6     d5     d4     d3     d2     d1     d0
- * apparently, 00 = rs232/eia, 01 = 20ma, 02 = hardcopy, 03 = test/loopback on whichever 2 bits do port select
+ * apparently, 00 = rs232/eia, 01 = 20ma, 10 = hardcopy, 11 = test/loopback 
  */
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
 	m_vgSOPS = data;
-#ifdef VG_VERBOSE
+//#ifdef VG_VERBOSE
 	logerror("VG: 0x45: SOPS Reg loaded with %02X: Blink: %d, Background GRB: %d%d%d, Serial select: %x, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>1)&7, m_vgSOPS&1);
-#endif
+//#endif
 }
 
 /* port 0x46: "PAT" load vg Pattern register */
@@ -418,21 +419,21 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vk100 )
 	// the dipswitches are common ground: when open (upward) the lines are pulled to 5v, otherwise they read as 0
 	PORT_START("SWITCHES")
-		PORT_DIPNAME( 0x01, 0x00, "Power Frequency" )			PORT_DIPLOCATION("SW:1")
+		PORT_DIPNAME( 0x01, 0x00, "Power Frequency" )			PORT_DIPLOCATION("SW:!1")
 		PORT_DIPSETTING( 0x00, "60Hz" )
 		PORT_DIPSETTING( 0x01, "50Hz" )
-		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )			PORT_DIPLOCATION("SW:2")
+		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )			PORT_DIPLOCATION("SW:!2")
 		PORT_DIPSETTING( 0x00, "20ma port" )
 		PORT_DIPSETTING( 0x02, "EIA port" )
-		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )			PORT_DIPLOCATION("SW:3")
+		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )			PORT_DIPLOCATION("SW:!3")
 		PORT_DIPSETTING( 0x00, "US" )
 		PORT_DIPSETTING( 0x04, "UK" )
-		PORT_DIPNAME( 0x18, 0x00, "Default Parity" )			PORT_DIPLOCATION("SW:4,5")
+		PORT_DIPNAME( 0x18, 0x00, "Default Parity" )			PORT_DIPLOCATION("SW:!4,!5")
 		PORT_DIPSETTING( 0x00, "Off" )
 		PORT_DIPSETTING( 0x10, "Even" )
 		PORT_DIPSETTING( 0x08, "Odd" )
 		PORT_DIPSETTING( 0x18, "Do Not Use This Setting" )
-		PORT_DIPNAME( 0xe0, 0xe0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:6,7,8")
+		PORT_DIPNAME( 0xe0, 0xe0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
 		PORT_DIPSETTING( 0x00, "110" )
 		PORT_DIPSETTING( 0x80, "300" )
 		PORT_DIPSETTING( 0x40, "600" )
@@ -456,7 +457,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF1/Hardcopy") PORT_CODE(KEYCODE_F1)
 		PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("COL2")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -464,7 +465,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("No scroll") PORT_CODE(KEYCODE_LALT)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 1") PORT_CODE(KEYCODE_1_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF2/Locator") PORT_CODE(KEYCODE_F2)
 		PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("COL3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
@@ -472,7 +473,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 2") PORT_CODE(KEYCODE_2_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3/Text") PORT_CODE(KEYCODE_F3)
 		PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("COL4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
@@ -480,7 +481,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 3") PORT_CODE(KEYCODE_3_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF4/Reset") PORT_CODE(KEYCODE_F4)
 		PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("COL5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
@@ -597,25 +598,80 @@ static MACHINE_RESET( vk100 )
 	state->m_GO = 0;
 }
 
+static DRIVER_INIT( vk100 )
+{
+	UINT8 *gfx = machine.root_device().memregion("vram")->base();
+	int i;
+	for (i = 0; i < 0x8000; i++)
+		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+}
+
 static PALETTE_INIT( vk100 )
 {
 	int i;
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb( machine, i, (i&4)?0xFF:0x00, (i&2)?0xFF:0x00, (i&1)?0xFF:0x00);
+		palette_set_color_rgb( machine, i, (i&2)?0xFF:0x00, (i&4)?0xFF:0x00, (i&1)?0xFF:0x00);
 }
 
 
 static INTERRUPT_GEN( vk100_vertical_interrupt )
 {
 	vk100_state *state = device->machine().driver_data<vk100_state>();
-	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, CLEAR_LINE);
 	state->m_GO = 0; // hack for now until the state machine works
+}
+
+static WRITE_LINE_DEVICE_HANDLER(i8251_rxrdy_int)
+{
+	vk100_state *m_state = device->machine().driver_data<vk100_state>();
+	device_set_input_line(m_state->m_maincpu, I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
+}
+
+static WRITE_LINE_DEVICE_HANDLER(i8251_txrdy_int)
+{
+	vk100_state *m_state = device->machine().driver_data<vk100_state>();
+	device_set_input_line(m_state->m_maincpu, I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
+}
+
+static VIDEO_START( vk100 )
+{
+	vk100_state *state = machine.driver_data<vk100_state>();
+	state->m_vram = state->memregion("vram")->base();
 }
 
 static MC6845_UPDATE_ROW( vk100_update_row )
 {
-	//fprintf(stderr,"y=%d, ma=%04x, ra=%02x, x_count=%02x\n", y, ma, ra, x_count);
+	static const UINT32 colorTable[8] = { 0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF }; 
+	//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x ", y, ma, ra, x_count);
+	/* figure out ram address based on tech manual page 5-23:
+	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0 
+	 * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
+	 */
+	vk100_state *state = device->machine().driver_data<vk100_state>();
+	//UINT8 *gfx = device->machine.root_device().memregion("vram")->base();
+	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
+	EA <<= 1; // this is needed to address the whole 0000-7fff area since we deal with 16 bit blocks
+	//printf("EA: %04X\n", EA);
+	// display the 64 different 12-bit-wide chunks
+	for (int i = 0; i < 64; i++)
+	{
+		UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8);
+		UINT8 fgColor = block&7;
+		//UINT8 blink = (block&8)>>3;
+		UINT8 bgColor = (state->m_vgSOPS&0x70)>>4;
+		if (state->m_vgSOPS&1) // reverse fg/bg colors
+		{
+			UINT8 temp = fgColor;
+			fgColor = bgColor;
+			bgColor = temp;
+		}
+		// display a 12-bit wide chunk
+		for (int j = 0; j < 12; j++)
+		{
+			bitmap.pix32(y, (12*i)+j) = (block&(0x10<<j))?colorTable[fgColor]:colorTable[bgColor];
+		}
+	}
 }
 
 
@@ -640,8 +696,8 @@ static const i8251_interface i8251_intf =
 	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
 	DEVCB_NULL, // out_rts_cb
-	DEVCB_NULL, // out_rxrdy_cb  TODO: this goes to an interrupt!
-	DEVCB_NULL, // out_txrdy_cb  TODO: this goes to an interrupt!
+	DEVCB_LINE(i8251_rxrdy_int), // out_rxrdy_cb
+	DEVCB_LINE(i8251_txrdy_int), // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
 	DEVCB_NULL // out_syndet_cb
 };
@@ -657,11 +713,12 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 	MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/12, mc6845_intf)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(vk100)
+	MCFG_VIDEO_START(vk100) // to set m_vram pointer properly (is there a less roundabout way to do this?)
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
@@ -708,20 +765,20 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 	
 	ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
-	// this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. (256*4, 82s129)
+	// not sure what this prom is, it may relate somehow to addressing or modifying vram. (256*4, 82s129)
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
-	// this is probably the "DIRECTION ROM", but might not be. (256*8, 82s135)
+	// this is probably the "SYNC ROM" since only addresses 0-6 are used within every 8 byte chunk. (256*8, 82s135)
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
 	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
-	// the following == mb6309 (256x8, 82s135) // possibly direction rom
+	// the following == mb6309 (256x8, 82s135) // probably direction rom
 	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0300, 0x0100, NO_DUMP)  // label verified from andy's board
-	// the following = mb6331 (32x8, 82s123) // possibly sync rom
+	// the following = mb6331 (32x8, 82s123) // MAYBE vector rom
 	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0400, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1980, vk100,  0,      0,       vk100,     vk100,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
