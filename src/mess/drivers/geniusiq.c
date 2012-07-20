@@ -47,6 +47,7 @@ public:
 	required_shared_ptr<UINT16>	m_vram;
 	required_shared_ptr<UINT16>	m_mouse_gfx;
 	virtual void machine_reset();
+	virtual void palette_init();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(flash_r);
 	DECLARE_WRITE8_MEMBER(flash_w);
@@ -62,6 +63,33 @@ public:
 	UINT16		m_input;
 };
 
+
+void geniusiq_state::palette_init()
+{
+	// shades need to be verified
+	const UINT8 palette[] =
+	{
+		0x00, 0x00, 0x00,    // Black?? (used in the cursor for transparency)
+		0xff, 0xff, 0xff,    // White
+		0xa0, 0xa0, 0xa0,    // Light grey
+		0x7f, 0x7f, 0x7f,    // Dark grey
+		0x00, 0x00, 0x00,    // Black
+		0x00, 0x60, 0xff,    // Sky blue
+		0x00, 0x00, 0xff,    // Blue
+		0xff, 0x00, 0x00,    // Red
+		0x00, 0xff, 0x00,    // Green
+		0x00, 0x7f, 0x00,    // Dark green
+		0xff, 0xff, 0x00,    // Yellow
+		0xff, 0x7f, 0x00,    // Orange
+		0x7f, 0x40, 0x00,    // Brown
+		0x60, 0x40, 0x00,    // Dark brown
+		0x60, 0x00, 0xff,    // Mauve
+		0xff, 0x00, 0xff     // Pink
+	};
+
+	for (int i=0; i<ARRAY_LENGTH(palette)/3; i++)
+		palette_set_color_rgb(machine(), i, palette[i*3], palette[i*3+1], palette[i*3+2]);
+}
 
 UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -135,6 +163,7 @@ READ16_MEMBER( geniusiq_state::input_r )
 
 		data |= (1<<8);
 
+		// TODO: some inputs can be lost during a fast keys sequence, maybe a queue can be the solution
 		m_input = 0;
 		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 	}
