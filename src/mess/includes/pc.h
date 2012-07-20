@@ -33,6 +33,7 @@ public:
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8	m_u73_q2;
 	UINT8	m_out1;
+	UINT8	m_memboard[4];		/* used only by ec1840 and ec1841 */
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_pc_spkrdata;
@@ -64,6 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_EXP_w);
 	DECLARE_READ8_MEMBER(pc_EXP_r);
 	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(ec1841_memboard_r);
+	DECLARE_WRITE8_MEMBER(ec1841_memboard_w);
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -120,6 +123,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge );
 TIMER_DEVICE_CALLBACK( pc_frame_interrupt );
 TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt );
 TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt );
+TIMER_DEVICE_CALLBACK( null_frame_interrupt );
 
 
 

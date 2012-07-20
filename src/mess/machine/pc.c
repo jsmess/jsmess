@@ -70,6 +70,75 @@
 		} \
 	} while (0)
 
+/*
+ * EC-1841 memory controller.  The machine can hold four memory boards;
+ * each board has a control register, its address is set by a DIP switch
+ * on the board itself.
+ *
+ * Only one board should be enabled for read, and one for write.
+ * Normally, this is the same board.
+ *
+ * Each board is divided into 4 banks, internally numbererd 0..3.
+ * POST tests each board on startup, and an error (indicated by
+ * I/O CH CK bus signal) causes it to disable failing bank(s) by writing
+ * 'reconfiguration code' (inverted number of failing memory bank) to
+ * the register.
+
+ * bit 1-0	'reconfiguration code'
+ * bit 2	enable read access
+ * bit 3 	enable write access
+ */
+
+READ8_MEMBER(pc_state::ec1841_memboard_r)
+{
+	pc_state *st = space.machine().driver_data<pc_state>();
+	return st->m_memboard[(offset % 4)];
+}
+
+WRITE8_MEMBER(pc_state::ec1841_memboard_w)
+{
+	pc_state *st = space.machine().driver_data<pc_state>();
+	address_space *program = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	running_machine &machine = space.machine();
+	UINT8 current;
+
+	DBG_LOG(1,"ec1841_memboard_w",("(%d) <- %02X at %s\n", offset, data, machine.describe_context()));
+
+	// for now, handle only board 0
+	if (offset > 0) {
+		st->m_memboard[offset] = data;
+		return;
+	}
+
+	current = st->m_memboard[offset];
+
+	if (BIT(current, 2) && !BIT(data, 2)) {
+		// disable read access
+		program->unmap_read(0, 0x7ffff);
+		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
+	}
+
+	if (BIT(current, 3) && !BIT(data, 3)) {
+		// disable write access
+		program->unmap_write(0, 0x7ffff);
+		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
+	}
+
+	if (!BIT(current, 2) && BIT(data, 2)) {
+		// enable read access
+		program->install_read_bank(0, 0x7ffff, "bank10");
+		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
+	}
+
+	if (!BIT(current, 3) && BIT(data, 3)) {
+		// enable write access
+		program->install_write_bank(0, 0x7ffff, "bank10");
+		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
+	}
+
+	st->m_memboard[offset] = data;
+}
+
 /*************************************************************************
  *
  *      PC DMA stuff
@@ -842,6 +911,7 @@ I8255_INTERFACE( pc_ppi8255_interface )
 
 
 static struct {
+	UINT8		pulsing;
 	UINT8		latch;		/* keyboard scan code */
 	UINT16		mask;		/* input lines */
 	emu_timer	*keyb_signal_timer;
@@ -867,25 +937,76 @@ static TIMER_CALLBACK( mc1502_keyb_signal_callback )
 	key |= machine.root_device().ioport("Y10")->read();
 	key |= machine.root_device().ioport("Y11")->read();
 	key |= machine.root_device().ioport("Y12")->read();
-	DBG_LOG(1,"mc1502_k_s_c",("= %02X%s\n", key, key ? " will IRQ" : ""));
+	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
+		(key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
+	/* 
+	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1; 
+	   keep pulsing while any key is pressed, and pulse one time after all keys
+	   are released.
+	 */
 	if (key) {
-		pic8259_ir1_w(st->m_pic8259, 1);
+		if (mc1502_keyb.pulsing < 2) {
+			mc1502_keyb.pulsing += 2;
+		}
+	}
+
+	if (mc1502_keyb.pulsing) {
+		pic8259_ir1_w(st->m_pic8259, (mc1502_keyb.pulsing & 1));
+		mc1502_keyb.pulsing--;
 	}
 }
 
 static READ8_DEVICE_HANDLER ( mc1502_ppi_porta_r )
 {
 	running_machine &machine = device->machine();
+
 	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
 	return mc1502_keyb.latch;
 }
 
 static WRITE8_DEVICE_HANDLER ( mc1502_ppi_porta_w )
 {
+	pc_state *st = device->machine().driver_data<pc_state>();
 	running_machine &machine = device->machine();
+
 	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
 	mc1502_keyb.latch = data;
+	if (mc1502_keyb.pulsing)
+		mc1502_keyb.pulsing--;
+	pic8259_ir1_w(st->m_pic8259, 0);
+}
+
+static WRITE8_DEVICE_HANDLER ( mc1502_ppi_portb_w )
+{
+	pc_state *st = device->machine().driver_data<pc_state>();
+	running_machine &machine = device->machine();
+
+	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+	st->m_ppi_portb = data;
+	pit8253_gate2_w(device->machine().device("pit8253"), BIT(data, 0));
+	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
+}
+
+static READ8_DEVICE_HANDLER ( mc1502_ppi_portc_r )
+{
+	running_machine &machine = device->machine();
+	pc_state *st = device->machine().driver_data<pc_state>();
+	int timer2_output = pit8253_get_output( device->machine().device("pit8253"), 2 );
+	int data = 0xff;
+	double tap_val = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+
+//	0x80 -- serial RxD
+//	0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
+	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(st->m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
+//	0x20 -- T2OUT
+	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+//	0x10 -- SNDOUT
+	data = ( data & ~0x10 ) | ( (BIT(st->m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
+
+	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n", 
+		data, tap_val, timer2_output, machine.describe_context()));
+	return data;
 }
 
 static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
@@ -906,7 +1027,7 @@ static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
 	if (mc1502_keyb.mask & 0x0400) { key |= machine.root_device().ioport("Y11")->read(); }
 	if (mc1502_keyb.mask & 0x0800) { key |= machine.root_device().ioport("Y12")->read(); }
 	key ^= 0xff;
-	DBG_LOG(1,"mc1502_kppi_porta_r",("= %02X\n", key));
+	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
@@ -920,7 +1041,7 @@ static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portb_w )
 		mc1502_keyb.mask |= 1 << 11;
 	else
 		mc1502_keyb.mask &= ~(1 << 11);
-	DBG_LOG(1,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
 static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
@@ -929,7 +1050,7 @@ static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
 
 	mc1502_keyb.mask &= ~(7 << 8);
 	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
-	DBG_LOG(1,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
 
@@ -1024,8 +1145,8 @@ I8255_INTERFACE( mc1502_ppi8255_interface )
 	DEVCB_HANDLER(mc1502_ppi_porta_r),
 	DEVCB_HANDLER(mc1502_ppi_porta_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pcjr_ppi_portb_w),	// hack
-	DEVCB_NULL,
+	DEVCB_HANDLER(mc1502_ppi_portb_w),
+	DEVCB_HANDLER(mc1502_ppi_portc_r),
 	DEVCB_NULL
 };
 
@@ -1257,7 +1378,6 @@ DRIVER_INIT( pcjr )
 DRIVER_INIT( mc1502 )
 {
 	mess_init_pc_common(machine, 0, NULL, pc_set_irq_line);
-	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
 }
 
 static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
@@ -1335,8 +1455,16 @@ MACHINE_START( mc1502 )
 	st->m_dma8237 = NULL;
 	st->m_pit8253 = machine.device("pit8253");
 
+	/* 
+           Keyboard polling circuit holds IRQ1 high until a key is
+           pressed, then it starts a timer that pulses IRQ1 low each
+           40ms (check) for 20ms (check) until all keys are released.
+           Last pulse causes BIOS to write a 'break' scancode into port 60h.
+	 */
+	pic8259_ir1_w(st->m_pic8259, 1);
+	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
 	mc1502_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));
-	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(40), 0, attotime::from_msec(40) );
+	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
 }
 
 
@@ -1364,6 +1492,7 @@ MACHINE_RESET( pcjr )
 	st->m_pc_spkrdata = 0;
 	st->m_pc_input = 0;
 	st->m_dma_channel = 0;
+	memset(st->m_memboard,0xc,sizeof(st->m_memboard));	// check
 	memset(st->m_dma_offset,0,sizeof(st->m_dma_offset));
 	st->m_ppi_portc_switch_high = 0;
 	st->m_ppi_speaker = 0;
@@ -1465,7 +1594,6 @@ TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt )
 	if((scanline % 64) == 0 &&  pcjr_keyb.transferring == 0 )
 		pc_keyboard();
 }
-
 
 /*
 ibm xt bios
