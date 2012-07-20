@@ -7,7 +7,7 @@
 
         Todo:
               handle blink attribute in the vram display renderer
-              emulate vector generator hardware enough to write stuff to vram
+              fix vector generator hardware enough to write stuff to vram LEGIBLY
               * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
               hook up baud generator to i8251 rx and tx clocks
 
@@ -165,42 +165,60 @@ public:
 static TIMER_CALLBACK( execute_vg )
 {
 	/* figure out ram address based on tech manual page 5-24:
-	 * real address to 16-bit chunk a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0 
-	 * X+Y input                    Y8  Y7  Y6  Y5  Y4  Y3  Y2  Y1  X9' X8' X7' X6' X5' X4' 
+	 * real address to 16-bit chunk a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0 
+	 * X+Y input                    Y8  Y7  | Y6  Y5  Y4  Y3 | Y2  Y1  X9' X8'| X7' X6' X5' X4' 
 	            X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
 	 */
 	vk100_state *state = machine.driver_data<vk100_state>();
 	while (state->m_GO) // temporary hack to draw the entire vector in one call
 	{
-		UINT16 X_prime = state->m_trans[state->m_vgX>>2]<<2;
-		UINT16 EA = (state->m_vgY&0x1FE)<<5|(X_prime>>4);
-		EA <<= 1;
-		//UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8);
+		UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&3); // appears correct
+		UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+		//EA indexes a block of 16 bits
+		UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
 		// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-		if (!(X_prime&0x4))
-		{ // modify the left nybble only
-			UINT8 tempnyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0xF0)>>4;
-			state->m_LASTVRAM = tempnyb;
-			UINT8 othernyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0x0F);
-			tempnyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|state->m_LASTVRAM];
-			tempnyb <<= 4;
-			state->m_vram[EA+((X_prime&0x8)>>3)] = tempnyb | othernyb;
+		UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
+		printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
+		UINT8 thisNyb = 0;
+		UINT16 blockRemain = 0;
+		switch(nybbleNum)
+		{
+			case 0: // modify the left nybble only (from the first byte)
+				thisNyb = (block&0xF000)>>12;
+				blockRemain = (block&0x0FFF); // save the rest of the block
+				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				state->m_LASTVRAM = thisNyb;
+				block = blockRemain | (thisNyb<<12);
+				break;
+			case 1: // modify the right nybble only (from the first byte)
+				thisNyb = (block&0x0F00)>>8;
+				blockRemain = (block&0xF0FF); // save the rest of the block
+				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				state->m_LASTVRAM = thisNyb;
+				block = blockRemain | (thisNyb<<8);
+				break;
+			case 2: // modify the left nybble of the second byte
+				thisNyb = (block&0x00F0)>>4;
+				blockRemain = (block&0xFF0F); // save the rest of the block
+				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				state->m_LASTVRAM = thisNyb;
+				block = blockRemain | (thisNyb<<4);
+				break;
+			default: // should never EVER get here
+				printf("ERROR: attempted to modify the attribute nybble!\n");
+				break;
 		}
-		else
-		{ // modify the right nybble only
-			UINT8 tempnyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0x0F);
-			state->m_LASTVRAM = tempnyb;
-			UINT8 othernyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0xF0);
-			tempnyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|state->m_LASTVRAM];
-			state->m_vram[EA+((X_prime&0x8)>>3)] = tempnyb | othernyb;
-		}
-		if (state->m_vgWOPS&0x08) state->m_vram[EA+1] = (state->m_vgWOPS&0xF0)>>4;
-		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!
+		// check if the attribute nybble is supposed to be modified, and if so do so
+		if (state->m_vgWOPS&0x08) block = (block&0xFFF0)|((state->m_vgWOPS&0xF0)>>4);
+		// finally write the block back to ram
+		state->m_vram[(EA<<1)+1] = block&0xFF;
+		state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!`
 		//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
 		if (((++state->m_vgPMUL_Count)&0xF)==0) {
 			state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
-			if (state->m_vgPAT_Shift == 0x01) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
-			state->m_vgPAT_Shift >>= 1;
+			if (state->m_vgPAT_Shift == 0x80) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
+			state->m_vgPAT_Shift <<= 1;
 		}
 	}
 }
@@ -327,7 +345,7 @@ WRITE8_MEMBER(vk100_state::vgEX_MOV)
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually move the ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_vgPAT_Shift = 1; // load vgPAT_Shift
 	m_EX_TYPE = 0;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -342,7 +360,7 @@ WRITE8_MEMBER(vk100_state::vgEX_DOT)
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the dot to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_vgPAT_Shift = 1; // load vgPAT_Shift
 	m_EX_TYPE = 1;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -357,7 +375,7 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the vector to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_vgPAT_Shift = 1; // load vgPAT_Shift
 	m_EX_TYPE = 2;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -372,7 +390,7 @@ WRITE8_MEMBER(vk100_state::vgEX_ER)
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually use the state machine to draw the vector to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_vgPAT_Shift = 1; // load vgPAT_Shift
 	m_EX_TYPE = 3;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -728,15 +746,15 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 	// display the 64 different 12-bit-wide chunks
 	for (int i = 0; i < 64; i++)
 	{
-		UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8);
-		UINT8 fgColor = block&7;
+		UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8); // store big endian
+		UINT8 fgColor = block&0x7;
 		// TODO: blink is NOT HANDLED YET!; is this done by using the cursor output of the CRTC somehow?
-		//UINT8 blink = (block&8)>>3;
+		//UINT8 blink = block&0x8;
 		UINT8 bgColor = (state->m_vgSOPS&0x70)>>4;
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = ((block&(0x10<<j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
+			bitmap.pix32(y, (12*i)+j) = ((block&(0x8000>>j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
 		}
 	}
 }
