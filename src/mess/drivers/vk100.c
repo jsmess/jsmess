@@ -6,6 +6,7 @@
         28/07/2009 added Guru-readme(TM)
 
         Todo:
+              handle blink attribute in the vram display renderer
               emulate vector generator hardware enough to write stuff to vram
               * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
               hook up baud generator to i8251 rx and tx clocks
@@ -121,17 +122,23 @@ public:
 	required_device<device_t> m_uart;
 
 	UINT8* m_vram;
+	UINT8* m_trans;
+	UINT8* m_pattern;
 	UINT16 m_vgX;
 	UINT16 m_vgY;
 	UINT8 m_vgERR;
 	UINT8 m_vgSOPS;
 	UINT8 m_vgPAT;
-	UINT8 m_vgPMUL;
+	UINT8 m_vgPAT_Shift; // holds the shifted pattern
+	UINT8 m_vgPMUL; // reload value for pmul_count
+	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDU;
 	UINT8 m_vgDVM;
 	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
 	UINT8 m_BAUD;
+	UINT8 m_EX_TYPE;
+	UINT8 m_LASTVRAM;
 	UINT8 m_GO;
 	
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -151,9 +158,52 @@ public:
 	DECLARE_WRITE8_MEMBER(KBDW);
 	DECLARE_WRITE8_MEMBER(BAUD);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
-	//DECLARE_READ8_MEMBER(SYSTAT_A);
+	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
 };
+
+static TIMER_CALLBACK( execute_vg )
+{
+	/* figure out ram address based on tech manual page 5-24:
+	 * real address to 16-bit chunk a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0 
+	 * X+Y input                    Y8  Y7  Y6  Y5  Y4  Y3  Y2  Y1  X9' X8' X7' X6' X5' X4' 
+	            X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
+	 */
+	vk100_state *state = machine.driver_data<vk100_state>();
+	while (state->m_GO) // temporary hack to draw the entire vector in one call
+	{
+		UINT16 X_prime = state->m_trans[state->m_vgX>>2]<<2;
+		UINT16 EA = (state->m_vgY&0x1FE)<<5|(X_prime>>4);
+		EA <<= 1;
+		//UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8);
+		// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
+		if (!(X_prime&0x4))
+		{ // modify the left nybble only
+			UINT8 tempnyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0xF0)>>4;
+			state->m_LASTVRAM = tempnyb;
+			UINT8 othernyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0x0F);
+			tempnyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|state->m_LASTVRAM];
+			tempnyb <<= 4;
+			state->m_vram[EA+((X_prime&0x8)>>3)] = tempnyb | othernyb;
+		}
+		else
+		{ // modify the right nybble only
+			UINT8 tempnyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0x0F);
+			state->m_LASTVRAM = tempnyb;
+			UINT8 othernyb = (state->m_vram[EA+((X_prime&0x8)>>3)]&0xF0);
+			tempnyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|state->m_LASTVRAM];
+			state->m_vram[EA+((X_prime&0x8)>>3)] = tempnyb | othernyb;
+		}
+		if (state->m_vgWOPS&0x08) state->m_vram[EA+1] = (state->m_vgWOPS&0xF0)>>4;
+		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!
+		//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
+		if (((++state->m_vgPMUL_Count)&0xF)==0) {
+			state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
+			if (state->m_vgPAT_Shift == 0x01) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
+			state->m_vgPAT_Shift >>= 1;
+		}
+	}
+}
 
 /*
 void drawVector(UINT16 px, UINT16 py, UINT16 x, UINT16 y, int pattern)
@@ -276,7 +326,11 @@ WRITE8_MEMBER(vk100_state::vgEX_MOV)
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually move the ram with correct timing
+	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
+	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_EX_TYPE = 0;
 	m_GO = 1;
+	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
 /* port 0x65: "EX DOT" execute a dot (start the state machine) */
@@ -287,7 +341,11 @@ WRITE8_MEMBER(vk100_state::vgEX_DOT)
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the dot to ram with correct timing
+	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
+	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_EX_TYPE = 1;
 	m_GO = 1;
+	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
 /* port 0x66: "EX VEC" execute a pattern (8 fixed direction) vector (start the state machine) */
@@ -298,7 +356,11 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the vector to ram with correct timing
+	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
+	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_EX_TYPE = 2;
 	m_GO = 1;
+	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
 /* port 0x67: "EX ER" execute an arbitrary bresenham vector (start the state machine) */
@@ -309,7 +371,11 @@ WRITE8_MEMBER(vk100_state::vgEX_ER)
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually use the state machine to draw the vector to ram with correct timing
+	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
+	m_vgPAT_Shift = 0x80; // load vgPAT_Shift
+	m_EX_TYPE = 3;
 	m_GO = 1;
+	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
@@ -347,10 +413,10 @@ WRITE8_MEMBER(vk100_state::BAUD)
  299 reads, rotates result right 3 times and ANDs the result with 0x0F
  2A4 reads, rotates result left 1 time and ANDS the result with 0xF0
 */
-/*READ8_MEMBER(vk100_state::SYSTAT_A)
+READ8_MEMBER(vk100_state::SYSTAT_A)
 {
-	return ((1-m_GO)<<7)|0x7F;
-}*/
+	return ((m_GO?0:1)<<7)|(m_LASTVRAM<<3)|0x7;
+}
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual */
 READ8_MEMBER(vk100_state::SYSTAT_B)
@@ -404,7 +470,7 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	//AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
+	AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
 	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (dipswitches?)
 	AM_RANGE(0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
 	AM_RANGE(0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
@@ -589,21 +655,26 @@ static MACHINE_RESET( vk100 )
 	state->m_vgERR = 0;
 	state->m_vgSOPS = 0;
 	state->m_vgPAT = 0;
+	state->m_vgPAT_Shift = 0x80;
 	state->m_vgPMUL = 0;
+	state->m_vgPMUL_Count = 0;
 	state->m_vgDU = 0;
 	state->m_vgDVM = 0;
 	state->m_vgDIR = 0;
 	state->m_vgWOPS = 0;
 	state->m_BAUD = 0;
+	state->m_EX_TYPE = 0;
+	state->m_LASTVRAM = 0xF;
 	state->m_GO = 0;
 }
 
 static DRIVER_INIT( vk100 )
 {
 	UINT8 *gfx = machine.root_device().memregion("vram")->base();
-	int i;
-	for (i = 0; i < 0x8000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	// for debug purposes, set the entire screen to black but with the attributes of all pixels set to white
+	for (int i = 1; i < 0x8000; i+=2)
+		gfx[i] = 0xF;
+		//gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 }
 
 static PALETTE_INIT( vk100 )
@@ -619,7 +690,6 @@ static INTERRUPT_GEN( vk100_vertical_interrupt )
 	vk100_state *state = device->machine().driver_data<vk100_state>();
 	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, ASSERT_LINE);
 	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, CLEAR_LINE);
-	state->m_GO = 0; // hack for now until the state machine works
 }
 
 static WRITE_LINE_DEVICE_HANDLER(i8251_rxrdy_int)
@@ -638,6 +708,8 @@ static VIDEO_START( vk100 )
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
 	state->m_vram = state->memregion("vram")->base();
+	state->m_trans = state->memregion("trans")->base();
+	state->m_pattern = state->memregion("pattern")->base();
 }
 
 static MC6845_UPDATE_ROW( vk100_update_row )
@@ -658,18 +730,13 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 	{
 		UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8);
 		UINT8 fgColor = block&7;
+		// TODO: blink is NOT HANDLED YET!; is this done by using the cursor output of the CRTC somehow?
 		//UINT8 blink = (block&8)>>3;
 		UINT8 bgColor = (state->m_vgSOPS&0x70)>>4;
-		if (state->m_vgSOPS&1) // reverse fg/bg colors
-		{
-			UINT8 temp = fgColor;
-			fgColor = bgColor;
-			bgColor = temp;
-		}
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = (block&(0x10<<j))?colorTable[fgColor]:colorTable[bgColor];
+			bitmap.pix32(y, (12*i)+j) = ((block&(0x10<<j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
 		}
 	}
 }
@@ -741,7 +808,7 @@ ROM_START( vk100 )
 	ROM_LOAD( "23-018e4-00.rom3.ic53", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
 	ROM_LOAD( "23-190e2-00.rom4.ic54", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
 
-	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF ) // 32k of vram
+	ROM_REGION( 0x8000, "vram", ROMREGION_ERASE00 ) // 32k of vram
 
 	ROM_REGION( 0x400, "pattern", ROMREGION_ERASEFF )
     /* This is the "PATTERN ROM", (1k*4, 82s137)
@@ -753,8 +820,8 @@ ROM_START( vk100 )
 i.e. addr bits 9876543210
                ||||||\\\\- input from ram A
                ||||\\----- bit select (from x reg lsb)
-               |||\------- negate N
-               |\\-------- function
+               |||\------- negate N \___ low 3 bits of WOPS
+               |\\-------- function /
                \---------- pattern bit P
           functions are:
           Overlay: M=A|(P^N)
@@ -763,19 +830,21 @@ i.e. addr bits 9876543210
           Erase: M=N
      */
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
-	
-	ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
+
+	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
+	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
+	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
 	// not sure what this prom is, it may relate somehow to addressing or modifying vram. (256*4, 82s129)
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	// this is probably the "SYNC ROM" since only addresses 0-6 are used within every 8 byte chunk. (256*8, 82s135)
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
-	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
-	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
-	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 	// the following == mb6309 (256x8, 82s135) // probably direction rom
-	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0300, 0x0100, NO_DUMP)  // label verified from andy's board
+	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0200, 0x0100, NO_DUMP)  // label verified from andy's board
 	// the following = mb6331 (32x8, 82s123) // MAYBE vector rom
-	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0400, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0300, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
 /* Driver */
