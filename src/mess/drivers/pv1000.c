@@ -17,8 +17,11 @@ class pv1000_state : public driver_device
 {
 public:
 	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_p_videoram(*this, "p_videoram")
+		{ }
 
 	DECLARE_WRITE8_MEMBER(pv1000_io_w);
 	DECLARE_READ8_MEMBER(pv1000_io_r);
@@ -36,8 +39,8 @@ public:
 	emu_timer		*m_irq_on_timer;
 	emu_timer		*m_irq_off_timer;
 
-	device_t *m_maincpu;
-	screen_device *m_screen;
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_p_videoram;
 };
 
@@ -332,8 +335,6 @@ static MACHINE_START( pv1000 )
 
 	state->m_irq_on_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
 	state->m_irq_off_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
-	state->m_maincpu = machine.device( "maincpu" );
-	state->m_screen = machine.device<screen_device>("screen" );
 }
 
 
