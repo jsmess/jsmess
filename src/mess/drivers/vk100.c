@@ -93,9 +93,16 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
     X - 0 X X X X (0x30) "
 
 */
-#undef VG_VERBOSE
+// show messages related to writes to the 0x4x VG registers
+#undef VG40_VERBOSE
+// show messages related to writes to the 0x6x VG registers
+#undef VG60_VERBOSE
+// show messages related to LED/beeper writes
 #undef LED_VERBOSE
+// show messages related to KYBD writes
 #undef KBD_VERBOSE
+// debug the pattern reg
+#undef PAT_DEBUG
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -129,7 +136,7 @@ public:
 	UINT8 m_vgERR;
 	UINT8 m_vgSOPS;
 	UINT8 m_vgPAT;
-	UINT8 m_vgPAT_Shift; // holds the shifted pattern
+	UINT16 m_vgPAT_Mask; // current mask for PAT but <<1
 	UINT8 m_vgPMUL; // reload value for pmul_count
 	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDU;
@@ -167,59 +174,80 @@ static TIMER_CALLBACK( execute_vg )
 	/* figure out ram address based on tech manual page 5-24:
 	 * real address to 16-bit chunk a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0 
 	 * X+Y input                    Y8  Y7  | Y6  Y5  Y4  Y3 | Y2  Y1  X9' X8'| X7' X6' X5' X4' 
-	            X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
+	 *          X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
+	 * Figure out the ram address in address space "vram" based on this:
+	 * vram is 0x8000 long (0x4000 16-bit blocks in sequence)
+	 * so:
+	 * vram: a14 a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
+	 * vg:   Y8  Y7  Y6  | Y5  Y4  Y3  Y2 | Y1  X9' X8' X7'| X6' X5' X4'(x3') x2' x1 x0
+	 *     X3' is handled by the nybblenum statement, as is X2'
+	 *     X1 and X0 are handled by the pattern rom directly:
+	 *     x0 -> a0, x1 -> a1
+	 *     this handles bits like:
+	 *     x1 x0
+	 *      0  0 -> bit 0
+	 *      0  1 -> bit 1
+	 *      1  0 -> bit 2
+	 *      1  1 -> bit 3
+	 *
 	 */
 	vk100_state *state = machine.driver_data<vk100_state>();
 	while (state->m_GO) // temporary hack to draw the entire vector in one call
 	{
-		UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&3); // appears correct
+		// XFinal is (X'&0x3FC)|(X&0x3)
+		UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
+		// EA is the effective ram address for a 16-bit block
 		UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
-		//EA indexes a block of 16 bits
+		// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
 		UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
 		// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 		UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
-		printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
+		//printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
+		// patmask should be vg_patmask >>1 unless vg_patmask is 0x1 in which case it is 0x80
+		UINT8 PATMask = state->m_vgPAT_Mask >> 1;
+		if (PATMask == 0) PATMask = 0x80;
 		UINT8 thisNyb = 0;
 		UINT16 blockRemain = 0;
 		switch(nybbleNum)
 		{
-			case 0: // modify the left nybble only (from the first byte)
-				thisNyb = (block&0xF000)>>12;
-				blockRemain = (block&0x0FFF); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-				state->m_LASTVRAM = thisNyb;
-				block = blockRemain | (thisNyb<<12);
-				break;
-			case 1: // modify the right nybble only (from the first byte)
+			case 2: // modify the left nybble only (from the first byte)
 				thisNyb = (block&0x0F00)>>8;
 				blockRemain = (block&0xF0FF); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 				state->m_LASTVRAM = thisNyb;
 				block = blockRemain | (thisNyb<<8);
 				break;
-			case 2: // modify the left nybble of the second byte
+			case 1: // modify the right nybble only (from the first byte)
 				thisNyb = (block&0x00F0)>>4;
 				blockRemain = (block&0xFF0F); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Shift)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 				state->m_LASTVRAM = thisNyb;
 				block = blockRemain | (thisNyb<<4);
 				break;
+			case 0: // modify the left nybble of the second byte
+				thisNyb = (block&0x000F);
+				blockRemain = (block&0xFFF0); // save the rest of the block
+				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+				state->m_LASTVRAM = thisNyb;
+				block = blockRemain | thisNyb;
+				break;
 			default: // should never EVER get here
-				printf("ERROR: attempted to modify the attribute nybble!\n");
+				fatalerror("ERROR: VK100 VG attempted to modify the attribute nybble!\n");
 				break;
 		}
 		// check if the attribute nybble is supposed to be modified, and if so do so
-		if (state->m_vgWOPS&0x08) block = (block&0xFFF0)|((state->m_vgWOPS&0xF0)>>4);
+		if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
 		// finally write the block back to ram
 		state->m_vram[(EA<<1)+1] = block&0xFF;
 		state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
-		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!`
+		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!
+		//state->m_vgY++;// hack to mix stuff up a little
 		//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
-		if (((++state->m_vgPMUL_Count)&0xF)==0) {
+		if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
 			state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
-			if (state->m_vgPAT_Shift == 0x80) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
-			state->m_vgPAT_Shift <<= 1;
-		}
+			state->m_vgPAT_Mask >>= 1;
+			if ((state->m_vgPAT_Mask) == 0x00) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
+			}
 	}
 }
 
@@ -234,7 +262,7 @@ WRITE8_MEMBER(vk100_state::vgLD_X)
 {
 	m_vgX &= 0xFF << ((1-offset)*8);
 	m_vgX |= ((UINT16)data) << (offset*8);
-#ifdef VG_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x%02X: X Reg loaded with %04X, new X value is %04X\n", 0x40+offset, ((UINT16)data) << (offset*8), m_vgX);
 #endif
 }
@@ -244,7 +272,7 @@ WRITE8_MEMBER(vk100_state::vgLD_Y)
 {
 	m_vgY &= 0xFF << ((1-offset)*8);
 	m_vgY |= ((UINT16)data) << (offset*8);
-#ifdef VG_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x%02X: Y Reg loaded with %04X, new Y value is %04X\n", 0x42+offset, ((UINT16)data) << (offset*8), m_vgY);
 #endif
 }
@@ -253,7 +281,7 @@ WRITE8_MEMBER(vk100_state::vgLD_Y)
 WRITE8_MEMBER(vk100_state::vgERR)
 {
 	m_vgERR = data;
-#ifdef VG_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x44: ERR Reg loaded with %02X\n", m_vgERR);
 #endif
 }
@@ -267,16 +295,23 @@ WRITE8_MEMBER(vk100_state::vgERR)
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
 	m_vgSOPS = data;
-//#ifdef VG_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x45: SOPS Reg loaded with %02X: Blink: %d, Background GRB: %d%d%d, Serial select: %x, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>1)&7, m_vgSOPS&1);
-//#endif
+#endif
 }
 
 /* port 0x46: "PAT" load vg Pattern register */
 WRITE8_MEMBER(vk100_state::vgPAT)
 {
 	m_vgPAT = data;
-#ifdef VG_VERBOSE
+#ifdef PAT_DEBUG
+	for (int i = 7; i >= 0; i--) 
+	{
+		printf("%s", (data&(1<<i))?"X":".");
+	}
+	printf("\n");
+#endif
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x46: PAT Reg loaded with %02X\n", m_vgPAT);
 #endif
 }
@@ -289,7 +324,7 @@ WRITE8_MEMBER(vk100_state::vgPAT)
 WRITE8_MEMBER(vk100_state::vgPMUL)
 {
 	m_vgPMUL = data;
-#ifdef VG_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x47: PMUL Reg loaded with %02X\n", m_vgPMUL);
 #endif
 }
@@ -298,7 +333,7 @@ WRITE8_MEMBER(vk100_state::vgPMUL)
 WRITE8_MEMBER(vk100_state::vgDU)
 {
 	m_vgDU = data;
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x60: DU Reg loaded with %02X\n", m_vgDU);
 #endif
 }
@@ -307,7 +342,7 @@ WRITE8_MEMBER(vk100_state::vgDU)
 WRITE8_MEMBER(vk100_state::vgDVM)
 {
 	m_vgDVM = data;
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x61: DVM Reg loaded with %02X\n", m_vgDVM);
 #endif
 }
@@ -316,7 +351,7 @@ WRITE8_MEMBER(vk100_state::vgDVM)
 WRITE8_MEMBER(vk100_state::vgDIR)
 {
 	m_vgDIR = data;
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x62: DIR Reg loaded with %02X\n", m_vgDIR);
 #endif
 }
@@ -330,7 +365,7 @@ WRITE8_MEMBER(vk100_state::vgDIR)
 WRITE8_MEMBER(vk100_state::vgWOPS)
 {
 	m_vgWOPS = data;
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	static const char *const functions[] = { "Overlay", "Replace", "Complement", "Erase" };
 	logerror("VG: 0x64: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (m_vgWOPS>>7)&1, (m_vgWOPS>>6)&1, (m_vgWOPS>>5)&1, (m_vgWOPS>>4)&1, (m_vgWOPS>>3)&1, functions[(m_vgWOPS>>1)&3], m_vgWOPS&1);
 #endif
@@ -339,13 +374,13 @@ WRITE8_MEMBER(vk100_state::vgWOPS)
 /* port 0x64: "EX MOV" execute a move (start the state machine) */
 WRITE8_MEMBER(vk100_state::vgEX_MOV)
 {
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG Execute Move 0x64 written: stub!\n");
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually move the ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 1; // load vgPAT_Shift
+	m_vgPAT_Mask = 0x100;
 	m_EX_TYPE = 0;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -354,13 +389,13 @@ WRITE8_MEMBER(vk100_state::vgEX_MOV)
 /* port 0x65: "EX DOT" execute a dot (start the state machine) */
 WRITE8_MEMBER(vk100_state::vgEX_DOT)
 {
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x65: Execute Dot written: stub!\n");
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the dot to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 1; // load vgPAT_Shift
+	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_EX_TYPE = 1;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -369,13 +404,13 @@ WRITE8_MEMBER(vk100_state::vgEX_DOT)
 /* port 0x66: "EX VEC" execute a pattern (8 fixed direction) vector (start the state machine) */
 WRITE8_MEMBER(vk100_state::vgEX_VEC)
 {
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x66: Execute Vector written: stub!\n");
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually draw the vector to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 1; // load vgPAT_Shift
+	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_EX_TYPE = 2;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -384,13 +419,13 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 /* port 0x67: "EX ER" execute an arbitrary bresenham vector (start the state machine) */
 WRITE8_MEMBER(vk100_state::vgEX_ER)
 {
-#ifdef VG_VERBOSE
+#ifdef VG60_VERBOSE
 	logerror("VG: 0x67: Execute Arbitrary 'error' vector written: stub!\n");
 #endif
 	// TODO: short term: do some calculations here and print the expected starting ram address etc
 	// TODO: long term: fire a timer and actually use the state machine to draw the vector to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Shift = 1; // load vgPAT_Shift
+	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_EX_TYPE = 3;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
@@ -406,7 +441,9 @@ WRITE8_MEMBER(vk100_state::KBDW)
 	output_set_value("hardcopy_led", BIT(data, 2) ? 1 : 0);
 	output_set_value("l1_led", BIT(data, 1) ? 1 : 0);
 	output_set_value("l2_led", BIT(data, 0) ? 1 : 0);
+#ifdef LED_VERBOSE
 	if (BIT(data, 6)) logerror("kb keyclick bit 6 set: not emulated yet (multivibrator)!\n");
+#endif
 	beep_set_state( m_speaker, BIT(data, 7));
 #ifdef LED_VERBOSE
 	logerror("LED state: %02X: %s %s %s %s %s %s\n", data&0xFF, (data&0x20)?"------- LOCAL ":"ON LINE ----- ", (data&0x10)?"--------- ":"NO SCROLL ", (data&0x8)?"----- ":"BASIC ", (data&0x4)?"--------- ":"HARD-COPY ", (data&0x2)?"-- ":"L1 ", (data&0x1)?"-- ":"L2 ");
@@ -529,9 +566,9 @@ static INPUT_PORTS_START( vk100 )
 
 	PORT_START("CAPSSHIFT") // CAPS LOCK and SHIFT appear as the high 2 bits on all rows
 		PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_START("COL0")
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK)
+		PORT_START("COL0")
 		PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED) // row 0 bit 6 is always low, checked by keyboard test
 		PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED) // all rows have these bits left low to save a mask op later
@@ -673,7 +710,7 @@ static MACHINE_RESET( vk100 )
 	state->m_vgERR = 0;
 	state->m_vgSOPS = 0;
 	state->m_vgPAT = 0;
-	state->m_vgPAT_Shift = 0x80;
+	state->m_vgPAT_Mask = 0x80;
 	state->m_vgPMUL = 0;
 	state->m_vgPMUL_Count = 0;
 	state->m_vgDU = 0;
@@ -689,10 +726,13 @@ static MACHINE_RESET( vk100 )
 static DRIVER_INIT( vk100 )
 {
 	UINT8 *gfx = machine.root_device().memregion("vram")->base();
-	// for debug purposes, set the entire screen to black but with the attributes of all pixels set to white
-	for (int i = 1; i < 0x8000; i+=2)
-		gfx[i] = 0xF;
+	// for debug purposes, set the entire screen to a hash pattern
+	for (int i = 0; i < 0x8000; i+=2)
+	{
+		gfx[i] = 0xFA;
+		gfx[i+1] = 0xAA;
 		//gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	}
 }
 
 static PALETTE_INIT( vk100 )
@@ -732,7 +772,9 @@ static VIDEO_START( vk100 )
 
 static MC6845_UPDATE_ROW( vk100_update_row )
 {
-	static const UINT32 colorTable[8] = { 0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF }; 
+	static const UINT32 colorTable[16] = { 
+	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
+	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF }; 
 	//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x ", y, ma, ra, x_count);
 	/* figure out ram address based on tech manual page 5-23:
 	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0 
@@ -741,20 +783,17 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 	vk100_state *state = device->machine().driver_data<vk100_state>();
 	//UINT8 *gfx = device->machine.root_device().memregion("vram")->base();
 	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
-	EA <<= 1; // this is needed to address the whole 0000-7fff area since we deal with 16 bit blocks
-	//printf("EA: %04X\n", EA);
 	// display the 64 different 12-bit-wide chunks
 	for (int i = 0; i < 64; i++)
 	{
-		UINT16 block = state->m_vram[(EA+(2*i))+1] | (state->m_vram[(EA+(2*i))]<<8); // store big endian
-		UINT8 fgColor = block&0x7;
-		// TODO: blink is NOT HANDLED YET!; is this done by using the cursor output of the CRTC somehow?
-		//UINT8 blink = block&0x8;
-		UINT8 bgColor = (state->m_vgSOPS&0x70)>>4;
+		UINT16 block = state->m_vram[(EA<<1)+(2*i)+1] | (state->m_vram[(EA<<1)+(2*i)]<<8); // store big endian
+		UINT8 fgColor = (block&0xF000)>>12;
+		// TODO: blink is NOT HANDLED YET!
+		UINT8 bgColor = (state->m_vgSOPS&0xF0)>>4;
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = ((block&(0x8000>>j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
+			bitmap.pix32(y, (12*i)+j) = ((block&(0x0001<<j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
 		}
 	}
 }
