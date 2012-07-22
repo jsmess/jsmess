@@ -210,21 +210,21 @@ static TIMER_CALLBACK( execute_vg )
 		UINT16 blockRemain = 0;
 		switch(nybbleNum)
 		{
-			case 2: // modify the left nybble only (from the first byte)
+			case 2: // modify the right nybble only (from the first byte)
 				thisNyb = (block&0x0F00)>>8;
 				blockRemain = (block&0xF0FF); // save the rest of the block
 				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 				state->m_LASTVRAM = thisNyb;
 				block = blockRemain | (thisNyb<<8);
 				break;
-			case 1: // modify the right nybble only (from the first byte)
+			case 1: // modify the left nybble only (from the second byte)
 				thisNyb = (block&0x00F0)>>4;
 				blockRemain = (block&0xFF0F); // save the rest of the block
 				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 				state->m_LASTVRAM = thisNyb;
 				block = blockRemain | (thisNyb<<4);
 				break;
-			case 0: // modify the left nybble of the second byte
+			case 0: // modify the right nybble only (from the second byte)
 				thisNyb = (block&0x000F);
 				blockRemain = (block&0xFFF0); // save the rest of the block
 				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
@@ -240,8 +240,38 @@ static TIMER_CALLBACK( execute_vg )
 		// finally write the block back to ram
 		state->m_vram[(EA<<1)+1] = block&0xFF;
 		state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
-		state->m_vgX++;// TODO: since the direction rom is missing; the vector generator direction is FIXED rightward!
-		//state->m_vgY++;// hack to mix stuff up a little
+		// HACK: we need the proper direction rom dump for this!
+		switch(state->m_vgDIR&0x7)
+		{
+			case 0:
+				state->m_vgX++;
+				break;
+			case 7:
+				state->m_vgX++;
+				state->m_vgY++;
+				break;
+			case 6:
+				state->m_vgY++;
+				break;
+			case 5:
+				state->m_vgX--;
+				state->m_vgY++;
+				break;
+			case 4:
+				state->m_vgX--;
+				break;
+			case 3:
+				state->m_vgX--;
+				state->m_vgY--;
+				break;
+			case 2:
+				state->m_vgY--;
+				break;
+			case 1:
+				state->m_vgX++;
+				state->m_vgY--;
+				break;
+		}
 		//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
 		if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
 			state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
@@ -725,14 +755,14 @@ static MACHINE_RESET( vk100 )
 
 static DRIVER_INIT( vk100 )
 {
-	UINT8 *gfx = machine.root_device().memregion("vram")->base();
+	/*UINT8 *gfx = machine.root_device().memregion("vram")->base();
 	// for debug purposes, set the entire screen to a hash pattern
 	for (int i = 0; i < 0x8000; i+=2)
 	{
 		gfx[i] = 0xFA;
 		gfx[i+1] = 0xAA;
 		//gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	}
+	}*/
 }
 
 static PALETTE_INIT( vk100 )
