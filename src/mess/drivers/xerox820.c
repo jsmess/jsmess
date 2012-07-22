@@ -40,6 +40,8 @@
 #include "machine/z80dart.h"
 #include "machine/wd17xx.h"
 #include "machine/com8116.h"
+#include "sound/speaker.h"
+#include "sound/beep.h"
 #include "includes/xerox820.h"
 
 /* Keyboard HACK */
@@ -205,6 +207,7 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 
 WRITE8_MEMBER( xerox820ii_state::bell_w )
 {
+	speaker_level_w(m_speaker, offset );
 }
 
 WRITE8_MEMBER( xerox820ii_state::slden_w )
@@ -383,6 +386,12 @@ static INPUT_PORTS_START( xerox820 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
+static TIMER_CALLBACK( bigboard_beepoff )
+{
+	xerox820_state *state = machine.driver_data<xerox820_state>();
+	beep_set_state(state->m_beeper, 0);
+}
+
 /* Z80 PIO */
 
 READ8_MEMBER( xerox820_state::kbpio_pa_r )
@@ -448,6 +457,14 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 
 	/* bank switching */
 	bankswitch(BIT(data, 7));
+
+	/* beeper on bigboard */
+	if (BIT(data, 5) & (!m_bit5))
+	{
+		machine().scheduler().timer_set(attotime::from_msec(40), FUNC(bigboard_beepoff));
+		beep_set_state(m_beeper, 1 );
+	}
+	m_bit5 = BIT(data, 5);
 }
 
 WRITE8_MEMBER( xerox820ii_state::kbpio_pa_w )
@@ -659,14 +676,14 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				else
 					gfx = 0xff;
 
-				/* Display a scanline of a character (7 pixels) */
-				*p++ = 0;
-				*p++ = ( gfx & 0x10 ) ? 0 : 1;
-				*p++ = ( gfx & 0x08 ) ? 0 : 1;
-				*p++ = ( gfx & 0x04 ) ? 0 : 1;
-				*p++ = ( gfx & 0x02 ) ? 0 : 1;
-				*p++ = ( gfx & 0x01 ) ? 0 : 1;
-				*p++ = 0;
+			/* Display a scanline of a character (7 pixels) */
+			*p++ = 0;
+			*p++ = BIT(gfx, 4) ^ 1;
+			*p++ = BIT(gfx, 3) ^ 1;
+			*p++ = BIT(gfx, 2) ^ 1;
+			*p++ = BIT(gfx, 1) ^ 1;
+			*p++ = BIT(gfx, 0) ^ 1;
+			*p++ = 0;
 			}
 		}
 		ma+=128;
@@ -729,6 +746,9 @@ void xerox820_state::machine_start()
 void xerox820_state::machine_reset()
 {
 	bankswitch(1);
+	/* bigboard has a one-pulse output to drive a user-supplied beeper */
+	beep_set_state(m_beeper, 0);
+	beep_set_frequency(m_beeper, 950);
 }
 
 void xerox820ii_state::machine_reset()
@@ -825,7 +845,6 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
-
 	MCFG_GFXDECODE(xerox820)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -833,6 +852,11 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	/* keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick,attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_20MHz/8))
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
@@ -859,7 +883,6 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
-
 	MCFG_GFXDECODE(xerox820ii)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -867,6 +890,11 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	/* keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_16MHz/4))
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0) // xerox820ii and xerox168
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
@@ -966,8 +994,8 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND)
-COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, mk83,       0,          0,      mk83,       xerox820,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND_HW)
+COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING )
+COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING )
+COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING )
+COMP( 198?, mk83,       0,          0,      mk83,       xerox820,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND_HW)

@@ -22,15 +22,16 @@ class xerox820_state : public driver_device
 public:
 	xerox820_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_kbpio(*this, Z80KBPIO_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_fdc(*this, FD1797_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
-	,
-		m_video_ram(*this, "video_ram"){ }
+	m_maincpu(*this, Z80_TAG),
+	m_kbpio(*this, Z80KBPIO_TAG),
+	m_ctc(*this, Z80CTC_TAG),
+	m_fdc(*this, FD1797_TAG),
+	m_speaker(*this, SPEAKER_TAG),
+	m_beeper(*this, BEEPER_TAG),
+	m_ram(*this, RAM_TAG),
+	m_floppy0(*this, FLOPPY_0),
+	m_floppy1(*this, FLOPPY_1),
+	m_video_ram(*this, "video_ram"){ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -42,6 +43,8 @@ public:
 	required_device<device_t> m_kbpio;
 	required_device<device_t> m_ctc;
 	required_device<device_t> m_fdc;
+	optional_device<device_t> m_speaker;
+	optional_device<device_t> m_beeper;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
@@ -61,6 +64,7 @@ public:
 
 	/* keyboard state */
 	int m_keydata;						/* keyboard data */
+	bool m_bit5;
 
 	/* video state */
 	required_shared_ptr<UINT8> m_video_ram; 					/* video RAM */
