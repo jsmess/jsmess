@@ -28,7 +28,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m011"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0xf6 : 0xff; }
+	virtual UINT8 module_id_r() { return 0xf6; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);
@@ -65,7 +65,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m022"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0xf4 : 0xff; }
+	virtual UINT8 module_id_r() { return 0xf4; }
 	virtual void read(offs_t offset, UINT8 &ata);
 	virtual void write(offs_t offset, UINT8 data);
 
@@ -90,7 +90,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m032"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0x79 : 0xff; }
+	virtual UINT8 module_id_r() { return 0x79; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);
@@ -116,7 +116,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m034"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0x7a : 0xff; }
+	virtual UINT8 module_id_r() { return 0x7a; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);
@@ -141,7 +141,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m035"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0x7b : 0xff; }
+	virtual UINT8 module_id_r() { return 0x7b; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);
@@ -167,7 +167,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m036"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0x78 : 0xff; }
+	virtual UINT8 module_id_r() { return 0x78; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);

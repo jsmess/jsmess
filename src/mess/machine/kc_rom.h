@@ -31,7 +31,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_8k"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0xfb : 0xff; }
+	virtual UINT8 module_id_r() { return 0xfb; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual UINT8* get_cart_base();
@@ -62,7 +62,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m006"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0xfc : 0xff; }
+	virtual UINT8 module_id_r() { return 0xfc; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 };
@@ -83,7 +83,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "kc_m033"; }
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return m_mei ? 0x01 : 0xff; }
+	virtual UINT8 module_id_r() { return 0x01; }
 	virtual void control_w(UINT8 data);
 	virtual void read(offs_t offset, UINT8 &data);
 
