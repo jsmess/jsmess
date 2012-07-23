@@ -8215,6 +8215,19 @@
 	</software>
 
 	<software name="dexterdsu" cloneof="dexterds">
+		<description>Dexter's Laboratory - Deesaster Strikes! (USA, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>BAM! Entertainment</publisher>
+		<info name="serial" value="AGB-ADLE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dexter's laboratory - deesaster strikes! (usa) (en,fr,de,es,it) (rev 1).bin" size="4194304" crc="6bf168e6" sha1="b838b5bb37bfeb3315a68b6d372f29a5de635444" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dexterdsua" cloneof="dexterds">
 		<description>Dexter's Laboratory - Deesaster Strikes! (USA)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>

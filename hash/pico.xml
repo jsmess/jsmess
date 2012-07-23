@@ -26,7 +26,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ３丁目のタマ モモちゃんはどこ！ - 3-choume no Tama Momo-chan wa Doko! (Sega - 199407xx - HPC-6013)
 * 愛と夢と冒険 サンリオピューロランド - Ai to Yume to Bouken Sanrio Puroland! (Sega - 199410xx - HPC-6014)
 * スヌーピーのがくげいかい - Snoopy no Gakugeikai (Sega - 19951027 - HPC-6016)
-* クイズにチャレンジ！ ドラえもん - Quiz ni Challenge! Doraemon (Sega - 1995xxxx - HPC-6020)
 * めざせプロ野球 - Mezase Pro Yakyuu (Sega - 1995xxxx - HPC-6021)
 * 魔法騎士 レイアース マジックナイトたんじょう - Mahou Kishi Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
 * ミッキーと大きな古時計 - Mickey To Ooki na Furudokei (Sega - 1995xxxx - HPC-6023)
@@ -45,7 +44,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ハローキティのすてきなおたんじょうび  - Hello Kitty no Suteki nao Tanjoubi (Sega - 1997xxxx - HPC-6040)
 * よべばこたえる　ドラえもん のびたとひみつどうぐをみつけよう! - Yobeba Kotaeru Doraemon - Nobita to Himitsu Douguwomitsukeyou! (Sega - ???? - HPC-6041)
 * ぬりえだいすき! ダンボのわくわくサーカス! - Nurie Daisuki! Dumbo no Wakuwaku Saakasu! (Sega - 1997xxxx - HPC-6044)
-* あいとゆめのくに サンリオピューロランドあそびながらおぼえよう!ひらがな カタカナ - Ai to Yume no Kuni Sanrio Puroland Asobi na Garaoboeyou! Hiragana Katakana (Sega - 1997xxxx - HPC-6045)
 * もしもしピコ セット だれがでるかな?もしもしピコで テレビとおしゃべり! <同梱> - Moshimoshi Pico Set with Darega Derukana? Moshimoshi Pico de Terebi Tooshaberi! (Sega - 1997xxxx - HPC-6046)
 * パケット２ ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
 * みんなでカラオケ! うたってピコ セット いっしょにうたおう すきなうた！ <同梱> - Minna de Karaoke! Utatte Pico Set with Isshoni Utaou Sukinauta! (Sega - 1997xxxx - HPC-6049)
@@ -150,7 +148,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 忍たま乱太郎 - Nintama Rantarou (Bandai - ???? - T-133150)
 * BFビーファイターカブト - BF B-Fighter Kabuto (Bandai - 1996xxxx - T-133170)
 * ゲゲゲの鬼太郎 - Gegege no Kitarou (Bandai - ???? - T-133180)
-* ウルトラマンティガ - Ultraman Tiga (Bandai - 1997xxxx - T-133200)
 * ゴー！ゴー！コニーちゃん！ ドキドキワールド！ - Go! Go! Koni-chan! Dokidoki World (Bandai - ???? - T-133210)
 * 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
 * キューティーハニー - Cutey Honey (Bandai - 1997xxxx - T-133230)
@@ -205,7 +202,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ<10th> - Tokyo Disneyland Toon Town Mickey no Bokuha Untenshu ~10th Anniversary Edition~ (Kodansha - 200305xx - T-255080)
 * くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
 * くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
-* 右脳開発シリーズ6 アヒルのペックルのかぞえてみよう - Unou Kaihatsu Series 6 Ahiru no Pekkle no Kazoete Miyou (Imagineer - 19951104 - T-150110)
 * 右脳開発シリーズ11 平成教育委員会Jr. - Unou Kaihatsu Series 11 Heisei Kyouikuiinkai Jr. (Imagineer - 19960102 - T-150130)
 * 右脳開発シリーズ5 ハローキティのすてきなたからもの - Unou Kaihatsu Series 5 Hello Kitty no Suteki na Takaramono (Imagineer - 19951104 - T-150???)
 * 右脳開発シリーズ10 ノンタンといっしょ わいわいにっぽん - Unou Kaihatsu Series 10 Nontan to Issho Waiwai Nihon (Imagineer - 19960102 - T-150???)
@@ -290,6 +286,33 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="a year at pooh corner (japan).bin" size="524288" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ahirupek">
+		<description>Ahiru no Pekkle no Kazoete Miyou (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150110"/>
+		<info name="release" value="19951104"/>
+		<info name="alt_title" value="右脳開発シリーズ6 アヒルのペックルのかぞえてみよう"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="unou kaihatsu series 6 - ahiru no pekkuru no kazoetemiyou (japan).bin" size="1048576" crc="6ff09f8e" sha1="4b496b47aa0d0ea74c85712515c76d3e99f28fb4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanrioag">
+		<description>Ai to Yume no Kuni - Sanrio Puroland - Asobi na Gara Oboeyou! Hiragana Katakana (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6045"/>
+		<info name="alt_title" value="あいとゆめのくに サンリオピューロランドあそびながらおぼえよう!ひらがな カタカナ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ai to yume no kuni sanrio puroland asobi nagara oboeyou! hiragana katakana (japan).bin" size="1048576" crc="6859c975" sha1="5df847c8140f0c8762d6959ecfdb5f53c70ee0bc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1108,6 +1131,19 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="quizdora">
+		<description>Quiz ni Challenge! Doraemon (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6020"/>
+		<info name="alt_title" value="クイズにチャレンジ！ ドラえもん"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="quiz ni challenge! doraemon (japan).bin" size="1048576" crc="876a43a8" sha1="50214e02c82f9d85efc2dcbca6e1c82dd86b7854" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kpkuruma">
 		<description>Race ni de Youyo! Ken-chan to Pepe Boku no Kuruma de Daibouken (Jpn)</description>
 		<year>1996</year>
@@ -1340,6 +1376,19 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tottoko hamtarou haru natsu aki fuyu tottoko nakayoshi! ham-chans! (japan).bin" size="2097152" crc="71f39f19" sha1="faa6a6c997c9a5a8f9da30b0db44df01097c12b8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultramtig">
+		<description>Ultraman Tiga (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133200"/>
+		<info name="alt_title" value="ウルトラマンティガ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ultraman tiga (japan).bin" size="524288" crc="35be2a19" sha1="7270c0594f0e18a3c6cf2b2a190c2999b643cd19" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2596,17 +2645,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Doraemon - Nobita to Maigo no Kyouryuu (J) (REV02).bin" size="????" crc="190dadbe" sha1="4ba7a3b30033f1c5b5adfd3ec7a1500ac912790d" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doraquiz">
-		<description>Doraemon - Quiz ni Challenge! (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Doraemon - Quiz ni Challenge! (J).bin" size="????" crc="876a43a8" sha1="50214e02c82f9d85efc2dcbca6e1c82dd86b7854" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
