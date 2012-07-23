@@ -1710,8 +1710,6 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_VIDEO)/t6a04.o		\
 	$(MESS_MACHINE)/ti85.o		\
 	$(MESS_DRIVERS)/ti89.o		\
-	$(MESS_MACHINE)/tms9901.o	\
-	$(MESS_MACHINE)/tms9902.o	\
 	$(MESS_MACHINE)/990_hd.o	\
 	$(MESS_MACHINE)/990_tap.o	\
 	$(MESS_MACHINE)/ti990.o		\
