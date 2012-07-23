@@ -91,6 +91,8 @@ PCB - German Version:
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
+#define KEYBOARD_QUEUE_SIZE 	8
+
 class geniusiq_state : public driver_device
 {
 public:
@@ -120,7 +122,12 @@ public:
 
 	UINT16		m_mouse_posx;
 	UINT16		m_mouse_posy;
-	UINT16		m_input;
+	struct
+	{
+		UINT16	buffer[KEYBOARD_QUEUE_SIZE];
+		int 	head;
+		int 	tail;
+	} m_keyboard;
 };
 
 
@@ -217,27 +224,30 @@ READ16_MEMBER( geniusiq_state::input_r )
 
 	UINT16 data = 0;
 
-	if(m_input != 0)
+	if(m_keyboard.head != m_keyboard.tail)
 	{
-		data = m_input;
+		data = m_keyboard.buffer[m_keyboard.head];
+
+		m_keyboard.head = (m_keyboard.head+1) % KEYBOARD_QUEUE_SIZE;
 
 		data |= (1<<8);
-
-		// TODO: some inputs can be lost during a fast keys sequence, maybe a queue can be the solution
-		m_input = 0;
-		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 	}
+
+	if(m_keyboard.head == m_keyboard.tail)
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 
 	return data;
 }
 
 INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 {
-	m_input = (UINT8)(FPTR)param;
+	m_keyboard.buffer[m_keyboard.tail] = (UINT8)(FPTR)param;
 
 	// set bit 7 if the key is released
 	if (!newval)
-		m_input |= 0x80;
+		m_keyboard.buffer[m_keyboard.tail] |= 0x80;
+
+	m_keyboard.tail = (m_keyboard.tail+1) % KEYBOARD_QUEUE_SIZE;
 
 	// new input from keyboard
 	m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
@@ -426,6 +436,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( geniusiq_state )
 {
+	m_keyboard.head = m_keyboard.tail = 0;
 }
 
 static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
