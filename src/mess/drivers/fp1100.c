@@ -69,10 +69,9 @@ public:
 	//m_wave(*this, WAVE_TAG),
 	//m_speaker(*this, SPEAKER_TAG),
 	//m_printer(*this, "centronics"),
-	m_crtc(*this, "crtc")
-	//m_fdc(*this, "fdc")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_crtc(*this, "crtc"),
+	//m_fdc(*this, "fdc"),
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -130,9 +129,9 @@ static MC6845_UPDATE_ROW( fp1100_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (((ma+x)<<3) + ra) & 0x3fff;
-		r = state->m_p_videoram[mem];
-		g = state->m_p_videoram[mem+0x4000];
-		b = state->m_p_videoram[mem+0x8000];
+		b = state->m_p_videoram[mem];
+		r = state->m_p_videoram[mem+0x4000];
+		g = state->m_p_videoram[mem+0x8000];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -150,7 +149,6 @@ READ8_MEMBER( fp1100_state::fp1100_mem_r )
 		UINT8 *ipl = memregion("ipl")->base();
 		return ipl[offset];
 	}
-
 	return m_wram[offset];
 }
 
@@ -247,7 +245,7 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
-	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_SHARE("p_videoram") //vram B/R/G
+	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_SHARE("videoram") //vram B/R/G
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ_PORT("DSW") AM_WRITENOP // key mux write
@@ -346,10 +344,7 @@ INPUT_PORTS_END
 static MACHINE_START(fp1100)
 {
 	fp1100_state *state = machine.driver_data<fp1100_state>();
-
-	state->m_wram = auto_alloc_array(machine, UINT8, 0x10000);
-
-	state_save_register_global_pointer(machine, state->m_wram, 0x10000);
+	state->m_wram = state->memregion("wram")->base();
 }
 
 static MACHINE_RESET(fp1100)
@@ -448,9 +443,11 @@ ROM_START( fp1100 )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_COPY( "sub_ipl", 0x2400, 0x0000, 0x0800 )
+
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT     INIT    COMPANY    FULLNAME       FLAGS */
 COMP( 1983, fp1100,  0,      0,       fp1100,     fp1100,    0,     "Casio",   "FP-1100", GAME_NOT_WORKING | GAME_NO_SOUND)
