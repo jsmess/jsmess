@@ -204,93 +204,91 @@ static TIMER_CALLBACK( execute_vg )
 	 *
 	 */
 	vk100_state *state = machine.driver_data<vk100_state>();
-	while (state->m_GO) // temporary hack to draw the entire vector in one call
+	// XFinal is (X'&0x3FC)|(X&0x3)
+	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
+	// EA is the effective ram address for a 16-bit block
+	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
+	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
+	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
+	//printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
+	// patmask should be vg_patmask >>1 unless vg_patmask is 0x1 in which case it is 0x80
+	UINT8 PATMask = state->m_vgPAT_Mask >> 1;
+	if (PATMask == 0) PATMask = 0x80;
+	UINT8 thisNyb = 0;
+	UINT16 blockRemain = 0;
+	switch(nybbleNum)
 	{
-		// XFinal is (X'&0x3FC)|(X&0x3)
-		UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
-		// EA is the effective ram address for a 16-bit block
-		UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
-		// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-		UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
-		// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-		UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
-		//printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
-		// patmask should be vg_patmask >>1 unless vg_patmask is 0x1 in which case it is 0x80
-		UINT8 PATMask = state->m_vgPAT_Mask >> 1;
-		if (PATMask == 0) PATMask = 0x80;
-		UINT8 thisNyb = 0;
-		UINT16 blockRemain = 0;
-		switch(nybbleNum)
-		{
-			case 2: // modify the right nybble only (from the first byte)
-				thisNyb = (block&0x0F00)>>8;
-				blockRemain = (block&0xF0FF); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-				state->m_LASTVRAM = thisNyb;
-				block = blockRemain | (thisNyb<<8);
-				break;
-			case 1: // modify the left nybble only (from the second byte)
-				thisNyb = (block&0x00F0)>>4;
-				blockRemain = (block&0xFF0F); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-				state->m_LASTVRAM = thisNyb;
-				block = blockRemain | (thisNyb<<4);
-				break;
-			case 0: // modify the right nybble only (from the second byte)
-				thisNyb = (block&0x000F);
-				blockRemain = (block&0xFFF0); // save the rest of the block
-				thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-				state->m_LASTVRAM = thisNyb;
-				block = blockRemain | thisNyb;
-				break;
-			default: // should never EVER get here
-				fatalerror("ERROR: VK100 VG attempted to modify the attribute nybble!\n");
-				break;
-		}
-		// check if the attribute nybble is supposed to be modified, and if so do so
-		if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
-		// finally write the block back to ram
-		state->m_vram[(EA<<1)+1] = block&0xFF;
-		state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
-		// HACK: we need the proper direction rom dump for this!
-		switch(state->m_vgDIR&0x7)
-		{
-			case 0:
-				state->m_vgX++;
-				break;
-			case 7:
-				state->m_vgX++;
-				state->m_vgY++;
-				break;
-			case 6:
-				state->m_vgY++;
-				break;
-			case 5:
-				state->m_vgX--;
-				state->m_vgY++;
-				break;
-			case 4:
-				state->m_vgX--;
-				break;
-			case 3:
-				state->m_vgX--;
-				state->m_vgY--;
-				break;
-			case 2:
-				state->m_vgY--;
-				break;
-			case 1:
-				state->m_vgX++;
-				state->m_vgY--;
-				break;
-		}
-		//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
-		if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
-			state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
-			state->m_vgPAT_Mask >>= 1;
-			if ((state->m_vgPAT_Mask) == 0x00) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
-			}
+		case 2: // modify the right nybble only (from the first byte)
+			thisNyb = (block&0x0F00)>>8;
+			blockRemain = (block&0xF0FF); // save the rest of the block
+			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			state->m_LASTVRAM = thisNyb;
+			block = blockRemain | (thisNyb<<8);
+			break;
+		case 1: // modify the left nybble only (from the second byte)
+			thisNyb = (block&0x00F0)>>4;
+			blockRemain = (block&0xFF0F); // save the rest of the block
+			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			state->m_LASTVRAM = thisNyb;
+			block = blockRemain | (thisNyb<<4);
+			break;
+		case 0: // modify the right nybble only (from the second byte)
+			thisNyb = (block&0x000F);
+			blockRemain = (block&0xFFF0); // save the rest of the block
+			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			state->m_LASTVRAM = thisNyb;
+			block = blockRemain | thisNyb;
+			break;
+		default: // should never EVER get here
+			fatalerror("ERROR: VK100 VG attempted to modify the attribute nybble!\n");
+			break;
 	}
+	// check if the attribute nybble is supposed to be modified, and if so do so
+	if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
+	// finally write the block back to ram
+	state->m_vram[(EA<<1)+1] = block&0xFF;
+	state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+	// HACK: we need the proper direction rom dump for this!
+	switch(state->m_vgDIR&0x7)
+	{
+		case 0:
+			state->m_vgX++;
+			break;
+		case 7:
+			state->m_vgX++;
+			state->m_vgY++;
+			break;
+		case 6:
+			state->m_vgY++;
+			break;
+		case 5:
+			state->m_vgX--;
+			state->m_vgY++;
+			break;
+		case 4:
+			state->m_vgX--;
+			break;
+		case 3:
+			state->m_vgX--;
+			state->m_vgY--;
+			break;
+		case 2:
+			state->m_vgY--;
+			break;
+		case 1:
+			state->m_vgX++;
+			state->m_vgY--;
+			break;
+	}
+	//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
+	if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
+		state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
+		state->m_vgPAT_Mask >>= 1;
+		if ((state->m_vgPAT_Mask) == 0x00) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
+		}
+	if (state->m_GO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/6), FUNC(execute_vg)); // note the 6 is wrong, need to find exact val for this; also varies somewhat by vector type.
 }
 
 /*
