@@ -7,9 +7,16 @@
 
         Todo:
               handle blink attribute in the vram display renderer
-              fix vector generator hardware enough to write stuff to vram LEGIBLY
+              * figure out the timing for this, framewise
+                guessing its some power of 2 vblanks clocking a j/k flipflop
+              * fix vector generator hardware enough to pass the startup self test
               * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
-              hook up baud generator to i8251 rx and tx clocks
+                btw, dump those two proms from andy's board
+              * figure out the remaining 3 bits in the SOPS register.
+                two control the 8251 serial hookup, but what does the third do?
+              * figure out the correct meaning of systat b register
+              * figure out how the dipswitches get read, they're hooked up wrong
+              * hook up baud generator to i8251 rx and tx clocks
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -91,8 +98,10 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 
     - X 0 0 X 0 X (0x1A) = Vector time-out error
     X - 0 X X X X (0x30) "
-
+Not sure exactly what this tests, likely tries firing the vector generator
+state machine and sees if the GO bit ever finishes and goes back to 0
 */
+
 // show messages related to writes to the 0x4x VG registers
 #undef VG40_VERBOSE
 // show messages related to writes to the 0x6x VG registers
@@ -103,6 +112,9 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 #undef KBD_VERBOSE
 // debug the pattern reg
 #undef PAT_DEBUG
+// show reads from the two systat registers
+#undef SYSTAT_A_VERBOSE
+#undef SYSTAT_B_VERBOSE
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -144,7 +156,7 @@ public:
 	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
 	UINT8 m_BAUD;
-	UINT8 m_EX_TYPE;
+	UINT8 m_VG_MODE;
 	UINT8 m_LASTVRAM;
 	UINT8 m_GO;
 	
@@ -405,13 +417,12 @@ WRITE8_MEMBER(vk100_state::vgWOPS)
 WRITE8_MEMBER(vk100_state::vgEX_MOV)
 {
 #ifdef VG60_VERBOSE
-	logerror("VG Execute Move 0x64 written: stub!\n");
+	logerror("VG Execute Move 0x64 written with %d\n", data);
 #endif
-	// TODO: short term: do some calculations here and print the expected starting ram address etc
-	// TODO: long term: fire a timer and actually move the ram with correct timing
+	// TODO: what the heck does this DO? dump vector prom
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100;
-	m_EX_TYPE = 0;
+	m_VG_MODE = 0;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
@@ -420,13 +431,12 @@ WRITE8_MEMBER(vk100_state::vgEX_MOV)
 WRITE8_MEMBER(vk100_state::vgEX_DOT)
 {
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x65: Execute Dot written: stub!\n");
+	logerror("VG: 0x65: Execute Dot written with %d\n", data);
 #endif
-	// TODO: short term: do some calculations here and print the expected starting ram address etc
-	// TODO: long term: fire a timer and actually draw the dot to ram with correct timing
+	// TODO: what the heck does this DO? dump vector prom
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_EX_TYPE = 1;
+	m_VG_MODE = 1;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
@@ -435,13 +445,11 @@ WRITE8_MEMBER(vk100_state::vgEX_DOT)
 WRITE8_MEMBER(vk100_state::vgEX_VEC)
 {
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x66: Execute Vector written: stub!\n");
+	logerror("VG: 0x66: Execute Vector written with %d\n", data);
 #endif
-	// TODO: short term: do some calculations here and print the expected starting ram address etc
-	// TODO: long term: fire a timer and actually draw the vector to ram with correct timing
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_EX_TYPE = 2;
+	m_VG_MODE = 2;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
@@ -450,13 +458,12 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 WRITE8_MEMBER(vk100_state::vgEX_ER)
 {
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x67: Execute Arbitrary 'error' vector written: stub!\n");
+	logerror("VG: 0x67: Execute Arbitrary 'error' vector written with %d\n", data);
 #endif
-	// TODO: short term: do some calculations here and print the expected starting ram address etc
-	// TODO: long term: fire a timer and actually use the state machine to draw the vector to ram with correct timing
+	// TODO: what the heck does this DO? dump vector prom
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_EX_TYPE = 3;
+	m_VG_MODE = 3;
 	m_GO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
@@ -500,12 +507,25 @@ WRITE8_MEMBER(vk100_state::BAUD)
 */
 READ8_MEMBER(vk100_state::SYSTAT_A)
 {
+#ifdef SYSTAT_A_VERBOSE
+	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
+#endif
 	return ((m_GO?0:1)<<7)|(m_LASTVRAM<<3)|0x7;
 }
 
-/* port 0x48: "SYSTAT B"; NOT documented in the tech manual */
+/* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
+ * ?      ?      ?      ?      ?      ?      ?      ?
+ * d7     d6     d5     d4     d3     d2     d1     d0 
+ * according to the code at 606, the systat b register has something
+ * to do with the uart 8251, though what exactly is unclear.
+ * it XORs the read of systat_b with the E register (which holds 0x6)
+ * and checks the result
+ */
 READ8_MEMBER(vk100_state::SYSTAT_B)
 {
+#ifdef SYSTAT_B_VERBOSE
+	logerror("0x%04X: SYSTAT_B Read!\n", cpu_get_pc(m_maincpu));
+#endif
 	return ioport("SWITCHES")->read();
 }
 
@@ -748,21 +768,9 @@ static MACHINE_RESET( vk100 )
 	state->m_vgDIR = 0;
 	state->m_vgWOPS = 0;
 	state->m_BAUD = 0;
-	state->m_EX_TYPE = 0;
+	state->m_VG_MODE = 0;
 	state->m_LASTVRAM = 0xF;
 	state->m_GO = 0;
-}
-
-static DRIVER_INIT( vk100 )
-{
-	/*UINT8 *gfx = machine.root_device().memregion("vram")->base();
-	// for debug purposes, set the entire screen to a hash pattern
-	for (int i = 0; i < 0x8000; i+=2)
-	{
-		gfx[i] = 0xFA;
-		gfx[i+1] = 0xAA;
-		//gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	}*/
 }
 
 static PALETTE_INIT( vk100 )
@@ -919,12 +927,12 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
-	// this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+	// this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
 	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	// not sure what this prom is, it may relate somehow to addressing or modifying vram. (256*4, 82s129)
+	// not sure what this prom is, it may relate somehow to addressing or modifying vram, or the systat b register and dipswitches. (256*4, 82s129)
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	// this is probably the "SYNC ROM" since only addresses 0-6 are used within every 8 byte chunk. (256*8, 82s135)
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
@@ -937,4 +945,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
