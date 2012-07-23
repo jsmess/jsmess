@@ -932,11 +932,29 @@ i.e. addr bits 9876543210
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
 	// not sure what this prom is, it may relate somehow to addressing or modifying vram, or the systat b register and dipswitches. (256*4, 82s129)
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
-	// this is probably the "SYNC ROM" since only addresses 0-6 are used within every 8 byte chunk. (256*8, 82s135)
+	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
+	 * the vector rom bits are complex and are unfortunately poorly documented
+	 * in the tech manual. see figure 5-23.
+	 * addr bits: 76543210
+	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
+	 *            ||\\---- ?VG_MODE?
+	 *            |\------ CARRY_IN
+	 *            \------- ?
+	 *
+	 * data bits: 76543210
+	 *            |||||||\-- ? MAYBE WRT L
+	 *            ||||||\--- ? MAYBE /PIXEL WRT (ahead by 2 clocks?)
+	 *            |||||\---- ? MAYBE /SYSTAT_A WRT (ahead by 2 clocks?)
+	 *            ||||\----- /LD ERROR (strobes calculated value into the vgERR register)
+	 *            |||\------ ? MAYBE STROBE L (delayed by 2 clocks?)
+	 *            ||\------- ? possibly carry out
+	 *            |\-------- C0 (high during DVM read, low otherwise)
+	 *            \--------- ? 
+	 */
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
-	// the following == mb6309 (256x8, 82s135) // probably direction rom
+	// the following == mb6309 (256x8, 82s135) // DIRECTION rom
 	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0200, 0x0100, NO_DUMP)  // label verified from andy's board
-	// the following = mb6331 (32x8, 82s123) // MAYBE vector rom
+	// the following = mb6331 (32x8, 82s123) // SYNC rom
 	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0300, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
