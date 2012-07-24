@@ -350,9 +350,9 @@ WRITE8_MEMBER(vk100_state::vgSOPS)
 {
 	static const char *const serialDest[4] = { "EIA232", "20ma", "Hardcopy", "Loopback/test" };
 	m_vgSOPS = data;
-//#ifdef VG40_VERBOSE
+#ifdef VG40_VERBOSE
 	logerror("VG: 0x45: SOPS Reg loaded with %02X: Background KGRB: %d%d%d%d, Blink: %d, Serial select: %s, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>3)&1, serialDest[(m_vgSOPS>>1)&3], m_vgSOPS&1);
-//#endif
+#endif
 }
 
 /* port 0x46: "PAT" load vg Pattern register */
