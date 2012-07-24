@@ -11,7 +11,6 @@
               * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
                 btw, dump those two proms from andy's board
               * figure out the correct meaning of systat b register
-              * figure out how the dipswitches get read, they're hooked up wrong
               * hook up baud generator to i8251 rx and tx clocks
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
