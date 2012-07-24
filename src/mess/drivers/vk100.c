@@ -467,7 +467,7 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
-/* port 0x67: "EX ER" execute an arbitrary bresenham vector (start the state machine) */
+/* port 0x67: "EX ER" execute an "erase"? */
 WRITE8_MEMBER(vk100_state::vgEX_ER)
 {
 #ifdef VG60_VERBOSE
@@ -514,7 +514,7 @@ WRITE8_MEMBER(vk100_state::BAUD)
  * this appears to be the only way the vram can be READ by the cpu
  
  31D reads and checks d7 in a loop
- 205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 0101?)
+ 205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 1010?)
  299 reads, rotates result right 3 times and ANDs the result with 0x0F
  2A4 reads, rotates result left 1 time and ANDS the result with 0xF0
 */
@@ -531,6 +531,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * d7     d6     d5     d4     d3     d2     d1     d0 
  * according to the code at 606, the systat b register has something
  * to do with the uart 8251, though what exactly is unclear.
+ * the ACTS (inverse of DCTS) signal lives in one of these bits (see 5-62)
  * it XORs the read of systat_b with the E register (which holds 0x6)
  * and checks the result
  */
