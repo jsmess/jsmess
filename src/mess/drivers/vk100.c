@@ -98,6 +98,11 @@ Not sure exactly what this tests, likely tries firing the vector generator
 state machine and sees if the GO bit ever finishes and goes back to 0
 */
 
+// named timer IDs
+#define TID_I8251_RX 1
+#define TID_I8251_TX 2
+#define TID_SYNC 3
+
 // show messages related to writes to the 0x4x VG registers
 #undef VG40_VERBOSE
 // show messages related to writes to the 0x6x VG registers
@@ -128,13 +133,19 @@ public:
 		m_screen(*this, "screen"),
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, BEEPER_TAG),
-		m_uart(*this, "i8251")
+		m_uart(*this, "i8251")//,
+		//m_i8251_rx_timer(NULL),
+		//m_i8251_tx_timer(NULL),
+		//m_sync_timer(NULL)
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_uart;
+	//required_device<device_t> m_i8251_rx_timer;
+	//required_device<device_t> m_i8251_tx_timer;
+	//required_device<device_t> m_sync_timer;
 
 	UINT8* m_vram;
 	UINT8* m_trans;
@@ -348,9 +359,9 @@ WRITE8_MEMBER(vk100_state::vgERR)
  */
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
-	static const char *const serialDest[4] = { "EIA232", "20ma", "Hardcopy", "Loopback/test" };
 	m_vgSOPS = data;
 #ifdef VG40_VERBOSE
+	static const char *const serialDest[4] = { "EIA232", "20ma", "Hardcopy", "Loopback/test" };
 	logerror("VG: 0x45: SOPS Reg loaded with %02X: Background KGRB: %d%d%d%d, Blink: %d, Serial select: %s, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>3)&1, serialDest[(m_vgSOPS>>1)&3], m_vgSOPS&1);
 #endif
 }
@@ -505,13 +516,18 @@ WRITE8_MEMBER(vk100_state::BAUD)
 {
 	m_BAUD = data;
 	logerror("IO: 0x6C: write of %02X, TODO: set the i8251 clocks as appropriate here!\n", m_BAUD);
+	//TODO: adjust the rate of the rx and tx timers here
 }
 
-/* port 0x40: "SYSTAT A"; various status bits, poorly documented in the tech manual
- * /GO    BIT3   BIT2   BIT1   BIT0   ?      ?      ?
- * d7     d6     d5     d4     d3     d2     d1     d0 
+/* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
+ * /GO    BIT3   BIT2   BIT1   BIT0   Dip       ?      ?
+ *                                    Switch
+ * d7     d6     d5     d4     d3     d2        d1     d0 
  * bit3, 2, 1, 0 are the last 4 bits read by the vector generator from VRAM
  * this appears to be the only way the vram can be READ by the cpu
+ d2 is where the dipswitch values are read from, based on the offset
+ d1 is unknown
+ d0 is unknown
  
  31D reads and checks d7 in a loop
  205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 1010?)
@@ -523,7 +539,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|0x7;
+	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|(((ioport("SWITCHES")->read()>>offset)&1)?0x4:0)|0x3;
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
@@ -540,7 +556,7 @@ READ8_MEMBER(vk100_state::SYSTAT_B)
 #ifdef SYSTAT_B_VERBOSE
 	logerror("0x%04X: SYSTAT_B Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return ioport("SWITCHES")->read();
+	return 0xFF;
 }
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
@@ -589,8 +605,8 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	AM_RANGE (0x40, 0x40) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
-	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (dipswitches?)
+	AM_RANGE (0x40, 0x47) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
+	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff and maybe dipswitches)
 	AM_RANGE(0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
 	AM_RANGE(0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
@@ -787,14 +803,6 @@ static MACHINE_RESET( vk100 )
 	state->m_vgGO = 0;
 }
 
-static PALETTE_INIT( vk100 )
-{
-	int i;
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb( machine, i, (i&2)?0xFF:0x00, (i&4)?0xFF:0x00, (i&1)?0xFF:0x00);
-}
-
-
 static INTERRUPT_GEN( vk100_vertical_interrupt )
 {
 	vk100_state *state = device->machine().driver_data<vk100_state>();
@@ -812,6 +820,14 @@ static WRITE_LINE_DEVICE_HANDLER(i8251_txrdy_int)
 {
 	vk100_state *m_state = device->machine().driver_data<vk100_state>();
 	device_set_input_line(m_state->m_maincpu, I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
+}
+
+static DRIVER_INIT( vk100 )
+{
+	// figure out how the heck to initialize the timers here
+	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
+	//m_i8251_tx_timer = timer_alloc(TID_I8251_TX);
+	//m_i8251_sync_timer = timer_alloc(TID_SYNC);
 }
 
 static VIDEO_START( vk100 )
@@ -870,6 +886,8 @@ static const i8251_interface i8251_intf =
 {
 	DEVCB_NULL, // in_rxd_cb
 	DEVCB_NULL, // out_txd_cb
+	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rx), // in_rxd_cb
+	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
 	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
 	DEVCB_NULL, // out_rts_cb
@@ -893,8 +911,6 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 	MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/12, mc6845_intf)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(vk100)
 	MCFG_VIDEO_START(vk100) // to set m_vram pointer properly (is there a less roundabout way to do this?)
 
 	/* i8251 uart */
@@ -1012,4 +1028,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1980, vk100,  0,      0,       vk100,     vk100,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
