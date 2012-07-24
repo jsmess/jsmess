@@ -145,11 +145,11 @@ public:
 	UINT8* m_pattern;
 	UINT16 m_vgX;
 	UINT16 m_vgY;
-	UINT8 m_vgERR;
+	UINT16 m_vgERR; // error register can cause carries which need to be caught
 	UINT8 m_vgSOPS;
 	UINT8 m_vgPAT;
 	UINT16 m_vgPAT_Mask; // current mask for PAT but <<1
-	UINT8 m_vgPMUL; // reload value for pmul_count
+	UINT8 m_vgPMUL; // reload value for PMUL_Count
 	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDU;
 	UINT8 m_vgDVM;
@@ -158,7 +158,7 @@ public:
 	UINT8 m_BAUD;
 	UINT8 m_VG_MODE;
 	UINT8 m_LASTVRAM;
-	UINT8 m_GO;
+	UINT8 m_vgGO;
 	
 	DECLARE_WRITE8_MEMBER(vgLD_X);
 	DECLARE_WRITE8_MEMBER(vgLD_Y);
@@ -247,9 +247,27 @@ static TIMER_CALLBACK( execute_vg )
 	}
 	// check if the attribute nybble is supposed to be modified, and if so do so
 	if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
-	// finally write the block back to ram
-	state->m_vram[(EA<<1)+1] = block&0xFF;
-	state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
+	switch (state->m_VG_MODE)
+	{
+		case 0: // move; adjusts the x and y but doesn't write anything. do nothing
+			break;
+		case 1: // dot: only write the LAST pixel in the chain TODO: some fallthrough magic here?
+			if ((state->m_vgPAT_Mask) == 0x01)
+			{
+				state->m_vram[(EA<<1)+1] = block&0xFF;
+				state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+			}
+			break;
+		case 2: // vec: draw the vector
+			state->m_vram[(EA<<1)+1] = block&0xFF;
+			state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+			break;
+		case 3: // er: erase?
+			state->m_vram[(EA<<1)+1] = 0;
+			state->m_vram[(EA<<1)] = (block&0xF000)>>8;
+			break;
+	}
 	// HACK: we need the proper direction rom dump for this!
 	switch(state->m_vgDIR&0x7)
 	{
@@ -286,9 +304,9 @@ static TIMER_CALLBACK( execute_vg )
 	if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
 		state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
 		state->m_vgPAT_Mask >>= 1;
-		if ((state->m_vgPAT_Mask) == 0x00) state->m_GO = 0; // check if the pattern shifter is empty, if so we're done
+		if ((state->m_vgPAT_Mask) == 0x00) state->m_vgGO = 0; // check if the pattern shifter is empty, if so we're done
 		}
-	if (state->m_GO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/6), FUNC(execute_vg)); // note the 6 is wrong, need to find exact val for this; also varies somewhat by vector type.
+	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/6), FUNC(execute_vg)); // note the 6 is wrong, need to find exact val for this; also varies somewhat by vector type.
 }
 
 /*
@@ -421,7 +439,7 @@ WRITE8_MEMBER(vk100_state::vgEX_MOV)
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100;
 	m_VG_MODE = 0;
-	m_GO = 1;
+	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
@@ -435,7 +453,7 @@ WRITE8_MEMBER(vk100_state::vgEX_DOT)
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_VG_MODE = 1;
-	m_GO = 1;
+	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
@@ -448,7 +466,7 @@ WRITE8_MEMBER(vk100_state::vgEX_VEC)
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_VG_MODE = 2;
-	m_GO = 1;
+	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
@@ -462,7 +480,7 @@ WRITE8_MEMBER(vk100_state::vgEX_ER)
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
 	m_VG_MODE = 3;
-	m_GO = 1;
+	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg)); 
 }
 
@@ -508,7 +526,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return ((m_GO?0:1)<<7)|(m_LASTVRAM<<3)|0x7;
+	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|0x7;
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
@@ -768,7 +786,7 @@ static MACHINE_RESET( vk100 )
 	state->m_BAUD = 0;
 	state->m_VG_MODE = 0;
 	state->m_LASTVRAM = 0xF;
-	state->m_GO = 0;
+	state->m_vgGO = 0;
 }
 
 static PALETTE_INIT( vk100 )
@@ -943,7 +961,7 @@ i.e. addr bits 9876543210
 	 *
 	 * data bits: 76543210
 	 *            |||||||\-- ? MAYBE WRT L
-	 *            ||||||\--- ? MAYBE /PIXEL WRT (ahead by 2 clocks?)
+	 *            ||||||\--- ? MAYBE related to the dir rom PIXEL WRT (ahead by 2 clocks?)
 	 *            |||||\---- ? MAYBE /SYSTAT_A WRT (ahead by 2 clocks?)
 	 *            ||||\----- /LD ERROR (strobes calculated value into the vgERR register)
 	 *            |||\------ ? MAYBE STROBE L (delayed by 2 clocks?)
@@ -952,9 +970,45 @@ i.e. addr bits 9876543210
 	 *            \--------- ? 
 	 */
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
-	// the following == mb6309 (256x8, 82s135) // DIRECTION rom
+	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+	 * see figure 5-24 on pahe 5-39
+	 * It tells the direction and enable for counting on the X and Y counters
+	 * and also handles the non-math related parts of the bresenham line algorithm
+	 * addr bits: 76543210
+	 *            ||||\\\\-- DIR (vgDIR register low 4 bits)
+	 *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
+	 *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
+	 *            |\-------- feedback bit from d5 gated by vclk
+	 *            \--------- GND/UNUSED?
+	 * data bits: 76543210
+	 *            |||||||\-- ENA X (enables change on X counter)
+	 *            ||||||\--- ENA Y (enables change on Y counter)
+	 *            |||||\---- Y DIRECTION (high is count down, low is count up)
+	 *            ||||\----- X DIRECTION (high is count down, low is count up)
+	 *            |||\------ PIXEL WRT
+	 *            ||\------- feedback bit to a6
+	 *            |\-------- UNUSED?
+	 *            \--------- UNUSED?
+	 */
 	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0200, 0x0100, NO_DUMP)  // label verified from andy's board
-	// the following = mb6331 (32x8, 82s123) // SYNC rom
+	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
+	 * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
+	 * The exact pins for each signal are not documented.
+	 * addr bits: 43210
+	 *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
+	 *            \------ ? (not grounded)
+	 * data bits: 76543210
+	 *            |||||||\-- ? wrt/rd
+	 *            ||||||\--- ? ras
+	 *            |||||\---- ? cas
+	 *            ||||\----- ? ld shfr
+	 *            |||\------ ? strobe
+	 *            ||\------- ? write
+	 *            |\-------- ? ra
+	 *            \--------- ? rb
+	 * ? unknown bits: RB an RA which choose which of the DU/DVM/WOPS/DIR registers in the register file are going to adders
+	 * ? /RAS and /CAS
+	 */
 	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0300, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
 
