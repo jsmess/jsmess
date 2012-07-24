@@ -535,10 +535,11 @@ WRITE8_MEMBER(vk100_state::BAUD)
 */
 READ8_MEMBER(vk100_state::SYSTAT_A)
 {
+	UINT8 dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|(((ioport("SWITCHES")->read()>>offset)&1)?0x4:0)|0x3;
+	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|0x3;
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
@@ -623,8 +624,8 @@ static INPUT_PORTS_START( vk100 )
 		PORT_DIPSETTING( 0x00, "60Hz" )
 		PORT_DIPSETTING( 0x01, "50Hz" )
 		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )			PORT_DIPLOCATION("SW:!2")
-		PORT_DIPSETTING( 0x00, "20ma port" )
-		PORT_DIPSETTING( 0x02, "EIA port" )
+		PORT_DIPSETTING( 0x00, "EIA port" )
+		PORT_DIPSETTING( 0x02, "20ma port" )
 		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )			PORT_DIPLOCATION("SW:!3")
 		PORT_DIPSETTING( 0x00, "US" )
 		PORT_DIPSETTING( 0x04, "UK" )
@@ -633,7 +634,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_DIPSETTING( 0x10, "Even" )
 		PORT_DIPSETTING( 0x08, "Odd" )
 		PORT_DIPSETTING( 0x18, "Do Not Use This Setting" )
-		PORT_DIPNAME( 0xe0, 0xe0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
+		PORT_DIPNAME( 0xe0, 0xc0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
 		PORT_DIPSETTING( 0x00, "110" )
 		PORT_DIPSETTING( 0x80, "300" )
 		PORT_DIPSETTING( 0x40, "600" )
