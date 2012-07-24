@@ -306,7 +306,7 @@ static TIMER_CALLBACK( execute_vg )
 		state->m_vgPAT_Mask >>= 1;
 		if ((state->m_vgPAT_Mask) == 0x00) state->m_vgGO = 0; // check if the pattern shifter is empty, if so we're done
 		}
-	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/6), FUNC(execute_vg)); // note the 6 is wrong, need to find exact val for this; also varies somewhat by vector type.
+	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), FUNC(execute_vg)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /*
@@ -999,15 +999,13 @@ i.e. addr bits 9876543210
 	 *            \------ ? (not grounded)
 	 * data bits: 76543210
 	 *            |||||||\-- ? wrt/rd
-	 *            ||||||\--- ? ras
-	 *            |||||\---- ? cas
+	 *            ||||||\--- ? /RAS
+	 *            |||||\---- ? /CAS
 	 *            ||||\----- ? ld shfr
 	 *            |||\------ ? strobe
 	 *            ||\------- ? write
-	 *            |\-------- ? ra
-	 *            \--------- ? rb
-	 * ? unknown bits: RB an RA which choose which of the DU/DVM/WOPS/DIR registers in the register file are going to adders
-	 * ? /RAS and /CAS
+	 *            |\-------- ? ra\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
+	 *            \--------- ? rb/
 	 */
 	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0300, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
 ROM_END
