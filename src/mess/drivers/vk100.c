@@ -6,14 +6,10 @@
         28/07/2009 added Guru-readme(TM)
 
         Todo:
-              handle blink attribute in the vram display renderer
-              * figure out the timing for this, framewise
-                guessing its some power of 2 vblanks clocking a j/k flipflop
               * fix vector generator hardware enough to pass the startup self test
+                the tests are described on page 6-5 thru 6-8 of the tech reference
               * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
                 btw, dump those two proms from andy's board
-              * figure out the remaining 3 bits in the SOPS register.
-                two control the 8251 serial hookup, but what does the third do?
               * figure out the correct meaning of systat b register
               * figure out how the dipswitches get read, they're hooked up wrong
               * hook up baud generator to i8251 rx and tx clocks
@@ -345,17 +341,18 @@ WRITE8_MEMBER(vk100_state::vgERR)
 }
 
 /* port 0x45: "SOPS" screen options 
- * Blink --Background color--  ?     Serial Select?  Reverse
- * Enable Green  Red    Blue   ?      ?      ?      BG/FG
+ * Blink --Background color--  Blink Serial Select  Reverse
+ * Enable Green  Red    Blue   Control              BG/FG
  * d7     d6     d5     d4     d3     d2     d1     d0
  * apparently, 00 = rs232/eia, 01 = 20ma, 10 = hardcopy, 11 = test/loopback 
  */
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
+	static const char *const serialDest[4] = { "EIA232", "20ma", "Hardcopy", "Loopback/test" };
 	m_vgSOPS = data;
-#ifdef VG40_VERBOSE
-	logerror("VG: 0x45: SOPS Reg loaded with %02X: Blink: %d, Background GRB: %d%d%d, Serial select: %x, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>1)&7, m_vgSOPS&1);
-#endif
+//#ifdef VG40_VERBOSE
+	logerror("VG: 0x45: SOPS Reg loaded with %02X: Background KGRB: %d%d%d%d, Blink: %d, Serial select: %s, Reverse BG/FG: %d\n", m_vgSOPS, (m_vgSOPS>>7)&1, (m_vgSOPS>>6)&1, (m_vgSOPS>>5)&1, (m_vgSOPS>>4)&1, (m_vgSOPS>>3)&1, serialDest[(m_vgSOPS>>1)&3], m_vgSOPS&1);
+//#endif
 }
 
 /* port 0x46: "PAT" load vg Pattern register */
@@ -828,26 +825,27 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 {
 	static const UINT32 colorTable[16] = { 
 	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
-	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF }; 
+	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF };
+	static const UINT32 colorTable2[16] = { 
+	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
+	0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000 }; 
 	//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x ", y, ma, ra, x_count);
 	/* figure out ram address based on tech manual page 5-23:
 	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0 
 	 * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
 	 */
 	vk100_state *state = device->machine().driver_data<vk100_state>();
-	//UINT8 *gfx = device->machine.root_device().memregion("vram")->base();
 	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
 	// display the 64 different 12-bit-wide chunks
 	for (int i = 0; i < 64; i++)
 	{
-		UINT16 block = state->m_vram[(EA<<1)+(2*i)+1] | (state->m_vram[(EA<<1)+(2*i)]<<8); // store big endian
-		UINT8 fgColor = (block&0xF000)>>12;
-		// TODO: blink is NOT HANDLED YET!
-		UINT8 bgColor = (state->m_vgSOPS&0xF0)>>4;
+		UINT16 block = state->m_vram[(EA<<1)+(2*i)+1] | (state->m_vram[(EA<<1)+(2*i)]<<8);
+		UINT32 fgColor = (state->m_vgSOPS&0x08)?colorTable[(block&0xF000)>>12]:colorTable2[(block&0xF000)>>12];
+		UINT32 bgColor = (state->m_vgSOPS&0x08)?colorTable[(state->m_vgSOPS&0xF0)>>4]:colorTable2[(state->m_vgSOPS&0xF0)>>4];
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
-			bitmap.pix32(y, (12*i)+j) = ((block&(0x0001<<j))^(state->m_vgSOPS&1))?colorTable[fgColor]:colorTable[bgColor];
+			bitmap.pix32(y, (12*i)+j) = (((block&(0x0001<<j))?1:0)^(state->m_vgSOPS&1))?fgColor:bgColor;
 		}
 	}
 }
