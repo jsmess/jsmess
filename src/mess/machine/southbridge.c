@@ -8,6 +8,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/southbridge.h"
 #include "machine/pc_keyboards.h"
+#include "machine/8237dma.h"
 
 const struct pic8259_interface at_pic8259_master_config =
 {

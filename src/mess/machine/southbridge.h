@@ -21,7 +21,6 @@
 #include "includes/ps2.h"
 
 #include "imagedev/harddriv.h"
-#include "machine/8237dma.h"
 #include "machine/pci.h"
 #include "machine/kb_keytro.h"
 

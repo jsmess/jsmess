@@ -62,12 +62,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( at_state::at_dma8237_2_r )
 {
-	return i8237_r( m_dma8237_2, offset / 2);
+	return m_dma8237_2->read(space, offset / 2);
 }
 
 WRITE8_MEMBER( at_state::at_dma8237_2_w )
 {
-	i8237_w( m_dma8237_2, offset / 2, data);
+	m_dma8237_2->write(space, offset / 2, data);
 }
 
 READ8_MEMBER( at_state::at_keybc_r )
@@ -105,7 +105,7 @@ WRITE8_MEMBER( at_state::write_rtc )
 
 static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
@@ -136,7 +136,7 @@ WRITE16_MEMBER( at_state::neat_chipset_w )
 
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0022, 0x0023) AM_READWRITE(neat_chipset_r, neat_chipset_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at386_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
@@ -193,7 +193,7 @@ WRITE32_MEMBER( at_state::ct486_chipset_w )
 
 static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(ct486_chipset_r, ct486_chipset_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megapc_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff) // TODO: is this the correct type?
@@ -335,14 +335,14 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir7_w),
 
 	// dma request
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq0_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq1_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq2_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq0_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq3_w),
 
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq1_w),
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq2_w),
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq3_w),
 };
 
 static SLOT_INTERFACE_START(pc_isa16_cards)
@@ -425,6 +425,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 
@@ -459,6 +460,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 
@@ -480,6 +482,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 
@@ -504,6 +507,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( atvga, at_state )
@@ -525,6 +529,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xb42639, at_state )
@@ -545,6 +550,7 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

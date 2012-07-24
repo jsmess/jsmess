@@ -36,7 +36,7 @@
 #include "includes/ps2.h"
 
 #include "imagedev/harddriv.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pci.h"
 #include "machine/kb_keytro.h"
 
@@ -99,8 +99,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<device_t> m_pic8259_master;
 	optional_device<device_t> m_pic8259_slave;
-	optional_device<device_t> m_dma8237_1;
-	optional_device<device_t> m_dma8237_2;
+	optional_device<am9517a_device> m_dma8237_1;
+	optional_device<am9517a_device> m_dma8237_2;
 	optional_device<device_t> m_pit8254;
 	optional_device<cs8221_device> m_cs8221;
 	optional_device<cs4031_device> m_cs4031;
@@ -180,8 +180,8 @@ public:
 extern const struct pic8259_interface at_pic8259_master_config;
 extern const struct pic8259_interface at_pic8259_slave_config;
 extern const struct pit8253_config at_pit8254_config;
-extern const i8237_interface at_dma8237_1_config;
-extern const i8237_interface at_dma8237_2_config;
+extern const am9517a_interface at_dma8237_1_config;
+extern const am9517a_interface at_dma8237_2_config;
 
 
 DRIVER_INIT( atcga );

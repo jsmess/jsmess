@@ -9,7 +9,7 @@
 
 #include "machine/ins8250.h"
 #include "machine/i8255.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/isa.h"
 #include "machine/pc_kbdc.h"
 #include "imagedev/cassette.h"
@@ -37,10 +37,11 @@ protected:
 
 	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler, const char *whandler_name);
+	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 public:
 	required_device<cpu_device>  m_maincpu;
 	required_device<device_t>  m_pic8259;
-	required_device<device_t>  m_dma8237;
+	required_device<am9517a_device>  m_dma8237;
 	required_device<device_t>  m_pit8253;
 	required_device<i8255_device>  m_ppi8255;
 	required_device<device_t>  m_speaker;

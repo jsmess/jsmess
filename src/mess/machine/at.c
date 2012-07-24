@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER( at_state::pc_dma_hrq_changed )
 	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_2, state );
+	m_dma8237_2->hack_w(state);
 }
 
 READ8_MEMBER(at_state::pc_dma_read_byte)
@@ -229,14 +229,14 @@ WRITE_LINE_MEMBER( at_state::pc_dack0_w ) { set_dma_channel(m_dma8237_1, 0, stat
 WRITE_LINE_MEMBER( at_state::pc_dack1_w ) { set_dma_channel(m_dma8237_1, 1, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack2_w ) { set_dma_channel(m_dma8237_1, 2, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack3_w ) { set_dma_channel(m_dma8237_1, 3, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack4_w ) { i8237_hlda_w( m_dma8237_1, state ? 0 : 1); } // it's inverted
+WRITE_LINE_MEMBER( at_state::pc_dack4_w ) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
 WRITE_LINE_MEMBER( at_state::pc_dack5_w ) { set_dma_channel(m_dma8237_2, 5, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack6_w ) { set_dma_channel(m_dma8237_2, 6, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack7_w ) { set_dma_channel(m_dma8237_2, 7, state); }
 
 I8237_INTERFACE( at_dma8237_1_config )
 {
-	DEVCB_DEVICE_LINE("dma8237_2",i8237_dreq0_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq0_w),
 	DEVCB_DRIVER_LINE_MEMBER(at_state, at_dma8237_out_eop),
 	DEVCB_DRIVER_MEMBER(at_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(at_state, pc_dma_write_byte),

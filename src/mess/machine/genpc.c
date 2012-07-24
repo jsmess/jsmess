@@ -11,7 +11,6 @@
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/8237dma.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
@@ -64,7 +63,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237, state );
+	m_dma8237->hack_w(state);
 }
 
 
@@ -122,7 +121,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_3_dack_w )
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_0_dack_w )
 {
 	m_u73_q2 = 0;
-	i8237_dreq0_w( m_dma8237, m_u73_q2 );
+	m_dma8237->dreq0_w( m_u73_q2 );
 }
 
 
@@ -199,7 +198,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
 	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
 	{
 		m_u73_q2 = 1;
-		i8237_dreq0_w( m_dma8237, m_u73_q2 );
+		m_dma8237->dreq0_w( m_u73_q2 );
 	}
 	m_out1 = state;
 }
@@ -422,9 +421,9 @@ static const isa8bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("pic8259", pic8259_ir7_w),
 
 	// dma request
-	DEVCB_DEVICE_LINE("dma8237", i8237_dreq1_w),
-	DEVCB_DEVICE_LINE("dma8237", i8237_dreq2_w),
-	DEVCB_DEVICE_LINE("dma8237", i8237_dreq3_w)
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq3_w)
 };
 
 static const pc_kbdc_interface pc_kbdc_intf =
@@ -583,6 +582,23 @@ void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t
 	}
 }
 
+void ibm5160_mb_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+{
+	int buswidth = m_maincpu->memory().space_config(AS_IO)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			break;
+		case 16:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
+			break;
+		default:
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -590,7 +606,7 @@ void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t
 
 void ibm5160_mb_device::device_start()
 {
-	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, FUNC(i8237_r), FUNC(i8237_w) );
+	install_device(0x0000, 0x000f, 0, 0, read8_delegate(FUNC(am9517a_device::read), (am9517a_device*)m_dma8237), write8_delegate(FUNC(am9517a_device::write), (am9517a_device*)m_dma8237) );
 	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );
 	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );
 
@@ -632,7 +648,7 @@ void ibm5160_mb_device::device_reset()
 	device_set_irq_callback(m_maincpu, pc_irq_callback);
 
 	m_u73_q2 = 0;
-	m_out1 = 0;
+	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
 	m_pc_input = 0;
 	m_dma_channel = 0;
