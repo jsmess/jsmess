@@ -22,11 +22,10 @@
 
     per-game specific TODO:
     - 177: gameplay is too fast (parent pc8801 only);
-    - Acro Jet: hangs waiting for an irq;
+    - Acro Jet: hangs waiting for an irq (floppy issue);
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
-    - Alpha (demo): crashes with "illegal function" msg;
-    - Aploon: crashes because it doesn't clear irqs when it's supposed to do so;
+    - Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
     - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
@@ -161,6 +160,10 @@
 //#include "includes/pc8801.h"
 
 //#define USE_PROPER_I8214
+
+
+#define IRQ_DEBUG		(0)
+#define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
 #define MASTER_CLOCK XTAL_4MHz
 
@@ -1049,6 +1052,8 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 		m_i8214_irq_level = 7;
 	else
 		m_i8214_irq_level = data & 7;
+
+	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
 }
 
 
@@ -1062,6 +1067,11 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 
 	if(m_vrtc_irq_mask == 0)
 		m_vrtc_irq_latch = 0;
+
+	if(m_timer_irq_mask == 0 && m_vrtc_irq_mask == 0)
+		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+
+	IRQ_LOG(("%02x MASK\n",data));
 
 	//if(data & 4)
 	//  printf("IRQ mask %02x\n",data);
@@ -1274,7 +1284,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_ctrl2_w)
 WRITE8_MEMBER(pc8801_state::pc8801_pcg8100_w)
 {
 	if(data)
-	printf("Write to PCG-8100 %02x %02x\n",offset,data);
+		printf("Write to PCG-8100 %02x %02x\n",offset,data);
 }
 
 /* Balance of Power temp work-around */
@@ -1566,7 +1576,7 @@ static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
-//  AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
+	AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w )
@@ -1984,46 +1994,52 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 }
 
 #else
+
+#include "debugger.h"
+
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_i8214_irq_level >= 5 && state->m_sound_irq_latch)
+	if(state->m_sound_irq_latch)
 	{
 		state->m_sound_irq_latch = 0;
 		return 4*2;
 	}
-	else if(state->m_i8214_irq_level >= 2 && state->m_vrtc_irq_latch)
+	else if(state->m_vrtc_irq_latch)
 	{
 		state->m_vrtc_irq_latch = 0;
 		return 1*2;
 	}
-	else if(state->m_i8214_irq_level >= 3 && state->m_timer_irq_latch)
+	else if(state->m_timer_irq_latch)
 	{
 		state->m_timer_irq_latch = 0;
 		return 2*2;
 	}
 
 	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",state->m_i8214_irq_level,state->m_sound_irq_latch,state->m_vrtc_irq_latch,state->m_timer_irq_latch);
+	debugger_break(device->machine());
 
-	return 2*2; //TODO: mustn't happen, it does if you press shift on N88-BASIC
+	return 4*2; //TODO: mustn't happen
 }
 
 static void pc8801_sound_irq( device_t *device, int irq )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_sound_irq_mask)
+	if(state->m_sound_irq_mask && state->m_i8214_irq_level >= 5 && irq)
 	{
-		state->m_sound_irq_latch = irq;
-		cputag_set_input_line(device->machine(),"maincpu",0,irq);
+		state->m_sound_irq_latch = 1;
+		//IRQ_LOG(("sound\n"));
+		cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
 	}
 }
 
 static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 {
 	pc8801_state *state = timer.machine().driver_data<pc8801_state>();
-	if(state->m_timer_irq_mask)
+	if(state->m_timer_irq_mask && state->m_i8214_irq_level >= 3)
 	{
 		state->m_timer_irq_latch = 1;
+		//IRQ_LOG(("timer\n"));
 		cputag_set_input_line(timer.machine(),"maincpu",0,HOLD_LINE);
 	}
 }
@@ -2031,9 +2047,10 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_vrtc_irq_mask)
+	if(state->m_vrtc_irq_mask && state->m_i8214_irq_level >= 2)
 	{
 		state->m_vrtc_irq_latch = 1;
+		//IRQ_LOG(("vrtc\n"));
 		device_set_input_line(device,0,HOLD_LINE);
 	}
 }
