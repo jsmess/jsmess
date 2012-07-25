@@ -26,12 +26,15 @@
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
     - Alpha (demo): stuck note in title screen, doesn't seem to go further;
-    - Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
+    - Balance of Power: uses the SIO port for mouse polling;
     - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
+	- The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything.
     - Blue Moon Story: moans with a kanji msg;.
     - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
+	- Carrot: gfxs are messed up
+	- Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
     - Hang-On: typical busted attributes for a N-BASIC game
@@ -49,8 +52,13 @@
     - Burunet
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
+    - Cuby Panic (copy protection routine at 0x911A)
+    - Combat
+    - Harakiri
+    - Kuronekosou Souzoku Satsujin Jiken ("Illegal function call in 105")
     - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
+	- Mr. Pro Yakyuu
     - Space Harrier
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
@@ -1053,7 +1061,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 	else
 		m_i8214_irq_level = data & 7;
 
-	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
+	//IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
 }
 
 
@@ -1071,7 +1079,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 	if(m_timer_irq_mask == 0 && m_vrtc_irq_mask == 0)
 		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
 
-	IRQ_LOG(("%02x MASK\n",data));
+	//IRQ_LOG(("%02x MASK\n",data));
 
 	//if(data & 4)
 	//  printf("IRQ mask %02x\n",data);
