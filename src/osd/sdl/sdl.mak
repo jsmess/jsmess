@@ -505,6 +505,11 @@ LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
 
+# can't use native libs with emscripten
+ifeq ($(TARGETOS),emscripten)
+LIBS =
+endif
+
 #-------------------------------------------------
 # Dependencies
 #-------------------------------------------------
