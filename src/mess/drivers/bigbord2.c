@@ -131,7 +131,7 @@ public:
 	bool m_fdc_drq;						/* data request */
 	bool m_8n5;							/* 5.25" / 8" drive select */
 	bool m_dsdd;							/* double sided disk detect */
-	bool m_c8[8];
+	int m_c8[8];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_6845;
