@@ -30,7 +30,8 @@ extern DRIVER_INIT( llc1 );
 extern MACHINE_START( llc1 );
 extern MACHINE_RESET( llc1 );
 
-extern const z80pio_interface llc1_z80pio_intf;
+extern const z80pio_interface llc1_z80pio1_intf;
+extern const z80pio_interface llc1_z80pio2_intf;
 extern const z80pio_interface llc2_z80pio_intf;
 
 extern const z80ctc_interface llc1_ctc_intf;

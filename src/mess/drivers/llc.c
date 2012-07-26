@@ -14,9 +14,10 @@
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
 #include "includes/llc.h"
+#include "llc1.lh"
 
 /* Address maps */
-static ADDRESS_MAP_START(llc1_mem, AS_PROGRAM, 8, llc_state )
+static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
 	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
@@ -27,12 +28,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( llc1_io, AS_IO, 8, llc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xEC, 0xEF) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	//AM_RANGE(0xF4, 0xF7) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xEC, 0xEF) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xF4, 0xF7) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(llc2_mem, AS_PROGRAM, 8, llc_state )
+static ADDRESS_MAP_START( llc2_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK("bank3")
@@ -116,12 +117,12 @@ static INPUT_PORTS_START( llc1 )
 	PORT_START("LINE7")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_TILDE)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_SLASH_PAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
 	PORT_START("LINE8")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
@@ -273,6 +274,14 @@ INPUT_PORTS_END
 
 static const z80_daisy_config llc1_daisy_chain[] =
 {
+	{ "z80pio2" },
+	{ "z80ctc" },
+	{ "z80pio1" },
+	{ NULL }
+};
+
+static const z80_daisy_config llc2_daisy_chain[] =
+{
 	{ "z80pio" },
 	{ "z80ctc" },
 	{ NULL }
@@ -306,11 +315,11 @@ static const gfx_layout llc2_charlayout =
 };
 
 static GFXDECODE_START( llc1 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, llc1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, llc1_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( llc2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, llc2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, llc2_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine driver */
@@ -331,20 +340,21 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_SIZE(64*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(llc1)
-
 	MCFG_GFXDECODE(llc1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
 	MCFG_VIDEO_START(llc1)
+	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
-	MCFG_Z80PIO_ADD( "z80pio", XTAL_3MHz, llc1_z80pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
+	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc1_z80pio2_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( llc2, llc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
+	MCFG_CPU_CONFIG(llc2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
 
@@ -375,19 +385,20 @@ MACHINE_CONFIG_END
 
 ROM_START( llc1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, CRC(0e81378d) SHA1(0fbb6eca016d0f439ea1c9aa0cb0affb5f49ea69) )
-    ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
-    ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
-    ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
-	ROM_REGION(0x0400, "gfx1",0)
+	// bad dump ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, CRC(0e81378d) SHA1(0fbb6eca016d0f439ea1c9aa0cb0affb5f49ea69) )
+	ROM_LOAD( "llc1mon.bin", 0x0000, 0x0800, CRC(e291dd63) SHA1(31a71bef84f7c164a270d0895cb645e078e9c6f2) )
+	ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
+	ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
+	ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
+	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD ("llc1_zg.bin", 0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
 ROM_END
 
 ROM_START( llc2 )
 	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "scchmon_91.bin", 0x0000, 0x1000, CRC(218d8236) SHA1(b8297272cc79751afc2eb8688d99b40691346dcb) )
-    ROM_LOAD( "gsbasic.bin", 0x10000, 0x2000, CRC(78a5f388) SHA1(e7b475b98dce36b24540ad11eb89046ddb4f02af) )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD( "scchmon_91.bin", 0x0000, 0x1000, CRC(218d8236) SHA1(b8297272cc79751afc2eb8688d99b40691346dcb) )
+	ROM_LOAD( "gsbasic.bin", 0x10000, 0x2000, CRC(78a5f388) SHA1(e7b475b98dce36b24540ad11eb89046ddb4f02af) )
+	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("llc2font.bin", 0x0000, 0x0800, CRC(ce53e55d) SHA1(da23d93f14a8a1f8d82bb72470a96b0bfd81ed1b) )
 	ROM_REGION(0x0800, "k7659",0)
 	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
@@ -396,6 +407,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1984, llc1,	0,		0,		llc1,		llc1,		llc1,	 "<unknown>",		 "LLC-1",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1984, llc2,	llc1,	0,		llc2,		k7659,		llc2,	 "<unknown>",		 "LLC-2",		GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME       FLAGS */
+COMP( 1984, llc1,   0,      0,      llc1,       llc1,       llc1,    "SCCH",    "LLC-1", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1984, llc2,   llc1,   0,      llc2,       k7659,      llc2,    "SCCH",    "LLC-2", GAME_NO_SOUND_HW)
