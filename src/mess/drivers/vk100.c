@@ -8,10 +8,9 @@
         Todo:
               * fix vector generator hardware enough to pass the startup self test
                 the tests are described on page 6-5 thru 6-8 of the tech reference
-              * note that since two proms aren't dumped yet some stuff will have to be HLE'd for now
-                btw, dump those two proms from andy's board
+              * hook up the direction and sync prom to the sync counter
               * figure out the correct meaning of systat b register
-              * hook up baud generator to i8251 rx and tx clocks
+              * hook up smc_5016t baud generator to i8251 rx and tx clocks
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -510,7 +509,8 @@ WRITE8_MEMBER(vk100_state::KBDW)
 #endif
 }
 
-/* port 0x6C: "BAUD" sets the dividers for the rx and tx clocks on the 8251 */
+/* port 0x6C: "BAUD" controls the smc 5016t baud generator which
+ * sets the dividers for the rx and tx clocks on the 8251 */
 WRITE8_MEMBER(vk100_state::BAUD)
 {
 	m_BAUD = data;
@@ -574,7 +574,7 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x700f) AM_MIRROR(0x0ff0) AM_READ(vk100_keyboard_column_r)
+	AM_RANGE( 0x7000, 0x700f ) AM_MIRROR(0x0ff0) AM_READ(vk100_keyboard_column_r)
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -605,8 +605,8 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	AM_RANGE (0x40, 0x47) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram)
-	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff and maybe dipswitches)
+	AM_RANGE (0x40, 0x47) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
+	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff)
 	AM_RANGE(0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
 	AM_RANGE(0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
@@ -634,7 +634,7 @@ static INPUT_PORTS_START( vk100 )
 		PORT_DIPSETTING( 0x10, "Even" )
 		PORT_DIPSETTING( 0x08, "Odd" )
 		PORT_DIPSETTING( 0x18, "Do Not Use This Setting" )
-		PORT_DIPNAME( 0xe0, 0xc0, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
+		PORT_DIPNAME( 0xe0, 0x00, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
 		PORT_DIPSETTING( 0x00, "110" )
 		PORT_DIPSETTING( 0x80, "300" )
 		PORT_DIPSETTING( 0x40, "600" )
@@ -886,8 +886,8 @@ static const i8251_interface i8251_intf =
 {
 	DEVCB_NULL, // in_rxd_cb
 	DEVCB_NULL, // out_txd_cb
-	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rx), // in_rxd_cb
-	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
+	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rx), // in_rxd_cb
+	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
 	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
 	DEVCB_NULL, // out_rts_cb
@@ -924,15 +924,18 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-/* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf page 5-10 (pdf pg 114),
-The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 6fff.
+/* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
+page 5-10 (pdf pg 114), The 4 firmware roms should go from 0x0000-0x1fff,
+0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a
+little bit longer and goes to 6fff. The data goes 6000-67ff and the 6800-6ff
+area is blank.
 */
 ROM_START( vk100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-031e4-00.rom1.ic51", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
-	ROM_LOAD( "23-017e4-00.rom2.ic52", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
-	ROM_LOAD( "23-018e4-00.rom3.ic53", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
-	ROM_LOAD( "23-190e2-00.rom4.ic54", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
+	ROM_LOAD( "23-031e4-00.rom1.e53", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
+	ROM_LOAD( "23-017e4-00.rom2.e52", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
+	ROM_LOAD( "23-018e4-00.rom3.e51", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
+	ROM_LOAD( "23-190e2-00.rom4.e50", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASE00 ) // 32k of vram
 
@@ -970,9 +973,9 @@ i.e. addr bits 9876543210
 	 * in the tech manual. see figure 5-23.
 	 * addr bits: 76543210
 	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            ||\\---- ?VG_MODE?
-	 *            |\------ CARRY_IN
-	 *            \------- ?
+	 *            ||\\------ ?VG_MODE?
+	 *            |\-------- CARRY_IN
+	 *            \--------- ?
 	 *
 	 * data bits: 76543210
 	 *            |||||||\-- ? MAYBE WRT L
@@ -994,7 +997,7 @@ i.e. addr bits 9876543210
 	 *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
 	 *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
 	 *            |\-------- feedback bit from d5 gated by vclk
-	 *            \--------- GND/UNUSED?
+	 *            \--------- GND; the second half of the prom is blank (0x00)
 	 * data bits: 76543210
 	 *            |||||||\-- ENA X (enables change on X counter)
 	 *            ||||||\--- ENA Y (enables change on Y counter)
@@ -1005,7 +1008,7 @@ i.e. addr bits 9876543210
 	 *            |\-------- UNUSED?
 	 *            \--------- UNUSED?
 	 */
-	ROM_LOAD( "wb8141_059b1.tbp18s22n.pr5.ic108", 0x0200, 0x0100, NO_DUMP)  // label verified from andy's board
+	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0200, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
 	 * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
 	 * The exact pins for each signal are not documented.
@@ -1022,7 +1025,7 @@ i.e. addr bits 9876543210
 	 *            |\-------- ? ra\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
 	 *            \--------- ? rb/
 	 */
-	ROM_LOAD( "wb8214_297a1.74s288.pr6.ic89", 0x0300, 0x0100, NO_DUMP) // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8-14_297a1.74s288.pr6.ic89", 0x0300, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
 
 /* Driver */
