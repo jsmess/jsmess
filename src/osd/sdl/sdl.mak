@@ -37,6 +37,12 @@
 
 # NO_X11 = 1
 
+# uncomment next line to disable XInput support for e.g. multiple lightguns 
+# using Wiimote driver (see http://spritesmods.com/?art=wiimote-mamegun for more info)
+# enabling NO_X11 also implies no XInput support, of course.
+
+# NO_USE_XINPUT = 1
+
 # uncomment and adapt next line to link against specific GL-Library
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
@@ -94,6 +100,9 @@ endif
 ifdef NOASM
 DEFS += -DSDLMAME_NOASM
 endif
+
+# patch up problems with new zlib
+DEFS += -D_LFS64_LARGEFILE=0
 
 # bring in external flags for RPM build
 CCOMFLAGS += $(OPT_FLAGS)
@@ -193,6 +202,7 @@ ifeq ($(TARGETOS),haiku)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 NO_X11 = 1
+NO_USE_XINPUT = 1
 LIBS += -lnetwork -lbsd
 endif
 
@@ -206,6 +216,7 @@ SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDL_NETWORK = pcap
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
+NO_USE_XINPUT = 1
 ifdef BIGENDIAN
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
@@ -234,6 +245,7 @@ ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = win32
 NO_X11 = 1
+NO_USE_XINPUT = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
 LIBGL = -lopengl32
 SDLMAIN = $(SDLOBJ)/main.o
@@ -268,6 +280,7 @@ DEFS += -DSDLMAME_OS2
 SYNC_IMPLEMENTATION = os2
 NO_DEBUGGER = 1
 NO_X11 = 1
+NO_USE_XINPUT = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
 endif
@@ -549,6 +562,17 @@ INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
 
 #-------------------------------------------------
+# XInput
+#-------------------------------------------------
+
+ifneq ($(NO_USE_XINPUT),1)
+DEFS += -DUSE_XINPUT=1 -DUSE_XINPUT_DEBUG=0
+LIBS += -lXext -lXi
+else
+DEFS += -DUSE_XINPUT=0
+endif # USE_XINPUT
+
+#-------------------------------------------------
 # Network (TAP/TUN)
 #-------------------------------------------------
 
@@ -649,3 +673,4 @@ zip:
 	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
 
 endif
+
